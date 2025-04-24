@@ -137,13 +137,11 @@
     <h1>🎉 Benvenuto!</h1>
     <div class="container">
       <h2>🎯 Gioco dei Numeri 🎯</h2>
-      <p>Devi indovinare un numero segreto. </p>
-      <p>Hai <strong>5 tentativi</strong> per ogni livello.</p>
-      <p>Ci sono <strong>10 livelli</strong> sempre più difficili. Da 0 a 1000!</p>
-      <p>Buona fortuna, campione! 💪</p>
-      <p>Scegli la modalità di difficoltà:</p>
+      <p>Indovina il numero segreto! 🔐</p>
+      <p>Hai diversi livelli di difficoltà:</p>
       <button onclick="startGame('easy')">Facile</button>
-   <button onclick="startGame('hard')">Difficile</button>
+      <button onclick="startGame('medium')">Medio</button>
+      <button onclick="startGame('hard')">Difficile</button>
     </div>
   </div>
 
@@ -154,123 +152,128 @@
       <p>Inserisci un numero:</p>
       <input type="number" id="userGuess" min="0" />
       <button onclick="check()">Verifica</button>
-      <p>Tentativi rimasti: <span id="tentativi">5</span></p>
+      <p>Tentativi rimasti: <span id="tentativi">10</span></p>
       <p id="message"></p>
       <button id="retryBtn" class="hidden" onclick="retry()">🔁 Riprova</button>
-      <p id="timer" class="hidden">Tempo rimanente: <span id="timerValue">10</span> secondi</p>
+      <p id="timer" class="hidden">Tempo rimanente: <span id="timerValue">50</span> sec</p>
     </div>
   </div>
 
   <script>
     let currentLevel = 1;
     let numeroSegreto = 0;
-    let tentativiRimasti = 5;
+    let tentativiRimasti = 10;
     let score = 0;
     let timerInterval;
-    let timerValue = 10;
-    let gameMode = 'easy'; // Default difficulty
+    let timerValue = 50;
+    let gameMode = 'easy';
 
-    // Inizia il gioco
     function startGame(mode) {
       gameMode = mode;
       document.getElementById("intro").classList.add("hidden");
       document.getElementById("game").classList.remove("hidden");
+      currentLevel = 1;
+      score = 0;
       avviaLivello();
     }
 
-    // Imposta il livello e il numero segreto
     function avviaLivello() {
       const maxNumber = livelloMax(currentLevel);
       numeroSegreto = Math.floor(Math.random() * (maxNumber + 1));
-      tentativiRimasti = 5;
+      tentativiRimasti = (gameMode === 'medium') ? 8 : 10;
+
       document.getElementById("tentativi").textContent = tentativiRimasti;
       document.getElementById("livelloCorrente").textContent = currentLevel;
       document.getElementById("maxNumber").textContent = maxNumber;
       document.getElementById("message").textContent = '';
       document.getElementById("retryBtn").classList.add("hidden");
       document.getElementById("userGuess").value = '';
+      document.getElementById("timer").classList.add("hidden");
 
       if (gameMode === 'hard') {
         startTimer();
       }
     }
 
-    // Imposta la difficoltà per ogni livello
     function livelloMax(livello) {
       const valori = [10, 20, 30, 50, 70, 100, 150, 200, 500, 1000];
-      return valori[livello - 1] || 1000;  // Se il livello è superiore a 10, imposta 1000
+      return valori[livello - 1] || 1000;
     }
 
-    // Avvia il timer nella modalità difficile
     function startTimer() {
       document.getElementById("timer").classList.remove("hidden");
       timerValue = 50;
       document.getElementById("timerValue").textContent = timerValue;
 
-      timerInterval = setInterval(function() {
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
         timerValue--;
         document.getElementById("timerValue").textContent = timerValue;
         if (timerValue <= 0) {
           clearInterval(timerInterval);
           document.getElementById("message").textContent = "❌ Tempo scaduto! Il numero era " + numeroSegreto;
           document.getElementById("retryBtn").classList.remove("hidden");
+          document.getElementById("loseSound").play();
         }
       }, 1000);
     }
 
-    // Controlla la risposta dell'utente
     function check() {
       const guess = parseInt(document.getElementById("userGuess").value);
       if (isNaN(guess)) return;
 
-      if (gameMode === 'hard') {
-        clearInterval(timerInterval);
-      }
+      if (gameMode === 'hard') clearInterval(timerInterval); // Stop the timer if guessing
 
       if (guess === numeroSegreto) {
-        score += 10;  // Aggiungi punti per la risposta corretta
-        document.getElementById("message").textContent = "🎉 Bravo! Passi al prossimo livello!";
+        score += 10;
+        document.getElementById("message").textContent = "🎉 Corretto! Avanti!";
         document.getElementById("winSound").play();
         setTimeout(() => {
           if (currentLevel < 10) {
             currentLevel++;
             avviaLivello();
           } else {
-            document.getElementById("message").textContent = `🏆 Complimenti! Hai completato tutti i livelli! Punteggio finale: ${score}`;
+            document.getElementById("message").textContent = `🏆 Bravo! Hai completato il gioco! Punteggio: ${score}`;
           }
         }, 1500);
       } else {
         tentativiRimasti--;
         document.getElementById("tentativi").textContent = tentativiRimasti;
         if (tentativiRimasti === 0) {
-          document.getElementById("message").textContent = "❌ Hai perso! Il numero era " + numeroSegreto;
-          document.getElementById("retryBtn").classList.remove("hidden");
           document.getElementById("loseSound").play();
+          if (gameMode === 'medium') {
+            document.getElementById("message").textContent = "❌ Hai perso! Ricominci dal livello 1.";
+            setTimeout(() => {
+              currentLevel = 1;
+              avviaLivello();
+            }, 2000);
+          } else {
+            document.getElementById("message").textContent = "❌ Hai perso! Il numero era " + numeroSegreto;
+            document.getElementById("retryBtn").classList.remove("hidden");
+          }
         } else {
           document.getElementById("message").textContent = guess < numeroSegreto ? "📉 Troppo basso!" : "📈 Troppo alto!";
         }
       }
+
+      if (gameMode === 'hard') {
+        startTimer();  // Restart timer when checking next guess
+      }
     }
 
-    // Riprova
     function retry() {
       avviaLivello();
     }
 
-    // Torna alla home
     function goHome() {
       document.getElementById("game").classList.add("hidden");
       document.getElementById("intro").classList.remove("hidden");
-      currentLevel = 1;
-      score = 0;
-      clearInterval(timerInterval);  // Clear timer when going back home
+      clearInterval(timerInterval);
     }
 
-    // Toggle della musica
     function toggleMusic() {
       const music = document.getElementById("bgMusic");
-      if (music.paused) music.play();
-      else music.pause();
+      music.paused ? music.play() : music.pause();
     }
   </script>
 </body>
