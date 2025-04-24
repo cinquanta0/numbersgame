@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Gioco Multiplayer</title>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</head>
+<body>
+    <h1>Gioco Multiplayer</h1>
+    <button onclick="joinGame()">Entra in una stanza</button><br><br>
+
+    <input type="number" id="guess_input" placeholder="Inserisci un numero">
+    <button onclick="sendGuess()">Invia Tentativo</button>
+
+    <pre id="game_output"></pre>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Gioco Multiplayer</title>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script>
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        // Quando il gioco inizia
+        socket.emit('start_game');
+
+        // Funzione per inviare un tentativo
+        function sendGuess() {
+            const guess = document.getElementById('guess_input').value;
+            socket.emit('guess', { guess: guess });
+        }
+
+        // Ricevi messaggio di risultato
+        socket.on('result', function(data) {
+            document.getElementById('game_output').textContent = data.message;
+        });
+
+        // Ricevi messaggio di errore
+        socket.on('error', function(data) {
+            document.getElementById('game_output').textContent = data.message;
+        });
+    </script>
+</head>
+<body>
+    <h1>Gioco Multiplayer</h1>
+    <p>Benvenuto, {{ username }}! Inizia a indovinare il numero segreto.</p>
+
+    <input type="number" id="guess_input" placeholder="Inserisci un numero">
+    <button onclick="sendGuess()">Invia Tentativo</button>
+
+    <pre id="game_output"></pre>
+</body>
+</html>
