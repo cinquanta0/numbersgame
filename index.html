@@ -53,26 +53,17 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    input[type=number], button {
+    button {
       padding: 15px;
       margin: 10px 0;
       font-size: 1.2rem;
       border-radius: 12px;
       border: none;
       outline: none;
-    }
-
-    input[type=number] {
-      width: 100%;
-    }
-
-    button {
       background: #00fff2;
       color: black;
       cursor: pointer;
       font-weight: bold;
-      border: 2px solid #00cfc4;
-      font-size: 1.2rem;
     }
 
     button:hover {
@@ -121,9 +112,35 @@
     .home-btn:hover, .music-btn:hover {
       opacity: 0.9;
     }
+
+    .level-btn {
+      margin: 10px;
+      padding: 15px;
+      font-size: 1.5rem;
+      border-radius: 12px;
+      width: 200px;
+      cursor: pointer;
+      background-color: #3498db;
+      color: white;
+      border: none;
+    }
+
+    .level-btn:disabled {
+      background-color: #7f8c8d;
+      cursor: not-allowed;
+    }
+
+    /* Nuovo stile per l'immagine */
+    .logo {
+      width: 200px;
+      margin-bottom: 30px;
+    }
   </style>
 </head>
 <body>
+
+  <!-- Aggiungi l'immagine del logo -->
+  <img src="logo-gioco.png" alt="Logo del Gioco" class="logo">
 
   <button onclick="goHome()" class="home-btn">🏠 Home</button>
   <button onclick="toggleMusic()" class="music-btn">🎵 Musica</button>
@@ -132,21 +149,23 @@
   <audio id="winSound" src="win.mp3"></audio>
   <audio id="loseSound" src="lose.mp3"></audio>
 
-  <!-- Intro -->
-  <!-- Intro -->
-<div id="intro">
-  <img src="logo-gioco.png" alt="Logo Gioco" style="width: 200px; height: auto; margin-bottom: 20px;">
-  <h1>🎉 Benvenuto!</h1>
-  <div class="container">
-    <h2>🎯 Gioco dei Numeri 🎯</h2>
-    <p>Indovina il numero segreto! 🔐</p>
-    <p>Hai diversi livelli di difficoltà:</p>
-    <button onclick="startGame('easy')">Facile</button>
-    <button onclick="startGame('medium')">Medio</button>
-    <button onclick="startGame('hard')">Difficile</button>
+  <!-- Schermata Selezione Modalità -->
+  <div id="intro">
+    <h1>🎉 Benvenuto!</h1>
+    <div class="container">
+      <h2>🎯 Gioco dei Numeri 🎯</h2>
+      <p>Seleziona la modalità di gioco:</p>
+      <button onclick="startMode('easy')">Facile</button>
+      <button onclick="startMode('medium')">Medio</button>
+      <button onclick="startMode('hard')">Difficile</button>
+    </div>
   </div>
-</div>
 
+  <!-- Schermata Selezione Livelli -->
+  <div id="levelSelect" class="hidden">
+    <h2>Seleziona un Livello</h2>
+    <div id="levelButtons"></div>
+  </div>
 
   <!-- Gioco -->
   <div id="game" class="hidden">
@@ -158,7 +177,7 @@
       <p>Tentativi rimasti: <span id="tentativi">10</span></p>
       <p id="message"></p>
       <button id="retryBtn" class="hidden" onclick="retry()">🔁 Riprova</button>
-      <p id="timer" class="hidden">Tempo rimanente: <span id="timerValue">50</span> sec</p>
+      <p id="timer" class="hidden">Tempo rimanente: <span id="timerValue">45</span> sec</p>
     </div>
   </div>
 
@@ -168,16 +187,30 @@
     let tentativiRimasti = 10;
     let score = 0;
     let timerInterval;
-    let timerValue = 50;
+    let timerValue = 45;  // Timer di 45 secondi per livello
     let gameMode = 'easy';
+    let levelsUnlocked = { easy: [1], medium: [1], hard: [1] };
 
-    function startGame(mode) {
+    function startMode(mode) {
       gameMode = mode;
       document.getElementById("intro").classList.add("hidden");
-      document.getElementById("game").classList.remove("hidden");
-      currentLevel = 1;
-      score = 0;
+      document.getElementById("levelSelect").classList.remove("hidden");
+      loadLevelButtons();
+    }
+
+    function loadLevelButtons() {
+      let buttonsHtml = '';
+      for (let i = 1; i <= 10; i++) {
+        buttonsHtml += `<button class="level-btn" ${levelsUnlocked[gameMode].includes(i) ? '' : 'disabled'} onclick="startLevel(${i})">Livello ${i}</button>`;
+      }
+      document.getElementById('levelButtons').innerHTML = buttonsHtml;
+    }
+
+    function startLevel(level) {
+      currentLevel = level;
       avviaLivello();
+      document.getElementById("levelSelect").classList.add("hidden");
+      document.getElementById("game").classList.remove("hidden");
     }
 
     function avviaLivello() {
@@ -191,7 +224,8 @@
       document.getElementById("message").textContent = '';
       document.getElementById("retryBtn").classList.add("hidden");
       document.getElementById("userGuess").value = '';
-      document.getElementById("timer").classList.add("hidden");
+      document.getElementById("timer").classList.remove("hidden");
+      document.getElementById("timerValue").textContent = timerValue;
 
       if (gameMode === 'hard') {
         startTimer();
@@ -204,8 +238,7 @@
     }
 
     function startTimer() {
-      document.getElementById("timer").classList.remove("hidden");
-      timerValue = 50;
+      timerValue = 45;  // Ogni livello ha un timer di 45 secondi
       document.getElementById("timerValue").textContent = timerValue;
 
       clearInterval(timerInterval);
@@ -225,15 +258,14 @@
       const guess = parseInt(document.getElementById("userGuess").value);
       if (isNaN(guess)) return;
 
-      if (gameMode === 'hard') clearInterval(timerInterval); // Stop the timer if guessing
-
       if (guess === numeroSegreto) {
         score += 10;
         document.getElementById("message").textContent = "🎉 Corretto! Avanti!";
         document.getElementById("winSound").play();
         setTimeout(() => {
           if (currentLevel < 10) {
-            currentLevel++;
+            levelsUnlocked[gameMode].push(currentLevel + 1);
+            loadLevelButtons();
             avviaLivello();
           } else {
             document.getElementById("message").textContent = `🏆 Bravo! Hai completato il gioco! Punteggio: ${score}`;
@@ -244,23 +276,11 @@
         document.getElementById("tentativi").textContent = tentativiRimasti;
         if (tentativiRimasti === 0) {
           document.getElementById("loseSound").play();
-          if (gameMode === 'medium') {
-            document.getElementById("message").textContent = "❌ Hai perso! Ricominci dal livello 1.";
-            setTimeout(() => {
-              currentLevel = 1;
-              avviaLivello();
-            }, 2000);
-          } else {
-            document.getElementById("message").textContent = "❌ Hai perso! Il numero era " + numeroSegreto;
-            document.getElementById("retryBtn").classList.remove("hidden");
-          }
+          document.getElementById("message").textContent = "❌ Hai perso! Il numero era " + numeroSegreto;
+          document.getElementById("retryBtn").classList.remove("hidden");
         } else {
           document.getElementById("message").textContent = guess < numeroSegreto ? "📉 Troppo basso!" : "📈 Troppo alto!";
         }
-      }
-
-      if (gameMode === 'hard') {
-        startTimer();  // Restart timer when checking next guess
       }
     }
 
@@ -270,6 +290,7 @@
 
     function goHome() {
       document.getElementById("game").classList.add("hidden");
+      document.getElementById("levelSelect").classList.add("hidden");
       document.getElementById("intro").classList.remove("hidden");
       clearInterval(timerInterval);
     }
