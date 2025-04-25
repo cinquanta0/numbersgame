@@ -130,16 +130,37 @@
       cursor: not-allowed;
     }
 
-    /* Nuovo stile per l'immagine */
     .logo {
       width: 200px;
       margin-bottom: 30px;
+    }
+
+    #scoreForm input {
+      margin-top: 10px;
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 10px;
+      border: none;
+      width: 80%;
+    }
+
+    #leaderboard ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    #leaderboard li {
+      font-size: 1.1rem;
+      margin: 5px 0;
+    }
+
+    #scoreForm, #leaderboard {
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
 
-  <!-- Aggiungi l'immagine del logo -->
   <img src="logo-gioco.png" alt="Logo del Gioco" class="logo">
 
   <button onclick="goHome()" class="home-btn">🏠 Home</button>
@@ -158,6 +179,7 @@
       <button onclick="startMode('easy')">Facile</button>
       <button onclick="startMode('medium')">Medio</button>
       <button onclick="startMode('hard')">Difficile</button>
+      <button onclick="showLeaderboard()">🏆 Classifica</button>
     </div>
   </div>
 
@@ -178,6 +200,21 @@
       <p id="message"></p>
       <button id="retryBtn" class="hidden" onclick="retry()">🔁 Riprova</button>
       <p id="timer" class="hidden">Tempo rimanente: <span id="timerValue">45</span> sec</p>
+
+      <div id="scoreForm" class="hidden">
+        <p>🎉 Inserisci il tuo nome per la classifica:</p>
+        <input type="text" id="playerName" placeholder="Il tuo nome" />
+        <button onclick="saveScore()">Salva</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Classifica -->
+  <div id="leaderboard" class="hidden">
+    <div class="container">
+      <h2>🏆 Classifica</h2>
+      <ul id="scoreList"></ul>
+      <button onclick="goHome()">🔙 Torna alla Home</button>
     </div>
   </div>
 
@@ -187,12 +224,13 @@
     let tentativiRimasti = 10;
     let score = 0;
     let timerInterval;
-    let timerValue = 45;  // Timer di 45 secondi per livello
+    let timerValue = 45;
     let gameMode = 'easy';
     let levelsUnlocked = { easy: [1], medium: [1], hard: [1] };
 
     function startMode(mode) {
       gameMode = mode;
+      score = 0;
       document.getElementById("intro").classList.add("hidden");
       document.getElementById("levelSelect").classList.remove("hidden");
       loadLevelButtons();
@@ -216,7 +254,8 @@
     function avviaLivello() {
       const maxNumber = livelloMax(currentLevel);
       numeroSegreto = Math.floor(Math.random() * (maxNumber + 1));
-      tentativiRimasti = (gameMode === 'medium') ? 8 : 10;
+      tentativiRimasti = currentLevel <= 5 ? 5 : 10;
+      if (gameMode === 'medium') tentativiRimasti -= 2;
 
       document.getElementById("tentativi").textContent = tentativiRimasti;
       document.getElementById("livelloCorrente").textContent = currentLevel;
@@ -224,12 +263,11 @@
       document.getElementById("message").textContent = '';
       document.getElementById("retryBtn").classList.add("hidden");
       document.getElementById("userGuess").value = '';
-      document.getElementById("timer").classList.remove("hidden");
+      document.getElementById("scoreForm").classList.add("hidden");
+      document.getElementById("timer").classList.toggle("hidden", gameMode !== 'hard');
       document.getElementById("timerValue").textContent = timerValue;
 
-      if (gameMode === 'hard') {
-        startTimer();
-      }
+      if (gameMode === 'hard') startTimer();
     }
 
     function livelloMax(livello) {
@@ -238,9 +276,7 @@
     }
 
     function startTimer() {
-      timerValue = 45;  // Ogni livello ha un timer di 45 secondi
-      document.getElementById("timerValue").textContent = timerValue;
-
+      timerValue = 45;
       clearInterval(timerInterval);
       timerInterval = setInterval(() => {
         timerValue--;
@@ -260,21 +296,24 @@
 
       if (guess === numeroSegreto) {
         score += 10;
-        document.getElementById("message").textContent = "🎉 Corretto! Avanti!";
+        document.getElementById("message").textContent = "🎉 Corretto!";
         document.getElementById("winSound").play();
+        clearInterval(timerInterval);
         setTimeout(() => {
           if (currentLevel < 10) {
             levelsUnlocked[gameMode].push(currentLevel + 1);
             loadLevelButtons();
             avviaLivello();
           } else {
-            document.getElementById("message").textContent = `🏆 Bravo! Hai completato il gioco! Punteggio: ${score}`;
+            document.getElementById("message").textContent = `🏆 Hai completato il gioco! Punteggio: ${score}`;
+            document.getElementById("scoreForm").classList.remove("hidden");
           }
         }, 1500);
       } else {
         tentativiRimasti--;
         document.getElementById("tentativi").textContent = tentativiRimasti;
         if (tentativiRimasti === 0) {
+          clearInterval(timerInterval);
           document.getElementById("loseSound").play();
           document.getElementById("message").textContent = "❌ Hai perso! Il numero era " + numeroSegreto;
           document.getElementById("retryBtn").classList.remove("hidden");
@@ -291,6 +330,7 @@
     function goHome() {
       document.getElementById("game").classList.add("hidden");
       document.getElementById("levelSelect").classList.add("hidden");
+      document.getElementById("leaderboard").classList.add("hidden");
       document.getElementById("intro").classList.remove("hidden");
       clearInterval(timerInterval);
     }
@@ -298,6 +338,31 @@
     function toggleMusic() {
       const music = document.getElementById("bgMusic");
       music.paused ? music.play() : music.pause();
+    }
+
+    function saveScore() {
+      const name = document.getElementById("playerName").value.trim();
+      if (!name) return alert("Inserisci un nome!");
+
+      const newScore = { name, score };
+      const leaderboard = JSON.parse(localStorage.getItem("leaderboard")) || [];
+      leaderboard.push(newScore);
+      leaderboard.sort((a, b) => b.score - a.score);
+      localStorage.setItem("leaderboard", JSON.stringify(leaderboard));
+
+      document.getElementById("scoreForm").classList.add("hidden");
+      showLeaderboard();
+    }
+
+    function showLeaderboard() {
+      document.getElementById("intro").classList.add("hidden");
+      document.getElementById("levelSelect").classList.add("hidden");
+      document.getElementById("game").classList.add("hidden");
+      document.getElementById("leaderboard").classList.remove("hidden");
+
+      const leaderboard = JSON.parse(localStorage.getItem("leaderboard")) || [];
+      const list = leaderboard.map(entry => `<li>${entry.name} - ${entry.score} punti</li>`).join('');
+      document.getElementById("scoreList").innerHTML = list || "<li>Nessun punteggio ancora!</li>";
     }
   </script>
 </body>
