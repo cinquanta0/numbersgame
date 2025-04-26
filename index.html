@@ -109,23 +109,6 @@
       font-size: 1rem;
     }
 
-    .level-btn {
-      margin: 10px;
-      padding: 15px;
-      font-size: 1.5rem;
-      border-radius: 12px;
-      width: 200px;
-      cursor: pointer;
-      background-color: #3498db;
-      color: white;
-      border: none;
-    }
-
-    .level-btn.locked {
-      background-color: grey;
-      cursor: not-allowed;
-    }
-
     .logo { width: 200px; margin-bottom: 30px; }
 
     #scoreForm input {
@@ -304,7 +287,6 @@
   let playerName = '';
   let musicPlaying = true;
 
-  // Livelli sbloccati separati per modalità
   const unlockedLevels = {
     easy: 1,
     medium: 1,
@@ -366,102 +348,88 @@
     let maxNumber;
 
     if (mode === 'easy') {
-      maxNumber = 10 + (currentLevel - 1) * 10;
+      maxNumber = 10 + (currentLevel - 1) * 5;
+      tentativiRimasti = 10;
+      document.getElementById("timer").classList.add("hidden"); // Nascondi il timer
     } else if (mode === 'medium') {
-      maxNumber = 50 + (currentLevel - 1) * 25;
+      maxNumber = 50 + (currentLevel - 1) * 10;
+      tentativiRimasti = 12;
+      document.getElementById("timer").classList.add("hidden"); // Nascondi il timer
     } else if (mode === 'hard') {
-      maxNumber = 100 + (currentLevel - 1) * 50;
+      maxNumber = 100 + (currentLevel - 1) * 20;
+      tentativiRimasti = 15;
+      document.getElementById("timer").classList.remove("hidden"); // Mostra il timer
+      if (timerInterval) {
+        clearInterval(timerInterval);
+      }
+
+      timerValue = 45;
+      timerInterval = setInterval(() => {
+        timerValue--;
+        document.getElementById("timerValue").textContent = timerValue;
+        if (timerValue <= 0) {
+          clearInterval(timerInterval);
+          document.getElementById("message").textContent = "💥 Tempo scaduto!";
+          document.getElementById("retryBtn").classList.remove("hidden");
+        }
+      }, 1000);
     }
 
     numeroSegreto = Math.floor(Math.random() * maxNumber);
-    tentativiRimasti = 10;
-    timerValue = 45;
+    document.getElementById("maxNumber").textContent = maxNumber;
     document.getElementById("tentativi").textContent = tentativiRimasti;
     document.getElementById("livelloCorrente").textContent = currentLevel;
-    document.getElementById("maxNumber").textContent = maxNumber;
-
-    clearInterval(timerInterval);
-    if (mode === 'hard') {
-      document.getElementById("timer").classList.remove("hidden");
-      timerInterval = setInterval(updateTimer, 1000);
-    } else {
-      document.getElementById("timer").classList.add("hidden");
-    }
-  }
-
-  function updateTimer() {
-    timerValue--;
-    document.getElementById("timerValue").textContent = timerValue;
-    if (timerValue <= 0) {
-      clearInterval(timerInterval);
-      document.getElementById("message").textContent = "⏰ Tempo scaduto!";
-      document.getElementById("loseSound").play();
-      document.getElementById("retryBtn").classList.remove("hidden");
-    }
+    document.getElementById("message").textContent = '';
+    document.getElementById("retryBtn").classList.add("hidden");
   }
 
   function check() {
     const userGuess = parseInt(document.getElementById("userGuess").value);
     if (userGuess === numeroSegreto) {
-      score += 10;
-      document.getElementById("message").textContent = "🎉 Corretto!";
-      document.getElementById("winSound").play();
-      confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 } });
-
-      currentLevel++;
-      unlockedLevels[gameMode] = Math.max(unlockedLevels[gameMode], currentLevel);
-
-      setLevel(gameMode);
+      score++;
+      document.getElementById("message").textContent = `🎉 Hai indovinato! Punteggio: ${score}`;
+      unlockedLevels[gameMode]++;
+      document.getElementById("retryBtn").classList.remove("hidden");
+      clearInterval(timerInterval); // Se il timer è in corso, fermalo
     } else {
       tentativiRimasti--;
       document.getElementById("tentativi").textContent = tentativiRimasti;
-
-      if (userGuess < numeroSegreto) {
-        document.getElementById("message").textContent = "🔼 Il numero è più alto!";
-      } else {
-        document.getElementById("message").textContent = "🔽 Il numero è più basso!";
-      }
-
-      if (tentativiRimasti <= 0) {
-        document.getElementById("message").textContent = "😞 Hai perso! Il numero era " + numeroSegreto;
-        document.getElementById("loseSound").play();
-        clearInterval(timerInterval);
+      if (tentativiRimasti === 0) {
+        document.getElementById("message").textContent = "😞 Tentativi finiti!";
         document.getElementById("retryBtn").classList.remove("hidden");
+        clearInterval(timerInterval); // Se il timer è in corso, fermalo
       }
     }
   }
 
   function retry() {
-    document.getElementById("retryBtn").classList.add("hidden");
-    currentLevel = 1;
-    score = 0;
     setLevel(gameMode);
-  }
-
-  function showLeaderboard() {
-    document.getElementById("intro").classList.add("hidden");
-    document.getElementById("leaderboard").classList.remove("hidden");
-    displayLeaderboard();
+    document.getElementById("retryBtn").classList.add("hidden");
+    document.getElementById("userGuess").value = "";
   }
 
   function saveScore() {
-    let leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
-    leaderboard.push({ name: playerName, score: score });
-    leaderboard.sort((a, b) => b.score - a.score);
-    localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
+    const playerScore = {
+      name: playerName,
+      score: score
+    };
+    let scores = JSON.parse(localStorage.getItem("scores")) || [];
+    scores.push(playerScore);
+    scores.sort((a, b) => b.score - a.score); // Ordina per punteggio
+    localStorage.setItem("scores", JSON.stringify(scores));
     showLeaderboard();
   }
 
-  function displayLeaderboard() {
-    let leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
+  function showLeaderboard() {
+    const scores = JSON.parse(localStorage.getItem("scores")) || [];
     const scoreList = document.getElementById("scoreList");
-    scoreList.innerHTML = '';
-
-    leaderboard.forEach((entry, index) => {
-      const li = document.createElement('li');
-      li.textContent = `${index + 1}. ${entry.name} - ${entry.score} punti`;
+    scoreList.innerHTML = "";
+    scores.forEach(score => {
+      const li = document.createElement("li");
+      li.textContent = `${score.name}: ${score.score}`;
       scoreList.appendChild(li);
     });
+    document.getElementById("leaderboard").classList.remove("hidden");
   }
 </script>
 </body>
