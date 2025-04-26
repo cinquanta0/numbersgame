@@ -385,17 +385,29 @@
 
   function check() {
     const userGuess = parseInt(document.getElementById("userGuess").value);
+    const messageElement = document.getElementById("message");
+    
     if (userGuess === numeroSegreto) {
       score++;
-      document.getElementById("message").textContent = `🎉 Hai indovinato! Punteggio: ${score}`;
+      messageElement.textContent = `🎉 Hai indovinato! Punteggio: ${score}`;
+      messageElement.style.color = "green"; // Successo, colore verde
       unlockedLevels[gameMode]++;
       document.getElementById("retryBtn").classList.remove("hidden");
       clearInterval(timerInterval); // Se il timer è in corso, fermalo
     } else {
       tentativiRimasti--;
       document.getElementById("tentativi").textContent = tentativiRimasti;
-      if (tentativiRimasti === 0) {
-        document.getElementById("message").textContent = "😞 Tentativi finiti!";
+      
+      if (userGuess < numeroSegreto) {
+        messageElement.textContent = "📉 Il numero è troppo basso!";
+        messageElement.style.color = "red"; // Errore, colore rosso
+      } else if (userGuess > numeroSegreto) {
+        messageElement.textContent = "📈 Il numero è troppo alto!";
+        messageElement.style.color = "red"; // Errore, colore rosso
+      }
+      
+      if (tentativiRimasti <= 0) {
+        messageElement.textContent = `💥 Hai perso! Il numero segreto era ${numeroSegreto}.`;
         document.getElementById("retryBtn").classList.remove("hidden");
         clearInterval(timerInterval); // Se il timer è in corso, fermalo
       }
@@ -403,33 +415,31 @@
   }
 
   function retry() {
+    document.getElementById("userGuess").value = '';
     setLevel(gameMode);
     document.getElementById("retryBtn").classList.add("hidden");
-    document.getElementById("userGuess").value = "";
-  }
-
-  function saveScore() {
-    const playerScore = {
-      name: playerName,
-      score: score
-    };
-    let scores = JSON.parse(localStorage.getItem("scores")) || [];
-    scores.push(playerScore);
-    scores.sort((a, b) => b.score - a.score); // Ordina per punteggio
-    localStorage.setItem("scores", JSON.stringify(scores));
-    showLeaderboard();
+    document.getElementById("message").textContent = '';
   }
 
   function showLeaderboard() {
-    const scores = JSON.parse(localStorage.getItem("scores")) || [];
+    document.getElementById("leaderboard").classList.remove("hidden");
+    document.getElementById("intro").classList.add("hidden");
+    const leaderboard = JSON.parse(localStorage.getItem("leaderboard")) || [];
     const scoreList = document.getElementById("scoreList");
-    scoreList.innerHTML = "";
-    scores.forEach(score => {
+    scoreList.innerHTML = '';
+    leaderboard.forEach(player => {
       const li = document.createElement("li");
-      li.textContent = `${score.name}: ${score.score}`;
+      li.textContent = `${player.name}: ${player.score}`;
       scoreList.appendChild(li);
     });
-    document.getElementById("leaderboard").classList.remove("hidden");
+  }
+
+  function saveScore() {
+    const leaderboard = JSON.parse(localStorage.getItem("leaderboard")) || [];
+    leaderboard.push({ name: playerName, score: score });
+    leaderboard.sort((a, b) => b.score - a.score); // Ordina per punteggio decrescente
+    localStorage.setItem("leaderboard", JSON.stringify(leaderboard));
+    showLeaderboard();
   }
 </script>
 </body>
