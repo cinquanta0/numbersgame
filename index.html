@@ -164,6 +164,68 @@
       font-size: 2rem;
       z-index: 999;
     }
+
+    /* Media Queries per dispositivi mobili */
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 3rem;
+      }
+
+      .container {
+        width: 80%;
+        padding: 20px;
+      }
+
+      button {
+        font-size: 1rem;
+        padding: 10px;
+        width: 100%;
+      }
+
+      .level-btn {
+        font-size: 1.2rem;
+        width: 100%;
+      }
+
+      .logo {
+        width: 150px;
+        margin-bottom: 20px;
+      }
+
+      .music-btn, .home-btn, .theme-selector {
+        font-size: 1rem;
+        padding: 8px 16px;
+      }
+
+      #tentativi {
+        font-size: 1.2rem;
+      }
+    }
+
+    @media (max-width: 400px) {
+      h1 {
+        font-size: 2.5rem;
+      }
+
+      .container {
+        padding: 15px;
+      }
+
+      button {
+        font-size: 1rem;
+        padding: 8px;
+      }
+
+      .level-btn {
+        font-size: 1.2rem;
+        width: 100%;
+      }
+
+      .logo {
+        width: 120px;
+        margin-bottom: 15px;
+      }
+    }
   </style>
 </head>
 <body class="default-theme">
@@ -393,15 +455,14 @@
   function displayLeaderboard() {
     let leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
     const scoreList = document.getElementById("scoreList");
-    scoreList.innerHTML = "";
+    scoreList.innerHTML = '';
+
     leaderboard.forEach((entry, index) => {
-      const li = document.createElement("li");
+      const li = document.createElement('li');
       li.textContent = `${index + 1}. ${entry.name} - ${entry.score} punti`;
       scoreList.appendChild(li);
     });
   }
-
-  window.addEventListener('load', displayLeaderboard);
 </script>
 </body>
 </html>
