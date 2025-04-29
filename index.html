@@ -107,6 +107,16 @@
     .hidden { display: none; }
     #rules { background: rgba(255,255,255,0.1); padding: 20px; border-radius: 12px; text-align: left; margin-bottom: 20px; }
     #rules ul { padding-left: 20px; }
+
+    #finalMessage h2 {
+      font-size: 3rem;
+      color: gold;
+      text-shadow: 2px 2px 10px #000;
+    }
+    #finalMessage p {
+      font-size: 1.2rem;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body class="default-theme">
@@ -169,11 +179,11 @@
   </div>
 </div>
 
-<div id="leaderboard" class="hidden">
+<div id="finalMessage" class="hidden">
   <div class="container">
-    <h2>🏆 Classifica</h2>
-    <ul id="scoreList"></ul>
-    <button onclick="goHome()">🔙 Torna alla Home</button>
+    <h2>🎊 Complimenti!</h2>
+    <p>Hai completato tutti i livelli! 🏅</p>
+    <p>Verrai reindirizzato alla Home tra pochi secondi...</p>
   </div>
 </div>
 
@@ -215,6 +225,7 @@ function startMode(selectedMode) {
   document.getElementById("tentativi").innerText = maxAttempts;
   document.getElementById("intro").classList.add("hidden");
   document.getElementById("game").classList.remove("hidden");
+  document.getElementById("finalMessage").classList.add("hidden");
   resetGame();
 }
 
@@ -257,6 +268,15 @@ function check() {
 
 function nextLevel() {
   currentLevel++;
+
+  if (currentLevel > 10) {
+    document.getElementById("game").classList.add("hidden");
+    document.getElementById("finalMessage").classList.remove("hidden");
+    showConfetti();
+    setTimeout(() => { goHome(); }, 5000);
+    return;
+  }
+
   document.getElementById("livelloCorrente").innerText = currentLevel;
 
   if (mode === "easy") maxNumber = 10 * currentLevel;
@@ -302,7 +322,6 @@ function saveScore() {
   const name = document.getElementById("playerName").value || "Anonimo";
   const score = currentLevel * 100;
   localStorage.setItem(name, score);
-  showLeaderboard();
 }
 
 function showComingSoon() {
