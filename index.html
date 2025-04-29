@@ -60,7 +60,6 @@
       border-radius: 20px;
       backdrop-filter: blur(10px);
       box-shadow: 0 0 20px rgba(0,0,0,0.5);
-      text-align: center;
       width: 320px;
       animation: fadeIn 1s ease forwards;
     }
@@ -87,29 +86,27 @@
     button { background: #00fff2; color: black; cursor: pointer; }
     button:hover { background: #00cfc4; }
     .music-btn, .home-btn, .theme-selector {
-      position: fixed;
-      top: 20px;
       padding: 10px 20px;
       border-radius: 20px;
       border: none;
       font-weight: bold;
       font-size: 1rem;
     }
-    .music-btn { right: 20px; background: #e74c3c; color: white; }
-    .home-btn { left: 20px; background: #f39c12; color: black; }
-    .theme-selector { right: 140px; background: #9b59b6; color: white; }
-    .hidden { display: none; }
-    #rules {
-      background: rgba(255,255,255,0.1);
-      padding: 20px;
-      border-radius: 12px;
-      text-align: left;
-      margin-bottom: 20px;
+    .music-btn { background: #e74c3c; color: white; }
+    .home-btn { background: #f39c12; color: black; }
+    .theme-selector { background: #9b59b6; color: white; }
+    @media screen and (max-width: 480px) {
+      h1 { font-size: 3rem; }
+      .container { width: 90%; padding: 20px; }
+      .music-btn, .home-btn, .theme-selector {
+        width: 100%;
+        margin: 10px 0;
+        font-size: 1.2rem;
+      }
     }
+    .hidden { display: none; }
+    #rules { background: rgba(255,255,255,0.1); padding: 20px; border-radius: 12px; text-align: left; margin-bottom: 20px; }
     #rules ul { padding-left: 20px; }
-    #scoreForm, #leaderboard { margin-top: 20px; }
-    #leaderboard ul { list-style: none; padding: 0; }
-    #leaderboard li { font-size: 1.2rem; margin: 5px 0; }
   </style>
 </head>
 <body class="default-theme">
@@ -119,20 +116,21 @@
 
 <img src="logo-gioco.png" alt="Logo del Gioco" class="logo" style="width:200px; margin-bottom:20px;">
 
-<button onclick="goHome()" class="home-btn">🏠 Home</button>
-<button onclick="toggleMusic()" class="music-btn">🎵 Musica</button>
-<select id="themeSelector" class="theme-selector" onchange="changeTheme(this.value)">
-  <option value="default">🎨 Classico</option>
-  <option value="sunset">🌅 Tramonto</option>
-  <option value="forest">🌲 Foresta</option>
-  <option value="neon">🌈 Neon</option>
-</select>
+<div class="button-container">
+  <button onclick="goHome()" class="home-btn">🏠 Home</button>
+  <button onclick="toggleMusic()" class="music-btn">🎵 Musica</button>
+  <select id="themeSelector" class="theme-selector" onchange="changeTheme(this.value)">
+    <option value="default">🎨 Classico</option>
+    <option value="sunset">🌅 Tramonto</option>
+    <option value="forest">🌲 Foresta</option>
+    <option value="neon">🌈 Neon</option>
+  </select>
+</div>
 
 <audio id="bgMusic" src="musica.mp3" loop></audio>
 <audio id="winSound" src="win.mp3"></audio>
 <audio id="loseSound" src="lose.mp3"></audio>
 
-<!-- Intro -->
 <div id="intro">
   <h1>🎉 Benvenuto!</h1>
   <div id="rules">
@@ -149,11 +147,10 @@
     <button onclick="startMode('easy')">Facile</button>
     <button onclick="startMode('medium')">Medio</button>
     <button onclick="startMode('hard')">Difficile</button>
-    <button onclick="showLeaderboard()">🏆 Classifica</button>
+    <button onclick="showComingSoon()">🏆 Classifica</button>
   </div>
 </div>
 
-<!-- Gioco -->
 <div id="game" class="hidden">
   <div class="container">
     <h2>🔢 Livello <span id="livelloCorrente">1</span> (0 - <span id="maxNumber">10</span>)</h2>
@@ -172,7 +169,6 @@
   </div>
 </div>
 
-<!-- Classifica -->
 <div id="leaderboard" class="hidden">
   <div class="container">
     <h2>🏆 Classifica</h2>
@@ -182,140 +178,166 @@
 </div>
 
 <script>
-let currentLevel = 1, numeroSegreto = 0, tentativiRimasti = 10, score = 0, timerValue = 34;
-let gameMode = 'easy', playerName = '', musicPlaying = true;
-let timerInterval, levelCompleted = false;
-const leaderboard = [], unlockedLevels = {easy:1, medium:1, hard:1};
+let currentLevel = 1;
+let maxNumber = 10;
+let maxAttempts = 10;
+let remainingAttempts = 10;
+let targetNumber;
+let gameTimer;
+let isMusicPlaying = false;
+let mode = "easy";
 
-window.onload = () => {
-  changeTheme(localStorage.getItem("selectedTheme") || "default");
-  document.getElementById("themeSelector").value = localStorage.getItem("selectedTheme") || "default";
-  setTimeout(() => document.getElementById("loadingScreen").style.display = "none", 2000);
+function startMode(selectedMode) {
+  mode = selectedMode;
+  currentLevel = 1;
+  document.getElementById("livelloCorrente").innerText = currentLevel;
 
-  particlesJS('particles-js', {
-    particles: { number: { value: 50 }, size: { value: 3 }, move: { speed: 1 }, line_linked: { enable: true } }
-  });
-};
+  switch (mode) {
+    case "easy":
+      maxNumber = 10;
+      maxAttempts = 12;
+      document.getElementById("timer").classList.add("hidden");
+      break;
+    case "medium":
+      maxNumber = 50;
+      maxAttempts = 8;
+      document.getElementById("timer").classList.add("hidden");
+      break;
+    case "hard":
+      maxNumber = 100;
+      maxAttempts = 9;
+      document.getElementById("timer").classList.remove("hidden");
+      startTimer();
+      break;
+  }
+
+  document.getElementById("maxNumber").innerText = maxNumber;
+  document.getElementById("tentativi").innerText = maxAttempts;
+  document.getElementById("intro").classList.add("hidden");
+  document.getElementById("game").classList.remove("hidden");
+  resetGame();
+}
+
+function resetGame() {
+  remainingAttempts = maxAttempts;
+  targetNumber = Math.floor(Math.random() * maxNumber) + 1;
+  document.getElementById("tentativi").innerText = remainingAttempts;
+  document.getElementById("message").innerText = "";
+  document.getElementById("userGuess").value = "";
+  document.getElementById("nextLevelBtn").classList.add("hidden");
+  document.getElementById("retryBtn").classList.add("hidden");
+  if (mode === "hard") startTimer();
+}
+
+function check() {
+  let guess = parseInt(document.getElementById("userGuess").value);
+  if (isNaN(guess)) {
+    document.getElementById("message").innerText = "Inserisci un numero valido!";
+    return;
+  }
+
+  remainingAttempts--;
+  document.getElementById("tentativi").innerText = remainingAttempts;
+
+  if (guess === targetNumber) {
+    document.getElementById("message").innerText = "🎉 Hai indovinato!";
+    document.getElementById("nextLevelBtn").classList.remove("hidden");
+    document.getElementById("winSound").play();
+    showConfetti();
+    stopTimer();
+  } else if (remainingAttempts === 0) {
+    document.getElementById("message").innerText = "😞 Hai perso!";
+    document.getElementById("retryBtn").classList.remove("hidden");
+    document.getElementById("loseSound").play();
+    stopTimer();
+  } else {
+    document.getElementById("message").innerText = guess < targetNumber ? "Troppo basso!" : "Troppo alto!";
+  }
+}
+
+function nextLevel() {
+  currentLevel++;
+  document.getElementById("livelloCorrente").innerText = currentLevel;
+
+  if (mode === "easy") maxNumber = 10 * currentLevel;
+  else if (mode === "medium") maxNumber = 50 * currentLevel;
+  else if (mode === "hard") maxNumber = 100 + (currentLevel - 1) * 50;
+
+  if (mode === "easy") maxAttempts = 10;
+  else if (mode === "medium") maxAttempts = 8;
+  else if (mode === "hard") maxAttempts = 5;
+
+  document.getElementById("maxNumber").innerText = maxNumber;
+  document.getElementById("tentativi").innerText = maxAttempts;
+
+  resetGame();
+}
+
+function retry() {
+  resetGame();
+  document.getElementById("retryBtn").classList.add("hidden");
+}
+
+function startTimer() {
+  clearInterval(gameTimer);
+  let timeLeft = 34;
+  document.getElementById("timerValue").innerText = timeLeft;
+  gameTimer = setInterval(() => {
+    timeLeft--;
+    document.getElementById("timerValue").innerText = timeLeft;
+    if (timeLeft <= 0) {
+      clearInterval(gameTimer);
+      document.getElementById("message").innerText = "⏰ Tempo scaduto!";
+      document.getElementById("retryBtn").classList.remove("hidden");
+      document.getElementById("loseSound").play();
+    }
+  }, 1000);
+}
+
+function stopTimer() {
+  clearInterval(gameTimer);
+}
+
+function saveScore() {
+  const name = document.getElementById("playerName").value || "Anonimo";
+  const score = currentLevel * 100;
+  localStorage.setItem(name, score);
+  showLeaderboard();
+}
+
+function showComingSoon() {
+  alert('Classifica: Coming Soon!');
+}
+
+function goHome() {
+  location.reload();
+}
 
 function toggleMusic() {
   const bgMusic = document.getElementById("bgMusic");
-  if (musicPlaying) { bgMusic.pause(); document.querySelector(".music-btn").textContent = "🎵 Musica Off"; }
-  else { bgMusic.play(); document.querySelector(".music-btn").textContent = "🎵 Musica On"; }
-  musicPlaying = !musicPlaying;
+  if (isMusicPlaying) bgMusic.pause();
+  else bgMusic.play();
+  isMusicPlaying = !isMusicPlaying;
 }
-function changeTheme(theme) {
-  document.body.className = theme + "-theme";
-  localStorage.setItem("selectedTheme", theme);
-}
-function goHome() {
-  clearInterval(timerInterval);
-  document.getElementById("intro").classList.remove("hidden");
-  document.getElementById("game").classList.add("hidden");
-  document.getElementById("leaderboard").classList.add("hidden");
-}
-function startMode(mode) {
-  playerName = document.getElementById("playerName").value.trim();
-  if (playerName.length < 2) return alert("Inserisci un nome valido (min 2 lettere)");
-  gameMode = mode; currentLevel = 1; score = 0;
-  document.getElementById("intro").classList.add("hidden");
-  document.getElementById("game").classList.remove("hidden");
-  startGame();
-}
-function startGame() {
-  levelCompleted = false;
-  tentativiRimasti = gameMode === "medium" ? 8 : 10;
-  numeroSegreto = Math.floor(Math.random() * (currentLevel * 10));
-  document.getElementById("tentativi").textContent = tentativiRimasti;
-  document.getElementById("livelloCorrente").textContent = currentLevel;
-  document.getElementById("maxNumber").textContent = currentLevel * 10;
-  document.getElementById("userGuess").value = '';
-  document.getElementById("timer").classList.toggle("hidden", gameMode !== "hard");
-  if (gameMode === "hard") {
-    timerValue = 34;
-    document.getElementById("timerValue").textContent = timerValue;
-    clearInterval(timerInterval);
-    timerInterval = setInterval(() => {
-      timerValue--;
-      document.getElementById("timerValue").textContent = timerValue;
-      if (timerValue <= 0) {
-        clearInterval(timerInterval);
-        document.getElementById("message").textContent = "💥 Tempo scaduto!";
-        document.getElementById("retryBtn").classList.remove("hidden");
-      }
-    }, 1000);
-  }
-}
-function check() {
-  if (levelCompleted) return;
-  const guess = parseInt(document.getElementById("userGuess").value);
-  if (isNaN(guess)) return alert("Inserisci un numero valido!");
 
-  const message = document.getElementById("message");
-  if (guess === numeroSegreto) {
-    score += 10;
-    confetti();
-    levelCompleted = true;
-    if (currentLevel < 10) currentLevel++;
-    document.getElementById("finalScore").textContent = score;
-    document.getElementById("trophy").textContent = getTrophy(score);
-    document.getElementById("retryBtn").classList.remove("hidden");
-    document.getElementById("nextLevelBtn").classList.remove("hidden");
-    document.getElementById("scoreForm").classList.remove("hidden");
-    message.textContent = "🎉 Indovinato!";
-    clearInterval(timerInterval);
-    if (currentLevel === 11) {
-      showCongratulations();
+function changeTheme(theme) {
+  document.body.className = theme + '-theme';
+}
+
+function showConfetti() {
+  confetti({ particleCount: 100, spread: 70, origin: { x: 0.5, y: 0.5 } });
+}
+
+window.onload = () => {
+  document.getElementById("loadingScreen").style.display = "none";
+  particlesJS("particles-js", {
+    particles: {
+      number: { value: 80 },
+      size: { value: 3 },
+      move: { speed: 1 }
     }
-  } else {
-    tentativiRimasti--;
-    document.getElementById("tentativi").textContent = tentativiRimasti;
-    if (tentativiRimasti === 0) {
-      message.textContent = "💥 Hai esaurito i tentativi!";
-      document.getElementById("retryBtn").classList.remove("hidden");
-      if (gameMode === "medium") {
-        currentLevel = 1;
-        document.getElementById("tentativi").textContent = gameMode === "medium" ? 8 : 10;
-      }
-    } else {
-      message.textContent = guess < numeroSegreto ? "Troppo basso!" : "Troppo alto!";
-    }
-  }
-}
-function retry() {
-  startGame();
-  document.getElementById("retryBtn").classList.add("hidden");
-  document.getElementById("nextLevelBtn").classList.add("hidden");
-  document.getElementById("message").textContent = "";
-}
-function nextLevel() {
-  startGame();
-  document.getElementById("retryBtn").classList.add("hidden");
-  document.getElementById("nextLevelBtn").classList.add("hidden");
-  document.getElementById("message").textContent = "";
-}
-function getTrophy(score) {
-  if (score >= 90) return "🥇 Oro!";
-  if (score >= 60) return "🥈 Argento!";
-  if (score >= 30) return "🥉 Bronzo!";
-  return "🎯 Continua!";
-}
-function saveScore() {
-  leaderboard.push({ name: playerName, score });
-  leaderboard.sort((a, b) => b.score - a.score);
-  showLeaderboard();
-}
-function showLeaderboard() {
-  document.getElementById("leaderboard").classList.remove("hidden");
-  document.getElementById("game").classList.add("hidden");
-  document.getElementById("intro").classList.add("hidden");
-  document.getElementById("scoreList").innerHTML = leaderboard.map(e => `<li>${e.name}: ${e.score}</li>`).join('');
-}
-function showCongratulations() {
-  document.getElementById("message").textContent = "🎉 Congratulazioni! Hai completato tutti i 10 livelli!";
-  setTimeout(() => {
-    alert("🎉 Congratulazioni! Hai completato il gioco!");
-  }, 500);
-}
+  });
+};
 </script>
 
 </body>
