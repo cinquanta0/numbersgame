@@ -14,21 +14,22 @@
       --forest-bg: linear-gradient(to right, #11998e, #38ef7d);
       --neon-bg: linear-gradient(to right, #8e2de2, #4a00e0);
     }
+    * { box-sizing: border-box; }
     body {
       font-family: 'Roboto', sans-serif;
       background: var(--default-bg);
       color: white;
+      margin: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 30px;
-      height: 100vh;
       justify-content: center;
+      min-height: 100vh;
+      padding: 1rem;
       text-align: center;
-      margin: 0;
-      overflow: hidden;
       transition: background 1s;
       position: relative;
+      overflow-x: hidden;
     }
     body.default-theme { background: var(--default-bg); color: white; }
     body.sunset-theme { background: var(--sunset-bg); color: #2c3e50; }
@@ -37,85 +38,97 @@
 
     #particles-js {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
       z-index: -1;
     }
+
     #loadingScreen {
-      position: absolute;
+      position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.7);
+      background: rgba(0,0,0,0.8);
       color: white;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 2rem;
-      z-index: 999;
+      z-index: 1000;
     }
-    .container {
-      background: rgba(255,255,255,0.1);
-      padding: 30px;
-      border-radius: 20px;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
-      width: 320px;
-      animation: fadeIn 1s ease forwards;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+
     h1 {
       font-family: 'Bangers', cursive;
-      font-size: 5rem;
-      margin: 0 0 40px;
+      font-size: 3rem;
+      margin: 0 0 20px;
       color: #FF6347;
-      text-shadow: 4px 4px 15px rgba(0,0,0,0.5);
-      text-transform: uppercase;
+      text-shadow: 2px 2px 10px rgba(0,0,0,0.6);
     }
-    button, select, input {
-      margin: 10px 0;
-      padding: 12px;
-      font-size: 1.1rem;
-      border-radius: 12px;
-      border: none;
-      font-weight: bold;
-    }
-    button { background: #00fff2; color: black; cursor: pointer; }
-    button:hover { background: #00cfc4; }
-    .music-btn, .home-btn, .theme-selector {
-      padding: 10px 20px;
+
+    .container {
+      background: rgba(255,255,255,0.1);
+      padding: 1.5rem;
       border-radius: 20px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 0 15px rgba(0,0,0,0.4);
+      width: 100%;
+      max-width: 400px;
+      margin: 1rem 0;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 0.75rem;
+      margin: 0.5rem 0;
+      font-size: 1rem;
+      border-radius: 10px;
       border: none;
       font-weight: bold;
-      font-size: 1rem;
     }
+
+    button {
+      background: #00fff2;
+      color: black;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #00cfc4;
+    }
+
     .music-btn { background: #e74c3c; color: white; }
     .home-btn { background: #f39c12; color: black; }
     .theme-selector { background: #9b59b6; color: white; }
-    @media screen and (max-width: 480px) {
-      h1 { font-size: 3rem; }
-      .container { width: 90%; padding: 20px; }
-      .music-btn, .home-btn, .theme-selector {
-        width: 100%;
-        margin: 10px 0;
-        font-size: 1.2rem;
-      }
-    }
+
     .hidden { display: none; }
-    #rules { background: rgba(255,255,255,0.1); padding: 20px; border-radius: 12px; text-align: left; margin-bottom: 20px; }
+
+    #rules {
+      background: rgba(255,255,255,0.1);
+      padding: 1rem;
+      border-radius: 12px;
+      text-align: left;
+    }
+
     #rules ul { padding-left: 20px; }
 
     #finalMessage h2 {
-      font-size: 3rem;
+      font-size: 2rem;
       color: gold;
-      text-shadow: 2px 2px 10px #000;
+      text-shadow: 1px 1px 6px #000;
     }
+
     #finalMessage p {
-      font-size: 1.2rem;
+      font-size: 1rem;
       margin-top: 10px;
+    }
+
+    img.logo {
+      width: 150px;
+      margin-bottom: 20px;
+    }
+
+    @media screen and (max-width: 480px) {
+      h1 { font-size: 2.2rem; }
+      .container { padding: 1rem; }
+      input, select, button { font-size: 1rem; }
     }
   </style>
 </head>
@@ -124,9 +137,45 @@
 <div id="loadingScreen">Caricamento...</div>
 <div id="particles-js"></div>
 
-<img src="logo-gioco.png" alt="Logo del Gioco" class="logo" style="width:200px; margin-bottom:20px;">
+<img src="logo-gioco.png" alt="Logo del Gioco" class="logo">
 
-<div class="button-container">
+<div class="container">
+  <h1>🎉 Benvenuto!</h1>
+
+  <div id="rules">
+    <h3>📜 Regole:</h3>
+    <ul>
+      <li>Indovina il numero segreto ad ogni livello!</li>
+      <li>Ogni livello diventa più difficile.</li>
+      <li>Hai tentativi limitati!</li>
+    </ul>
+  </div>
+
+  <input type="text" id="playerName" placeholder="Il tuo nome" minlength="2" />
+  <button onclick="startMode('easy')">Facile</button>
+  <button onclick="startMode('medium')">Medio</button>
+  <button onclick="startMode('hard')">Difficile</button>
+  <button onclick="showComingSoon()">🏆 Classifica</button>
+</div>
+
+<div class="container hidden" id="game">
+  <h2>Livello <span id="livelloCorrente">1</span> (0 - <span id="maxNumber">10</span>)</h2>
+  <input type="number" id="userGuess" placeholder="Inserisci numero" />
+  <button onclick="check()">Verifica</button>
+  <p>Tentativi rimasti: <span id="tentativi">10</span></p>
+  <p id="message"></p>
+  <p id="timer" class="hidden">Tempo: <span id="timerValue">34</span> sec</p>
+  <button id="retryBtn" class="hidden" onclick="retry()">🔁 Riprova</button>
+  <button id="nextLevelBtn" class="hidden" onclick="nextLevel()">Avanti</button>
+</div>
+
+<div class="container hidden" id="finalMessage">
+  <h2>🎊 Complimenti!</h2>
+  <p>Hai completato tutti i livelli!</p>
+  <p>Verrai reindirizzato alla Home tra pochi secondi...</p>
+</div>
+
+<div style="width: 100%; max-width: 400px; text-align: center;">
   <button onclick="goHome()" class="home-btn">🏠 Home</button>
   <button onclick="toggleMusic()" class="music-btn">🎵 Musica</button>
   <select id="themeSelector" class="theme-selector" onchange="changeTheme(this.value)">
@@ -140,53 +189,6 @@
 <audio id="bgMusic" src="musica.mp3" loop></audio>
 <audio id="winSound" src="win.mp3"></audio>
 <audio id="loseSound" src="lose.mp3"></audio>
-
-<div id="intro">
-  <h1>🎉 Benvenuto!</h1>
-  <div id="rules">
-    <h3>📜 Regole:</h3>
-    <ul>
-      <li>Mobile non ancora disponibile!❌</li>
-      <li>Indovina il numero segreto ad ogni livello!✅</li>
-      <li>Ogni livello diventa più difficile.✅</li>
-      <li>Se finisci i tentativi, riparti da capo.✅</li>
-    </ul>
-  </div>
-  <div class="container">
-    <h2>🎯 Gioco dei Numeri 🎯</h2>
-    <input type="text" id="playerName" placeholder="Il tuo nome" minlength="2" />
-    <button onclick="startMode('easy')">Facile</button>
-    <button onclick="startMode('medium')">Medio</button>
-    <button onclick="startMode('hard')">Difficile</button>
-    <button onclick="showComingSoon()">🏆 Classifica</button>
-  </div>
-</div>
-
-<div id="game" class="hidden">
-  <div class="container">
-    <h2>🔢 Livello <span id="livelloCorrente">1</span> (0 - <span id="maxNumber">10</span>)</h2>
-    <input type="number" id="userGuess" placeholder="Inserisci numero" />
-    <button onclick="check()">Verifica</button>
-    <p>Tentativi rimasti: <span id="tentativi">10</span></p>
-    <p id="message"></p>
-    <button id="retryBtn" class="hidden" onclick="retry()">🔁 Riprova</button>
-    <button id="nextLevelBtn" class="hidden" onclick="nextLevel()">Avanti</button>
-    <p id="timer" class="hidden">Tempo: <span id="timerValue">34</span> sec</p>
-    <div id="scoreForm" class="hidden">
-      <p>🎉 Punteggio: <span id="finalScore">0</span></p>
-      <p id="trophy"></p>
-      <button onclick="saveScore()">Salva punteggio</button>
-    </div>
-  </div>
-</div>
-
-<div id="finalMessage" class="hidden">
-  <div class="container">
-    <h2>🎊 Complimenti!</h2>
-    <p>Hai completato tutti i livelli! 🏅</p>
-    <p>Verrai reindirizzato alla Home tra pochi secondi...</p>
-  </div>
-</div>
 
 <script>
 let currentLevel = 1;
@@ -224,7 +226,6 @@ function startMode(selectedMode) {
 
   document.getElementById("maxNumber").innerText = maxNumber;
   document.getElementById("tentativi").innerText = maxAttempts;
-  document.getElementById("intro").classList.add("hidden");
   document.getElementById("game").classList.remove("hidden");
   document.getElementById("finalMessage").classList.add("hidden");
   resetGame();
@@ -269,7 +270,6 @@ function check() {
 
 function nextLevel() {
   currentLevel++;
-
   if (currentLevel > 10) {
     document.getElementById("game").classList.add("hidden");
     document.getElementById("finalMessage").classList.remove("hidden");
@@ -279,7 +279,6 @@ function nextLevel() {
   }
 
   document.getElementById("livelloCorrente").innerText = currentLevel;
-
   if (mode === "easy") maxNumber = 10 * currentLevel;
   else if (mode === "medium") maxNumber = 50 * currentLevel;
   else if (mode === "hard") maxNumber = 100 + (currentLevel - 1) * 50;
@@ -290,7 +289,6 @@ function nextLevel() {
 
   document.getElementById("maxNumber").innerText = maxNumber;
   document.getElementById("tentativi").innerText = maxAttempts;
-
   resetGame();
 }
 
@@ -319,12 +317,6 @@ function stopTimer() {
   clearInterval(gameTimer);
 }
 
-function saveScore() {
-  const name = document.getElementById("playerName").value || "Anonimo";
-  const score = currentLevel * 100;
-  localStorage.setItem(name, score);
-}
-
 function showComingSoon() {
   alert('Classifica: Coming Soon!');
 }
@@ -351,11 +343,7 @@ function showConfetti() {
 window.onload = () => {
   document.getElementById("loadingScreen").style.display = "none";
   particlesJS("particles-js", {
-    particles: {
-      number: { value: 80 },
-      size: { value: 3 },
-      move: { speed: 1 }
-    }
+    particles: { number: { value: 80 }, size: { value: 3 }, move: { speed: 1 } }
   });
 };
 </script>
