@@ -43,18 +43,6 @@
       z-index: -1;
     }
 
-    #loadingScreen {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0,0,0,0.8);
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2rem;
-      z-index: 1000;
-    }
-
     h1 {
       font-family: 'Bangers', cursive;
       font-size: 3rem;
@@ -129,7 +117,6 @@
 </head>
 <body class="default-theme">
 
-<div id="loadingScreen">Caricamento...</div>
 <div id="particles-js"></div>
 
 <img src="logo-gioco.png" alt="Logo del Gioco" class="logo">
@@ -241,8 +228,8 @@ function startMode(selectedMode) {
 
 function resetGame() {
   remainingAttempts = maxAttempts;
-  targetNumber = Math.floor(Math.random() * maxNumber) + 1;
   document.getElementById("tentativi").innerText = remainingAttempts;
+  targetNumber = Math.floor(Math.random() * maxNumber) + 1;
   document.getElementById("message").innerText = "";
   document.getElementById("userGuess").value = "";
   document.getElementById("nextLevelBtn").classList.add("hidden");
@@ -254,6 +241,12 @@ function check() {
   let guess = parseInt(document.getElementById("userGuess").value);
   if (isNaN(guess)) {
     document.getElementById("message").innerText = "Inserisci un numero valido!";
+    return;
+  }
+
+  // Bug fix: prevent attempts from going below 0
+  if (remainingAttempts <= 0) {
+    document.getElementById("message").innerText = "I tentativi sono esauriti!";
     return;
   }
 
