@@ -115,11 +115,6 @@
       text-shadow: 1px 1px 6px #000;
     }
 
-    #finalMessage p {
-      font-size: 1rem;
-      margin-top: 10px;
-    }
-
     img.logo {
       width: 150px;
       margin-bottom: 20px;
@@ -146,15 +141,22 @@
     <h3>📜 Regole:</h3>
     <ul>
       <li>Indovina il numero segreto ad ogni livello!</li>
-      <li>Ogni livello diventa più difficile.</li>
-      <li>Hai tentativi limitati!</li>
+      <li>Modalità singola o multiplayer locale</li>
+      <li>Ogni livello diventa più difficile!</li>
     </ul>
   </div>
 
   <input type="text" id="playerName" placeholder="Il tuo nome" minlength="2" />
+  <div id="multiplayerInputs" class="hidden">
+    <input type="text" id="player1" placeholder="Giocatore 1" />
+    <input type="text" id="player2" placeholder="Giocatore 2" />
+    <button onclick="startMultiplayerGame()">Inizia la sfida</button>
+  </div>
+
   <button onclick="startMode('easy')">Facile</button>
   <button onclick="startMode('medium')">Medio</button>
   <button onclick="startMode('hard')">Difficile</button>
+  <button onclick="startMultiplayer()">🎮 Multiplayer</button>
   <button onclick="showComingSoon()">🏆 Classifica</button>
 </div>
 
@@ -199,6 +201,12 @@ let targetNumber;
 let gameTimer;
 let isMusicPlaying = false;
 let mode = "easy";
+let multiplayerMode = false;
+let players = ["", ""];
+let scores = [0, 0];
+let turns = [0, 0];
+let currentPlayer = 0;
+let multiplayerRounds = 3;
 
 function startMode(selectedMode) {
   mode = selectedMode;
@@ -251,18 +259,47 @@ function check() {
 
   remainingAttempts--;
   document.getElementById("tentativi").innerText = remainingAttempts;
+  turns[currentPlayer]++;
 
   if (guess === targetNumber) {
-    document.getElementById("message").innerText = "🎉 Hai indovinato!";
-    document.getElementById("nextLevelBtn").classList.remove("hidden");
+    document.getElementById("message").innerText = `🎉 ${players[currentPlayer] || "Hai"} ha indovinato!`;
     document.getElementById("winSound").play();
     showConfetti();
     stopTimer();
+    scores[currentPlayer]++;
+
+    if (multiplayerMode) {
+      if (turns[currentPlayer] >= multiplayerRounds) {
+        endMultiplayer();
+      } else {
+        setTimeout(() => {
+          alert(`Tocca a ${players[1 - currentPlayer]}`);
+          currentPlayer = 1 - currentPlayer;
+          retry();
+        }, 1000);
+      }
+    } else {
+      document.getElementById("nextLevelBtn").classList.remove("hidden");
+    }
+
   } else if (remainingAttempts === 0) {
-    document.getElementById("message").innerText = "😞 Hai perso!";
-    document.getElementById("retryBtn").classList.remove("hidden");
+    document.getElementById("message").innerText = `😞 ${players[currentPlayer] || "Hai"} ha perso!`;
     document.getElementById("loseSound").play();
     stopTimer();
+
+    if (multiplayerMode) {
+      if (turns[currentPlayer] >= multiplayerRounds) {
+        endMultiplayer();
+      } else {
+        setTimeout(() => {
+          alert(`Tocca a ${players[1 - currentPlayer]}`);
+          currentPlayer = 1 - currentPlayer;
+          retry();
+        }, 1000);
+      }
+    } else {
+      document.getElementById("retryBtn").classList.remove("hidden");
+    }
   } else {
     document.getElementById("message").innerText = guess < targetNumber ? "Troppo basso!" : "Troppo alto!";
   }
@@ -317,8 +354,47 @@ function stopTimer() {
   clearInterval(gameTimer);
 }
 
-function showComingSoon() {
-  alert('Classifica: Coming Soon!');
+function startMultiplayer() {
+  multiplayerMode = true;
+  document.getElementById("playerName").classList.add("hidden");
+  document.getElementById("multiplayerInputs").classList.remove("hidden");
+}
+
+function startMultiplayerGame() {
+  players[0] = document.getElementById("player1").value.trim();
+  players[1] = document.getElementById("player2").value.trim();
+  if (!players[0] || !players[1]) {
+    alert("Inserisci entrambi i nomi!");
+    return;
+  }
+  currentPlayer = 0;
+  scores = [0, 0];
+  turns = [0, 0];
+  alert(`${players[currentPlayer]} inizia per primo!`);
+  document.getElementById("multiplayerInputs").classList.add("hidden");
+  startMode("easy");
+}
+
+function endMultiplayer() {
+  document.getElementById("game").classList.add("hidden");
+  document.getElementById("finalMessage").classList.remove("hidden");
+
+  let winnerText = "";
+  if (scores[0] > scores[1]) {
+    winnerText = `🏆 Vince ${players[0]}! (${scores[0]} vs ${scores[1]})`;
+  } else if (scores[1] > scores[0]) {
+    winnerText = `🏆 Vince ${players[1]}! (${scores[1]} vs ${scores[0]})`;
+  } else {
+    winnerText = `🤝 Pareggio! (${scores[0]} - ${scores[1]})`;
+  }
+
+  document.getElementById("finalMessage").innerHTML = `
+    <h2>🎊 Sfida terminata!</h2>
+    <p>${winnerText}</p>
+    <p>Verrai reindirizzato alla Home tra pochi secondi...</p>
+  `;
+  showConfetti();
+  setTimeout(() => { goHome(); }, 5000);
 }
 
 function goHome() {
@@ -340,6 +416,10 @@ function showConfetti() {
   confetti({ particleCount: 100, spread: 70, origin: { x: 0.5, y: 0.5 } });
 }
 
+function showComingSoon() {
+  alert('Classifica: Coming Soon!');
+}
+
 window.onload = () => {
   document.getElementById("loadingScreen").style.display = "none";
   particlesJS("particles-js", {
@@ -347,6 +427,5 @@ window.onload = () => {
   });
 };
 </script>
-
 </body>
 </html>
