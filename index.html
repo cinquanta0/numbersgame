@@ -322,10 +322,9 @@ function nextLevel() {
 
   if (mode === "easy") maxAttempts = 10;
   else if (mode === "medium") maxAttempts = 8;
-  else if (mode === "hard") maxAttempts = 5;
+  else maxAttempts = 9;
 
   document.getElementById("maxNumber").innerText = maxNumber;
-  document.getElementById("tentativi").innerText = maxAttempts;
   resetGame();
 }
 
@@ -335,18 +334,18 @@ function retry() {
 }
 
 function startTimer() {
-  clearInterval(gameTimer);
-  let timeLeft = 34;
-  document.getElementById("timerValue").innerText = timeLeft;
-
+  let time = 34;
+  document.getElementById("timerValue").innerText = time;
   gameTimer = setInterval(() => {
-    timeLeft--;
-    document.getElementById("timerValue").innerText = timeLeft;
-    if (timeLeft <= 0) {
+    time--;
+    document.getElementById("timerValue").innerText = time;
+    if (time <= 0) {
       clearInterval(gameTimer);
       document.getElementById("message").innerText = "Tempo scaduto!";
       stopTimer();
-      document.getElementById("retryBtn").classList.remove("hidden");
+      remainingAttempts = 0;
+      document.getElementById("tentativi").innerText = remainingAttempts;
+      check();
     }
   }, 1000);
 }
@@ -356,48 +355,32 @@ function stopTimer() {
 }
 
 function showConfetti() {
-  confetti();
+  confetti({
+    particleCount: 100,
+    spread: 70,
+    origin: { y: 0.6 }
+  });
 }
 
 function goHome() {
   window.location.reload();
 }
 
-function startMultiplayer() {
-  multiplayerMode = true;
-  document.getElementById("multiplayerInputs").classList.remove("hidden");
-  document.getElementById("game").classList.add("hidden");
-}
-
-function startMultiplayerGame() {
-  players[0] = document.getElementById("player1").value;
-  players[1] = document.getElementById("player2").value;
-  if (!players[0] || !players[1]) {
-    alert("Inserisci i nomi di entrambi i giocatori!");
-    return;
-  }
-  document.getElementById("multiplayerInputs").classList.add("hidden");
-  startMode(mode);
-}
-
-function endMultiplayer() {
-  alert(`${players[0]} ha vinto!`);
-  goHome();
-}
-
 function toggleMusic() {
-  const music = document.getElementById("bgMusic");
   if (isMusicPlaying) {
-    music.pause();
+    document.getElementById("bgMusic").pause();
+    isMusicPlaying = false;
   } else {
-    music.play();
+    document.getElementById("bgMusic").play();
+    isMusicPlaying = true;
   }
-  isMusicPlaying = !isMusicPlaying;
 }
 
 function changeTheme(theme) {
-  document.body.className = theme + "-theme";
+  document.body.classList.remove("default-theme", "sunset-theme", "forest-theme", "neon-theme");
+  document.body.classList.add(`${theme}-theme`);
 }
 </script>
+
 </body>
 </html>
