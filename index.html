@@ -145,17 +145,9 @@
   </div>
 
   <input type="text" id="playerName" placeholder="Il tuo nome" minlength="2" />
-  <div id="multiplayerInputs" class="hidden">
-    <input type="text" id="player1" placeholder="Giocatore 1" />
-    <input type="text" id="player2" placeholder="Giocatore 2" />
-    <button onclick="startMultiplayerGame()">Inizia la sfida</button>
-  </div>
-
   <button onclick="startMode('easy')">Facile</button>
   <button onclick="startMode('medium')">Medio</button>
   <button onclick="startMode('hard')">Difficile</button>
-  <button onclick="startMultiplayer()">🎮 Multiplayer</button>
-  <button onclick="showComingSoon()">🏆 Classifica</button>
 </div>
 
 <div class="container hidden" id="game">
@@ -199,35 +191,24 @@ let targetNumber;
 let gameTimer;
 let isMusicPlaying = false;
 let mode = "easy";
-let multiplayerMode = false;
-let players = ["", ""];
-let scores = [0, 0];
-let turns = [0, 0];
-let currentPlayer = 0;
-let multiplayerRounds = 3;
 
 function startMode(selectedMode) {
   mode = selectedMode;
   currentLevel = 1;
   document.getElementById("livelloCorrente").innerText = currentLevel;
 
-  switch (mode) {
-    case "easy":
-      maxNumber = 10;
-      maxAttempts = 12;
-      document.getElementById("timer").classList.add("hidden");
-      break;
-    case "medium":
-      maxNumber = 50;
-      maxAttempts = 8;
-      document.getElementById("timer").classList.add("hidden");
-      break;
-    case "hard":
-      maxNumber = 100;
-      maxAttempts = 9;
-      document.getElementById("timer").classList.remove("hidden");
-      startTimer();
-      break;
+  if (mode === "easy") {
+    maxNumber = 10;
+    maxAttempts = 12;
+    document.getElementById("timer").classList.add("hidden");
+  } else if (mode === "medium") {
+    maxNumber = 50;
+    maxAttempts = 8;
+    document.getElementById("timer").classList.add("hidden");
+  } else if (mode === "hard") {
+    maxNumber = 100;
+    maxAttempts = 9;
+    document.getElementById("timer").classList.remove("hidden");
   }
 
   document.getElementById("maxNumber").innerText = maxNumber;
@@ -238,6 +219,7 @@ function startMode(selectedMode) {
 }
 
 function resetGame() {
+  stopTimer();
   remainingAttempts = maxAttempts;
   document.getElementById("tentativi").innerText = remainingAttempts;
   targetNumber = Math.floor(Math.random() * maxNumber) + 1;
@@ -257,52 +239,24 @@ function check() {
 
   if (remainingAttempts <= 0) {
     document.getElementById("message").innerText = "I tentativi sono esauriti!";
+    document.getElementById("retryBtn").classList.remove("hidden");
     return;
   }
 
-  remainingAttempts = Math.max(remainingAttempts - 1, 0);
+  remainingAttempts--;
   document.getElementById("tentativi").innerText = remainingAttempts;
-  turns[currentPlayer]++;
 
   if (guess === targetNumber) {
-    document.getElementById("message").innerText = `🎉 ${players[currentPlayer] || "Hai"} ha indovinato!`;
+    document.getElementById("message").innerText = `🎉 Hai indovinato!`;
     document.getElementById("winSound").play();
     showConfetti();
     stopTimer();
-    scores[currentPlayer]++;
-
-    if (multiplayerMode) {
-      if (turns[currentPlayer] >= multiplayerRounds) {
-        endMultiplayer();
-      } else {
-        setTimeout(() => {
-          alert(`Tocca a ${players[1 - currentPlayer]}`);
-          currentPlayer = 1 - currentPlayer;
-          retry();
-        }, 1000);
-      }
-    } else {
-      document.getElementById("nextLevelBtn").classList.remove("hidden");
-    }
-
+    document.getElementById("nextLevelBtn").classList.remove("hidden");
   } else if (remainingAttempts === 0) {
-    document.getElementById("message").innerText = `😞 ${players[currentPlayer] || "Hai"} ha perso!`;
+    document.getElementById("message").innerText = `😞 Hai perso! Il numero era ${targetNumber}`;
     document.getElementById("loseSound").play();
     stopTimer();
-
-    if (multiplayerMode) {
-      if (turns[currentPlayer] >= multiplayerRounds) {
-        endMultiplayer();
-      } else {
-        setTimeout(() => {
-          alert(`Tocca a ${players[1 - currentPlayer]}`);
-          currentPlayer = 1 - currentPlayer;
-          retry();
-        }, 1000);
-      }
-    } else {
-      document.getElementById("retryBtn").classList.remove("hidden");
-    }
+    document.getElementById("retryBtn").classList.remove("hidden");
   } else {
     document.getElementById("message").innerText = guess < targetNumber ? "Troppo basso!" : "Troppo alto!";
   }
@@ -314,14 +268,14 @@ function nextLevel() {
     document.getElementById("game").classList.add("hidden");
     document.getElementById("finalMessage").classList.remove("hidden");
     showConfetti();
-    setTimeout(() => { goHome(); }, 5000);
+    setTimeout(goHome, 5000);
     return;
   }
 
   document.getElementById("livelloCorrente").innerText = currentLevel;
   if (mode === "easy") maxNumber = 10 * currentLevel;
   else if (mode === "medium") maxNumber = 50 * currentLevel;
-  else if (mode === "hard") maxNumber = 100 + (currentLevel - 1) * 50;
+  else maxNumber = 100 + (currentLevel - 1) * 50;
 
   if (mode === "easy") maxAttempts = 10;
   else if (mode === "medium") maxAttempts = 8;
@@ -332,8 +286,8 @@ function nextLevel() {
 }
 
 function retry() {
+  stopTimer();
   resetGame();
-  document.getElementById("retryBtn").classList.add("hidden");
 }
 
 function startTimer() {
@@ -344,11 +298,11 @@ function startTimer() {
     document.getElementById("timerValue").innerText = time;
     if (time <= 0) {
       clearInterval(gameTimer);
-      document.getElementById("message").innerText = "Tempo scaduto!";
+      document.getElementById("message").innerText = "⏰ Tempo scaduto!";
       stopTimer();
       remainingAttempts = 0;
       document.getElementById("tentativi").innerText = remainingAttempts;
-      check();
+      document.getElementById("retryBtn").classList.remove("hidden");
     }
   }, 1000);
 }
@@ -370,17 +324,18 @@ function goHome() {
 }
 
 function toggleMusic() {
+  const bgMusic = document.getElementById("bgMusic");
   if (isMusicPlaying) {
-    document.getElementById("bgMusic").pause();
+    bgMusic.pause();
     isMusicPlaying = false;
   } else {
-    document.getElementById("bgMusic").play();
+    bgMusic.play();
     isMusicPlaying = true;
   }
 }
 
 function changeTheme(theme) {
-  document.body.classList.remove("default-theme", "sunset-theme", "forest-theme", "neon-theme");
+  document.body.className = "";
   document.body.classList.add(`${theme}-theme`);
 }
 
@@ -404,9 +359,7 @@ function createNumber() {
   };
 }
 
-for (let i = 0; i < 100; i++) {
-  fallingNumbers.push(createNumber());
-}
+for (let i = 0; i < 100; i++) fallingNumbers.push(createNumber());
 
 function animateNumbers() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
