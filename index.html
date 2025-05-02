@@ -40,6 +40,16 @@
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
+      z-index: -2;
+    }
+
+    #numberCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
       z-index: -1;
     }
 
@@ -117,6 +127,7 @@
 </head>
 <body class="default-theme">
 
+<canvas id="numberCanvas"></canvas>
 <div id="particles-js"></div>
 
 <img src="logo-gioco.png" alt="Logo del Gioco" class="logo">
@@ -244,7 +255,6 @@ function check() {
     return;
   }
 
-  // Bug fix: prevent attempts from going below 0
   if (remainingAttempts <= 0) {
     document.getElementById("message").innerText = "I tentativi sono esauriti!";
     return;
@@ -373,6 +383,54 @@ function changeTheme(theme) {
   document.body.classList.remove("default-theme", "sunset-theme", "forest-theme", "neon-theme");
   document.body.classList.add(`${theme}-theme`);
 }
+
+// ANIMAZIONE NUMERI COLORATI
+const canvas = document.getElementById("numberCanvas");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const numbers = "0123456789";
+const fallingNumbers = [];
+
+function createNumber() {
+  return {
+    value: numbers[Math.floor(Math.random() * numbers.length)],
+    x: Math.random() * canvas.width,
+    y: -30,
+    speed: 1 + Math.random() * 3,
+    size: 16 + Math.random() * 24,
+    color: `hsl(${Math.random() * 360}, 100%, 60%)`
+  };
+}
+
+for (let i = 0; i < 100; i++) {
+  fallingNumbers.push(createNumber());
+}
+
+function animateNumbers() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  for (let n of fallingNumbers) {
+    ctx.fillStyle = n.color;
+    ctx.font = `${n.size}px Bangers, sans-serif`;
+    ctx.fillText(n.value, n.x, n.y);
+    n.y += n.speed;
+    if (n.y > canvas.height) {
+      n.y = -30;
+      n.x = Math.random() * canvas.width;
+      n.value = numbers[Math.floor(Math.random() * numbers.length)];
+      n.color = `hsl(${Math.random() * 360}, 100%, 60%)`;
+    }
+  }
+  requestAnimationFrame(animateNumbers);
+}
+
+animateNumbers();
+
+window.addEventListener('resize', () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
 </script>
 
 </body>
