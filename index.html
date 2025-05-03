@@ -173,10 +173,8 @@
   <button onclick="startMode('easy')">Facile</button>
   <button onclick="startMode('medium')">Medio</button>
   <button onclick="startMode('hard')">Difficile</button>
-<button onclick="createRoom()">🎮 Crea Stanza</button>
-<button onclick="joinRoom()">🔑 Entra in Stanza</button>
-<button id="startBtn" class="hidden" onclick="startMultiplayerGame()">🚀 Avvia Partita</button>
 </div>
+
 <div class="container hidden" id="game">
   <h2>Livello <span id="livelloCorrente">1</span> (0 - <span id="maxNumber">10</span>)</h2>
   <input type="number" id="userGuess" placeholder="Inserisci numero" />
@@ -412,96 +410,6 @@ window.addEventListener('resize', () => {
   canvas.height = window.innerHeight;
 });
 </script>
-<!-- Firebase App (necessario) -->
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<!-- Firebase Database (Realtime DB) -->
-<script>
-  // CONFIGURAZIONE FIREBASE
-  const firebaseConfig = {
-    apiKey: "AIzaSyB3B2tN4rrJKOuTG0-_j5QRIveHyY1mC1A",
-
-    authDomain: "gioconumerionline.firebaseapp.com",
-
-    databaseURL: "https://gioconumerionline-default-rtdb.europe-west1.firebasedatabase.app",
-
-    projectId: "gioconumerionline",
-
-    storageBucket: "gioconumerionline.firebasestorage.app",
-
-    messagingSenderId: "1073261749458",
-
-    appId: "1:1073261749458:web:39ef973e4e2ffd7107b90b",
-
-    measurementId: "G-E0FRWRMEXH"
-
-  };
-
-  // Inizializza Firebase
-  firebase.initializeApp(firebaseConfig);
-  // ==== MULTIPLAYER CON FIREBASE ====
-let roomId = null;
-let playerName = "";
-let isHost = false;
-
-// Crea una stanza multiplayer
-function createRoom() {
-  playerName = document.getElementById("playerName").value.trim();
-  if (!playerName) return alert("Inserisci un nome!");
-
-  roomId = Math.random().toString(36).substring(2, 8); // ID stanza casuale
-  isHost = true;
-
-  firebase.database().ref("rooms/" + roomId).set({
-    host: playerName,
-    players: { [playerName]: true },
-    gameState: "waiting"
-  });
-
-  document.getElementById("startBtn").classList.remove("hidden");
-  alert("Stanza creata! Codice: " + roomId);
-}
-
-// Unisciti a una stanza multiplayer esistente
-function joinRoom() {
-  playerName = document.getElementById("playerName").value.trim();
-  const inputRoomId = prompt("Inserisci il codice della stanza:");
-
-  if (!playerName || !inputRoomId) return;
-
-  roomId = inputRoomId;
-  isHost = false;
-
-  firebase.database().ref("rooms/" + roomId + "/players/" + playerName).set(true)
-    .then(() => {
-      alert("Entrato nella stanza: " + roomId);
-      listenForGameStart(); // ascolta se l'host avvia la partita
-    })
-    .catch(() => {
-      alert("Errore: la stanza non esiste.");
-    });
-}
-
-// Avvia la partita (solo l'host può farlo)
-function startMultiplayerGame() {
-  if (isHost) {
-    firebase.database().ref("rooms/" + roomId).update({ gameState: "started" });
-    startMode("easy"); // scegli il livello da far partire
-  }
-}
-
-// Ascolta quando l'host avvia la partita
-function listenForGameStart() {
-  firebase.database().ref("rooms/" + roomId + "/gameState").on("value", snapshot => {
-    if (snapshot.val() === "started" && !isHost) {
-      startMode("easy"); // deve essere uguale all'host
-    }
-  });
-}
-
-  const db = firebase.database(); // riferimento al database
-</script>
-
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 
 </body>
 </html>
