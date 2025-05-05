@@ -7,7 +7,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
   <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-  <script src="https://cdn.ably.io/lib/ably.min-1.js"></script>
 
   <style>
     :root {
@@ -86,14 +85,8 @@
     }
 
     @keyframes fadeIn {
-      0% {
-        opacity: 0;
-        transform: scale(0.95);
-      }
-      100% {
-        opacity: 1;
-        transform: scale(1);
-      }
+      0% { opacity: 0; transform: scale(0.95); }
+      100% { opacity: 1; transform: scale(1); }
     }
 
     input, select, button {
@@ -114,14 +107,10 @@
       transition: background 0.3s;
     }
 
-    button:hover {
-      background: #00cfc4;
-    }
-
+    button:hover { background: #00cfc4; }
     .music-btn { background: #e74c3c; color: white; }
     .home-btn { background: #f39c12; color: black; }
     .theme-selector { background: #9b59b6; color: white; }
-
     .hidden { display: none; }
 
     #rules {
@@ -133,7 +122,6 @@
     }
 
     #rules ul { padding-left: 20px; }
-
     #finalMessage h2 {
       font-size: 2rem;
       color: gold;
@@ -161,17 +149,12 @@
 
 <div class="container">
   <h1>🎉 Benvenuto!</h1>
-<div class="container" id="lobby">
-  <input type="text" id="roomName" placeholder="Nome Stanza" />
-  <button onclick="joinRoom()">🎮 Crea o Unisciti</button>
-  <button onclick="joinRandomMatch()">🎲 Matchmaking Casuale</button>
-</div> 
-  
+
   <div id="rules">
     <h3>📜 Regole:</h3>
     <ul>
       <li>Indovina il numero segreto ad ogni livello!</li>
-      <li>Modalità singola o multiplayer locale</li>
+      <li>Modalità singola con 3 livelli di difficoltà</li>
       <li>Ogni livello diventa più difficile!</li>
     </ul>
   </div>
@@ -416,103 +399,6 @@ window.addEventListener('resize', () => {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 });
-let ably;
-let channel;
-
-function joinRoom() {
-  const room = document.getElementById("roomName").value.trim();
-  const name = document.getElementById("playerName").value.trim();
-
-  if (!room || !name) {
-    alert("Inserisci il tuo nome e il nome della stanza!");
-    return;
-  }
-
-  document.getElementById("lobby").classList.add("hidden");
-  document.querySelectorAll("button[onclick^='startMode']").forEach(btn => btn.classList.remove("hidden"));
-
-  ably = new Ably.Realtime('TCHezw.yYA6-w:Q1yVxf8MqcvSvIrwDuBZs8Q47Agy-y-XirqTD2v-HFg');
-  channel = ably.channels.get(`gioco-numeri-${room}`);
-
-  // Presence tracking
-  channel.attach(() => {
-    channel.presence.enter({ name });
-
-    channel.presence.subscribe('enter', (member) => {
-      console.log(`${member.clientId} è entrato`);
-    });
-
-    channel.presence.get((err, members) => {
-      if (members.length > 2) {
-        alert("Questa stanza è già piena. Prova un'altra.");
-        channel.presence.leave();
-        window.location.reload();
-      }
-    });
-  });
-
-  channel.subscribe('guess', function(message) {
-    const otherPlayer = message.data.player;
-    const numero = message.data.guess;
-    if (otherPlayer !== name) {
-      console.log(`🎯 ${otherPlayer} ha scelto: ${numero}`);
-    }
-  });
-}
-
-function playerGuess(guess) {
-  const name = document.getElementById("playerName").value;
-  if (channel) {
-    channel.publish('guess', { player: name, guess });
-  }
-}
-
-const originalCheck = check;
-check = function() {
-  const guess = parseInt(document.getElementById("userGuess").value);
-  if (!isNaN(guess)) playerGuess(guess);
-  originalCheck();
-};
-async function joinRandomMatch() {
-  const name = document.getElementById("playerName").value.trim();
-  if (!name) {
-    alert("Inserisci il tuo nome prima di iniziare!");
-    return;
-  }
-
-  ably = new Ably.Realtime('TCHezw.yYA6-w:Q1yVxf8MqcvSvIrwDuBZs8Q47Agy-y-XirqTD2v-HFg');
-
-  // Ottieni una lista casuale di potenziali stanze
-  const baseRoomName = "random-match-";
-  let foundRoom = null;
-
-  for (let i = 0; i < 10; i++) {
-    const room = `${baseRoomName}${i}`;
-    const testChannel = ably.channels.get(`gioco-numeri-${room}`);
-    
-    let occupancy = 0;
-    try {
-      const presence = await testChannel.presence.get();
-      occupancy = presence.length;
-    } catch (e) {
-      console.log(`Errore nel controllo presenza stanza ${room}:`, e);
-    }
-
-    if (occupancy === 1) {
-      foundRoom = room;
-      break;
-    }
-  }
-
-  // Se nessuna stanza ha solo 1 giocatore, crea una nuova
-  if (!foundRoom) {
-    foundRoom = `${baseRoomName}${Math.floor(Math.random() * 10000)}`;
-  }
-
-  document.getElementById("roomName").value = foundRoom;
-  joinRoom();
-}
-
 </script>
 
 </body>
