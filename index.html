@@ -399,7 +399,29 @@ window.addEventListener('resize', () => {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 });
-</script>
+</script> 
+<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+<script>
+  const socket = io('http://localhost:3000'); // Cambia con il tuo dominio/server
 
+  socket.on('waiting', (msg) => {
+    alert(msg);
+  });
+
+  socket.on('startMatch', (data) => {
+    alert("Sfida iniziata!");
+    // Puoi avviare qui la logica multiplayer o reindirizzare
+  });
+
+  function inviaTentativo(numero) {
+    const room = "room"; // Dovrai salvarla una volta ricevuta
+    socket.emit('guessNumber', { guess: numero, room });
+  }
+
+  socket.on('opponentGuess', (guess) => {
+    console.log("Il tuo avversario ha provato:", guess);
+    // Mostralo in UI o confronta se vuoi la modalità competitiva
+  });
+</script>
 </body>
 </html>
