@@ -5,7 +5,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-app.use(express.static(__dirname + "/public")); // per servire HTML + JS
+app.use(express.static(__dirname));
 
 const rooms = {}; // { roomCode: { players: [], ... } }
 
