@@ -19,42 +19,50 @@ const tentativi = document.getElementById("tentativi");
 let roomCode = "";
 let playerName = "";
 
-createBtn.addEventListener("click", () => {
-    playerName = playerNameInput.value.trim();
-    const level = document.getElementById("difficulty-select").value;
-    if (playerName) {
-        socket.emit("createRoom", playerName, level);
-    }
-});
+if (createBtn) {
+    createBtn.addEventListener("click", () => {
+        playerName = playerNameInput.value.trim();
+        const level = document.getElementById("difficulty-select").value;
+        if (playerName) {
+            socket.emit("createRoom", playerName, level);
+        }
+    });
+}
 
-joinBtn.addEventListener("click", () => {
-    playerName = playerNameInput.value.trim();
-    roomCode = roomCodeInput.value.trim();
-    const level = document.getElementById("difficulty-select").value;
-    if (playerName && roomCode) {
-        socket.emit("joinRoom", { roomCode, playerName, level });
-    }
-});
+if (joinBtn) {
+    joinBtn.addEventListener("click", () => {
+        playerName = playerNameInput.value.trim();
+        roomCode = roomCodeInput.value.trim();
+        const level = document.getElementById("difficulty-select").value;
+        if (playerName && roomCode) {
+            socket.emit("joinRoom", { roomCode, playerName, level });
+        }
+    });
+}
 
-submitGuess.addEventListener("click", () => {
-    const guess = parseInt(userGuessInput.value);
-    if (!isNaN(guess)) {
-        socket.emit("playerGuess", { roomCode, playerName, guess });
-    }
-});
+if (submitGuess) {
+    submitGuess.addEventListener("click", () => {
+        const guess = parseInt(userGuessInput.value);
+        if (!isNaN(guess)) {
+            socket.emit("playerGuess", { roomCode, playerName, guess });
+        }
+    });
+}
 
 // Gestione invio dei messaggi
 const sendChatButton = document.getElementById("send-chat");
 const chatInput = document.getElementById("chat-input");
 const chatMessages = document.getElementById("chat-messages");
 
-sendChatButton.addEventListener("click", () => {
-    const message = chatInput.value.trim();
-    if (message) {
-        socket.emit("sendMessage", message); // Invia il messaggio al server
-        chatInput.value = ""; // Pulisce il campo di input
-    }
-});
+if (sendChatButton) {
+    sendChatButton.addEventListener("click", () => {
+        const message = chatInput.value.trim();
+        if (message) {
+            socket.emit("sendMessage", message); // Invia il messaggio al server
+            chatInput.value = ""; // Pulisce il campo di input
+        }
+    });
+}
 
 // Ricezione dei messaggi e visualizzazione nella chat
 socket.on("receiveMessage", ({ playerName, message }) => {
@@ -79,6 +87,7 @@ socket.on("joinedRoom", code => {
 });
 
 socket.on("updateGame", data => {
+    console.log("Aggiornamento stato gioco:", data); // Aggiungi questa riga per fare debug
     levelInfo.textContent = `Livello: ${data.level}`;
     turnMessage.textContent = data.turnMessage;
     tentativi.textContent = data.tentativi.map(player => `${player.name}: ${player.tentativi} tentativi`).join(", ");
