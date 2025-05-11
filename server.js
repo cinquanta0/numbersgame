@@ -5,7 +5,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-app.use(express.static(__dirname));
+app.use(express.static(__dirname + "/public")); // per servire HTML + JS
 
 const rooms = {}; // { roomCode: { players: [], ... } }
 
@@ -39,7 +39,6 @@ io.on("connection", socket => {
         };
         socket.join(roomCode); // Unisce il giocatore alla stanza appena creata
         socket.emit("roomCreated", roomCode); // Invia il codice della stanza al client
-        updateGameState(roomCode); // Aggiorna lo stato del gioco appena la stanza è creata
     });
 
     // Gestione ingresso in una stanza esistente
@@ -55,7 +54,7 @@ io.on("connection", socket => {
             });
             socket.join(roomCode); // Unisce il giocatore alla stanza
             io.to(roomCode).emit("joinedRoom", roomCode); // Avvisa gli altri giocatori
-            updateGameState(roomCode); // Aggiorna lo stato del gioco
+            updateGameState(roomCode);
         } else {
             socket.emit("error", "Stanza piena o non esistente");
         }
@@ -87,7 +86,7 @@ io.on("connection", socket => {
         }
 
         room.currentTurn = (room.currentTurn + 1) % room.players.length; // Passa al prossimo giocatore
-        updateGameState(roomCode, feedback); // Invia lo stato aggiornato
+        updateGameState(roomCode, feedback);
     });
 
     // Gestione chat
@@ -129,7 +128,6 @@ function updateGameState(roomCode, feedback = "") {
     });
 }
 
-const port = process.env.PORT || 3000;
-server.listen(port, () => {
-    console.log(`Server avviato sulla porta ${port}`);
+server.listen(3000, () => {
+    console.log("Server avviato su http://localhost:3000");
 });
