@@ -25,161 +25,163 @@
         <p id="tentativi"></p>
         <p id="message"></p>
     </div>
-<style>
-    :root {
-      --default-bg: linear-gradient(to right, #2c3e50, #3498db);
-      --sunset-bg: linear-gradient(to right, #ff7e5f, #feb47b);
-      --forest-bg: linear-gradient(to right, #11998e, #38ef7d);
-      --neon-bg: linear-gradient(to right, #8e2de2, #4a00e0);
-    }
-    * { box-sizing: border-box; }
-    body {
-      font-family: 'Roboto', sans-serif;
-      background: var(--default-bg);
-      color: white;
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 1rem;
-      text-align: center;
-      transition: background 1s;
-      position: relative;
-      overflow-x: hidden;
-    }
-    body.default-theme { background: var(--default-bg); color: white; }
-    body.sunset-theme { background: var(--sunset-bg); color: #2c3e50; }
-    body.forest-theme { background: var(--forest-bg); color: #1b1b1b; }
-    body.neon-theme { background: var(--neon-bg); color: #ffffff; }
 
-    #particles-js {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      z-index: -2;
-    }
+    <style>
+        :root {
+          --default-bg: linear-gradient(to right, #2c3e50, #3498db);
+          --sunset-bg: linear-gradient(to right, #ff7e5f, #feb47b);
+          --forest-bg: linear-gradient(to right, #11998e, #38ef7d);
+          --neon-bg: linear-gradient(to right, #8e2de2, #4a00e0);
+        }
+        * { box-sizing: border-box; }
+        body {
+          font-family: 'Roboto', sans-serif;
+          background: var(--default-bg);
+          color: white;
+          margin: 0;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          min-height: 100vh;
+          padding: 1rem;
+          text-align: center;
+          transition: background 1s;
+          position: relative;
+          overflow-x: hidden;
+        }
+        body.default-theme { background: var(--default-bg); color: white; }
+        body.sunset-theme { background: var(--sunset-bg); color: #2c3e50; }
+        body.forest-theme { background: var(--forest-bg); color: #1b1b1b; }
+        body.neon-theme { background: var(--neon-bg); color: #ffffff; }
 
-    #numberCanvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: -1;
-    }
+        #particles-js {
+          position: fixed;
+          top: 0; left: 0;
+          width: 100%; height: 100%;
+          z-index: -2;
+        }
 
-    h1 {
-      font-family: 'Bangers', cursive;
-      font-size: 3rem;
-      margin: 0 0 20px;
-      color: #FF6347;
-      text-shadow: 2px 2px 10px rgba(0,0,0,0.6);
-      animation: shine 1.5s linear infinite alternate;
-    }
+        #numberCanvas {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          pointer-events: none;
+          z-index: -1;
+        }
 
-    @keyframes shine {
-      0% {
-        text-shadow: 0 0 20px rgba(255, 255, 255, 0.6), 0 0 30px rgba(255, 255, 255, 0.6);
-      }
-      100% {
-        text-shadow: 0 0 40px rgba(255, 255, 255, 0.9), 0 0 60px rgba(255, 255, 255, 0.9);
-      }
-    }
+        h1 {
+          font-family: 'Bangers', cursive;
+          font-size: 3rem;
+          margin: 0 0 20px;
+          color: #FF6347;
+          text-shadow: 2px 2px 10px rgba(0,0,0,0.6);
+          animation: shine 1.5s linear infinite alternate;
+        }
 
-    .container {
-      background: rgba(255,255,255,0.1);
-      padding: 1.5rem;
-      border-radius: 20px;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 0 15px rgba(0,0,0,0.4);
-      width: 100%;
-      max-width: 400px;
-      margin: 1rem 0;
-      animation: fadeIn 1s ease-out;
-    }
+        @keyframes shine {
+          0% {
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.6), 0 0 30px rgba(255, 255, 255, 0.6);
+          }
+          100% {
+            text-shadow: 0 0 40px rgba(255, 255, 255, 0.9), 0 0 60px rgba(255, 255, 255, 0.9);
+          }
+        }
 
-    @keyframes fadeIn {
-      0% { opacity: 0; transform: scale(0.95); }
-      100% { opacity: 1; transform: scale(1); }
-    }
+        .container {
+          background: rgba(255,255,255,0.1);
+          padding: 1.5rem;
+          border-radius: 20px;
+          backdrop-filter: blur(10px);
+          box-shadow: 0 0 15px rgba(0,0,0,0.4);
+          width: 100%;
+          max-width: 400px;
+          margin: 1rem 0;
+          animation: fadeIn 1s ease-out;
+        }
 
-    input, select, button {
-      width: 100%;
-      padding: 0.75rem;
-      margin: 0.5rem 0;
-      font-size: 1rem;
-      border-radius: 10px;
-      border: none;
-      font-weight: bold;
-      box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
-    }
+        @keyframes fadeIn {
+          0% { opacity: 0; transform: scale(0.95); }
+          100% { opacity: 1; transform: scale(1); }
+        }
 
-    button {
-      background: #00fff2;
-      color: black;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
+        input, select, button {
+          width: 100%;
+          padding: 0.75rem;
+          margin: 0.5rem 0;
+          font-size: 1rem;
+          border-radius: 10px;
+          border: none;
+          font-weight: bold;
+          box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+        }
 
-    button:hover { background: #00cfc4; }
-    .music-btn { background: #e74c3c; color: white; }
-    .home-btn { background: #f39c12; color: black; }
-    .theme-selector { background: #9b59b6; color: white; }
-    .hidden { display: none; }
+        button {
+          background: #00fff2;
+          color: black;
+          cursor: pointer;
+          transition: background 0.3s;
+        }
 
-    #rules {
-      background: rgba(255,255,255,0.1);
-      padding: 1rem;
-      border-radius: 12px;
-      text-align: left;
-      animation: fadeIn 1s ease-out;
-    }
+        button:hover { background: #00cfc4; }
+        .music-btn { background: #e74c3c; color: white; }
+        .home-btn { background: #f39c12; color: black; }
+        .theme-selector { background: #9b59b6; color: white; }
+        .hidden { display: none; }
 
-    #rules ul { padding-left: 20px; }
-    #finalMessage h2 {
-      font-size: 2rem;
-      color: gold;
-      text-shadow: 1px 1px 6px #000;
-    }
+        #rules {
+          background: rgba(255,255,255,0.1);
+          padding: 1rem;
+          border-radius: 12px;
+          text-align: left;
+          animation: fadeIn 1s ease-out;
+        }
 
-    img.logo {
-      width: 150px;
-      margin-bottom: 20px;
-    }
+        #rules ul { padding-left: 20px; }
+        #finalMessage h2 {
+          font-size: 2rem;
+          color: gold;
+          text-shadow: 1px 1px 6px #000;
+        }
 
-    @media screen and (max-width: 480px) {
-      h1 { font-size: 2.2rem; }
-      .container { padding: 1rem; }
-      input, select, button { font-size: 1rem; }
-    }
-  </style>
-</head>
-<body class="default-theme">
+        img.logo {
+          width: 150px;
+          margin-bottom: 20px;
+        }
 
-<canvas id="numberCanvas"></canvas>
-<div id="particles-js"></div>
-<div id="rules">
-    <h3>📜 Regole:</h3>
-    <ul>
-      <li>Indovina il numero segreto ad ogni livello!</li>
-      <li>Modalità multiplayer con 4 livelli di difficoltà!</li>
-      <li>La modalità hardcore è perfetta da giocare con gli amici!</li>
-    </ul>
-  </div>
-<img src="logo-gioco.png" alt="Logo del Gioco" class="logo">
-<div id="chat" class="container">
-  <h3>💬 Chat</h3>
-  <div id="chat-messages" style="height: 150px; overflow-y: auto; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 10px; margin-bottom: 10px;"></div>
-  <input type="text" id="chat-input" placeholder="Scrivi un messaggio...">
-  <button id="send-chat">Invia</button>
-</div>
-<select id="difficulty-select">
-    <option value="easy">Facile</option>
-    <option value="medium">Medio</option>
-    <option value="hard">Difficile</option>
-    <option value="hardcore">Hardcore</option>
-</select>
+        @media screen and (max-width: 480px) {
+          h1 { font-size: 2.2rem; }
+          .container { padding: 1rem; }
+          input, select, button { font-size: 1rem; }
+        }
+    </style>
 
+    <div id="rules">
+        <h3>📜 Regole:</h3>
+        <ul>
+            <li>Indovina il numero segreto ad ogni livello!</li>
+            <li>Modalità multiplayer con 4 livelli di difficoltà!</li>
+            <li>La modalità hardcore è perfetta da giocare con gli amici!</li>
+        </ul>
+    </div>
+
+    <img src="logo-gioco.png" alt="Logo del Gioco" class="logo">
+
+    <div id="chat" class="container">
+        <h3>💬 Chat</h3>
+        <div id="chat-messages" style="height: 150px; overflow-y: auto; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 10px; margin-bottom: 10px;"></div>
+        <input type="text" id="chat-input" placeholder="Scrivi un messaggio...">
+        <button id="send-chat">Invia</button>
+    </div>
+
+    <select id="difficulty-select">
+        <option value="easy">Facile</option>
+        <option value="medium">Medio</option>
+        <option value="hard">Difficile</option>
+        <option value="hardcore">Hardcore</option>
+    </select>
+
+</body>
+</html>
