@@ -7,7 +7,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
   <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-
+<script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+<script src="script.js"></script>
   <style>
     :root {
       --default-bg: linear-gradient(to right, #2c3e50, #3498db);
@@ -163,6 +164,8 @@
   <button onclick="startMode('easy')">Facile</button>
   <button onclick="startMode('medium')">Medio</button>
   <button onclick="startMode('hard')">Difficile</button>
+  <button onclick="window.location.href='multiplayer.html'">🎮 Gioca in Multiplayer</button>
+
 </div>
 
 <div class="container hidden" id="game">
@@ -399,7 +402,7 @@ window.addEventListener('resize', () => {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 });
-
 </script>
+
 </body>
 </html>
