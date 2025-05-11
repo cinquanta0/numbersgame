@@ -176,7 +176,9 @@ function updateGameState(roomCode, feedback = "") {
     });
 }
 
-server.listen(3000, () => {
-    console.log("Server avviato su http://localhost:3000");
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+    console.log(`Server in ascolto su porta ${PORT}`);
 });
+
 
