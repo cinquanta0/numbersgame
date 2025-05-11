@@ -131,7 +131,8 @@ function updateGameState(roomCode, feedback = "") {
     });
 }
 
-// Ascolta sulla porta definita da Render (o su 3000 in locale)
+const port = process.env.PORT || 3000;
 server.listen(port, () => {
     console.log(`Server avviato su http://localhost:${port}`);
 });
+
