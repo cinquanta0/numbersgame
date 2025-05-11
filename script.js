@@ -19,57 +19,26 @@ const tentativi = document.getElementById("tentativi");
 let roomCode = "";
 let playerName = "";
 
-if (createBtn) {
-    createBtn.addEventListener("click", () => {
-        playerName = playerNameInput.value.trim();
-        const level = document.getElementById("difficulty-select").value;
-        if (playerName) {
-            socket.emit("createRoom", playerName, level);
-        }
-    });
-}
+createBtn.addEventListener("click", () => {
+    playerName = playerNameInput.value.trim();
+    if (playerName) {
+        socket.emit("createRoom", playerName);
+    }
+});
 
-if (joinBtn) {
-    joinBtn.addEventListener("click", () => {
-        playerName = playerNameInput.value.trim();
-        roomCode = roomCodeInput.value.trim();
-        const level = document.getElementById("difficulty-select").value;
-        if (playerName && roomCode) {
-            socket.emit("joinRoom", { roomCode, playerName, level });
-        }
-    });
-}
+joinBtn.addEventListener("click", () => {
+    playerName = playerNameInput.value.trim();
+    roomCode = roomCodeInput.value.trim();
+    if (playerName && roomCode) {
+        socket.emit("joinRoom", { roomCode, playerName });
+    }
+});
 
-if (submitGuess) {
-    submitGuess.addEventListener("click", () => {
-        const guess = parseInt(userGuessInput.value);
-        if (!isNaN(guess)) {
-            socket.emit("playerGuess", { roomCode, playerName, guess });
-        }
-    });
-}
-
-// Gestione invio dei messaggi
-const sendChatButton = document.getElementById("send-chat");
-const chatInput = document.getElementById("chat-input");
-const chatMessages = document.getElementById("chat-messages");
-
-if (sendChatButton) {
-    sendChatButton.addEventListener("click", () => {
-        const message = chatInput.value.trim();
-        if (message) {
-            socket.emit("sendMessage", message); // Invia il messaggio al server
-            chatInput.value = ""; // Pulisce il campo di input
-        }
-    });
-}
-
-// Ricezione dei messaggi e visualizzazione nella chat
-socket.on("receiveMessage", ({ playerName, message }) => {
-    const messageElement = document.createElement("p");
-    messageElement.innerHTML = `<strong>${playerName}:</strong> ${message}`;
-    chatMessages.appendChild(messageElement);
-    chatMessages.scrollTop = chatMessages.scrollHeight; // Scrolla verso il basso per il nuovo messaggio
+submitGuess.addEventListener("click", () => {
+    const guess = parseInt(userGuessInput.value);
+    if (!isNaN(guess)) {
+        socket.emit("playerGuess", { roomCode, playerName, guess });
+    }
 });
 
 socket.on("roomCreated", code => {
@@ -87,9 +56,28 @@ socket.on("joinedRoom", code => {
 });
 
 socket.on("updateGame", data => {
-    console.log("Aggiornamento stato gioco:", data); // Aggiungi questa riga per fare debug
     levelInfo.textContent = `Livello: ${data.level}`;
     turnMessage.textContent = data.turnMessage;
+    // Mostra tentativi per ogni giocatore
     tentativi.textContent = data.tentativi.map(player => `${player.name}: ${player.tentativi} tentativi`).join(", ");
     message.textContent = data.feedback;
 });
+const chatInput = document.getElementById('chat-input');
+const sendChatBtn = document.getElementById('send-chat');
+const chatMessages = document.getElementById('chat-messages');
+
+sendChatBtn.addEventListener('click', () => {
+  const message = chatInput.value.trim();
+  if (message) {
+    socket.emit('chatMessage', message);
+    chatInput.value = '';
+  }
+});
+
+socket.on('chatMessage', ({ playerName, message }) => {
+  const msgElement = document.createElement('p');
+  msgElement.innerHTML = `<strong>${playerName}:</strong> ${message}`;
+  chatMessages.appendChild(msgElement);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+});
+
