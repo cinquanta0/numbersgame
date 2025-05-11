@@ -1,6 +1,7 @@
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
+
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
@@ -15,52 +16,56 @@ function generateRoomCode() {
 
 function getRandomNumber(level) {
     const max = level * 10;
-    return Math.floor(Math.random() * (max + 1)); // Numero casuale tra 0 e livello*10
+    return Math.floor(Math.random() * (max + 1));
 }
 
 io.on("connection", socket => {
     let roomCode = null;
     let playerName = null;
 
-    // Gestione creazione della stanza
-    socket.on("createRoom", playerNameParam => {
-        playerName = playerNameParam; // Salva il nome del giocatore
-        const roomCodeGenerated = generateRoomCode();
-        roomCode = roomCodeGenerated; // Assegna il codice della stanza al socket
+    // Creazione stanza
+    socket.on("createRoom", (playerNameParam, levelParam) => {
+        playerName = playerNameParam;
+        const level = parseInt(levelParam) || 1;
+        roomCode = generateRoomCode();
+
         rooms[roomCode] = {
             players: [{
                 id: socket.id,
                 name: playerName,
-                tentativi: 5, // Ogni giocatore ha i suoi tentativi
+                tentativi: 5,
             }],
             currentTurn: 0,
-            numberToGuess: getRandomNumber(1),
-            level: 1,
+            numberToGuess: getRandomNumber(level),
+            level: level,
         };
-        socket.join(roomCode); // Unisce il giocatore alla stanza appena creata
-        socket.emit("roomCreated", roomCode); // Invia il codice della stanza al client
+
+        socket.join(roomCode);
+        socket.emit("roomCreated", roomCode);
     });
 
-    // Gestione ingresso in una stanza esistente
-    socket.on("joinRoom", ({ roomCode: enteredRoomCode, playerName: enteredPlayerName }) => {
+    // Entrata in stanza
+    socket.on("joinRoom", ({ roomCode: enteredRoomCode, playerName: enteredPlayerName, level: levelParam }) => {
         const room = rooms[enteredRoomCode];
         if (room && room.players.length < 2) {
             playerName = enteredPlayerName;
             roomCode = enteredRoomCode;
+
             room.players.push({
                 id: socket.id,
                 name: playerName,
-                tentativi: 5, // Ogni nuovo giocatore ha i suoi tentativi
+                tentativi: 5,
             });
-            socket.join(roomCode); // Unisce il giocatore alla stanza
-            io.to(roomCode).emit("joinedRoom", roomCode); // Avvisa gli altri giocatori
+
+            socket.join(roomCode);
+            io.to(roomCode).emit("joinedRoom", roomCode);
             updateGameState(roomCode);
         } else {
             socket.emit("error", "Stanza piena o non esistente");
         }
     });
 
-    // Gestione del tentativo di un giocatore
+    // Tentativi
     socket.on("playerGuess", ({ roomCode, playerName, guess }) => {
         const room = rooms[roomCode];
         if (!room) return;
@@ -72,48 +77,48 @@ io.on("connection", socket => {
         if (guess === room.numberToGuess) {
             feedback = `Bravo ${currentPlayer.name}! Hai indovinato!`;
             room.level++;
-            room.numberToGuess = getRandomNumber(room.level); // Nuovo numero per il livello successivo
-            room.players.forEach(player => player.tentativi = 5); // Reset dei tentativi per tutti i giocatori
+            room.numberToGuess = getRandomNumber(room.level);
+            room.players.forEach(player => player.tentativi = 5);
         } else {
-            currentPlayer.tentativi--; // Riduci i tentativi solo per il giocatore corrente
+            currentPlayer.tentativi--;
             feedback = guess < room.numberToGuess ? "Troppo basso!" : "Troppo alto!";
             if (currentPlayer.tentativi <= 0) {
                 feedback = `Game over! Era ${room.numberToGuess}`;
-                room.players.forEach(player => player.tentativi = 5); // Reset tentativi per tutti
-                room.numberToGuess = getRandomNumber(room.level); // Nuovo numero per il livello successivo
-                room.level = 1; // Reset del livello
+                room.level = 1;
+                room.numberToGuess = getRandomNumber(room.level);
+                room.players.forEach(player => player.tentativi = 5);
             }
         }
 
-        room.currentTurn = (room.currentTurn + 1) % room.players.length; // Passa al prossimo giocatore
+        room.currentTurn = (room.currentTurn + 1) % room.players.length;
         updateGameState(roomCode, feedback);
     });
 
-    // Gestione chat
-    socket.on('chatMessage', (message) => {
-        if (roomCode) { // Verifica che il giocatore sia in una stanza
-            io.to(roomCode).emit('chatMessage', {
-                playerName: playerName, // Invia il nome del giocatore
+    // Chat
+    socket.on("sendMessage", (message) => {
+        if (roomCode) {
+            io.to(roomCode).emit("receiveMessage", {
+                playerName,
                 message
             });
         }
     });
 
-    // Quando il giocatore si disconnette, rimuoviamo la stanza se non ci sono più giocatori
-    socket.on('disconnect', () => {
+    // Disconnessione
+    socket.on("disconnect", () => {
         if (roomCode) {
             const room = rooms[roomCode];
             if (room) {
                 room.players = room.players.filter(player => player.id !== socket.id);
                 if (room.players.length === 0) {
-                    delete rooms[roomCode]; // Rimuove la stanza se non ci sono più giocatori
+                    delete rooms[roomCode];
                 }
             }
         }
     });
 });
 
-// Funzione per aggiornare lo stato del gioco per tutti i giocatori nella stanza
+// Funzione per aggiornare lo stato del gioco
 function updateGameState(roomCode, feedback = "") {
     const room = rooms[roomCode];
     if (!room) return;
