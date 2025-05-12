@@ -30,11 +30,23 @@
     </div>
 <style>
     :root {
-      --default-bg: linear-gradient(to right, #2c3e50, #3498db);
-      --sunset-bg: linear-gradient(to right, #ff7e5f, #feb47b);
-      --forest-bg: linear-gradient(to right, #11998e, #38ef7d);
-      --neon-bg: linear-gradient(to right, #8e2de2, #4a00e0);
-    }
+      body.default-theme {
+  background: linear-gradient(to right, #2c3e50, #3498db);
+  color: white;
+}
+body.sunset-theme {
+  background: linear-gradient(to right, #ff7e5f, #feb47b);
+  color: #2c3e50;
+}
+body.forest-theme {
+  background: linear-gradient(to right, #11998e, #38ef7d);
+  color: #1b1b1b;
+}
+body.neon-theme {
+  background: linear-gradient(to right, #8e2de2, #4a00e0);
+  color: white;
+}
+
     * { box-sizing: border-box; }
     body {
       font-family: 'Roboto', sans-serif;
