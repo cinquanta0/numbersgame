@@ -447,6 +447,17 @@ window.addEventListener('resize', () => {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 });
+function handleCredentialResponse(response) {
+  const token = response.credential;
+  console.log("ID Token ricevuto da Google:", token);
+
+  // Qui puoi salvare il login localmente o inviarlo a un server
+  localStorage.setItem("google_token", token);
+
+  // Esempio: mostra che l’utente è loggato
+  document.body.innerHTML = "<h1>Sei loggato con Google!</h1>";
+}
+
 </script>
 
 </body>
