@@ -255,12 +255,28 @@ function startMode(selectedMode) {
   document.getElementById("finalMessage").classList.add("hidden");
   resetGame();
 }
+let previousNumbers = [];
+
+function generateSmartNumber(max, level) {
+  let num;
+  let attempts = 0;
+  do {
+    const base = Math.floor(Math.random() * (max - level)) + 1;
+    const noise = Math.abs(Math.floor(Math.sin(Date.now() + attempts * 17) * 10)) % level;
+    num = Math.min(max, base + noise);
+    attempts++;
+  } while (previousNumbers.includes(num) && attempts < 10);
+
+  previousNumbers.push(num);
+  if (previousNumbers.length > 10) previousNumbers.shift(); // Ricorda solo gli ultimi 10 numeri
+  return num;
+}
 
 function resetGame() {
   stopTimer();
   remainingAttempts = maxAttempts;
   document.getElementById("tentativi").innerText = remainingAttempts;
-  targetNumber = Math.floor(Math.random() * maxNumber) + 1;
+  targetNumber = generateSmartNumber(maxNumber, currentLevel);
   document.getElementById("message").innerText = "";
   document.getElementById("userGuess").value = "";
   document.getElementById("nextLevelBtn").classList.add("hidden");
