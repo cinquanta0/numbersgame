@@ -2,9 +2,6 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Gioco Multiplayer</title>
     <script src="/socket.io/socket.io.js"></script>
     <script src="script.js" defer></script>
@@ -30,23 +27,11 @@
     </div>
 <style>
     :root {
-      body.default-theme {
-  background: linear-gradient(to right, #2c3e50, #3498db);
-  color: white;
-}
-body.sunset-theme {
-  background: linear-gradient(to right, #ff7e5f, #feb47b);
-  color: #2c3e50;
-}
-body.forest-theme {
-  background: linear-gradient(to right, #11998e, #38ef7d);
-  color: #1b1b1b;
-}
-body.neon-theme {
-  background: linear-gradient(to right, #8e2de2, #4a00e0);
-  color: white;
-}
-
+      --default-bg: linear-gradient(to right, #2c3e50, #3498db);
+      --sunset-bg: linear-gradient(to right, #ff7e5f, #feb47b);
+      --forest-bg: linear-gradient(to right, #11998e, #38ef7d);
+      --neon-bg: linear-gradient(to right, #8e2de2, #4a00e0);
+    }
     * { box-sizing: border-box; }
     body {
       font-family: 'Roboto', sans-serif;
@@ -198,5 +183,4 @@ body.neon-theme {
   <option value="hard">Difficile</option>
   <option value="hardcore">Hardcore</option>
 </select>
-
 
