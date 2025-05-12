@@ -3,34 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Gioco dei Numeri</title>
   <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
   <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
-<script src="script.js" defer></script>
+<script src="script.js"></script>
   <style>
     :root {
-      body.default-theme {
-  background: linear-gradient(to right, #2c3e50, #3498db);
-  color: white;
-}
-body.sunset-theme {
-  background: linear-gradient(to right, #ff7e5f, #feb47b);
-  color: #2c3e50;
-}
-body.forest-theme {
-  background: linear-gradient(to right, #11998e, #38ef7d);
-  color: #1b1b1b;
-}
-body.neon-theme {
-  background: linear-gradient(to right, #8e2de2, #4a00e0);
-  color: white;
-}
-
+      --default-bg: linear-gradient(to right, #2c3e50, #3498db);
+      --sunset-bg: linear-gradient(to right, #ff7e5f, #feb47b);
+      --forest-bg: linear-gradient(to right, #11998e, #38ef7d);
+      --neon-bg: linear-gradient(to right, #8e2de2, #4a00e0);
+    }
     * { box-sizing: border-box; }
     body {
       font-family: 'Roboto', sans-serif;
