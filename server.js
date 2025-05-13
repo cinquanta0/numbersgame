@@ -36,10 +36,11 @@ function getRandomNumber(level, difficulty) {
         default: increment = 30;
     }
 
-    const min = increment * (level - 1);
-    const max = min + increment;
+    const min = 0;
+    const max = increment * level;
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
 
 io.on("connection", socket => {
     let roomCode = null;
@@ -165,8 +166,9 @@ function updateGameState(roomCode, feedback = "") {
         default: rangeMax = 30;
     }
 
-    const min = rangeMax * (room.level - 1);
-    const max = min + rangeMax;
+    const max = rangeMax * room.level;
+    const min = 0;
+
 
     io.to(roomCode).emit("updateGame", {
         level: `Livello ${room.level}: Indovina un numero tra ${min} e ${max}`,
@@ -180,5 +182,3 @@ const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
     console.log(`Server in ascolto su porta ${PORT}`);
 });
-
-
