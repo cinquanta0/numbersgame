@@ -179,15 +179,6 @@ body.neon-theme {
       <li>Ogni livello diventa più difficile!</li>
     </ul>
   </div>
-  <!-- Libreria di Google -->
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-
-<!-- Login con Google -->
-<div id="g_id_onload"
-     data-client_id="51313543072-707dptir7ro5evoh789l50h53k7pnpno.apps.googleusercontent.com"
-     data-callback="handleCredentialResponse">
-</div>
-<div class="g_id_signin" data-type="standard" data-size="large"></div>
 
   <input type="text" id="playerName" placeholder="Il tuo nome" minlength="2" />
   <button onclick="startMode('easy')">Facile</button>
@@ -209,6 +200,11 @@ body.neon-theme {
 </div>
 
 <div class="container hidden" id="finalMessage">
+<div class="container" id="leaderboard">
+  <h3>🏆 Classifica Locale</h3>
+  <ul id="scoreList" style="text-align:left; padding-left: 0;"></ul>
+</div>
+ 
   <h2>🎊 Complimenti!</h2>
   <p>Hai completato tutti i livelli!</p>
   <p>Verrai reindirizzato alla Home tra pochi secondi...</p>
@@ -328,12 +324,21 @@ function check() {
 function nextLevel() {
   currentLevel++;
   if (currentLevel > 10) {
-    document.getElementById("game").classList.add("hidden");
-    document.getElementById("finalMessage").classList.remove("hidden");
-    showConfetti();
-    setTimeout(goHome, 5000);
-    return;
-  }
+  document.getElementById("game").classList.add("hidden");
+  document.getElementById("finalMessage").classList.remove("hidden");
+  showConfetti();
+
+  // Ottieni il nome del giocatore
+  const name = document.getElementById("playerName").value || "Anonimo";
+
+  // Salva il punteggio
+  saveScore(name, currentLevel - 1);
+
+  // Ritorna alla home dopo 5 secondi
+  setTimeout(goHome, 5000);
+  return;
+}
+
 
   document.getElementById("livelloCorrente").innerText = currentLevel;
   if (mode === "easy") maxNumber = 10 * currentLevel;
@@ -447,6 +452,38 @@ window.addEventListener('resize', () => {
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 });
+// Funzione per salvare il punteggio nel localStorage
+function saveScore(name, level) {
+  // Recupera la lista dei punteggi dal localStorage (o crea una lista vuota se non ci sono punteggi)
+  const scores = JSON.parse(localStorage.getItem("scores") || "[]");
+
+  // Aggiungi il nuovo punteggio
+  scores.push({ name, level });
+
+  // Ordina i punteggi in ordine decrescente (dal più alto al più basso)
+  scores.sort((a, b) => b.level - a.level);
+
+  // Salva di nuovo i punteggi nel localStorage
+  localStorage.setItem("scores", JSON.stringify(scores));
+
+  // Rende visibile la classifica aggiornata
+  renderScores();
+}
+
+// Funzione per visualizzare la classifica
+function renderScores() {
+  const scoreList = document.getElementById("scoreList");
+  const scores = JSON.parse(localStorage.getItem("scores") || "[]");
+
+  // Mostra solo i primi 10 punteggi
+  scoreList.innerHTML = scores
+    .slice(0, 10)
+    .map(s => `<li><strong>${s.name}</strong>: Livello ${s.level}</li>`)
+    .join("");
+}
+
+// Mostra la classifica ogni volta che la pagina si carica
+renderScores();
 
 </script>
 
