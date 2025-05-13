@@ -185,6 +185,7 @@ body.neon-theme {
   <button onclick="startMode('medium')">Medio</button>
   <button onclick="startMode('hard')">Difficile</button>
   <button onclick="window.location.href='multiplayer.html'">🎮 Gioca in Multiplayer</button>
+  <button onclick="startMode('hardcore')">🔥 Hardcore</button>
 
 </div>
 
@@ -240,19 +241,24 @@ function startMode(selectedMode) {
   currentLevel = 1;
   document.getElementById("livelloCorrente").innerText = currentLevel;
 
-  if (mode === "easy") {
-    maxNumber = 10;
-    maxAttempts = 10;
-    document.getElementById("timer").classList.add("hidden");
-  } else if (mode === "medium") {
-    maxNumber = 50;
-    maxAttempts = 8;
-    document.getElementById("timer").classList.add("hidden");
-  } else if (mode === "hard") {
-    maxNumber = 100;
-    maxAttempts = 9;
-    document.getElementById("timer").classList.remove("hidden");
-  }
+ if (mode === "easy") {
+  maxNumber = 30 * currentLevel;
+  maxAttempts = 10;
+  document.getElementById("timer").classList.add("hidden");
+} else if (mode === "medium") {
+  maxNumber = 60 * currentLevel;
+  maxAttempts = 10;
+  document.getElementById("timer").classList.add("hidden");
+} else if (mode === "hard") {
+  maxNumber = 150 * currentLevel;
+  maxAttempts = 9;
+  document.getElementById("timer").classList.remove("hidden");
+} else if (mode === "hardcore") {
+  maxNumber = 300 * currentLevel;
+  maxAttempts = 13;
+  document.getElementById("timer").classList.remove("hidden");
+}
+
 
   document.getElementById("maxNumber").innerText = maxNumber;
   document.getElementById("tentativi").innerText = maxAttempts;
@@ -341,9 +347,11 @@ function nextLevel() {
 
 
   document.getElementById("livelloCorrente").innerText = currentLevel;
-  if (mode === "easy") maxNumber = 10 * currentLevel;
-  else if (mode === "medium") maxNumber = 50 * currentLevel;
-  else maxNumber = 100 + (currentLevel - 1) * 50;
+  if (mode === "easy") maxNumber = 30 * currentLevel;
+else if (mode === "medium") maxNumber = 60 * currentLevel;
+else if (mode === "hard") maxNumber = 150 * currentLevel;
+else if (mode === "hardcore") maxNumber = 300 * currentLevel;
+
 
   if (mode === "easy") maxAttempts = 10;
   else if (mode === "medium") maxAttempts = 8;
