@@ -3,20 +3,27 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gioco dei Numeri</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <title>Gioco dei Numeri Evoluto</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Orbitron:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
   <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-<script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
-<script src="script.js"></script>
+  <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+
   <style>
     :root {
       --default-bg: linear-gradient(to right, #2c3e50, #3498db);
       --sunset-bg: linear-gradient(to right, #ff7e5f, #feb47b);
       --forest-bg: linear-gradient(to right, #11998e, #38ef7d);
       --neon-bg: linear-gradient(to right, #8e2de2, #4a00e0);
+      --cyber-bg: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      
+      --primary-color: #00fff2;
+      --secondary-color: #ff6b6b;
+      --accent-color: #ffd93d;
     }
+    
     * { box-sizing: border-box; }
+    
     body {
       font-family: 'Roboto', sans-serif;
       background: var(--default-bg);
@@ -33,30 +40,31 @@
       position: relative;
       overflow-x: hidden;
     }
+    
     body.default-theme {
-  background-color: #2c3e50;
-  background-image: linear-gradient(to right, #2c3e50, #3498db);
-  color: white;
-}
-
-body.sunset-theme {
-  background-color: #ff7e5f;
-  background-image: linear-gradient(to right, #ff7e5f, #feb47b);
-  color: #2c3e50;
-}
-
-body.forest-theme {
-  background-color: #11998e;
-  background-image: linear-gradient(to right, #11998e, #38ef7d);
-  color: #1b1b1b;
-}
-
-body.neon-theme {
-  background-color: #8e2de2;
-  background-image: linear-gradient(to right, #8e2de2, #4a00e0);
-  color: #ffffff;
-}
-
+      background-image: linear-gradient(to right, #2c3e50, #3498db);
+      color: white;
+    }
+    
+    body.sunset-theme {
+      background-image: linear-gradient(to right, #ff7e5f, #feb47b);
+      color: #2c3e50;
+    }
+    
+    body.forest-theme {
+      background-image: linear-gradient(to right, #11998e, #38ef7d);
+      color: #1b1b1b;
+    }
+    
+    body.neon-theme {
+      background-image: linear-gradient(to right, #8e2de2, #4a00e0);
+      color: #ffffff;
+    }
+    
+    body.cyber-theme {
+      background-image: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      color: #e0e0e0;
+    }
 
     #particles-js {
       position: fixed;
@@ -125,10 +133,18 @@ body.neon-theme {
       background: #00fff2;
       color: black;
       cursor: pointer;
-      transition: background 0.3s;
+      transition: all 0.3s ease;
     }
 
-    button:hover { background: #00cfc4; }
+    button:hover { 
+      background: #00cfc4; 
+      transform: translateY(-2px);
+    }
+    
+    button:active {
+      transform: translateY(0);
+    }
+    
     .music-btn { background: #e74c3c; color: white; }
     .home-btn { background: #f39c12; color: black; }
     .theme-selector { background: #9b59b6; color: white; }
@@ -143,6 +159,7 @@ body.neon-theme {
     }
 
     #rules ul { padding-left: 20px; }
+    
     #finalMessage h2 {
       font-size: 2rem;
       color: gold;
@@ -153,11 +170,279 @@ body.neon-theme {
       width: 150px;
       margin-bottom: 20px;
     }
+    
+    /* Nuovi stili per le modalità di gioco */
+    .game-modes {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    
+    .mode-card {
+      background: rgba(255,255,255,0.15);
+      border-radius: 15px;
+      padding: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+    
+    .mode-card:hover {
+      background: rgba(255,255,255,0.25);
+      transform: translateY(-5px);
+      border-color: var(--primary-color);
+    }
+    
+    .mode-icon {
+      font-size: 2rem;
+      margin-bottom: 5px;
+    }
+    
+    .mode-title {
+      font-weight: bold;
+      font-family: 'Orbitron', sans-serif;
+      margin-bottom: 5px;
+    }
+    
+    .mode-desc {
+      font-size: 0.8rem;
+      opacity: 0.8;
+    }
+    
+    /* Stili per la barra di progressione */
+    .progress-container {
+      background: rgba(0,0,0,0.2);
+      border-radius: 10px;
+      height: 10px;
+      margin: 15px 0;
+      overflow: hidden;
+    }
+    
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #00fff2, #00cfc4);
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+    
+    /* Stili per i suggerimenti */
+    .hint-container {
+      margin: 10px 0;
+      padding: 10px;
+      background: rgba(255, 217, 61, 0.2);
+      border-radius: 10px;
+      border-left: 4px solid #ffd93d;
+    }
+    
+    /* Stili per la cronologia tentativi */
+    .history-container {
+      max-height: 150px;
+      overflow-y: auto;
+      margin: 15px 0;
+      background: rgba(0,0,0,0.2);
+      border-radius: 10px;
+      padding: 10px;
+    }
+    
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .history-item:last-child {
+      border-bottom: none;
+    }
+    
+    /* Stili per il sistema di power-up */
+    .powerups {
+      display: flex;
+      gap: 10px;
+      margin: 15px 0;
+    }
+    
+    .powerup {
+      flex: 1;
+      background: rgba(0,0,0,0.2);
+      border-radius: 10px;
+      padding: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .powerup:hover {
+      background: rgba(0,0,0,0.3);
+      transform: translateY(-2px);
+    }
+    
+    .powerup-icon {
+      font-size: 1.5rem;
+      margin-bottom: 5px;
+    }
+    
+    .powerup-name {
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+    
+    /* Stili per il sistema di livelli */
+    .level-badge {
+      background: #ffd93d;
+      color: black;
+      border-radius: 20px;
+      padding: 5px 15px;
+      font-weight: bold;
+      display: inline-block;
+      margin-bottom: 10px;
+    }
+    
+    /* Stili per la classifica */
+    .leaderboard {
+      margin-top: 20px;
+    }
+    
+    .leaderboard-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 8px;
+      margin-bottom: 5px;
+    }
+    
+    .rank {
+      background: #ffd93d;
+      color: black;
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      margin-right: 10px;
+    }
+    
+    .player-info {
+      flex: 1;
+      text-align: left;
+      display: flex;
+      align-items: center;
+    }
+    
+    .score-info {
+      font-weight: bold;
+      color: #00fff2;
+    }
+    
+    /* Animazioni aggiuntive */
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+    
+    .pulse {
+      animation: pulse 1s infinite;
+    }
+    
+    .shake {
+      animation: shake 0.5s;
+    }
+    
+    /* Stili per il sistema di achievements */
+    .achievement {
+      background: rgba(0,0,0,0.3);
+      border-radius: 10px;
+      padding: 10px;
+      margin: 10px 0;
+      display: flex;
+      align-items: center;
+    }
+    
+    .achievement-icon {
+      font-size: 2rem;
+      margin-right: 15px;
+    }
+    
+    .achievement-info {
+      text-align: left;
+      flex: 1;
+    }
+    
+    .achievement-title {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    
+    .achievement-desc {
+      font-size: 0.8rem;
+      opacity: 0.8;
+    }
+    
+    /* Stili per il numero vivente */
+    .living-number {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 3rem;
+      font-weight: bold;
+      margin: 20px 0;
+      color: #00fff2;
+      text-shadow: 0 0 10px currentColor;
+      transition: all 0.5s ease;
+    }
+    
+    /* Stili per la modalità storia */
+    .story-container {
+      background: rgba(0,0,0,0.2);
+      border-radius: 15px;
+      padding: 15px;
+      margin: 15px 0;
+      text-align: left;
+    }
+    
+    .story-title {
+      font-family: 'Bangers', cursive;
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+      color: #ffd93d;
+    }
+    
+    .story-text {
+      line-height: 1.5;
+      margin-bottom: 15px;
+    }
+    
+    .story-choices {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .story-choice {
+      flex: 1;
+      background: rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .story-choice:hover {
+      background: rgba(255,255,255,0.2);
+    }
 
     @media screen and (max-width: 480px) {
       h1 { font-size: 2.2rem; }
       .container { padding: 1rem; }
       input, select, button { font-size: 1rem; }
+      .game-modes { grid-template-columns: 1fr; }
+      .powerups { flex-direction: column; }
     }
   </style>
 </head>
@@ -168,65 +453,265 @@ body.neon-theme {
 
 <img src="logo-gioco.png" alt="Logo del Gioco" class="logo">
 
-<div class="container">
-  <h1>🎉 Benvenuto!</h1>
+<div class="container" id="mainScreen">
+  <h1>🎮 Numero Quest</h1>
 
   <div id="rules">
-    <h3>📜 Regole:</h3>
+    <h3>📜 Benvenuto all'avventura numerica!</h3>
     <ul>
-      <li>Indovina il numero segreto ad ogni livello!</li>
-      <li>Modalità singola con 3 livelli di difficoltà</li>
-      <li>Ogni livello diventa più difficile!</li>
+      <li>Indovina il numero segreto in ogni livello</li>
+      <li>Sblocca modalità speciali e power-up</li>
+      <li>Colleziona achievement e scala la classifica</li>
+      <li>Scopri la storia del Regno dei Numeri</li>
     </ul>
   </div>
 
-  <input type="text" id="playerName" placeholder="Il tuo nome" minlength="2" />
-  <button onclick="startMode('easy')">Facile</button>
-  <button onclick="startMode('medium')">Medio</button>
-  <button onclick="startMode('hard')">Difficile</button>
-  <button onclick="window.location.href='multiplayer.html'">🎮 Gioca in Multiplayer</button>
-  <button onclick="startMode('hardcore')">🔥 Hardcore</button>
+  <input type="text" id="playerName" placeholder="Il tuo nome da eroe" minlength="2" />
+  
+  <div class="game-modes">
+    <div class="mode-card" onclick="startMode('easy')">
+      <div class="mode-icon">🧩</div>
+      <div class="mode-title">Facile</div>
+      <div class="mode-desc">Numeri fino a 30, 10 tentativi</div>
+    </div>
+    
+    <div class="mode-card" onclick="startMode('medium')">
+      <div class="mode-icon">⚔️</div>
+      <div class="mode-title">Medio</div>
+      <div class="mode-desc">Numeri fino a 60, 8 tentativi</div>
+    </div>
+    
+    <div class="mode-card" onclick="startMode('hard')">
+      <div class="mode-icon">🔥</div>
+      <div class="mode-title">Difficile</div>
+      <div class="mode-desc">Numeri fino a 150, timer attivo</div>
+    </div>
+    
+    <div class="mode-card" onclick="startMode('hardcore')">
+      <div class="mode-icon">💀</div>
+      <div class="mode-title">Hardcore</div>
+      <div class="mode-desc">Numeri fino a 300, timer ridotto</div>
+    </div>
+  </div>
+  
+  <button onclick="openSpecialModes()" class="pulse">✨ Modalità Speciali</button>
+  <button onclick="window.location.href='multiplayer.html'">👥 Multiplayer</button>
+  <button onclick="openAchievements()">🏆 Achievements</button>
+</div>
 
+<div class="container hidden" id="specialModesScreen">
+  <h2>✨ Modalità Speciali</h2>
+  
+  <div class="game-modes">
+    <div class="mode-card" onclick="startSpecialMode('living')">
+      <div class="mode-icon">🌱</div>
+      <div class="mode-title">Numero Vivente</div>
+      <div class="mode-desc">Alleva il tuo numero e fallo crescere</div>
+    </div>
+    
+    <div class="mode-card" onclick="startSpecialMode('story')">
+      <div class="mode-icon">📚</div>
+      <div class="mode-title">Modalità Storia</div>
+      <div class="mode-desc">Scopri il mistero del Regno dei Numeri</div>
+    </div>
+    
+    <div class="mode-card" onclick="startSpecialMode('rhythm')">
+      <div class="mode-icon">🎵</div>
+      <div class="mode-title">Rhythm Numbers</div>
+      <div class="mode-desc">Indovina a ritmo di musica</div>
+    </div>
+    
+    <div class="mode-card" onclick="startSpecialMode('puzzle')">
+      <div class="mode-icon">🧠</div>
+      <div class="mode-title">Puzzle Numerici</div>
+      <div class="mode-desc">Risolvi enigmi matematici</div>
+    </div>
+  </div>
+  
+  <button onclick="goToMainScreen()">🔙 Torna al Menu</button>
+</div>
+
+<div class="container hidden" id="achievementsScreen">
+  <h2>🏆 Achievements</h2>
+  
+  <div id="achievementsList">
+    <div class="achievement">
+      <div class="achievement-icon">🔍</div>
+      <div class="achievement-info">
+        <div class="achievement-title">Primo Indovinello</div>
+        <div class="achievement-desc">Indovina il tuo primo numero</div>
+      </div>
+    </div>
+    
+    <div class="achievement">
+      <div class="achievement-icon">🎯</div>
+      <div class="achievement-info">
+        <div class="achievement-title">Precisione</div>
+        <div class="achievement-desc">Indovina al primo tentativo</div>
+      </div>
+    </div>
+    
+    <div class="achievement">
+      <div class="achievement-icon">⚡</div>
+      <div class="achievement-info">
+        <div class="achievement-title">Velocista</div>
+        <div class="achievement-desc">Indovina in meno di 5 secondi</div>
+      </div>
+    </div>
+    
+    <div class="achievement">
+      <div class="achievement-icon">🔥</div>
+      <div class="achievement-info">
+        <div class="achievement-title">Maestro dei Numeri</div>
+        <div class="achievement-desc">Completa la modalità Hardcore</div>
+      </div>
+    </div>
+  </div>
+  
+  <button onclick="goToMainScreen()">🔙 Torna al Menu</button>
 </div>
 
 <div class="container hidden" id="game">
+  <div class="level-badge" id="levelBadge">Livello 1</div>
   <h2>Livello <span id="livelloCorrente">1</span> (0 - <span id="maxNumber">10</span>)</h2>
+  
+  <div class="progress-container">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+  
   <input type="number" id="userGuess" placeholder="Inserisci numero" />
-  <button onclick="check()">Verifica</button>
+  <button onclick="check()">🔍 Verifica</button>
+  
   <p>Tentativi rimasti: <span id="tentativi">10</span></p>
   <p id="message"></p>
-  <p id="timer" class="hidden">Tempo: <span id="timerValue">34</span> sec</p>
+  <p id="timer" class="hidden">⏱️ Tempo: <span id="timerValue">34</span> sec</p>
+  
+  <div class="hint-container hidden" id="hintContainer">
+    <p id="hintText">Suggerimento: Il numero è pari</p>
+  </div>
+  
+  <div class="powerups">
+    <div class="powerup" onclick="usePowerup('hint')">
+      <div class="powerup-icon">💡</div>
+      <div class="powerup-name">Suggerimento</div>
+    </div>
+    <div class="powerup" onclick="usePowerup('time')">
+      <div class="powerup-icon">⏰</div>
+      <div class="powerup-name">+10 sec</div>
+    </div>
+    <div class="powerup" onclick="usePowerup('range')">
+      <div class="powerup-icon">📏</div>
+      <div class="powerup-name">Riduci Range</div>
+    </div>
+  </div>
+  
+  <div class="history-container" id="historyContainer">
+    <div class="history-title">Cronologia Tentativi</div>
+    <div id="historyList"></div>
+  </div>
+  
   <button id="retryBtn" class="hidden" onclick="retry()">🔁 Riprova</button>
-  <button id="nextLevelBtn" class="hidden" onclick="nextLevel()">Avanti</button>
+  <button id="nextLevelBtn" class="hidden" onclick="nextLevel()">⏭️ Livello Successivo</button>
+</div>
+
+<div class="container hidden" id="livingNumberScreen">
+  <h2>🌱 Il Tuo Numero Vivente</h2>
+  
+  <div class="living-number" id="livingNumber">7</div>
+  
+  <div class="progress-container">
+    <div class="progress-bar" id="growthBar" style="width: 35%;"></div>
+  </div>
+  
+  <p>Livello: <span id="numberLevel">1</span> | Felicità: <span id="happiness">85</span>%</p>
+  
+  <div class="powerups">
+    <div class="powerup" onclick="feedNumber()">
+      <div class="powerup-icon">🍎</div>
+      <div class="powerup-name">Nutri</div>
+    </div>
+    <div class="powerup" onclick="playWithNumber()">
+      <div class="powerup-icon">🎮</div>
+      <div class="powerup-name">Gioca</div>
+    </div>
+    <div class="powerup" onclick="trainNumber()">
+      <div class="powerup-icon">💪</div>
+      <div class="powerup-name">Allena</div>
+    </div>
+  </div>
+  
+  <div class="story-container">
+    <div class="story-title">Diario del Numero</div>
+    <div class="story-text" id="numberStory">
+      Il tuo numero è appena nato! Prenditi cura di lui e crescerà forte e saggio.
+    </div>
+  </div>
+  
+  <button onclick="goToMainScreen()">🔙 Torna al Menu</button>
+</div>
+
+<div class="container hidden" id="storyModeScreen">
+  <h2>📚 L'Avventura dei Numeri</h2>
+  
+  <div class="story-container">
+    <div class="story-title">Capitolo 1: Il Risveglio</div>
+    <div class="story-text" id="storyText">
+      Nel Regno dei Numeri, un'antica profezia parla di un eroe che riporterà l'equilibrio tra le cifre. Tu sei stato scelto per questa missione. Il Saggio Primo ti guiderà nel tuo viaggio...
+    </div>
+    
+    <div class="story-choices">
+      <div class="story-choice" onclick="makeStoryChoice(1)">Accetta la missione</div>
+      <div class="story-choice" onclick="makeStoryChoice(2)">Chiedi più informazioni</div>
+    </div>
+  </div>
+  
+  <div class="progress-container">
+    <div class="progress-bar" id="storyProgress" style="width: 10%;"></div>
+  </div>
+  
+  <button onclick="goToMainScreen()">🔙 Torna al Menu</button>
 </div>
 
 <div class="container hidden" id="finalMessage">
-<div class="container" id="leaderboard">
-  <h3>🏆 Classifica Locale</h3>
-  <ul id="scoreList" style="text-align:left; padding-left: 0;"></ul>
-</div>
- 
   <h2>🎊 Complimenti!</h2>
   <p>Hai completato tutti i livelli!</p>
+  
+  <div class="achievement pulse">
+    <div class="achievement-icon">🏆</div>
+    <div class="achievement-info">
+      <div class="achievement-title">Conquistatore</div>
+      <div class="achievement-desc">Hai completato tutti i livelli della modalità!</div>
+    </div>
+  </div>
+  
+  <div class="leaderboard">
+    <h3>🏆 Classifica Locale</h3>
+    <ul id="scoreList" style="text-align:left; padding-left: 0; list-style: none;"></ul>
+  </div>
+  
   <p>Verrai reindirizzato alla Home tra pochi secondi...</p>
 </div>
 
 <div style="width: 100%; max-width: 400px; text-align: center;">
   <button onclick="goHome()" class="home-btn">🏠 Home</button>
-  <button onclick="toggleMusic()" class="music-btn">🎵 Musica</button>
+  <button onclick="toggleMusic()" class="music-btn" id="musicBtn">🎵 Musica</button>
   <select id="themeSelector" class="theme-selector" onchange="changeTheme(this.value)">
     <option value="default">🎨 Classico</option>
     <option value="sunset">🌅 Tramonto</option>
     <option value="forest">🌲 Foresta</option>
     <option value="neon">🌈 Neon</option>
+    <option value="cyber">🤖 Cyber</option>
   </select>
 </div>
 
 <audio id="bgMusic" src="musica.mp3" loop></audio>
 <audio id="winSound" src="win.mp3"></audio>
 <audio id="loseSound" src="lose.mp3"></audio>
+<audio id="clickSound" src="click.mp3"></audio>
+<audio id="powerupSound" src="powerup.mp3"></audio>
 
 <script>
+// Variabili di gioco
 let currentLevel = 1;
 let maxNumber = 10;
 let maxAttempts = 10;
@@ -235,48 +720,192 @@ let targetNumber;
 let gameTimer;
 let isMusicPlaying = false;
 let mode = "easy";
+let gameHistory = [];
+let powerups = {
+  hint: 3,
+  time: 2,
+  range: 1
+};
+let achievements = [];
+let livingNumberData = {
+  value: 7,
+  level: 1,
+  happiness: 85,
+  growth: 35,
+  stories: []
+};
+let storyProgress = 0;
+let storyChoices = [];
 
+  document.addEventListener('DOMContentLoaded', () => {
+    const user = localStorage.getItem('numeroquest_current_user');
+    const expiry = localStorage.getItem('numeroquest_session_expiry');
+
+    if (!user || !expiry || Date.now() > parseInt(expiry)) {
+      window.location.href = 'login.html';
+    } else {
+      const username = JSON.parse(user).username;
+      document.getElementById('welcome-message').textContent = `Benvenuto, ${username}!`;
+    }
+
+    // 👇 Assicurati che questo codice esista ed è dentro DOMContentLoaded
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+      logoutBtn.addEventListener('click', () => {
+        localStorage.removeItem('numeroquest_current_user');
+        localStorage.removeItem('numeroquest_session_expiry');
+        window.location.href = 'login.html';
+      });
+    } else {
+      console.warn('Bottone logout non trovato!');
+    }
+  });
+
+
+
+// Inizializzazione
+document.addEventListener('DOMContentLoaded', function() {
+  renderScores();
+  loadPlayerData();
+  initializeParticles();
+});
+
+// Funzioni di navigazione
+function goToMainScreen() {
+  hideAllScreens();
+  document.getElementById("mainScreen").classList.remove("hidden");
+}
+
+function openSpecialModes() {
+  hideAllScreens();
+  document.getElementById("specialModesScreen").classList.remove("hidden");
+  playSound("clickSound");
+}
+
+function openAchievements() {
+  hideAllScreens();
+  document.getElementById("achievementsScreen").classList.remove("hidden");
+  playSound("clickSound");
+}
+
+function hideAllScreens() {
+  const screens = [
+    "mainScreen", "game", "finalMessage", "specialModesScreen", 
+    "achievementsScreen", "livingNumberScreen", "storyModeScreen"
+  ];
+  
+  screens.forEach(screen => {
+    document.getElementById(screen).classList.add("hidden");
+  });
+}
+
+// Funzioni di gioco standard
 function startMode(selectedMode) {
   mode = selectedMode;
   currentLevel = 1;
   document.getElementById("livelloCorrente").innerText = currentLevel;
 
- if (mode === "easy") {
-  maxNumber = 30 * currentLevel;
-  maxAttempts = 10;
-  document.getElementById("timer").classList.add("hidden");
-} else if (mode === "medium") {
-  maxNumber = 60 * currentLevel;
-  maxAttempts = 10;
-  document.getElementById("timer").classList.add("hidden");
-} else if (mode === "hard") {
-  maxNumber = 150 * currentLevel;
-  maxAttempts = 9;
-  document.getElementById("timer").classList.remove("hidden");
-} else if (mode === "hardcore") {
-  maxNumber = 300 * currentLevel;
-  maxAttempts = 13;
-  document.getElementById("timer").classList.remove("hidden");
-}
-
+  if (mode === "easy") {
+    maxNumber = 30 * currentLevel;
+    maxAttempts = 10;
+    document.getElementById("timer").classList.add("hidden");
+  } else if (mode === "medium") {
+    maxNumber = 60 * currentLevel;
+    maxAttempts = 8;
+    document.getElementById("timer").classList.add("hidden");
+  } else if (mode === "hard") {
+    maxNumber = 150 * currentLevel;
+    maxAttempts = 9;
+    document.getElementById("timer").classList.remove("hidden");
+  } else if (mode === "hardcore") {
+    maxNumber = 300 * currentLevel;
+    maxAttempts = 7;
+    document.getElementById("timer").classList.remove("hidden");
+  }
 
   document.getElementById("maxNumber").innerText = maxNumber;
   document.getElementById("tentativi").innerText = maxAttempts;
+  document.getElementById("levelBadge").innerText = `Livello ${currentLevel}`;
+  document.getElementById("progressBar").style.width = "0%";
+  
+  hideAllScreens();
   document.getElementById("game").classList.remove("hidden");
-  document.getElementById("finalMessage").classList.add("hidden");
+  document.getElementById("historyList").innerHTML = "";
+  
   resetGame();
+  playSound("clickSound");
 }
+
 let previousNumbers = [];
 
 function generateSmartNumber(max, level) {
   let num;
   let attempts = 0;
-  do {
-    const base = Math.floor(Math.random() * (max - level)) + 1;
-    const noise = Math.abs(Math.floor(Math.sin(Date.now() + attempts * 17) * 10)) % level;
-    num = Math.min(max, base + noise);
-    attempts++;
-  } while (previousNumbers.includes(num) && attempts < 10);
+  
+  // Algoritmo migliorato per generare numeri interessanti
+  if (level <= 3) {
+    // Livelli iniziali: numeri semplici
+    do {
+      const base = Math.floor(Math.random() * (max - level)) + 1;
+      const noise = Math.abs(Math.floor(Math.sin(Date.now() + attempts * 17) * 10)) % level;
+      num = Math.min(max, base + noise);
+      attempts++;
+    } while (previousNumbers.includes(num) && attempts < 10);
+  } else if (level <= 7) {
+    // Livelli medi: numeri con pattern
+    const patterns = [
+      // Numeri primi approssimativi
+      () => {
+        const primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47];
+        const validPrimes = primes.filter(p => p <= max);
+        return validPrimes[Math.floor(Math.random() * validPrimes.length)];
+      },
+      // Numeri quadrati
+      () => {
+        const base = Math.floor(Math.sqrt(max / 2));
+        return base * base;
+      },
+      // Numeri normali
+      () => Math.floor(Math.random() * max) + 1
+    ];
+    
+    const pattern = patterns[Math.floor(Math.random() * patterns.length)];
+    num = pattern();
+  } else {
+    // Livelli avanzati: numeri più complessi
+    const patterns = [
+      // Fibonacci
+      () => {
+        const fibonacci = [1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987];
+        const validFib = fibonacci.filter(f => f <= max);
+        return validFib[Math.floor(Math.random() * validFib.length)];
+      },
+      // Potenze di 2
+      () => {
+        let power = 1;
+        while (power * 2 <= max) power *= 2;
+        return power;
+      },
+      // Numeri palindromi
+      () => {
+        const digits = Math.floor(Math.log10(max)) + 1;
+        if (digits <= 1) return Math.floor(Math.random() * 9) + 1;
+        
+        const halfDigits = Math.floor(digits / 2);
+        const firstHalf = Math.floor(Math.random() * Math.pow(10, halfDigits - 1) + Math.pow(10, halfDigits - 2));
+        let palindrome = firstHalf.toString();
+        
+        for (let i = palindrome.length - (digits % 2 ? 2 : 1); i >= 0; i--) {
+          palindrome += palindrome[i];
+        }
+        
+        return parseInt(palindrome) <= max ? parseInt(palindrome) : Math.floor(Math.random() * max) + 1;
+      }
+    ];
+    
+    const pattern = patterns[Math.floor(Math.random() * patterns.length)];
+    num = pattern();
+  }
 
   previousNumbers.push(num);
   if (previousNumbers.length > 10) previousNumbers.shift(); // Ricorda solo gli ultimi 10 numeri
@@ -292,13 +921,20 @@ function resetGame() {
   document.getElementById("userGuess").value = "";
   document.getElementById("nextLevelBtn").classList.add("hidden");
   document.getElementById("retryBtn").classList.add("hidden");
-  if (mode === "hard") startTimer();
+  document.getElementById("hintContainer").classList.add("hidden");
+  document.getElementById("progressBar").style.width = "0%";
+  
+  gameHistory = [];
+  updateHistoryDisplay();
+  
+  if (mode === "hard" || mode === "hardcore") startTimer();
 }
 
 function check() {
   let guess = parseInt(document.getElementById("userGuess").value);
   if (isNaN(guess)) {
     document.getElementById("message").innerText = "Inserisci un numero valido!";
+    shakeElement("userGuess");
     return;
   }
 
@@ -311,51 +947,119 @@ function check() {
   remainingAttempts--;
   document.getElementById("tentativi").innerText = remainingAttempts;
 
+  // Aggiorna la barra di progresso
+  const progressPercentage = ((maxAttempts - remainingAttempts) / maxAttempts) * 100;
+  document.getElementById("progressBar").style.width = `${progressPercentage}%`;
+
   if (guess === targetNumber) {
     document.getElementById("message").innerText = `🎉 Hai indovinato!`;
-    document.getElementById("winSound").play();
+    playSound("winSound");
     showConfetti();
     stopTimer();
     document.getElementById("nextLevelBtn").classList.remove("hidden");
+    
+    // Aggiungi achievement se indovinato al primo tentativo
+    if (maxAttempts - remainingAttempts === 1) {
+      unlockAchievement("firstTry", "Precisione", "Hai indovinato al primo tentativo!");
+    }
+    
+    // Aggiungi alla cronologia
+    gameHistory.push({
+      guess: guess,
+      result: "CORRETTO! 🎉",
+      isCorrect: true
+    });
   } else if (remainingAttempts === 0) {
     document.getElementById("message").innerText = `😞 Hai perso! Il numero era ${targetNumber}`;
-    document.getElementById("loseSound").play();
+    playSound("loseSound");
     stopTimer();
     document.getElementById("retryBtn").classList.remove("hidden");
+    
+    // Aggiungi alla cronologia
+    gameHistory.push({
+      guess: guess,
+      result: guess < targetNumber ? "Troppo basso" : "Troppo alto",
+      isCorrect: false
+    });
   } else {
-    document.getElementById("message").innerText = guess < targetNumber ? "Troppo basso!" : "Troppo alto!";
+    // Calcola quanto è vicino il tentativo
+    const difference = Math.abs(guess - targetNumber);
+    const percentage = (difference / maxNumber) * 100;
+    
+    let message;
+    if (percentage <= 5) {
+      message = guess < targetNumber ? "🔥 Molto vicino! Più alto" : "🔥 Molto vicino! Più basso";
+    } else if (percentage <= 15) {
+      message = guess < targetNumber ? "📈 Vicino! Più alto" : "📉 Vicino! Più basso";
+    } else if (percentage <= 30) {
+      message = guess < targetNumber ? "⬆️ Troppo basso" : "⬇️ Troppo alto";
+    } else {
+      message = guess < targetNumber ? "⬆️⬆️ Molto basso" : "⬇️⬇️ Molto alto";
+    }
+    
+    document.getElementById("message").innerText = message;
+    
+    // Aggiungi alla cronologia
+    gameHistory.push({
+      guess: guess,
+      result: message,
+      isCorrect: false
+    });
   }
+  
+  updateHistoryDisplay();
+}
+
+function updateHistoryDisplay() {
+  const historyList = document.getElementById("historyList");
+  historyList.innerHTML = "";
+  
+  gameHistory.forEach((item, index) => {
+    const historyItem = document.createElement("div");
+    historyItem.className = "history-item";
+    
+    historyItem.innerHTML = `
+      <div>#${index + 1}: ${item.guess}</div>
+      <div style="color: ${item.isCorrect ? '#4caf50' : '#ff9800'}">${item.result}</div>
+    `;
+    
+    historyList.appendChild(historyItem);
+  });
 }
 
 function nextLevel() {
   currentLevel++;
   if (currentLevel > 10) {
-  document.getElementById("game").classList.add("hidden");
-  document.getElementById("finalMessage").classList.remove("hidden");
-  showConfetti();
+    hideAllScreens();
+    document.getElementById("finalMessage").classList.remove("hidden");
+    showConfetti();
 
-  // Ottieni il nome del giocatore
-  const name = document.getElementById("playerName").value || "Anonimo";
+    // Ottieni il nome del giocatore
+    const name = document.getElementById("playerName").value || "Anonimo";
 
-  // Salva il punteggio
-  saveScore(name, currentLevel - 1);
+    // Salva il punteggio
+    saveScore(name, currentLevel - 1, mode);
+    
+    // Sblocca achievement
+    unlockAchievement("completeGame", "Conquistatore", `Hai completato la modalità ${mode}!`);
 
-  // Ritorna alla home dopo 5 secondi
-  setTimeout(goHome, 5000);
-  return;
-}
-
+    // Ritorna alla home dopo 5 secondi
+    setTimeout(goHome, 5000);
+    return;
+  }
 
   document.getElementById("livelloCorrente").innerText = currentLevel;
+  document.getElementById("levelBadge").innerText = `Livello ${currentLevel}`;
+  
   if (mode === "easy") maxNumber = 30 * currentLevel;
-else if (mode === "medium") maxNumber = 60 * currentLevel;
-else if (mode === "hard") maxNumber = 150 * currentLevel;
-else if (mode === "hardcore") maxNumber = 300 * currentLevel;
-
+  else if (mode === "medium") maxNumber = 60 * currentLevel;
+  else if (mode === "hard") maxNumber = 150 * currentLevel;
+  else if (mode === "hardcore") maxNumber = 300 * currentLevel;
 
   if (mode === "easy") maxAttempts = 10;
   else if (mode === "medium") maxAttempts = 8;
-  else maxAttempts = 9;
+  else if (mode === "hard") maxAttempts = 9;
+  else if (mode === "hardcore") maxAttempts = 7;
 
   document.getElementById("maxNumber").innerText = maxNumber;
   resetGame();
@@ -367,11 +1071,20 @@ function retry() {
 }
 
 function startTimer() {
-  let time = 34;
+  let time = mode === "hardcore" ? 25 : 34;
   document.getElementById("timerValue").innerText = time;
   gameTimer = setInterval(() => {
     time--;
     document.getElementById("timerValue").innerText = time;
+    
+    // Effetto visivo quando il tempo sta per scadere
+    if (time <= 10) {
+      document.getElementById("timer").style.color = "#f44336";
+      if (!document.getElementById("timer").classList.contains("pulse")) {
+        document.getElementById("timer").classList.add("pulse");
+      }
+    }
+    
     if (time <= 0) {
       clearInterval(gameTimer);
       document.getElementById("message").innerText = "⏰ Tempo scaduto!";
@@ -385,6 +1098,8 @@ function startTimer() {
 
 function stopTimer() {
   clearInterval(gameTimer);
+  document.getElementById("timer").style.color = "";
+  document.getElementById("timer").classList.remove("pulse");
 }
 
 function showConfetti() {
@@ -399,74 +1114,380 @@ function goHome() {
   window.location.reload();
 }
 
+// Sistema di power-up
+function usePowerup(type) {
+  if (powerups[type] <= 0) {
+    alert(`Non hai più power-up ${type} disponibili!`);
+    return;
+  }
+  
+  powerups[type]--;
+  playSound("powerupSound");
+  
+  switch(type) {
+    case 'hint':
+      giveHint();
+      break;
+    case 'time':
+      addTime();
+      break;
+    case 'range':
+      reduceRange();
+      break;
+  }
+}
+
+function giveHint() {
+  const hintContainer = document.getElementById("hintContainer");
+  const hintText = document.getElementById("hintText");
+  
+  // Genera un suggerimento intelligente
+  let hint;
+  
+  if (targetNumber % 2 === 0) {
+    hint = "Il numero è pari";
+  } else {
+    hint = "Il numero è dispari";
+  }
+  
+  // Suggerimenti più avanzati per livelli superiori
+  if (currentLevel > 3) {
+    const digitCount = targetNumber.toString().length;
+    hint += ` e ha ${digitCount} cifr${digitCount === 1 ? 'a' : 'e'}`;
+  }
+  
+  if (currentLevel > 6) {
+    const firstDigit = targetNumber.toString()[0];
+    hint += `. La prima cifra è ${firstDigit}`;
+  }
+  
+  hintText.innerText = `💡 Suggerimento: ${hint}`;
+  hintContainer.classList.remove("hidden");
+}
+
+function addTime() {
+  if (mode === "hard" || mode === "hardcore") {
+    const currentTime = parseInt(document.getElementById("timerValue").innerText);
+    const newTime = currentTime + 10;
+    document.getElementById("timerValue").innerText = newTime;
+    
+    // Rimuovi effetti di urgenza se il tempo è stato esteso
+    if (newTime > 10) {
+      document.getElementById("timer").style.color = "";
+      document.getElementById("timer").classList.remove("pulse");
+    }
+  } else {
+    alert("Questo power-up funziona solo nelle modalità con timer!");
+  }
+}
+
+function reduceRange() {
+  const rangeText = document.getElementById("maxNumber");
+  const currentMax = parseInt(rangeText.innerText);
+  
+  // Riduci il range del 20%
+  const newMax = Math.max(targetNumber, Math.floor(currentMax * 0.8));
+  rangeText.innerText = newMax;
+  
+  // Aggiorna il messaggio
+  document.getElementById("message").innerText = `Range ridotto a 1-${newMax}!`;
+}
+
+// Sistema di achievement
+function unlockAchievement(id, title, description) {
+  if (achievements.includes(id)) return;
+  
+  achievements.push(id);
+  savePlayerData();
+  
+  // Mostra notifica
+  const notification = document.createElement("div");
+  notification.className = "achievement pulse";
+  notification.style.position = "fixed";
+  notification.style.bottom = "20px";
+  notification.style.left = "50%";
+  notification.style.transform = "translateX(-50%)";
+  notification.style.zIndex = "1000";
+  notification.style.background = "rgba(0,0,0,0.8)";
+  notification.style.padding = "15px";
+  notification.style.borderRadius = "10px";
+  notification.style.boxShadow = "0 0 20px rgba(255,217,61,0.5)";
+  
+  notification.innerHTML = `
+    <div style="display: flex; align-items: center;">
+      <div style="font-size: 2rem; margin-right: 15px;">🏆</div>
+      <div>
+        <div style="font-weight: bold; color: #ffd93d;">${title} Sbloccato!</div>
+        <div style="font-size: 0.8rem; opacity: 0.8;">${description}</div>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(notification);
+  
+  setTimeout(() => {
+    notification.style.opacity = "0";
+    notification.style.transition = "opacity 0.5s ease";
+    setTimeout(() => notification.remove(), 500);
+  }, 3000);
+}
+
+// Modalità speciali
+function startSpecialMode(mode) {
+  hideAllScreens();
+  
+  switch(mode) {
+    case 'living':
+      initLivingNumber();
+      document.getElementById("livingNumberScreen").classList.remove("hidden");
+      break;
+    case 'story':
+      initStoryMode();
+      document.getElementById("storyModeScreen").classList.remove("hidden");
+      break;
+    case 'rhythm':
+      alert("🎵 Modalità Rhythm Numbers in arrivo presto!");
+      document.getElementById("specialModesScreen").classList.remove("hidden");
+      break;
+    case 'puzzle':
+      alert("🧩 Modalità Puzzle Numerici in arrivo presto!");
+      document.getElementById("specialModesScreen").classList.remove("hidden");
+      break;
+  }
+  
+  playSound("clickSound");
+}
+
+// Modalità Numero Vivente
+function initLivingNumber() {
+  document.getElementById("livingNumber").innerText = livingNumberData.value;
+  document.getElementById("numberLevel").innerText = livingNumberData.level;
+  document.getElementById("happiness").innerText = livingNumberData.happiness;
+  document.getElementById("growthBar").style.width = `${livingNumberData.growth}%`;
+  document.getElementById("numberStory").innerText = livingNumberData.stories.length > 0 ? 
+    livingNumberData.stories[livingNumberData.stories.length - 1] : 
+    "Il tuo numero è appena nato! Prenditi cura di lui e crescerà forte e saggio.";
+}
+
+function feedNumber() {
+  livingNumberData.happiness = Math.min(100, livingNumberData.happiness + 10);
+  livingNumberData.growth = Math.min(100, livingNumberData.growth + 5);
+  
+  // Aggiungi una storia
+  livingNumberData.stories.push(`Giorno ${livingNumberData.stories.length + 1}: Hai nutrito il tuo numero con cibo matematico. Sembra più felice!`);
+  
+  checkNumberEvolution();
+  initLivingNumber();
+  playSound("powerupSound");
+}
+
+function playWithNumber() {
+  livingNumberData.happiness = Math.min(100, livingNumberData.happiness + 15);
+  
+  // Aggiungi una storia
+  livingNumberData.stories.push(`Giorno ${livingNumberData.stories.length + 1}: Hai giocato con il tuo numero. Si è divertito molto!`);
+  
+  checkNumberEvolution();
+  initLivingNumber();
+  playSound("powerupSound");
+}
+
+function trainNumber() {
+  livingNumberData.growth = Math.min(100, livingNumberData.growth + 15);
+  livingNumberData.happiness = Math.max(50, livingNumberData.happiness - 5);
+  
+  // Aggiungi una storia
+  livingNumberData.stories.push(`Giorno ${livingNumberData.stories.length + 1}: Hai allenato il tuo numero con esercizi matematici. È diventato più forte!`);
+  
+  checkNumberEvolution();
+  initLivingNumber();
+  playSound("powerupSound");
+}
+
+function checkNumberEvolution() {
+  if (livingNumberData.growth >= 100) {
+    livingNumberData.level++;
+    livingNumberData.growth = 0;
+    
+    // Evolvi il numero
+    if (livingNumberData.level % 2 === 0) {
+      livingNumberData.value = livingNumberData.value * 2;
+    } else {
+      livingNumberData.value = livingNumberData.value + 1;
+    }
+    
+    // Aggiungi una storia speciale
+    livingNumberData.stories.push(`EVOLUZIONE! Il tuo numero è cresciuto al livello ${livingNumberData.level} e si è trasformato in ${livingNumberData.value}!`);
+    
+    showConfetti();
+    unlockAchievement("numberEvolution", "Evoluzione Numerica", `Il tuo numero è evoluto al livello ${livingNumberData.level}!`);
+  }
+}
+
+// Modalità Storia
+function initStoryMode() {
+  document.getElementById("storyProgress").style.width = `${storyProgress * 10}%`;
+}
+
+function makeStoryChoice(choice) {
+  storyChoices.push(choice);
+  storyProgress++;
+  
+  // Aggiorna la barra di progresso
+  document.getElementById("storyProgress").style.width = `${storyProgress * 10}%`;
+  
+  // Aggiorna la storia in base alle scelte
+  updateStory();
+  
+  playSound("clickSound");
+}
+
+function updateStory() {
+  const storyText = document.getElementById("storyText");
+  const storyTitle = document.querySelector(".story-title");
+  const storyChoicesEl = document.querySelector(".story-choices");
+  
+  switch(storyProgress) {
+    case 1:
+      if (storyChoices[0] === 1) {
+        storyTitle.innerText = "Capitolo 1: Il Risveglio";
+        storyText.innerText = "Hai accettato la missione! Il Saggio Primo ti consegna un antico artefatto: la Chiave dei Numeri. 'Questo ti aiuterà a trovare i Numeri Perduti,' dice. 'Inizia la tua ricerca nella Valle Decimale.'";
+        storyChoicesEl.innerHTML = `
+          <div class="story-choice" onclick="makeStoryChoice(1)">Vai alla Valle Decimale</div>
+          <div class="story-choice" onclick="makeStoryChoice(2)">Chiedi del nemico</div>
+        `;
+      } else {
+        storyTitle.innerText = "Capitolo 1: Il Risveglio";
+        storyText.innerText = "'Il Regno dei Numeri è minacciato dal malvagio Divisore Zero,' spiega il Saggio. 'Ha rubato i Numeri Primi e senza di loro l'equilibrio è in pericolo. Devi recuperarli prima che sia troppo tardi.'";
+        storyChoicesEl.innerHTML = `
+          <div class="story-choice" onclick="makeStoryChoice(1)">Accetta la missione</div>
+          <div class="story-choice" onclick="makeStoryChoice(2)">Chiedi della ricompensa</div>
+        `;
+      }
+      break;
+    case 2:
+      storyTitle.innerText = "Capitolo 2: La Valle Decimale";
+      storyText.innerText = "Arrivi nella Valle Decimale, un luogo pieno di numeri fluttuanti. La Chiave dei Numeri inizia a brillare vicino a una caverna. All'interno, trovi un guardiano che ti sfida: 'Per passare, devi risolvere un enigma numerico.'";
+      storyChoicesEl.innerHTML = `
+        <div class="story-choice" onclick="makeStoryChoice(1)">Accetta la sfida</div>
+        <div class="story-choice" onclick="makeStoryChoice(2)">Cerca un'altra strada</div>
+      `;
+      break;
+    case 3:
+      storyTitle.innerText = "Capitolo 3: L'Enigma";
+      storyText.innerText = "Il guardiano ti presenta l'enigma: 'Sono un numero primo. Se mi aggiungi 2, otterrai un altro numero primo. Quale numero sono?' Rifletti attentamente...";
+      storyChoicesEl.innerHTML = `
+        <div class="story-choice" onclick="makeStoryChoice(1)">3</div>
+        <div class="story-choice" onclick="makeStoryChoice(2)">5</div>
+        <div class="story-choice" onclick="makeStoryChoice(3)">7</div>
+      `;
+      break;
+    case 4:
+      if (storyChoices[3] === 3) {
+        storyTitle.innerText = "Capitolo 4: La Scoperta";
+        storyText.innerText = "'Corretto!' esclama il guardiano. '3 + 2 = 5, entrambi numeri primi.' Ti consegna il primo Numero Primo perduto, che brilla di luce propria. 'Ora vai alle Montagne Binarie per trovare il prossimo.'";
+      } else {
+        storyTitle.innerText = "Capitolo 4: Il Tentativo";
+        storyText.innerText = "'Sbagliato,' dice il guardiano. 'Ma apprezzo il tuo coraggio.' Ti permette comunque di passare. 'Vai alle Montagne Binarie, ma stai attento. Il percorso sarà più difficile per te.'";
+      }
+      storyChoicesEl.innerHTML = `
+        <div class="story-choice" onclick="makeStoryChoice(1)">Continua l'avventura</div>
+      `;
+      break;
+    case 5:
+      storyTitle.innerText = "Continua...";
+      storyText.innerText = "La tua avventura nel Regno dei Numeri continuerà presto! Nuovi capitoli in arrivo...";
+      storyChoicesEl.innerHTML = `
+        <div class="story-choice" onclick="goToMainScreen()">Torna al menu</div>
+      `;
+      
+      // Sblocca achievement
+      unlockAchievement("storyProgress", "Narratore", "Hai iniziato l'avventura nel Regno dei Numeri!");
+      break;
+  }
+}
+
+// Funzioni di utilità
 function toggleMusic() {
   const bgMusic = document.getElementById("bgMusic");
+  const musicBtn = document.getElementById("musicBtn");
+  
   if (isMusicPlaying) {
     bgMusic.pause();
     isMusicPlaying = false;
+    musicBtn.innerText = "🔇 Musica";
   } else {
-    bgMusic.play();
+    bgMusic.play().catch(e => console.log("Autoplay prevented:", e));
     isMusicPlaying = true;
+    musicBtn.innerText = "🎵 Musica";
   }
 }
 
 function changeTheme(theme) {
   document.body.className = "";
   document.body.classList.add(`${theme}-theme`);
+  
+  // Salva il tema nelle preferenze
+  const playerData = loadPlayerData();
+  playerData.theme = theme;
+  savePlayerData(playerData);
 }
 
-// ANIMAZIONE NUMERI COLORATI
-const canvas = document.getElementById("numberCanvas");
-const ctx = canvas.getContext("2d");
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-
-const numbers = "0123456789";
-const fallingNumbers = [];
-
-function createNumber() {
-  return {
-    value: numbers[Math.floor(Math.random() * numbers.length)],
-    x: Math.random() * canvas.width,
-    y: -30,
-    speed: 1 + Math.random() * 3,
-    size: 16 + Math.random() * 24,
-    color: `hsl(${Math.random() * 360}, 100%, 60%)`
-  };
-}
-
-for (let i = 0; i < 100; i++) fallingNumbers.push(createNumber());
-
-function animateNumbers() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  for (let n of fallingNumbers) {
-    ctx.fillStyle = n.color;
-    ctx.font = `${n.size}px Bangers, sans-serif`;
-    ctx.fillText(n.value, n.x, n.y);
-    n.y += n.speed;
-    if (n.y > canvas.height) {
-      n.y = -30;
-      n.x = Math.random() * canvas.width;
-      n.value = numbers[Math.floor(Math.random() * numbers.length)];
-      n.color = `hsl(${Math.random() * 360}, 100%, 60%)`;
-    }
+function playSound(soundId) {
+  const sound = document.getElementById(soundId);
+  if (sound) {
+    sound.currentTime = 0;
+    sound.play().catch(e => console.log("Autoplay prevented:", e));
   }
-  requestAnimationFrame(animateNumbers);
 }
 
-animateNumbers();
+function shakeElement(elementId) {
+  const element = document.getElementById(elementId);
+  element.classList.add("shake");
+  
+  setTimeout(() => {
+    element.classList.remove("shake");
+  }, 500);
+}
 
-window.addEventListener('resize', () => {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-});
+// Gestione dati giocatore
+function loadPlayerData() {
+  const playerData = JSON.parse(localStorage.getItem("numeroquest_player") || "{}");
+  
+  // Applica tema salvato SENZA chiamare changeTheme
+  if (playerData.theme) {
+    applyTheme(playerData.theme); // Chiama direttamente la funzione che applica il tema
+  }
+  
+  return playerData;
+}
+
+function savePlayerData(data) {
+  if (!data) {
+    data = {
+      achievements: achievements,
+      livingNumber: livingNumberData,
+      storyProgress: storyProgress,
+      storyChoices: storyChoices,
+      theme: document.body.className.replace("-theme", "")
+    };
+  }
+  
+  localStorage.setItem("numeroquest_player", JSON.stringify(data));
+}
+
 // Funzione per salvare il punteggio nel localStorage
-function saveScore(name, level) {
+function saveScore(name, level, gameMode) {
   // Recupera la lista dei punteggi dal localStorage (o crea una lista vuota se non ci sono punteggi)
   const scores = JSON.parse(localStorage.getItem("scores") || "[]");
 
-  // Aggiungi il nuovo punteggio
-  scores.push({ name, level });
+  // Aggiungi il nuovo punteggio con modalità
+  scores.push({ 
+    name, 
+    level,
+    mode: gameMode,
+    date: new Date().toLocaleDateString()
+  });
 
   // Ordina i punteggi in ordine decrescente (dal più alto al più basso)
   scores.sort((a, b) => b.level - a.level);
@@ -486,13 +1507,115 @@ function renderScores() {
   // Mostra solo i primi 10 punteggi
   scoreList.innerHTML = scores
     .slice(0, 10)
-    .map(s => `<li><strong>${s.name}</strong>: Livello ${s.level}</li>`)
+    .map((s, index) => `
+      <li class="leaderboard-item">
+        <div class="player-info">
+          <div class="rank">${index + 1}</div>
+          <div>${s.name}</div>
+        </div>
+        <div class="score-info">
+          Liv. ${s.level} (${s.mode || 'classic'})
+        </div>
+      </li>
+    `)
     .join("");
 }
 
-// Mostra la classifica ogni volta che la pagina si carica
-renderScores();
+// ANIMAZIONE NUMERI COLORATI
+const canvas = document.getElementById("numberCanvas");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
+const numbers = "0123456789";
+const fallingNumbers = [];
+
+function createNumber() {
+  return {
+    value: numbers[Math.floor(Math.random() * numbers.length)],
+    x: Math.random() * canvas.width,
+    y: -30,
+    speed: 1 + Math.random() * 3,
+    size: 16 + Math.random() * 24,
+    color: `hsl(${Math.random() * 360}, 100%, 60%)`,
+    rotation: Math.random() * 30 - 15
+  };
+}
+
+for (let i = 0; i < 100; i++) fallingNumbers.push(createNumber());
+
+function animateNumbers() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  for (let n of fallingNumbers) {
+    ctx.save();
+    ctx.translate(n.x, n.y);
+    ctx.rotate(n.rotation * Math.PI / 180);
+    ctx.fillStyle = n.color;
+    ctx.font = `${n.size}px Bangers, sans-serif`;
+    ctx.fillText(n.value, 0, 0);
+    ctx.restore();
+    
+    n.y += n.speed;
+    n.rotation += 0.1;
+    
+    if (n.y > canvas.height) {
+      n.y = -30;
+      n.x = Math.random() * canvas.width;
+      n.value = numbers[Math.floor(Math.random() * numbers.length)];
+      n.color = `hsl(${Math.random() * 360}, 100%, 60%)`;
+    }
+  }
+  requestAnimationFrame(animateNumbers);
+}
+
+animateNumbers();
+
+window.addEventListener('resize', () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+});
+
+// Inizializzazione particelle
+function initializeParticles() {
+  particlesJS("particles-js", {
+    particles: {
+      number: { value: 80, density: { enable: true, value_area: 800 } },
+      color: { value: "#ffffff" },
+      shape: { type: "circle" },
+      opacity: { value: 0.5, random: true },
+      size: { value: 3, random: true },
+      line_linked: {
+        enable: true,
+        distance: 150,
+        color: "#ffffff",
+        opacity: 0.4,
+        width: 1
+      },
+      move: {
+        enable: true,
+        speed: 2,
+        direction: "none",
+        random: true,
+        straight: false,
+        out_mode: "out",
+        bounce: false
+      }
+    },
+    interactivity: {
+      detect_on: "canvas",
+      events: {
+        onhover: { enable: true, mode: "repulse" },
+        onclick: { enable: true, mode: "push" },
+        resize: true
+      },
+      modes: {
+        repulse: { distance: 100, duration: 0.4 },
+        push: { particles_nb: 4 }
+      }
+    },
+    retina_detect: true
+  });
+}
 </script>
 
 </body>
