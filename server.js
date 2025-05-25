@@ -1,522 +1,667 @@
-const express = require("express")
-const http = require("http")
-const socketIo = require("socket.io")
+const express = require('express');
+const { createServer } = require('http');
+const { Server } = require('socket.io');
+const path = require('path');
 
-const app = express()
-const server = http.createServer(app)
-const io = socketIo(server, {
+const app = express();
+const httpServer = createServer(app);
+
+// Configurazione Socket.io per Render
+const io = new Server(httpServer, {
   cors: {
     origin: "*",
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST"]
   },
-})
+  transports: ['websocket', 'polling']
+});
 
-app.use(express.static("public"))
+const PORT = process.env.PORT || 3000;
 
-const rooms = new Map()
-const players = new Map()
+// Serve static files
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Configurazioni base per difficoltà
-const DIFFICULTY_CONFIG = {
-  easy: { baseRange: 30, maxAttempts: 10 },
-  medium: { baseRange: 60, maxAttempts: 8 },
-  hard: { baseRange: 150, maxAttempts: 7 },
-  hardcore: { baseRange: 300, maxAttempts: 5 },
-}
+// Health check endpoint per Render
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
+});
 
-class GameRoom {
-  constructor(code, host, difficulty) {
-    this.code = code
-    this.host = host
-    this.difficulty = difficulty
-    this.players = new Map()
-    this.gameStarted = false
-    this.gameEnded = false
-    this.currentLevel = 1
-    this.maxLevels = 10
-    this.targetNumber = null
-    this.currentPlayerIndex = 0
-    this.history = []
-    this.scores = new Map()
-    this.levelStartTime = null
-    this.autoStartTimer = null
-    this.createdAt = Date.now()
+// API stats endpoint
+app.get('/api/stats', (req, res) => {
+  res.json({
+    rooms: rooms.size,
+    players: players.size,
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString()
+  });
+});
 
-    this.addPlayer(host)
-  }
+// Game state
+const rooms = new Map();
+const players = new Map();
 
-  // Calcola il range per il livello corrente
-  getCurrentRange() {
-    const baseRange = DIFFICULTY_CONFIG[this.difficulty].baseRange
-    return baseRange * this.currentLevel
-  }
-
-  addPlayer(playerData) {
-    this.players.set(playerData.id, {
-      ...playerData,
-      attempts: 0,
-      joinedAt: Date.now(),
-    })
-    this.scores.set(playerData.id, 0)
-
-    if (this.players.size >= 2 && !this.gameStarted && !this.autoStartTimer) {
-      this.scheduleAutoStart()
-    }
-  }
-
-  scheduleAutoStart() {
-    this.autoStartTimer = setTimeout(() => {
-      if (this.players.size >= 2 && !this.gameStarted) {
-        this.startGame()
-      }
-    }, 10000)
-  }
-
-  removePlayer(playerId) {
-    this.players.delete(playerId)
-    this.scores.delete(playerId)
-
-    if (this.players.size < 2 && this.autoStartTimer) {
-      clearTimeout(this.autoStartTimer)
-      this.autoStartTimer = null
-    }
-
-    if (this.host.id === playerId && this.players.size > 0) {
-      const newHost = Array.from(this.players.values())[0]
-      this.host = newHost
-      newHost.isHost = true
-      return newHost
-    }
-    return null
-  }
-
-  startGame() {
-    if (this.players.size < 2) return false
-
-    if (this.autoStartTimer) {
-      clearTimeout(this.autoStartTimer)
-      this.autoStartTimer = null
-    }
-
-    this.gameStarted = true
-    this.gameEnded = false
-    this.currentLevel = 1
-    this.startNewLevel()
-
-    this.players.forEach((player) => {
-      this.scores.set(player.id, 0)
-    })
-
-    console.log(`🎮 Partita iniziata nella stanza ${this.code}`)
-    return true
-  }
-
-  startNewLevel() {
-    const currentRange = this.getCurrentRange()
-    this.targetNumber = Math.floor(Math.random() * currentRange) + 1
-    this.currentPlayerIndex = 0
-    this.history = []
-    this.levelStartTime = Date.now()
-
-    // Reset attempts per questo livello
-    this.players.forEach((player) => (player.attempts = 0))
-
-    console.log(`🎯 LIVELLO ${this.currentLevel} INIZIATO:`)
-    console.log(`   Range: 1-${currentRange}`)
-    console.log(`   Numero target: ${this.targetNumber}`)
-    console.log(`   Stanza: ${this.code}`)
-  }
-
-  calculateScore(attempts, timeElapsed) {
-    const maxAttempts = DIFFICULTY_CONFIG[this.difficulty].maxAttempts
-    const maxPoints = 1000
-
-    const attemptScore = Math.max(0, ((maxAttempts - attempts) / maxAttempts) * maxPoints)
-    const timeBonus = Math.max(0, 200 - (timeElapsed / 1000) * 2)
-    const levelBonus = this.currentLevel * 50
-
-    return Math.max(100, Math.round(attemptScore + timeBonus + levelBonus))
-  }
-
-  makeGuess(playerId, guess) {
-    if (!this.gameStarted || this.gameEnded) return null
-
-    const playersArray = Array.from(this.players.values())
-    const currentPlayer = playersArray[this.currentPlayerIndex]
-
-    if (currentPlayer.id !== playerId) return null
-
-    const player = this.players.get(playerId)
-    player.attempts++
-
-    let result
-    if (guess === this.targetNumber) {
-      result = "correct"
-
-      const timeElapsed = Date.now() - this.levelStartTime
-      const levelScore = this.calculateScore(player.attempts, timeElapsed)
-      const currentScore = this.scores.get(playerId) || 0
-      this.scores.set(playerId, currentScore + levelScore)
-
-      if (this.currentLevel >= this.maxLevels) {
-        this.gameEnded = true
-      }
-    } else if (guess < this.targetNumber) {
-      result = "too_low"
-    } else {
-      result = "too_high"
-    }
-
-    const guessData = {
-      player: player.name,
-      playerId: playerId,
-      guess: guess,
-      result: result,
-      timestamp: Date.now(),
-    }
-
-    this.history.push(guessData)
-
-    if (result !== "correct") {
-      this.currentPlayerIndex = (this.currentPlayerIndex + 1) % this.players.size
-    }
-
-    return {
-      ...guessData,
-      targetNumber: result === "correct" ? this.targetNumber : null,
-      gameEnded: this.gameEnded,
-      currentPlayerIndex: this.currentPlayerIndex,
-      levelScore: result === "correct" ? this.calculateScore(player.attempts, Date.now() - this.levelStartTime) : 0,
-      levelCompleted: result === "correct",
-    }
-  }
-
-  nextLevel() {
-    if (this.currentLevel < this.maxLevels) {
-      this.currentLevel++
-      this.startNewLevel()
-      return true
-    }
-    return false
-  }
-
-  resetGame() {
-    this.gameStarted = false
-    this.gameEnded = false
-    this.targetNumber = null
-    this.currentPlayerIndex = 0
-    this.history = []
-    this.currentLevel = 1
-    this.levelStartTime = null
-
-    this.players.forEach((player) => {
-      player.attempts = 0
-      this.scores.set(player.id, 0)
-    })
-
-    if (this.players.size >= 2) {
-      this.scheduleAutoStart()
-    }
-  }
-
-  getFinalLeaderboard() {
-    return Array.from(this.players.values())
-      .map((player) => ({
-        name: player.name,
-        id: player.id,
-        totalScore: this.scores.get(player.id) || 0,
-        isHost: player.isHost,
-      }))
-      .sort((a, b) => b.totalScore - a.totalScore)
-  }
-
-  getGameState() {
-    const currentRange = this.getCurrentRange()
-    const maxAttempts = DIFFICULTY_CONFIG[this.difficulty].maxAttempts
-
-    return {
-      code: this.code,
-      host: this.host,
-      difficulty: this.difficulty,
-      players: Array.from(this.players.values()),
-      gameStarted: this.gameStarted,
-      gameEnded: this.gameEnded,
-      currentPlayerIndex: this.currentPlayerIndex,
-      history: this.history,
-      playersCount: this.players.size,
-      autoStartTimer: this.autoStartTimer ? true : false,
-      currentLevel: this.currentLevel,
-      maxLevels: this.maxLevels,
-      scores: Object.fromEntries(this.scores),
-      leaderboard: this.getFinalLeaderboard(),
-      // INFORMAZIONI LIVELLO CORRENTE
-      currentLevelInfo: {
-        level: this.currentLevel,
-        maxLevel: this.maxLevels,
-        range: `1-${currentRange}`,
-        maxRange: currentRange,
-        attempts: maxAttempts,
-        difficulty: this.difficulty,
-      },
-    }
-  }
-}
-
+// Utility functions
 function generateRoomCode() {
-  let code
-  do {
-    code = "GAME" + Math.random().toString(36).substr(2, 4).toUpperCase()
-  } while (rooms.has(code))
-  return code
+  return Math.random().toString(36).substring(2, 8).toUpperCase();
 }
 
-io.on("connection", (socket) => {
-  console.log(`Nuovo giocatore connesso: ${socket.id}`)
+function getDifficultySettings(difficulty) {
+  const settings = {
+    easy: { base: 30, attempts: 10 },
+    medium: { base: 60, attempts: 8 },
+    hard: { base: 150, attempts: 7 },
+    hardcore: { base: 300, attempts: 5 }
+  };
+  return settings[difficulty] || settings.easy;
+}
 
-  socket.on("createRoom", (data) => {
-    const roomCode = generateRoomCode()
-    const playerData = {
-      id: socket.id,
-      name: data.playerName,
-      isHost: true,
-    }
+function calculatePoints(attempts, maxAttempts) {
+  return Math.max(100 - (attempts - 1) * 10, 10);
+}
 
-    const room = new GameRoom(roomCode, playerData, data.difficulty)
-    rooms.set(roomCode, room)
-    players.set(socket.id, { roomCode, playerData })
+function getGuessResult(guess, target) {
+  if (guess === target) {
+    return 'correct';
+  } else if (Math.abs(guess - target) <= 5) {
+    return 'very_close';
+  } else if (Math.abs(guess - target) <= 15) {
+    return 'close';
+  } else {
+    return 'far';
+  }
+}
 
-    socket.join(roomCode)
+function getGuessMessage(guess, target, result) {
+  switch (result) {
+    case 'correct':
+      return '🎯 BERSAGLIO COLPITO! Perfetto!';
+    case 'very_close':
+      return guess < target ? '🔥 MOLTO VICINO! Prova più in alto' : '🔥 MOLTO VICINO! Prova più in basso';
+    case 'close':
+      return guess < target ? '🎯 VICINO! Prova più in alto' : '🎯 VICINO! Prova più in basso';
+    case 'far':
+      return guess < target ? '❄️ FREDDO! Molto più in alto' : '❄️ FREDDO! Molto più in basso';
+    default:
+      return 'Tentativo registrato';
+  }
+}
 
-    socket.emit("roomCreated", {
-      roomCode: roomCode,
-      gameState: room.getGameState(),
-    })
+// Socket.io connection handling
+io.on('connection', (socket) => {
+  console.log(`🚀 Giocatore connesso: ${socket.id}`);
 
-    console.log(`Stanza ${roomCode} creata da ${data.playerName}`)
-  })
+  // Create room
+  socket.on('createRoom', (data) => {
+    try {
+      const { playerName, difficulty } = data;
 
-  socket.on("joinRoom", (data) => {
-    const room = rooms.get(data.roomCode)
-
-    if (!room) {
-      socket.emit("error", { message: "Stanza non trovata!" })
-      return
-    }
-
-    if (room.players.size >= 6) {
-      socket.emit("error", { message: "Stanza piena!" })
-      return
-    }
-
-    const nameExists = Array.from(room.players.values()).some((p) => p.name === data.playerName)
-    if (nameExists) {
-      socket.emit("error", { message: "Nome già in uso in questa stanza!" })
-      return
-    }
-
-    const playerData = {
-      id: socket.id,
-      name: data.playerName,
-      isHost: false,
-    }
-
-    room.addPlayer(playerData)
-    players.set(socket.id, { roomCode: data.roomCode, playerData })
-
-    socket.join(data.roomCode)
-
-    socket.emit("roomJoined", {
-      roomCode: data.roomCode,
-      gameState: room.getGameState(),
-    })
-
-    socket.to(data.roomCode).emit("playerJoined", {
-      player: playerData,
-      gameState: room.getGameState(),
-    })
-
-    if (room.autoStartTimer) {
-      io.to(data.roomCode).emit("autoStartScheduled", {
-        message: "La partita inizierà automaticamente tra 10 secondi...",
-        gameState: room.getGameState(),
-      })
-    }
-
-    console.log(`${data.playerName} si è unito alla stanza ${data.roomCode}`)
-  })
-
-  socket.on("startGame", (data) => {
-    const playerInfo = players.get(socket.id)
-    if (!playerInfo) return
-
-    const room = rooms.get(playerInfo.roomCode)
-    if (!room || !playerInfo.playerData.isHost) {
-      socket.emit("error", { message: "Solo l'host può iniziare la partita!" })
-      return
-    }
-
-    if (room.startGame()) {
-      io.to(playerInfo.roomCode).emit("gameStarted", {
-        gameState: room.getGameState(),
-        manualStart: true,
-      })
-    } else {
-      socket.emit("error", { message: "Servono almeno 2 giocatori per iniziare!" })
-    }
-  })
-
-  socket.on("nextLevel", (data) => {
-    const playerInfo = players.get(socket.id)
-    if (!playerInfo) return
-
-    const room = rooms.get(playerInfo.roomCode)
-    if (!room || !playerInfo.playerData.isHost) {
-      socket.emit("error", { message: "Solo l'host può passare al livello successivo!" })
-      return
-    }
-
-    if (room.nextLevel()) {
-      const newGameState = room.getGameState()
-      io.to(playerInfo.roomCode).emit("levelStarted", {
-        gameState: newGameState,
-      })
-      console.log(`🎯 LIVELLO ${room.currentLevel} INIZIATO - Range: 1-${room.getCurrentRange()}`)
-    }
-  })
-
-  socket.on("makeGuess", (data) => {
-    const playerInfo = players.get(socket.id)
-    if (!playerInfo) return
-
-    const room = rooms.get(playerInfo.roomCode)
-    if (!room) return
-
-    const result = room.makeGuess(socket.id, data.guess)
-    if (!result) {
-      socket.emit("error", { message: "Non è il tuo turno o la partita non è valida!" })
-      return
-    }
-
-    io.to(playerInfo.roomCode).emit("guessResult", {
-      ...result,
-      gameState: room.getGameState(),
-    })
-
-    if (result.levelCompleted) {
-      if (result.gameEnded) {
-        io.to(playerInfo.roomCode).emit("gameCompleted", {
-          winner: result.player,
-          targetNumber: result.targetNumber,
-          gameState: room.getGameState(),
-          finalLeaderboard: room.getFinalLeaderboard(),
-        })
-      } else {
-        io.to(playerInfo.roomCode).emit("levelCompleted", {
-          winner: result.player,
-          targetNumber: result.targetNumber,
-          levelScore: result.levelScore,
-          gameState: room.getGameState(),
-        })
+      if (!playerName || !difficulty) {
+        socket.emit('error', { message: 'Nome giocatore e difficoltà richiesti' });
+        return;
       }
+
+      const roomCode = generateRoomCode();
+      const room = {
+        code: roomCode,
+        host: socket.id,
+        difficulty: difficulty,
+        players: {},
+        gameState: {
+          started: false,
+          currentLevel: 1,
+          maxLevel: 10,
+          targetNumber: null,
+          gameHistory: [],
+          levelCompleted: false
+        },
+        createdAt: new Date()
+      };
+
+      // Add player to room
+      room.players[socket.id] = {
+        id: socket.id,
+        name: playerName,
+        score: 0,
+        attempts: 0,
+        isHost: true,
+        joinedAt: new Date()
+      };
+
+      rooms.set(roomCode, room);
+      players.set(socket.id, { roomCode, playerName });
+
+      socket.join(roomCode);
+
+      socket.emit('roomCreated', {
+        roomCode: roomCode,
+        players: room.players,
+        difficulty: difficulty
+      });
+
+      console.log(`🏠 Stanza creata: ${roomCode} da ${playerName}`);
+    } catch (error) {
+      console.error('Errore creazione stanza:', error);
+      socket.emit('error', { message: 'Errore nella creazione della stanza' });
     }
-  })
+  });
 
-  socket.on("resetGame", (data) => {
-    const playerInfo = players.get(socket.id)
-    if (!playerInfo) return
+  // Join room
+  socket.on('joinRoom', (data) => {
+    try {
+      const { playerName, roomCode } = data;
 
-    const room = rooms.get(playerInfo.roomCode)
-    if (!room || !playerInfo.playerData.isHost) {
-      socket.emit("error", { message: "Solo l'host può resettare la partita!" })
-      return
-    }
+      if (!playerName || !roomCode) {
+        socket.emit('error', { message: 'Nome giocatore e codice stanza richiesti' });
+        return;
+      }
 
-    room.resetGame()
+      const room = rooms.get(roomCode.toUpperCase());
 
-    io.to(playerInfo.roomCode).emit("roomState", {
-      gameState: room.getGameState(),
-    })
-  })
+      if (!room) {
+        socket.emit('error', { message: 'Stanza non trovata' });
+        return;
+      }
 
-  socket.on("sendMessage", (data) => {
-    const playerInfo = players.get(socket.id)
-    if (!playerInfo) return
+      if (Object.keys(room.players).length >= 8) {
+        socket.emit('error', { message: 'Stanza piena (massimo 8 giocatori)' });
+        return;
+      }
 
-    const messageData = {
-      player: playerInfo.playerData.name,
-      message: data.message,
-      timestamp: Date.now(),
-    }
+      // Add player to room
+      room.players[socket.id] = {
+        id: socket.id,
+        name: playerName,
+        score: 0,
+        attempts: 0,
+        isHost: false,
+        joinedAt: new Date()
+      };
 
-    io.to(playerInfo.roomCode).emit("chatMessage", messageData)
-  })
+      players.set(socket.id, { roomCode: roomCode.toUpperCase(), playerName });
 
-  socket.on("getPublicRooms", () => {
-    const publicRooms = Array.from(rooms.values())
-      .filter((room) => !room.gameStarted && room.players.size < 6)
-      .slice(0, 10)
-      .map((room) => ({
-        code: room.code,
-        host: room.host.name,
+      socket.join(roomCode.toUpperCase());
+
+      // Notify all players
+      io.to(roomCode.toUpperCase()).emit('playerJoined', {
+        playerName: playerName,
+        players: room.players
+      });
+
+      socket.emit('roomJoined', {
+        roomCode: roomCode.toUpperCase(),
+        players: room.players,
         difficulty: room.difficulty,
-        players: room.players.size,
-        maxPlayers: 6,
-      }))
+        isHost: false
+      });
 
-    socket.emit("publicRooms", { rooms: publicRooms })
-  })
+      console.log(`🚪 ${playerName} è entrato nella stanza ${roomCode.toUpperCase()}`);
+    } catch (error) {
+      console.error('Errore join stanza:', error);
+      socket.emit('error', { message: 'Errore nell\'entrare nella stanza' });
+    }
+  });
 
-  socket.on("leaveRoom", (data) => {
-    const playerInfo = players.get(socket.id)
-    if (playerInfo) {
-      const room = rooms.get(playerInfo.roomCode)
-      if (room) {
-        const newHost = room.removePlayer(socket.id)
+  // Join random room
+  socket.on('joinRandomRoom', (data) => {
+    try {
+      const { playerName } = data;
 
-        socket.to(playerInfo.roomCode).emit("playerLeft", {
-          player: playerInfo.playerData,
-          gameState: room.getGameState(),
-          newHost: newHost,
-        })
+      if (!playerName) {
+        socket.emit('error', { message: 'Nome giocatore richiesto' });
+        return;
+      }
 
-        socket.leave(playerInfo.roomCode)
-
-        if (room.players.size === 0) {
-          rooms.delete(playerInfo.roomCode)
+      // Find available room
+      let availableRoom = null;
+      for (const [code, room] of rooms.entries()) {
+        if (Object.keys(room.players).length < 8 && !room.gameState.started) {
+          availableRoom = { code, room };
+          break;
         }
       }
 
-      players.delete(socket.id)
+      if (!availableRoom) {
+        socket.emit('error', { message: 'Nessuna stanza disponibile' });
+        return;
+      }
+
+      // Join the room
+      socket.emit('joinRoom', { playerName, roomCode: availableRoom.code });
+    } catch (error) {
+      console.error('Errore join random:', error);
+      socket.emit('error', { message: 'Errore nel trovare una stanza casuale' });
     }
-  })
+  });
 
-  socket.on("disconnect", () => {
-    const playerInfo = players.get(socket.id)
-    if (playerInfo) {
-      const room = rooms.get(playerInfo.roomCode)
-      if (room) {
-        const newHost = room.removePlayer(socket.id)
-
-        socket.to(playerInfo.roomCode).emit("playerLeft", {
-          player: playerInfo.playerData,
-          gameState: room.getGameState(),
-          newHost: newHost,
-        })
-
-        if (room.players.size === 0) {
-          rooms.delete(playerInfo.roomCode)
+  // Get public rooms
+  socket.on('getPublicRooms', () => {
+    try {
+      const publicRooms = [];
+      for (const [code, room] of rooms.entries()) {
+        if (Object.keys(room.players).length < 8 && !room.gameState.started) {
+          publicRooms.push({
+            code: code,
+            playerCount: Object.keys(room.players).length,
+            difficulty: room.difficulty,
+            createdAt: room.createdAt
+          });
         }
       }
 
-      players.delete(socket.id)
+      socket.emit('publicRooms', { rooms: publicRooms });
+    } catch (error) {
+      console.error('Errore get public rooms:', error);
+      socket.emit('error', { message: 'Errore nel recuperare le stanze pubbliche' });
     }
+  });
 
-    console.log(`Giocatore disconnesso: ${socket.id}`)
-  })
-})
+  // Start game
+  socket.on('startGame', (data) => {
+    try {
+      const { roomCode } = data;
+      const room = rooms.get(roomCode);
 
-const PORT = process.env.PORT || 3000
-server.listen(PORT, () => {
-  console.log(`🚀 Server avviato sulla porta ${PORT}`)
-  console.log(`📱 Apri http://localhost:${PORT}/multiplayer.html`)
-})
+      if (!room) {
+        socket.emit('error', { message: 'Stanza non trovata' });
+        return;
+      }
+
+      if (room.host !== socket.id) {
+        socket.emit('error', { message: 'Solo il host può iniziare il gioco' });
+        return;
+      }
+
+      if (room.gameState.started) {
+        socket.emit('error', { message: 'Il gioco è già iniziato' });
+        return;
+      }
+
+      // Initialize game
+      const settings = getDifficultySettings(room.difficulty);
+      const maxRange = settings.base * room.gameState.currentLevel;
+
+      room.gameState.started = true;
+      room.gameState.targetNumber = Math.floor(Math.random() * maxRange) + 1;
+      room.gameState.range = { min: 1, max: maxRange };
+      room.gameState.maxAttempts = settings.attempts;
+      room.gameState.gameHistory = [];
+      room.gameState.levelCompleted = false;
+
+      // Reset player attempts for this level
+      Object.keys(room.players).forEach((playerId) => {
+        room.players[playerId].attempts = 0;
+      });
+
+      io.to(roomCode).emit('gameStarted', {
+        level: room.gameState.currentLevel,
+        targetNumber: room.gameState.targetNumber,
+        range: room.gameState.range,
+        maxAttempts: room.gameState.maxAttempts
+      });
+
+      console.log(`🚀 Gioco iniziato nella stanza ${roomCode}, livello ${room.gameState.currentLevel}`);
+    } catch (error) {
+      console.error('Errore start game:', error);
+      socket.emit('error', { message: 'Errore nell\'iniziare il gioco' });
+    }
+  });
+
+  // Make guess
+  socket.on('makeGuess', (data) => {
+    try {
+      const { roomCode, guess } = data;
+      const room = rooms.get(roomCode);
+
+      if (!room || !room.gameState.started || room.gameState.levelCompleted) {
+        socket.emit('error', { message: 'Gioco non valido o completato' });
+        return;
+      }
+
+      const player = room.players[socket.id];
+      if (!player) {
+        socket.emit('error', { message: 'Giocatore non trovato' });
+        return;
+      }
+
+      if (player.attempts >= room.gameState.maxAttempts) {
+        socket.emit('error', { message: 'Hai esaurito i tentativi per questo livello' });
+        return;
+      }
+
+      player.attempts++;
+
+      const result = getGuessResult(guess, room.gameState.targetNumber);
+      const message = getGuessMessage(guess, room.gameState.targetNumber, result);
+
+      let points = 0;
+      if (result === 'correct') {
+        points = calculatePoints(player.attempts, room.gameState.maxAttempts);
+        player.score += points;
+        room.gameState.levelCompleted = true;
+      }
+
+      // Add to history
+      room.gameState.gameHistory.unshift({
+        playerId: socket.id,
+        playerName: player.name,
+        guess: guess,
+        result: result,
+        message: message.replace(/[🎯🔥❄️]/gu, '').trim(),
+        attempts: player.attempts,
+        timestamp: new Date()
+      });
+
+      // Get player scores
+      const playerScores = {};
+      Object.keys(room.players).forEach((playerId) => {
+        playerScores[playerId] = room.players[playerId].score;
+      });
+
+      // Send result to all players
+      io.to(roomCode).emit('guessResult', {
+        playerId: socket.id,
+        playerName: player.name,
+        guess: guess,
+        result: result,
+        message: message,
+        points: points,
+        gameHistory: room.gameState.gameHistory.slice(0, 20),
+        playerScores: playerScores
+      });
+
+      // Check if level completed
+      if (result === 'correct') {
+        setTimeout(() => {
+          const finalScores = {};
+          Object.keys(room.players).forEach((playerId) => {
+            finalScores[playerId] = room.players[playerId].score;
+          });
+
+          io.to(roomCode).emit('levelCompleted', {
+            winner: {
+              id: socket.id,
+              name: player.name,
+              attempts: player.attempts,
+              score: player.score
+            },
+            targetNumber: room.gameState.targetNumber,
+            level: room.gameState.currentLevel,
+            finalScores: finalScores
+          });
+
+          // Check if game completed
+          if (room.gameState.currentLevel >= room.gameState.maxLevel) {
+            setTimeout(() => {
+              const finalLeaderboard = Object.values(room.players).sort((a, b) => b.score - a.score);
+
+              io.to(roomCode).emit('gameCompleted', {
+                finalLeaderboard: finalLeaderboard,
+                gameStats: {
+                  levelsCompleted: room.gameState.currentLevel,
+                  totalAttempts: Object.values(room.players).reduce((sum, p) => sum + p.attempts, 0),
+                  gameTime: Math.floor((new Date() - room.createdAt) / 1000 / 60) + ' minuti'
+                }
+              });
+            }, 3000);
+          }
+        }, 1500);
+      }
+
+      console.log(`🎯 ${player.name} ha indovinato ${guess} (target: ${room.gameState.targetNumber}) - ${result}`);
+    } catch (error) {
+      console.error('Errore make guess:', error);
+      socket.emit('error', { message: 'Errore nel processare il tentativo' });
+    }
+  });
+
+  // Next level
+  socket.on('nextLevel', (data) => {
+    try {
+      const { roomCode } = data;
+      const room = rooms.get(roomCode);
+
+      if (!room) {
+        socket.emit('error', { message: 'Stanza non trovata' });
+        return;
+      }
+
+      if (room.host !== socket.id) {
+        socket.emit('error', { message: 'Solo il host può avanzare al livello successivo' });
+        return;
+      }
+
+      if (!room.gameState.levelCompleted) {
+        socket.emit('error', { message: 'Completa il livello corrente prima di avanzare' });
+        return;
+      }
+
+      if (room.gameState.currentLevel >= room.gameState.maxLevel) {
+        socket.emit('error', { message: 'Hai già completato tutti i livelli' });
+        return;
+      }
+
+      // Advance to next level
+      room.gameState.currentLevel++;
+      const settings = getDifficultySettings(room.difficulty);
+      const maxRange = settings.base * room.gameState.currentLevel;
+
+      room.gameState.targetNumber = Math.floor(Math.random() * maxRange) + 1;
+      room.gameState.range = { min: 1, max: maxRange };
+      room.gameState.gameHistory = [];
+      room.gameState.levelCompleted = false;
+
+      // Reset player attempts for this level
+      Object.keys(room.players).forEach((playerId) => {
+        room.players[playerId].attempts = 0;
+      });
+
+      io.to(roomCode).emit('gameStarted', {
+        level: room.gameState.currentLevel,
+        targetNumber: room.gameState.targetNumber,
+        range: room.gameState.range,
+        maxAttempts: room.gameState.maxAttempts
+      });
+
+      console.log(`➡️ Livello ${room.gameState.currentLevel} iniziato nella stanza ${roomCode}`);
+    } catch (error) {
+      console.error('Errore next level:', error);
+      socket.emit('error', { message: 'Errore nell\'avanzare al livello successivo' });
+    }
+  });
+
+  // New game
+  socket.on('newGame', (data) => {
+    try {
+      const { roomCode } = data;
+      const room = rooms.get(roomCode);
+
+      if (!room) {
+        socket.emit('error', { message: 'Stanza non trovata' });
+        return;
+      }
+
+      if (room.host !== socket.id) {
+        socket.emit('error', { message: 'Solo il host può iniziare una nuova partita' });
+        return;
+      }
+
+      // Reset game state
+      room.gameState.currentLevel = 1;
+      room.gameState.started = false;
+      room.gameState.targetNumber = null;
+      room.gameState.gameHistory = [];
+      room.gameState.levelCompleted = false;
+
+      // Reset all player scores and attempts
+      Object.keys(room.players).forEach((playerId) => {
+        room.players[playerId].score = 0;
+        room.players[playerId].attempts = 0;
+      });
+
+      // Start new game immediately
+      const settings = getDifficultySettings(room.difficulty);
+      const maxRange = settings.base * room.gameState.currentLevel;
+
+      room.gameState.started = true;
+      room.gameState.targetNumber = Math.floor(Math.random() * maxRange) + 1;
+      room.gameState.range = { min: 1, max: maxRange };
+      room.gameState.maxAttempts = settings.attempts;
+
+      io.to(roomCode).emit('gameStarted', {
+        level: room.gameState.currentLevel,
+        targetNumber: room.gameState.targetNumber,
+        range: room.gameState.range,
+        maxAttempts: room.gameState.maxAttempts
+      });
+
+      console.log(`🔄 Nuova partita iniziata nella stanza ${roomCode}`);
+    } catch (error) {
+      console.error('Errore new game:', error);
+      socket.emit('error', { message: 'Errore nell\'iniziare una nuova partita' });
+    }
+  });
+
+  // Chat message
+  socket.on('chatMessage', (data) => {
+    try {
+      const { roomCode, message } = data;
+      const room = rooms.get(roomCode);
+
+      if (!room) {
+        socket.emit('error', { message: 'Stanza non trovata' });
+        return;
+      }
+
+      const player = room.players[socket.id];
+      if (!player) {
+        socket.emit('error', { message: 'Giocatore non trovato' });
+        return;
+      }
+
+      if (!message || message.trim().length === 0) {
+        return;
+      }
+
+      // Broadcast message to all players in room
+      io.to(roomCode).emit('chatMessage', {
+        playerId: socket.id,
+        playerName: player.name,
+        message: message.trim(),
+        timestamp: new Date(),
+        isOwn: false
+      });
+
+      // Send back to sender with isOwn flag
+      socket.emit('chatMessage', {
+        playerId: socket.id,
+        playerName: player.name,
+        message: message.trim(),
+        timestamp: new Date(),
+        isOwn: true
+      });
+
+      console.log(`💬 ${player.name}: ${message.trim()}`);
+    } catch (error) {
+      console.error('Errore chat message:', error);
+      socket.emit('error', { message: 'Errore nell\'inviare il messaggio' });
+    }
+  });
+
+  // Leave room
+  socket.on('leaveRoom', (data) => {
+    try {
+      const { roomCode } = data;
+      handlePlayerLeave(socket.id, roomCode);
+    } catch (error) {
+      console.error('Errore leave room:', error);
+    }
+  });
+
+  // Handle disconnect
+  socket.on('disconnect', () => {
+    try {
+      const playerData = players.get(socket.id);
+      if (playerData) {
+        handlePlayerLeave(socket.id, playerData.roomCode);
+      }
+      console.log(`🚪 Giocatore disconnesso: ${socket.id}`);
+    } catch (error) {
+      console.error('Errore disconnect:', error);
+    }
+  });
+
+  // Handle player leave
+  function handlePlayerLeave(playerId, roomCode) {
+    try {
+      const room = rooms.get(roomCode);
+      if (!room) return;
+
+      const player = room.players[playerId];
+      if (!player) return;
+
+      const playerName = player.name;
+      const wasHost = player.isHost;
+
+      // Remove player from room
+      delete room.players[playerId];
+      players.delete(playerId);
+
+      // If room is empty, delete it
+      if (Object.keys(room.players).length === 0) {
+        rooms.delete(roomCode);
+        console.log(`🗑️ Stanza ${roomCode} eliminata (vuota)`);
+        return;
+      }
+
+      // If host left, assign new host
+      if (wasHost) {
+        const newHostId = Object.keys(room.players)[0];
+        room.players[newHostId].isHost = true;
+        room.host = newHostId;
+        console.log(`👑 Nuovo host: ${room.players[newHostId].name}`);
+      }
+
+      // Notify remaining players
+      io.to(roomCode).emit('playerLeft', {
+        playerName: playerName,
+        players: room.players
+      });
+
+      console.log(`🚪 ${playerName} ha abbandonato la stanza ${roomCode}`);
+    } catch (error) {
+      console.error('Errore handle player leave:', error);
+    }
+  }
+});
+
+// Cleanup empty rooms every 5 minutes
+setInterval(() => {
+  const now = new Date();
+  for (const [code, room] of rooms.entries()) {
+    // Remove rooms older than 2 hours with no players
+    if (Object.keys(room.players).length === 0 && now - room.createdAt > 2 * 60 * 60 * 1000) {
+      rooms.delete(code);
+      console.log(`🧹 Stanza ${code} rimossa (inattiva)`);
+    }
+  }
+}, 5 * 60 * 1000);
+
+// Start server
+httpServer.listen(PORT, '0.0.0.0', () => {
+  console.log(`🌌 Server Numero Quest in ascolto sulla porta ${PORT}`);
+  console.log(`🚀 Server pronto per Render!`);
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('🛑 Server in chiusura...');
+  httpServer.close(() => {
+    console.log('✅ Server chiuso correttamente');
+    process.exit(0);
+  });
+});
+
+module.exports = httpServer;
