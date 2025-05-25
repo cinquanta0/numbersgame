@@ -1,1622 +1,2833 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gioco dei Numeri Evoluto</title>
-  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Orbitron:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-  <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 Number Quest - L'Avventura Definitiva</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Orbitron:wght@400;700&family=Roboto:wght@400;700&family=Press+Start+2P&family=Fredoka+One&family=Righteous&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    
+    <style>
+        :root {
+            /* TEMA NEON (Default) */
+            --primary-neon: #00fff2;
+            --secondary-neon: #ff6b6b;
+            --accent-gold: #ffd93d;
+            --dark-bg: #0a0a0a;
+            --card-bg: rgba(255,255,255,0.1);
+            --glow: 0 0 20px currentColor;
+            --text-color: white;
+            --gradient-bg: linear-gradient(45deg, #0a0a0a, #1a1a2e, #16213e);
+        }
 
-  <style>
-    :root {
-      --default-bg: linear-gradient(to right, #2c3e50, #3498db);
-      --sunset-bg: linear-gradient(to right, #ff7e5f, #feb47b);
-      --forest-bg: linear-gradient(to right, #11998e, #38ef7d);
-      --neon-bg: linear-gradient(to right, #8e2de2, #4a00e0);
-      --cyber-bg: linear-gradient(to right, #0f2027, #203a43, #2c5364);
-      
-      --primary-color: #00fff2;
-      --secondary-color: #ff6b6b;
-      --accent-color: #ffd93d;
-    }
-    
-    * { box-sizing: border-box; }
-    
-    body {
-      font-family: 'Roboto', sans-serif;
-      background: var(--default-bg);
-      color: white;
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 1rem;
-      text-align: center;
-      transition: background 1s;
-      position: relative;
-      overflow-x: hidden;
-    }
-    
-    body.default-theme {
-      background-image: linear-gradient(to right, #2c3e50, #3498db);
-      color: white;
-    }
-    
-    body.sunset-theme {
-      background-image: linear-gradient(to right, #ff7e5f, #feb47b);
-      color: #2c3e50;
-    }
-    
-    body.forest-theme {
-      background-image: linear-gradient(to right, #11998e, #38ef7d);
-      color: #1b1b1b;
-    }
-    
-    body.neon-theme {
-      background-image: linear-gradient(to right, #8e2de2, #4a00e0);
-      color: #ffffff;
-    }
-    
-    body.cyber-theme {
-      background-image: linear-gradient(to right, #0f2027, #203a43, #2c5364);
-      color: #e0e0e0;
-    }
+        /* TEMA CYBERPUNK */
+        [data-theme="cyberpunk"] {
+            --primary-neon: #ff0080;
+            --secondary-neon: #00ff80;
+            --accent-gold: #ffff00;
+            --dark-bg: #0d0d0d;
+            --card-bg: rgba(255,0,128,0.1);
+            --gradient-bg: linear-gradient(45deg, #0d0d0d, #2d0a2d, #4a0e4e);
+        }
 
-    #particles-js {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      z-index: -2;
-    }
+        /* TEMA RETRO */
+        [data-theme="retro"] {
+            --primary-neon: #ff6600;
+            --secondary-neon: #ff3366;
+            --accent-gold: #ffcc00;
+            --dark-bg: #1a0f0a;
+            --card-bg: rgba(255,102,0,0.1);
+            --gradient-bg: linear-gradient(45deg, #1a0f0a, #2d1b0f, #4a2c1a);
+        }
 
-    #numberCanvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: -1;
-    }
+        /* TEMA OCEANO */
+        [data-theme="ocean"] {
+            --primary-neon: #00ccff;
+            --secondary-neon: #0066cc;
+            --accent-gold: #66ffcc;
+            --dark-bg: #0a1a2e;
+            --card-bg: rgba(0,204,255,0.1);
+            --gradient-bg: linear-gradient(45deg, #0a1a2e, #1a2e4a, #2e4a6b);
+        }
 
-    h1 {
-      font-family: 'Bangers', cursive;
-      font-size: 3rem;
-      margin: 0 0 20px;
-      color: #FF6347;
-      text-shadow: 2px 2px 10px rgba(0,0,0,0.6);
-      animation: shine 1.5s linear infinite alternate;
-    }
+        /* TEMA FORESTA */
+        [data-theme="forest"] {
+            --primary-neon: #00ff66;
+            --secondary-neon: #66ff00;
+            --accent-gold: #ffff66;
+            --dark-bg: #0a2e0a;
+            --card-bg: rgba(0,255,102,0.1);
+            --gradient-bg: linear-gradient(45deg, #0a2e0a, #1a4a1a, #2e6b2e);
+        }
 
-    @keyframes shine {
-      0% {
-        text-shadow: 0 0 20px rgba(255, 255, 255, 0.6), 0 0 30px rgba(255, 255, 255, 0.6);
-      }
-      100% {
-        text-shadow: 0 0 40px rgba(255, 255, 255, 0.9), 0 0 60px rgba(255, 255, 255, 0.9);
-      }
-    }
+        /* TEMA GALASSIA */
+        [data-theme="galaxy"] {
+            --primary-neon: #9966ff;
+            --secondary-neon: #ff66cc;
+            --accent-gold: #66ccff;
+            --dark-bg: #1a0a2e;
+            --card-bg: rgba(153,102,255,0.1);
+            --gradient-bg: linear-gradient(45deg, #1a0a2e, #2e1a4a, #4a2e6b);
+        }
 
-    .container {
-      background: rgba(255,255,255,0.1);
-      padding: 1.5rem;
-      border-radius: 20px;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 0 15px rgba(0,0,0,0.4);
-      width: 100%;
-      max-width: 400px;
-      margin: 1rem 0;
-      animation: fadeIn 1s ease-out;
-    }
-
-    @keyframes fadeIn {
-      0% { opacity: 0; transform: scale(0.95); }
-      100% { opacity: 1; transform: scale(1); }
-    }
-
-    input, select, button {
-      width: 100%;
-      padding: 0.75rem;
-      margin: 0.5rem 0;
-      font-size: 1rem;
-      border-radius: 10px;
-      border: none;
-      font-weight: bold;
-      box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
-    }
-
-    button {
-      background: #00fff2;
-      color: black;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    button:hover { 
-      background: #00cfc4; 
-      transform: translateY(-2px);
-    }
-    
-    button:active {
-      transform: translateY(0);
-    }
-    
-    .music-btn { background: #e74c3c; color: white; }
-    .home-btn { background: #f39c12; color: black; }
-    .theme-selector { background: #9b59b6; color: white; }
-    .hidden { display: none; }
-
-    #rules {
-      background: rgba(255,255,255,0.1);
-      padding: 1rem;
-      border-radius: 12px;
-      text-align: left;
-      animation: fadeIn 1s ease-out;
-    }
-
-    #rules ul { padding-left: 20px; }
-    
-    #finalMessage h2 {
-      font-size: 2rem;
-      color: gold;
-      text-shadow: 1px 1px 6px #000;
-    }
-
-    img.logo {
-      width: 150px;
-      margin-bottom: 20px;
-    }
-    
-    /* Nuovi stili per le modalità di gioco */
-    .game-modes {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 15px;
-    }
-    
-    .mode-card {
-      background: rgba(255,255,255,0.15);
-      border-radius: 15px;
-      padding: 15px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      border: 2px solid transparent;
-    }
-    
-    .mode-card:hover {
-      background: rgba(255,255,255,0.25);
-      transform: translateY(-5px);
-      border-color: var(--primary-color);
-    }
-    
-    .mode-icon {
-      font-size: 2rem;
-      margin-bottom: 5px;
-    }
-    
-    .mode-title {
-      font-weight: bold;
-      font-family: 'Orbitron', sans-serif;
-      margin-bottom: 5px;
-    }
-    
-    .mode-desc {
-      font-size: 0.8rem;
-      opacity: 0.8;
-    }
-    
-    /* Stili per la barra di progressione */
-    .progress-container {
-      background: rgba(0,0,0,0.2);
-      border-radius: 10px;
-      height: 10px;
-      margin: 15px 0;
-      overflow: hidden;
-    }
-    
-    .progress-bar {
-      height: 100%;
-      background: linear-gradient(90deg, #00fff2, #00cfc4);
-      width: 0%;
-      transition: width 0.5s ease;
-    }
-    
-    /* Stili per i suggerimenti */
-    .hint-container {
-      margin: 10px 0;
-      padding: 10px;
-      background: rgba(255, 217, 61, 0.2);
-      border-radius: 10px;
-      border-left: 4px solid #ffd93d;
-    }
-    
-    /* Stili per la cronologia tentativi */
-    .history-container {
-      max-height: 150px;
-      overflow-y: auto;
-      margin: 15px 0;
-      background: rgba(0,0,0,0.2);
-      border-radius: 10px;
-      padding: 10px;
-    }
-    
-    .history-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 5px;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-    }
-    
-    .history-item:last-child {
-      border-bottom: none;
-    }
-    
-    /* Stili per il sistema di power-up */
-    .powerups {
-      display: flex;
-      gap: 10px;
-      margin: 15px 0;
-    }
-    
-    .powerup {
-      flex: 1;
-      background: rgba(0,0,0,0.2);
-      border-radius: 10px;
-      padding: 10px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    
-    .powerup:hover {
-      background: rgba(0,0,0,0.3);
-      transform: translateY(-2px);
-    }
-    
-    .powerup-icon {
-      font-size: 1.5rem;
-      margin-bottom: 5px;
-    }
-    
-    .powerup-name {
-      font-size: 0.8rem;
-      font-weight: bold;
-    }
-    
-    /* Stili per il sistema di livelli */
-    .level-badge {
-      background: #ffd93d;
-      color: black;
-      border-radius: 20px;
-      padding: 5px 15px;
-      font-weight: bold;
-      display: inline-block;
-      margin-bottom: 10px;
-    }
-    
-    /* Stili per la classifica */
-    .leaderboard {
-      margin-top: 20px;
-    }
-    
-    .leaderboard-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 8px;
-      background: rgba(255,255,255,0.1);
-      border-radius: 8px;
-      margin-bottom: 5px;
-    }
-    
-    .rank {
-      background: #ffd93d;
-      color: black;
-      width: 25px;
-      height: 25px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      margin-right: 10px;
-    }
-    
-    .player-info {
-      flex: 1;
-      text-align: left;
-      display: flex;
-      align-items: center;
-    }
-    
-    .score-info {
-      font-weight: bold;
-      color: #00fff2;
-    }
-    
-    /* Animazioni aggiuntive */
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-    }
-    
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-5px); }
-      75% { transform: translateX(5px); }
-    }
-    
-    .pulse {
-      animation: pulse 1s infinite;
-    }
-    
-    .shake {
-      animation: shake 0.5s;
-    }
-    
-    /* Stili per il sistema di achievements */
-    .achievement {
-      background: rgba(0,0,0,0.3);
-      border-radius: 10px;
-      padding: 10px;
-      margin: 10px 0;
-      display: flex;
-      align-items: center;
-    }
-    
-    .achievement-icon {
-      font-size: 2rem;
-      margin-right: 15px;
-    }
-    
-    .achievement-info {
-      text-align: left;
-      flex: 1;
-    }
-    
-    .achievement-title {
-      font-weight: bold;
-      margin-bottom: 5px;
-    }
-    
-    .achievement-desc {
-      font-size: 0.8rem;
-      opacity: 0.8;
-    }
-    
-    /* Stili per il numero vivente */
-    .living-number {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 3rem;
-      font-weight: bold;
-      margin: 20px 0;
-      color: #00fff2;
-      text-shadow: 0 0 10px currentColor;
-      transition: all 0.5s ease;
-    }
-    
-    /* Stili per la modalità storia */
-    .story-container {
-      background: rgba(0,0,0,0.2);
-      border-radius: 15px;
-      padding: 15px;
-      margin: 15px 0;
-      text-align: left;
-    }
-    
-    .story-title {
-      font-family: 'Bangers', cursive;
-      font-size: 1.5rem;
-      margin-bottom: 10px;
-      color: #ffd93d;
-    }
-    
-    .story-text {
-      line-height: 1.5;
-      margin-bottom: 15px;
-    }
-    
-    .story-choices {
-      display: flex;
-      gap: 10px;
-    }
-    
-    .story-choice {
-      flex: 1;
-      background: rgba(255,255,255,0.1);
-      border-radius: 10px;
-      padding: 10px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    
-    .story-choice:hover {
-      background: rgba(255,255,255,0.2);
-    }
-
-    @media screen and (max-width: 480px) {
-      h1 { font-size: 2.2rem; }
-      .container { padding: 1rem; }
-      input, select, button { font-size: 1rem; }
-      .game-modes { grid-template-columns: 1fr; }
-      .powerups { flex-direction: column; }
-    }
-  </style>
-</head>
-<body class="default-theme">
-
-<canvas id="numberCanvas"></canvas>
-<div id="particles-js"></div>
-
-<img src="logo-gioco.png" alt="Logo del Gioco" class="logo">
-
-<div class="container" id="mainScreen">
-  <h1>🎮 Numero Quest</h1>
-
-  <div id="rules">
-    <h3>📜 Benvenuto all'avventura numerica!</h3>
-    <ul>
-      <li>Indovina il numero segreto in ogni livello</li>
-      <li>Sblocca modalità speciali e power-up</li>
-      <li>Colleziona achievement e scala la classifica</li>
-      <li>Scopri la storia del Regno dei Numeri</li>
-    </ul>
-  </div>
-
-  <input type="text" id="playerName" placeholder="Il tuo nome da eroe" minlength="2" />
-  
-  <div class="game-modes">
-    <div class="mode-card" onclick="startMode('easy')">
-      <div class="mode-icon">🧩</div>
-      <div class="mode-title">Facile</div>
-      <div class="mode-desc">Numeri fino a 30, 10 tentativi</div>
-    </div>
-    
-    <div class="mode-card" onclick="startMode('medium')">
-      <div class="mode-icon">⚔️</div>
-      <div class="mode-title">Medio</div>
-      <div class="mode-desc">Numeri fino a 60, 8 tentativi</div>
-    </div>
-    
-    <div class="mode-card" onclick="startMode('hard')">
-      <div class="mode-icon">🔥</div>
-      <div class="mode-title">Difficile</div>
-      <div class="mode-desc">Numeri fino a 150, timer attivo</div>
-    </div>
-    
-    <div class="mode-card" onclick="startMode('hardcore')">
-      <div class="mode-icon">💀</div>
-      <div class="mode-title">Hardcore</div>
-      <div class="mode-desc">Numeri fino a 300, timer ridotto</div>
-    </div>
-  </div>
-  
-  <button onclick="openSpecialModes()" class="pulse">✨ Modalità Speciali</button>
-  <button onclick="window.location.href='multiplayer.html'">👥 Multiplayer</button>
-  <button onclick="openAchievements()">🏆 Achievements</button>
-</div>
-
-<div class="container hidden" id="specialModesScreen">
-  <h2>✨ Modalità Speciali</h2>
-  
-  <div class="game-modes">
-    <div class="mode-card" onclick="startSpecialMode('living')">
-      <div class="mode-icon">🌱</div>
-      <div class="mode-title">Numero Vivente</div>
-      <div class="mode-desc">Alleva il tuo numero e fallo crescere</div>
-    </div>
-    
-    <div class="mode-card" onclick="startSpecialMode('story')">
-      <div class="mode-icon">📚</div>
-      <div class="mode-title">Modalità Storia</div>
-      <div class="mode-desc">Scopri il mistero del Regno dei Numeri</div>
-    </div>
-    
-    <div class="mode-card" onclick="startSpecialMode('rhythm')">
-      <div class="mode-icon">🎵</div>
-      <div class="mode-title">Rhythm Numbers</div>
-      <div class="mode-desc">Indovina a ritmo di musica</div>
-    </div>
-    
-    <div class="mode-card" onclick="startSpecialMode('puzzle')">
-      <div class="mode-icon">🧠</div>
-      <div class="mode-title">Puzzle Numerici</div>
-      <div class="mode-desc">Risolvi enigmi matematici</div>
-    </div>
-  </div>
-  
-  <button onclick="goToMainScreen()">🔙 Torna al Menu</button>
-</div>
-
-<div class="container hidden" id="achievementsScreen">
-  <h2>🏆 Achievements</h2>
-  
-  <div id="achievementsList">
-    <div class="achievement">
-      <div class="achievement-icon">🔍</div>
-      <div class="achievement-info">
-        <div class="achievement-title">Primo Indovinello</div>
-        <div class="achievement-desc">Indovina il tuo primo numero</div>
-      </div>
-    </div>
-    
-    <div class="achievement">
-      <div class="achievement-icon">🎯</div>
-      <div class="achievement-info">
-        <div class="achievement-title">Precisione</div>
-        <div class="achievement-desc">Indovina al primo tentativo</div>
-      </div>
-    </div>
-    
-    <div class="achievement">
-      <div class="achievement-icon">⚡</div>
-      <div class="achievement-info">
-        <div class="achievement-title">Velocista</div>
-        <div class="achievement-desc">Indovina in meno di 5 secondi</div>
-      </div>
-    </div>
-    
-    <div class="achievement">
-      <div class="achievement-icon">🔥</div>
-      <div class="achievement-info">
-        <div class="achievement-title">Maestro dei Numeri</div>
-        <div class="achievement-desc">Completa la modalità Hardcore</div>
-      </div>
-    </div>
-  </div>
-  
-  <button onclick="goToMainScreen()">🔙 Torna al Menu</button>
-</div>
-
-<div class="container hidden" id="game">
-  <div class="level-badge" id="levelBadge">Livello 1</div>
-  <h2>Livello <span id="livelloCorrente">1</span> (0 - <span id="maxNumber">10</span>)</h2>
-  
-  <div class="progress-container">
-    <div class="progress-bar" id="progressBar"></div>
-  </div>
-  
-  <input type="number" id="userGuess" placeholder="Inserisci numero" />
-  <button onclick="check()">🔍 Verifica</button>
-  
-  <p>Tentativi rimasti: <span id="tentativi">10</span></p>
-  <p id="message"></p>
-  <p id="timer" class="hidden">⏱️ Tempo: <span id="timerValue">34</span> sec</p>
-  
-  <div class="hint-container hidden" id="hintContainer">
-    <p id="hintText">Suggerimento: Il numero è pari</p>
-  </div>
-  
-  <div class="powerups">
-    <div class="powerup" onclick="usePowerup('hint')">
-      <div class="powerup-icon">💡</div>
-      <div class="powerup-name">Suggerimento</div>
-    </div>
-    <div class="powerup" onclick="usePowerup('time')">
-      <div class="powerup-icon">⏰</div>
-      <div class="powerup-name">+10 sec</div>
-    </div>
-    <div class="powerup" onclick="usePowerup('range')">
-      <div class="powerup-icon">📏</div>
-      <div class="powerup-name">Riduci Range</div>
-    </div>
-  </div>
-  
-  <div class="history-container" id="historyContainer">
-    <div class="history-title">Cronologia Tentativi</div>
-    <div id="historyList"></div>
-  </div>
-  
-  <button id="retryBtn" class="hidden" onclick="retry()">🔁 Riprova</button>
-  <button id="nextLevelBtn" class="hidden" onclick="nextLevel()">⏭️ Livello Successivo</button>
-</div>
-
-<div class="container hidden" id="livingNumberScreen">
-  <h2>🌱 Il Tuo Numero Vivente</h2>
-  
-  <div class="living-number" id="livingNumber">7</div>
-  
-  <div class="progress-container">
-    <div class="progress-bar" id="growthBar" style="width: 35%;"></div>
-  </div>
-  
-  <p>Livello: <span id="numberLevel">1</span> | Felicità: <span id="happiness">85</span>%</p>
-  
-  <div class="powerups">
-    <div class="powerup" onclick="feedNumber()">
-      <div class="powerup-icon">🍎</div>
-      <div class="powerup-name">Nutri</div>
-    </div>
-    <div class="powerup" onclick="playWithNumber()">
-      <div class="powerup-icon">🎮</div>
-      <div class="powerup-name">Gioca</div>
-    </div>
-    <div class="powerup" onclick="trainNumber()">
-      <div class="powerup-icon">💪</div>
-      <div class="powerup-name">Allena</div>
-    </div>
-  </div>
-  
-  <div class="story-container">
-    <div class="story-title">Diario del Numero</div>
-    <div class="story-text" id="numberStory">
-      Il tuo numero è appena nato! Prenditi cura di lui e crescerà forte e saggio.
-    </div>
-  </div>
-  
-  <button onclick="goToMainScreen()">🔙 Torna al Menu</button>
-</div>
-
-<div class="container hidden" id="storyModeScreen">
-  <h2>📚 L'Avventura dei Numeri</h2>
-  
-  <div class="story-container">
-    <div class="story-title">Capitolo 1: Il Risveglio</div>
-    <div class="story-text" id="storyText">
-      Nel Regno dei Numeri, un'antica profezia parla di un eroe che riporterà l'equilibrio tra le cifre. Tu sei stato scelto per questa missione. Il Saggio Primo ti guiderà nel tuo viaggio...
-    </div>
-    
-    <div class="story-choices">
-      <div class="story-choice" onclick="makeStoryChoice(1)">Accetta la missione</div>
-      <div class="story-choice" onclick="makeStoryChoice(2)">Chiedi più informazioni</div>
-    </div>
-  </div>
-  
-  <div class="progress-container">
-    <div class="progress-bar" id="storyProgress" style="width: 10%;"></div>
-  </div>
-  
-  <button onclick="goToMainScreen()">🔙 Torna al Menu</button>
-</div>
-
-<div class="container hidden" id="finalMessage">
-  <h2>🎊 Complimenti!</h2>
-  <p>Hai completato tutti i livelli!</p>
-  
-  <div class="achievement pulse">
-    <div class="achievement-icon">🏆</div>
-    <div class="achievement-info">
-      <div class="achievement-title">Conquistatore</div>
-      <div class="achievement-desc">Hai completato tutti i livelli della modalità!</div>
-    </div>
-  </div>
-  
-  <div class="leaderboard">
-    <h3>🏆 Classifica Locale</h3>
-    <ul id="scoreList" style="text-align:left; padding-left: 0; list-style: none;"></ul>
-  </div>
-  
-  <p>Verrai reindirizzato alla Home tra pochi secondi...</p>
-</div>
-
-<div style="width: 100%; max-width: 400px; text-align: center;">
-  <button onclick="goHome()" class="home-btn">🏠 Home</button>
-  <button onclick="toggleMusic()" class="music-btn" id="musicBtn">🎵 Musica</button>
-  <select id="themeSelector" class="theme-selector" onchange="changeTheme(this.value)">
-    <option value="default">🎨 Classico</option>
-    <option value="sunset">🌅 Tramonto</option>
-    <option value="forest">🌲 Foresta</option>
-    <option value="neon">🌈 Neon</option>
-    <option value="cyber">🤖 Cyber</option>
-  </select>
-</div>
-
-<audio id="bgMusic" src="musica.mp3" loop></audio>
-<audio id="winSound" src="win.mp3"></audio>
-<audio id="loseSound" src="lose.mp3"></audio>
-<audio id="clickSound" src="click.mp3"></audio>
-<audio id="powerupSound" src="powerup.mp3"></audio>
-
-<script>
-// Variabili di gioco
-let currentLevel = 1;
-let maxNumber = 10;
-let maxAttempts = 10;
-let remainingAttempts = 10;
-let targetNumber;
-let gameTimer;
-let isMusicPlaying = false;
-let mode = "easy";
-let gameHistory = [];
-let powerups = {
-  hint: 3,
-  time: 2,
-  range: 1
-};
-let achievements = [];
-let livingNumberData = {
-  value: 7,
-  level: 1,
-  happiness: 85,
-  growth: 35,
-  stories: []
-};
-let storyProgress = 0;
-let storyChoices = [];
-
-  document.addEventListener('DOMContentLoaded', () => {
-    const user = localStorage.getItem('numeroquest_current_user');
-    const expiry = localStorage.getItem('numeroquest_session_expiry');
-
-    if (!user || !expiry || Date.now() > parseInt(expiry)) {
-      window.location.href = 'login.html';
-    } else {
-      const username = JSON.parse(user).username;
-      document.getElementById('welcome-message').textContent = `Benvenuto, ${username}!`;
-    }
-
-    // 👇 Assicurati che questo codice esista ed è dentro DOMContentLoaded
-    const logoutBtn = document.getElementById('logout-btn');
-    if (logoutBtn) {
-      logoutBtn.addEventListener('click', () => {
-        localStorage.removeItem('numeroquest_current_user');
-        localStorage.removeItem('numeroquest_session_expiry');
-        window.location.href = 'login.html';
-      });
-    } else {
-      console.warn('Bottone logout non trovato!');
-    }
-  });
-
-
-
-// Inizializzazione
-document.addEventListener('DOMContentLoaded', function() {
-  renderScores();
-  loadPlayerData();
-  initializeParticles();
-});
-
-// Funzioni di navigazione
-function goToMainScreen() {
-  hideAllScreens();
-  document.getElementById("mainScreen").classList.remove("hidden");
-}
-
-function openSpecialModes() {
-  hideAllScreens();
-  document.getElementById("specialModesScreen").classList.remove("hidden");
-  playSound("clickSound");
-}
-
-function openAchievements() {
-  hideAllScreens();
-  document.getElementById("achievementsScreen").classList.remove("hidden");
-  playSound("clickSound");
-}
-
-function hideAllScreens() {
-  const screens = [
-    "mainScreen", "game", "finalMessage", "specialModesScreen", 
-    "achievementsScreen", "livingNumberScreen", "storyModeScreen"
-  ];
-  
-  screens.forEach(screen => {
-    document.getElementById(screen).classList.add("hidden");
-  });
-}
-
-// Funzioni di gioco standard
-function startMode(selectedMode) {
-  mode = selectedMode;
-  currentLevel = 1;
-  document.getElementById("livelloCorrente").innerText = currentLevel;
-
-  if (mode === "easy") {
-    maxNumber = 30 * currentLevel;
-    maxAttempts = 10;
-    document.getElementById("timer").classList.add("hidden");
-  } else if (mode === "medium") {
-    maxNumber = 60 * currentLevel;
-    maxAttempts = 8;
-    document.getElementById("timer").classList.add("hidden");
-  } else if (mode === "hard") {
-    maxNumber = 150 * currentLevel;
-    maxAttempts = 9;
-    document.getElementById("timer").classList.remove("hidden");
-  } else if (mode === "hardcore") {
-    maxNumber = 300 * currentLevel;
-    maxAttempts = 7;
-    document.getElementById("timer").classList.remove("hidden");
-  }
-
-  document.getElementById("maxNumber").innerText = maxNumber;
-  document.getElementById("tentativi").innerText = maxAttempts;
-  document.getElementById("levelBadge").innerText = `Livello ${currentLevel}`;
-  document.getElementById("progressBar").style.width = "0%";
-  
-  hideAllScreens();
-  document.getElementById("game").classList.remove("hidden");
-  document.getElementById("historyList").innerHTML = "";
-  
-  resetGame();
-  playSound("clickSound");
-}
-
-let previousNumbers = [];
-
-function generateSmartNumber(max, level) {
-  let num;
-  let attempts = 0;
-  
-  // Algoritmo migliorato per generare numeri interessanti
-  if (level <= 3) {
-    // Livelli iniziali: numeri semplici
-    do {
-      const base = Math.floor(Math.random() * (max - level)) + 1;
-      const noise = Math.abs(Math.floor(Math.sin(Date.now() + attempts * 17) * 10)) % level;
-      num = Math.min(max, base + noise);
-      attempts++;
-    } while (previousNumbers.includes(num) && attempts < 10);
-  } else if (level <= 7) {
-    // Livelli medi: numeri con pattern
-    const patterns = [
-      // Numeri primi approssimativi
-      () => {
-        const primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47];
-        const validPrimes = primes.filter(p => p <= max);
-        return validPrimes[Math.floor(Math.random() * validPrimes.length)];
-      },
-      // Numeri quadrati
-      () => {
-        const base = Math.floor(Math.sqrt(max / 2));
-        return base * base;
-      },
-      // Numeri normali
-      () => Math.floor(Math.random() * max) + 1
-    ];
-    
-    const pattern = patterns[Math.floor(Math.random() * patterns.length)];
-    num = pattern();
-  } else {
-    // Livelli avanzati: numeri più complessi
-    const patterns = [
-      // Fibonacci
-      () => {
-        const fibonacci = [1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987];
-        const validFib = fibonacci.filter(f => f <= max);
-        return validFib[Math.floor(Math.random() * validFib.length)];
-      },
-      // Potenze di 2
-      () => {
-        let power = 1;
-        while (power * 2 <= max) power *= 2;
-        return power;
-      },
-      // Numeri palindromi
-      () => {
-        const digits = Math.floor(Math.log10(max)) + 1;
-        if (digits <= 1) return Math.floor(Math.random() * 9) + 1;
-        
-        const halfDigits = Math.floor(digits / 2);
-        const firstHalf = Math.floor(Math.random() * Math.pow(10, halfDigits - 1) + Math.pow(10, halfDigits - 2));
-        let palindrome = firstHalf.toString();
-        
-        for (let i = palindrome.length - (digits % 2 ? 2 : 1); i >= 0; i--) {
-          palindrome += palindrome[i];
+        /* TEMA FUOCO */
+        [data-theme="fire"] {
+            --primary-neon: #ff4400;
+            --secondary-neon: #ff8800;
+            --accent-gold: #ffcc44;
+            --dark-bg: #2e0a0a;
+            --card-bg: rgba(255,68,0,0.1);
+            --gradient-bg: linear-gradient(45deg, #2e0a0a, #4a1a1a, #6b2e2e);
         }
         
-        return parseInt(palindrome) <= max ? parseInt(palindrome) : Math.floor(Math.random() * max) + 1;
-      }
-    ];
-    
-    const pattern = patterns[Math.floor(Math.random() * patterns.length)];
-    num = pattern();
-  }
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: var(--gradient-bg);
+            color: var(--text-color);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            transition: all 0.5s ease;
+        }
 
-  previousNumbers.push(num);
-  if (previousNumbers.length > 10) previousNumbers.shift(); // Ricorda solo gli ultimi 10 numeri
-  return num;
-}
+        /* CONTROLLI SUPERIORI */
+        .top-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
 
-function resetGame() {
-  stopTimer();
-  remainingAttempts = maxAttempts;
-  document.getElementById("tentativi").innerText = remainingAttempts;
-  targetNumber = generateSmartNumber(maxNumber, currentLevel);
-  document.getElementById("message").innerText = "";
-  document.getElementById("userGuess").value = "";
-  document.getElementById("nextLevelBtn").classList.add("hidden");
-  document.getElementById("retryBtn").classList.add("hidden");
-  document.getElementById("hintContainer").classList.add("hidden");
-  document.getElementById("progressBar").style.width = "0%";
-  
-  gameHistory = [];
-  updateHistoryDisplay();
-  
-  if (mode === "hard" || mode === "hardcore") startTimer();
-}
+        .control-btn {
+            background: var(--card-bg);
+            border: 2px solid var(--primary-neon);
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            font-size: 1.5rem;
+            color: var(--primary-neon);
+        }
 
-function check() {
-  let guess = parseInt(document.getElementById("userGuess").value);
-  if (isNaN(guess)) {
-    document.getElementById("message").innerText = "Inserisci un numero valido!";
-    shakeElement("userGuess");
-    return;
-  }
+        .control-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px var(--primary-neon);
+        }
 
-  if (remainingAttempts <= 0) {
-    document.getElementById("message").innerText = "I tentativi sono esauriti!";
-    document.getElementById("retryBtn").classList.remove("hidden");
-    return;
-  }
+        .control-btn.active {
+            background: var(--primary-neon);
+            color: var(--dark-bg);
+        }
 
-  remainingAttempts--;
-  document.getElementById("tentativi").innerText = remainingAttempts;
+        /* MENU TEMI */
+        .theme-menu {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            background: var(--card-bg);
+            border: 2px solid var(--primary-neon);
+            border-radius: 20px;
+            padding: 1rem;
+            backdrop-filter: blur(10px);
+            z-index: 999;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            min-width: 200px;
+        }
 
-  // Aggiorna la barra di progresso
-  const progressPercentage = ((maxAttempts - remainingAttempts) / maxAttempts) * 100;
-  document.getElementById("progressBar").style.width = `${progressPercentage}%`;
+        .theme-menu.open {
+            transform: translateX(0);
+        }
 
-  if (guess === targetNumber) {
-    document.getElementById("message").innerText = `🎉 Hai indovinato!`;
-    playSound("winSound");
-    showConfetti();
-    stopTimer();
-    document.getElementById("nextLevelBtn").classList.remove("hidden");
-    
-    // Aggiungi achievement se indovinato al primo tentativo
-    if (maxAttempts - remainingAttempts === 1) {
-      unlockAchievement("firstTry", "Precisione", "Hai indovinato al primo tentativo!");
-    }
-    
-    // Aggiungi alla cronologia
-    gameHistory.push({
-      guess: guess,
-      result: "CORRETTO! 🎉",
-      isCorrect: true
-    });
-  } else if (remainingAttempts === 0) {
-    document.getElementById("message").innerText = `😞 Hai perso! Il numero era ${targetNumber}`;
-    playSound("loseSound");
-    stopTimer();
-    document.getElementById("retryBtn").classList.remove("hidden");
-    
-    // Aggiungi alla cronologia
-    gameHistory.push({
-      guess: guess,
-      result: guess < targetNumber ? "Troppo basso" : "Troppo alto",
-      isCorrect: false
-    });
-  } else {
-    // Calcola quanto è vicino il tentativo
-    const difference = Math.abs(guess - targetNumber);
-    const percentage = (difference / maxNumber) * 100;
-    
-    let message;
-    if (percentage <= 5) {
-      message = guess < targetNumber ? "🔥 Molto vicino! Più alto" : "🔥 Molto vicino! Più basso";
-    } else if (percentage <= 15) {
-      message = guess < targetNumber ? "📈 Vicino! Più alto" : "📉 Vicino! Più basso";
-    } else if (percentage <= 30) {
-      message = guess < targetNumber ? "⬆️ Troppo basso" : "⬇️ Troppo alto";
-    } else {
-      message = guess < targetNumber ? "⬆️⬆️ Molto basso" : "⬇️⬇️ Molto alto";
-    }
-    
-    document.getElementById("message").innerText = message;
-    
-    // Aggiungi alla cronologia
-    gameHistory.push({
-      guess: guess,
-      result: message,
-      isCorrect: false
-    });
-  }
-  
-  updateHistoryDisplay();
-}
+        .theme-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 5px;
+        }
 
-function updateHistoryDisplay() {
-  const historyList = document.getElementById("historyList");
-  historyList.innerHTML = "";
-  
-  gameHistory.forEach((item, index) => {
-    const historyItem = document.createElement("div");
-    historyItem.className = "history-item";
-    
-    historyItem.innerHTML = `
-      <div>#${index + 1}: ${item.guess}</div>
-      <div style="color: ${item.isCorrect ? '#4caf50' : '#ff9800'}">${item.result}</div>
-    `;
-    
-    historyList.appendChild(historyItem);
-  });
-}
+        .theme-option:hover {
+            background: rgba(255,255,255,0.1);
+        }
 
-function nextLevel() {
-  currentLevel++;
-  if (currentLevel > 10) {
-    hideAllScreens();
-    document.getElementById("finalMessage").classList.remove("hidden");
-    showConfetti();
+        .theme-option.active {
+            background: var(--primary-neon);
+            color: var(--dark-bg);
+        }
 
-    // Ottieni il nome del giocatore
-    const name = document.getElementById("playerName").value || "Anonimo";
+        .theme-preview {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
 
-    // Salva il punteggio
-    saveScore(name, currentLevel - 1, mode);
-    
-    // Sblocca achievement
-    unlockAchievement("completeGame", "Conquistatore", `Hai completato la modalità ${mode}!`);
+        /* ANIMAZIONI BACKGROUND AVANZATE */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
 
-    // Ritorna alla home dopo 5 secondi
-    setTimeout(goHome, 5000);
-    return;
-  }
+        .star {
+            position: absolute;
+            background: var(--primary-neon);
+            border-radius: 50%;
+            animation: twinkle 2s infinite;
+        }
 
-  document.getElementById("livelloCorrente").innerText = currentLevel;
-  document.getElementById("levelBadge").innerText = `Livello ${currentLevel}`;
-  
-  if (mode === "easy") maxNumber = 30 * currentLevel;
-  else if (mode === "medium") maxNumber = 60 * currentLevel;
-  else if (mode === "hard") maxNumber = 150 * currentLevel;
-  else if (mode === "hardcore") maxNumber = 300 * currentLevel;
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
 
-  if (mode === "easy") maxAttempts = 10;
-  else if (mode === "medium") maxAttempts = 8;
-  else if (mode === "hard") maxAttempts = 9;
-  else if (mode === "hardcore") maxAttempts = 7;
+        .shooting-star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--accent-gold);
+            border-radius: 50%;
+            animation: shoot 3s linear infinite;
+        }
 
-  document.getElementById("maxNumber").innerText = maxNumber;
-  resetGame();
-}
+        @keyframes shoot {
+            0% {
+                transform: translateX(-100px) translateY(-100px);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(100vw) translateY(100vh);
+                opacity: 0;
+            }
+        }
 
-function retry() {
-  stopTimer();
-  resetGame();
-}
+        /* HEADER EPICO MIGLIORATO */
+        .epic-header {
+            text-align: center;
+            padding: 3rem 0;
+            background: linear-gradient(90deg, transparent, var(--card-bg), transparent);
+            border-bottom: 3px solid var(--primary-neon);
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
 
-function startTimer() {
-  let time = mode === "hardcore" ? 25 : 34;
-  document.getElementById("timerValue").innerText = time;
-  gameTimer = setInterval(() => {
-    time--;
-    document.getElementById("timerValue").innerText = time;
-    
-    // Effetto visivo quando il tempo sta per scadere
-    if (time <= 10) {
-      document.getElementById("timer").style.color = "#f44336";
-      if (!document.getElementById("timer").classList.contains("pulse")) {
-        document.getElementById("timer").classList.add("pulse");
-      }
-    }
-    
-    if (time <= 0) {
-      clearInterval(gameTimer);
-      document.getElementById("message").innerText = "⏰ Tempo scaduto!";
-      stopTimer();
-      remainingAttempts = 0;
-      document.getElementById("tentativi").innerText = remainingAttempts;
-      document.getElementById("retryBtn").classList.remove("hidden");
-    }
-  }, 1000);
-}
+        .epic-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: headerSweep 4s infinite;
+        }
 
-function stopTimer() {
-  clearInterval(gameTimer);
-  document.getElementById("timer").style.color = "";
-  document.getElementById("timer").classList.remove("pulse");
-}
+        @keyframes headerSweep {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
 
-function showConfetti() {
-  confetti({
-    particleCount: 100,
-    spread: 70,
-    origin: { y: 0.6 }
-  });
-}
+        .main-title {
+            font-family: 'Bangers', cursive;
+            font-size: clamp(3rem, 10vw, 6rem);
+            background: linear-gradient(45deg, var(--primary-neon), var(--accent-gold), var(--secondary-neon), var(--primary-neon));
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 3s ease-in-out infinite, titleFloat 4s ease-in-out infinite;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 30px var(--primary-neon);
+        }
 
-function goHome() {
-  window.location.reload();
-}
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
 
-// Sistema di power-up
-function usePowerup(type) {
-  if (powerups[type] <= 0) {
-    alert(`Non hai più power-up ${type} disponibili!`);
-    return;
-  }
-  
-  powerups[type]--;
-  playSound("powerupSound");
-  
-  switch(type) {
-    case 'hint':
-      giveHint();
-      break;
-    case 'time':
-      addTime();
-      break;
-    case 'range':
-      reduceRange();
-      break;
-  }
-}
+        @keyframes titleFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
 
-function giveHint() {
-  const hintContainer = document.getElementById("hintContainer");
-  const hintText = document.getElementById("hintText");
-  
-  // Genera un suggerimento intelligente
-  let hint;
-  
-  if (targetNumber % 2 === 0) {
-    hint = "Il numero è pari";
-  } else {
-    hint = "Il numero è dispari";
-  }
-  
-  // Suggerimenti più avanzati per livelli superiori
-  if (currentLevel > 3) {
-    const digitCount = targetNumber.toString().length;
-    hint += ` e ha ${digitCount} cifr${digitCount === 1 ? 'a' : 'e'}`;
-  }
-  
-  if (currentLevel > 6) {
-    const firstDigit = targetNumber.toString()[0];
-    hint += `. La prima cifra è ${firstDigit}`;
-  }
-  
-  hintText.innerText = `💡 Suggerimento: ${hint}`;
-  hintContainer.classList.remove("hidden");
-}
+        .subtitle {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            color: var(--accent-gold);
+            opacity: 0.9;
+            animation: subtitleGlow 2s ease-in-out infinite alternate;
+        }
 
-function addTime() {
-  if (mode === "hard" || mode === "hardcore") {
-    const currentTime = parseInt(document.getElementById("timerValue").innerText);
-    const newTime = currentTime + 10;
-    document.getElementById("timerValue").innerText = newTime;
-    
-    // Rimuovi effetti di urgenza se il tempo è stato esteso
-    if (newTime > 10) {
-      document.getElementById("timer").style.color = "";
-      document.getElementById("timer").classList.remove("pulse");
-    }
-  } else {
-    alert("Questo power-up funziona solo nelle modalità con timer!");
-  }
-}
+        @keyframes subtitleGlow {
+            0% { text-shadow: 0 0 10px var(--accent-gold); }
+            100% { text-shadow: 0 0 20px var(--accent-gold); }
+        }
 
-function reduceRange() {
-  const rangeText = document.getElementById("maxNumber");
-  const currentMax = parseInt(rangeText.innerText);
-  
-  // Riduci il range del 20%
-  const newMax = Math.max(targetNumber, Math.floor(currentMax * 0.8));
-  rangeText.innerText = newMax;
-  
-  // Aggiorna il messaggio
-  document.getElementById("message").innerText = `Range ridotto a 1-${newMax}!`;
-}
+        /* CONTAINER PRINCIPALE */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
 
-// Sistema di achievement
-function unlockAchievement(id, title, description) {
-  if (achievements.includes(id)) return;
-  
-  achievements.push(id);
-  savePlayerData();
-  
-  // Mostra notifica
-  const notification = document.createElement("div");
-  notification.className = "achievement pulse";
-  notification.style.position = "fixed";
-  notification.style.bottom = "20px";
-  notification.style.left = "50%";
-  notification.style.transform = "translateX(-50%)";
-  notification.style.zIndex = "1000";
-  notification.style.background = "rgba(0,0,0,0.8)";
-  notification.style.padding = "15px";
-  notification.style.borderRadius = "10px";
-  notification.style.boxShadow = "0 0 20px rgba(255,217,61,0.5)";
-  
-  notification.innerHTML = `
-    <div style="display: flex; align-items: center;">
-      <div style="font-size: 2rem; margin-right: 15px;">🏆</div>
-      <div>
-        <div style="font-weight: bold; color: #ffd93d;">${title} Sbloccato!</div>
-        <div style="font-size: 0.8rem; opacity: 0.8;">${description}</div>
-      </div>
+        /* SCHERMATA */
+        .screen {
+            display: none;
+            min-height: 80vh;
+            padding: 2rem;
+        }
+
+        .screen.active {
+            display: block;
+            animation: screenFadeIn 0.8s ease;
+        }
+
+        @keyframes screenFadeIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(30px) scale(0.95); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+            }
+        }
+
+        /* GRIGLIA MODALITÀ MIGLIORATA */
+        .game-modes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .mode-card {
+            background: var(--card-bg);
+            border: 3px solid transparent;
+            border-radius: 25px;
+            padding: 2rem;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(15px);
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+        }
+
+        .mode-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .mode-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, var(--primary-neon) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: -1;
+        }
+
+        .mode-card:hover::before {
+            left: 100%;
+        }
+
+        .mode-card:hover::after {
+            opacity: 0.1;
+        }
+
+        .mode-card:hover {
+            border-color: var(--primary-neon);
+            transform: translateY(-15px) rotateX(5deg) rotateY(5deg);
+            box-shadow: 
+                0 25px 50px rgba(0,0,0,0.3),
+                0 0 30px var(--primary-neon);
+        }
+
+        .mode-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            display: block;
+            text-align: center;
+            animation: iconBounce 2s ease-in-out infinite;
+        }
+
+        @keyframes iconBounce {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .mode-title {
+            font-family: 'Fredoka One', cursive;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: var(--accent-gold);
+            text-align: center;
+            text-shadow: 0 0 10px var(--accent-gold);
+        }
+
+        .mode-description {
+            font-size: 1rem;
+            opacity: 0.9;
+            line-height: 1.6;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .mode-features {
+            list-style: none;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .mode-features li {
+            margin-bottom: 0.5rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .mode-features li::before {
+            content: '⚡';
+            position: absolute;
+            left: 0;
+            color: var(--primary-neon);
+            animation: sparkle 1.5s ease-in-out infinite;
+        }
+
+        @keyframes sparkle {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        /* BOTTONI MIGLIORATI */
+        .btn {
+            background: linear-gradient(45deg, var(--primary-neon), var(--secondary-neon));
+            border: none;
+            border-radius: 20px;
+            padding: 1.2rem 2.5rem;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--dark-bg);
+            cursor: pointer;
+            transition: all 0.4s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            overflow: hidden;
+            margin: 0.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 
+                0 15px 30px rgba(0,0,0,0.4),
+                0 0 20px var(--primary-neon);
+        }
+
+        .btn:active {
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, var(--secondary-neon), var(--accent-gold));
+        }
+
+        .btn-gold {
+            background: linear-gradient(45deg, var(--accent-gold), #ffb300);
+        }
+
+        .btn-back {
+            background: linear-gradient(45deg, #666, #888);
+            color: white;
+        }
+
+        /* GAME INTERFACE MIGLIORATA */
+        .game-interface {
+            background: var(--card-bg);
+            border-radius: 25px;
+            padding: 2.5rem;
+            margin: 1.5rem 0;
+            backdrop-filter: blur(15px);
+            border: 3px solid var(--primary-neon);
+            box-shadow: 
+                0 10px 30px rgba(0,0,0,0.3),
+                inset 0 0 20px rgba(255,255,255,0.1);
+        }
+
+        .game-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+
+        .stat-item {
+            background: rgba(0,0,0,0.4);
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            flex: 1;
+            min-width: 140px;
+            border: 2px solid var(--primary-neon);
+            transition: all 0.3s ease;
+        }
+
+        .stat-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px var(--primary-neon);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--accent-gold);
+            text-shadow: 0 0 10px var(--accent-gold);
+            animation: valueGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes valueGlow {
+            0% { text-shadow: 0 0 10px var(--accent-gold); }
+            100% { text-shadow: 0 0 20px var(--accent-gold); }
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 0.5rem;
+        }
+
+        /* INPUT STYLES MIGLIORATI */
+        input[type="number"], input[type="text"], select {
+            background: rgba(0,0,0,0.4);
+            border: 3px solid var(--primary-neon);
+            border-radius: 15px;
+            padding: 1.2rem;
+            color: var(--text-color);
+            font-size: 1.2rem;
+            width: 100%;
+            margin: 0.8rem 0;
+            transition: all 0.3s ease;
+        }
+
+        input[type="number"]:focus, input[type="text"]:focus, select:focus {
+            outline: none;
+            box-shadow: 0 0 25px var(--primary-neon);
+            transform: scale(1.02);
+        }
+
+        /* PROGRESS BAR MIGLIORATA */
+        .progress-container {
+            background: rgba(0,0,0,0.4);
+            border-radius: 15px;
+            height: 25px;
+            margin: 1.5rem 0;
+            overflow: hidden;
+            border: 2px solid var(--primary-neon);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-neon), var(--accent-gold), var(--secondary-neon));
+            background-size: 200% 100%;
+            width: 0%;
+            transition: width 0.8s ease;
+            border-radius: 15px;
+            animation: progressShimmer 2s linear infinite;
+        }
+
+        @keyframes progressShimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        /* ADVENTURE MODE STYLES MIGLIORATI */
+        .character-selection {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .character-card {
+            background: rgba(0,0,0,0.4);
+            border: 3px solid transparent;
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .character-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(var(--primary-neon), var(--secondary-neon), var(--accent-gold), var(--primary-neon));
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: -1;
+            animation: rotate 4s linear infinite;
+        }
+
+        .character-card:hover::before, .character-card.selected::before {
+            opacity: 0.3;
+        }
+
+        .character-card:hover, .character-card.selected {
+            border-color: var(--accent-gold);
+            transform: scale(1.08) rotateY(5deg);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+        }
+
+        .character-avatar {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+            animation: characterFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes characterFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+        }
+
+        .character-name {
+            font-family: 'Righteous', cursive;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: var(--accent-gold);
+            font-size: 1.3rem;
+        }
+
+        .character-stats {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            line-height: 1.4;
+        }
+
+        /* GAME CANVAS STYLES - NUOVE MODALITÀ EPICHE */
+        .game-canvas {
+            width: 100%;
+            height: 500px;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f0f23);
+            border-radius: 25px;
+            position: relative;
+            overflow: hidden;
+            border: 3px solid var(--primary-neon);
+            margin: 2rem 0;
+            cursor: crosshair;
+        }
+
+        .player {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(45deg, var(--accent-gold), #ffb300);
+            border-radius: 50%;
+            border: 3px solid #ff8800;
+            transition: all 0.2s ease;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            animation: playerGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes playerGlow {
+            0% { box-shadow: 0 0 10px var(--accent-gold); }
+            100% { box-shadow: 0 0 25px var(--accent-gold); }
+        }
+
+        .enemy {
+            position: absolute;
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(45deg, var(--secondary-neon), #ff5252);
+            border-radius: 50%;
+            border: 2px solid #ff0000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            animation: enemyFloat 2s ease-in-out infinite;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        @keyframes enemyFloat {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-8px) scale(1.1); }
+        }
+
+        .enemy:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 20px var(--secondary-neon);
+        }
+
+        .npc {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(45deg, #45b7d1, #96ceb4);
+            border-radius: 50%;
+            border: 3px solid #2980b9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            animation: npcPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes npcPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* HUD STYLES */
+        .game-hud {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.8);
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--primary-neon);
+        }
+
+        .hud-stat {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: bold;
+        }
+
+        .health-bar, .mana-bar, .exp-bar {
+            width: 150px;
+            height: 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid var(--primary-neon);
+        }
+
+        .bar-fill {
+            height: 100%;
+            transition: width 0.5s ease;
+            border-radius: 8px;
+        }
+
+        .health-fill { background: linear-gradient(90deg, #ff4757, #ff6b6b); }
+        .mana-fill { background: linear-gradient(90deg, #3742fa, #5352ed); }
+        .exp-fill { background: linear-gradient(90deg, var(--accent-gold), #ffb300); }
+
+        /* DIALOG SYSTEM */
+        .dialog-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .dialog-box {
+            background: var(--card-bg);
+            border: 3px solid var(--primary-neon);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            backdrop-filter: blur(15px);
+            animation: dialogAppear 0.5s ease;
+        }
+
+        @keyframes dialogAppear {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .dialog-character {
+            font-size: 1.3rem;
+            color: var(--accent-gold);
+            margin-bottom: 1rem;
+            font-weight: bold;
+        }
+
+        .dialog-text {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .dialog-choices {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .dialog-choice {
+            background: rgba(255,255,255,0.1);
+            border: 2px solid var(--primary-neon);
+            color: white;
+            padding: 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dialog-choice:hover {
+            background: var(--primary-neon);
+            color: var(--dark-bg);
+            transform: translateX(10px);
+        }
+
+        /* COMBAT SYSTEM */
+        .combat-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1001;
+        }
+
+        .combat-interface {
+            background: var(--card-bg);
+            border: 3px solid var(--secondary-neon);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 800px;
+            width: 90%;
+            backdrop-filter: blur(15px);
+        }
+
+        .combat-enemy {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .enemy-avatar {
+            font-size: 6rem;
+            margin-bottom: 1rem;
+            animation: enemyBattle 1s ease-in-out infinite alternate;
+        }
+
+        @keyframes enemyBattle {
+            0% { transform: scale(1) rotate(-2deg); }
+            100% { transform: scale(1.1) rotate(2deg); }
+        }
+
+        .enemy-name {
+            font-size: 2rem;
+            color: var(--secondary-neon);
+            margin-bottom: 0.5rem;
+        }
+
+        .enemy-hp {
+            font-size: 1.2rem;
+            color: var(--accent-gold);
+        }
+
+        .combat-question {
+            background: rgba(0,0,0,0.5);
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+            text-align: center;
+            border: 2px solid var(--accent-gold);
+        }
+
+        .question-text {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--accent-gold);
+        }
+
+        .answer-input {
+            background: rgba(0,0,0,0.4);
+            border: 3px solid var(--primary-neon);
+            border-radius: 15px;
+            padding: 1rem;
+            color: var(--text-color);
+            font-size: 1.3rem;
+            width: 200px;
+            text-align: center;
+            margin: 1rem;
+        }
+
+        .answer-input:focus {
+            outline: none;
+            box-shadow: 0 0 25px var(--primary-neon);
+        }
+
+        .combat-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .combat-btn {
+            background: linear-gradient(45deg, var(--secondary-neon), #ff5252);
+            border: none;
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .combat-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(255,107,107,0.4);
+        }
+
+        /* RESPONSIVE MIGLIORATO */
+        @media (max-width: 768px) {
+            .game-modes-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .main-title {
+                font-size: 3.5rem;
+            }
+            
+            .mode-card {
+                padding: 1.5rem;
+            }
+
+            .game-stats {
+                flex-direction: column;
+            }
+
+            .top-controls {
+                top: 10px;
+                right: 10px;
+                gap: 5px;
+            }
+
+            .control-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+            }
+
+            .game-canvas {
+                height: 400px;
+            }
+        }
+
+        /* HIDDEN CLASS */
+        .hidden {
+            display: none !important;
+        }
+
+        /* SPECIAL SECTION MIGLIORATA */
+        .special-section {
+            background: linear-gradient(135deg, var(--card-bg), rgba(255,255,255,0.05));
+            border-radius: 30px;
+            padding: 3rem;
+            margin: 3rem 0;
+            border: 3px solid var(--primary-neon);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .special-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(transparent, var(--primary-neon), transparent);
+            opacity: 0.1;
+            animation: sectionRotate 10s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes sectionRotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .section-title {
+            font-family: 'Bangers', cursive;
+            font-size: 2.5rem;
+            color: var(--accent-gold);
+            margin-bottom: 2rem;
+            text-align: center;
+            text-shadow: 0 0 15px var(--accent-gold);
+            animation: titlePulse 3s ease-in-out infinite;
+        }
+
+        @keyframes titlePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* PARTICLES MIGLIORATI */
+        #particles-js {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+        }
+
+        /* VOLUME SLIDER */
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--card-bg);
+            padding: 10px 15px;
+            border-radius: 25px;
+            border: 2px solid var(--primary-neon);
+        }
+
+        .volume-slider {
+            width: 100px;
+            height: 5px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 5px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 15px;
+            height: 15px;
+            background: var(--primary-neon);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        /* LOADING ANIMATION */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--dark-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid var(--primary-neon);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* NOTIFICATION SYSTEM */
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--card-bg);
+            border: 2px solid var(--primary-neon);
+            border-radius: 15px;
+            padding: 1rem 2rem;
+            z-index: 1001;
+            backdrop-filter: blur(10px);
+            animation: notificationSlide 0.5s ease;
+        }
+
+        @keyframes notificationSlide {
+            from { transform: translateX(-50%) translateY(-100px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        /* EASTER EGG EFFECTS */
+        .rainbow-mode {
+            animation: rainbowCycle 3s linear infinite;
+        }
+
+        @keyframes rainbowCycle {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+
+        .matrix-rain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .matrix-char {
+            position: absolute;
+            color: var(--primary-neon);
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            animation: matrixFall 3s linear infinite;
+        }
+
+        @keyframes matrixFall {
+            0% { transform: translateY(-100vh); opacity: 1; }
+            100% { transform: translateY(100vh); opacity: 0; }
+        }
+    </style>
+</head>
+<body data-theme="neon">
+    <!-- LOADING OVERLAY -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
     </div>
-  `;
-  
-  document.body.appendChild(notification);
-  
-  setTimeout(() => {
-    notification.style.opacity = "0";
-    notification.style.transition = "opacity 0.5s ease";
-    setTimeout(() => notification.remove(), 500);
-  }, 3000);
-}
 
-// Modalità speciali
-function startSpecialMode(mode) {
-  hideAllScreens();
-  
-  switch(mode) {
-    case 'living':
-      initLivingNumber();
-      document.getElementById("livingNumberScreen").classList.remove("hidden");
-      break;
-    case 'story':
-      initStoryMode();
-      document.getElementById("storyModeScreen").classList.remove("hidden");
-      break;
-    case 'rhythm':
-      alert("🎵 Modalità Rhythm Numbers in arrivo presto!");
-      document.getElementById("specialModesScreen").classList.remove("hidden");
-      break;
-    case 'puzzle':
-      alert("🧩 Modalità Puzzle Numerici in arrivo presto!");
-      document.getElementById("specialModesScreen").classList.remove("hidden");
-      break;
-  }
-  
-  playSound("clickSound");
-}
-
-// Modalità Numero Vivente
-function initLivingNumber() {
-  document.getElementById("livingNumber").innerText = livingNumberData.value;
-  document.getElementById("numberLevel").innerText = livingNumberData.level;
-  document.getElementById("happiness").innerText = livingNumberData.happiness;
-  document.getElementById("growthBar").style.width = `${livingNumberData.growth}%`;
-  document.getElementById("numberStory").innerText = livingNumberData.stories.length > 0 ? 
-    livingNumberData.stories[livingNumberData.stories.length - 1] : 
-    "Il tuo numero è appena nato! Prenditi cura di lui e crescerà forte e saggio.";
-}
-
-function feedNumber() {
-  livingNumberData.happiness = Math.min(100, livingNumberData.happiness + 10);
-  livingNumberData.growth = Math.min(100, livingNumberData.growth + 5);
-  
-  // Aggiungi una storia
-  livingNumberData.stories.push(`Giorno ${livingNumberData.stories.length + 1}: Hai nutrito il tuo numero con cibo matematico. Sembra più felice!`);
-  
-  checkNumberEvolution();
-  initLivingNumber();
-  playSound("powerupSound");
-}
-
-function playWithNumber() {
-  livingNumberData.happiness = Math.min(100, livingNumberData.happiness + 15);
-  
-  // Aggiungi una storia
-  livingNumberData.stories.push(`Giorno ${livingNumberData.stories.length + 1}: Hai giocato con il tuo numero. Si è divertito molto!`);
-  
-  checkNumberEvolution();
-  initLivingNumber();
-  playSound("powerupSound");
-}
-
-function trainNumber() {
-  livingNumberData.growth = Math.min(100, livingNumberData.growth + 15);
-  livingNumberData.happiness = Math.max(50, livingNumberData.happiness - 5);
-  
-  // Aggiungi una storia
-  livingNumberData.stories.push(`Giorno ${livingNumberData.stories.length + 1}: Hai allenato il tuo numero con esercizi matematici. È diventato più forte!`);
-  
-  checkNumberEvolution();
-  initLivingNumber();
-  playSound("powerupSound");
-}
-
-function checkNumberEvolution() {
-  if (livingNumberData.growth >= 100) {
-    livingNumberData.level++;
-    livingNumberData.growth = 0;
-    
-    // Evolvi il numero
-    if (livingNumberData.level % 2 === 0) {
-      livingNumberData.value = livingNumberData.value * 2;
-    } else {
-      livingNumberData.value = livingNumberData.value + 1;
-    }
-    
-    // Aggiungi una storia speciale
-    livingNumberData.stories.push(`EVOLUZIONE! Il tuo numero è cresciuto al livello ${livingNumberData.level} e si è trasformato in ${livingNumberData.value}!`);
-    
-    showConfetti();
-    unlockAchievement("numberEvolution", "Evoluzione Numerica", `Il tuo numero è evoluto al livello ${livingNumberData.level}!`);
-  }
-}
-
-// Modalità Storia
-function initStoryMode() {
-  document.getElementById("storyProgress").style.width = `${storyProgress * 10}%`;
-}
-
-function makeStoryChoice(choice) {
-  storyChoices.push(choice);
-  storyProgress++;
-  
-  // Aggiorna la barra di progresso
-  document.getElementById("storyProgress").style.width = `${storyProgress * 10}%`;
-  
-  // Aggiorna la storia in base alle scelte
-  updateStory();
-  
-  playSound("clickSound");
-}
-
-function updateStory() {
-  const storyText = document.getElementById("storyText");
-  const storyTitle = document.querySelector(".story-title");
-  const storyChoicesEl = document.querySelector(".story-choices");
-  
-  switch(storyProgress) {
-    case 1:
-      if (storyChoices[0] === 1) {
-        storyTitle.innerText = "Capitolo 1: Il Risveglio";
-        storyText.innerText = "Hai accettato la missione! Il Saggio Primo ti consegna un antico artefatto: la Chiave dei Numeri. 'Questo ti aiuterà a trovare i Numeri Perduti,' dice. 'Inizia la tua ricerca nella Valle Decimale.'";
-        storyChoicesEl.innerHTML = `
-          <div class="story-choice" onclick="makeStoryChoice(1)">Vai alla Valle Decimale</div>
-          <div class="story-choice" onclick="makeStoryChoice(2)">Chiedi del nemico</div>
-        `;
-      } else {
-        storyTitle.innerText = "Capitolo 1: Il Risveglio";
-        storyText.innerText = "'Il Regno dei Numeri è minacciato dal malvagio Divisore Zero,' spiega il Saggio. 'Ha rubato i Numeri Primi e senza di loro l'equilibrio è in pericolo. Devi recuperarli prima che sia troppo tardi.'";
-        storyChoicesEl.innerHTML = `
-          <div class="story-choice" onclick="makeStoryChoice(1)">Accetta la missione</div>
-          <div class="story-choice" onclick="makeStoryChoice(2)">Chiedi della ricompensa</div>
-        `;
-      }
-      break;
-    case 2:
-      storyTitle.innerText = "Capitolo 2: La Valle Decimale";
-      storyText.innerText = "Arrivi nella Valle Decimale, un luogo pieno di numeri fluttuanti. La Chiave dei Numeri inizia a brillare vicino a una caverna. All'interno, trovi un guardiano che ti sfida: 'Per passare, devi risolvere un enigma numerico.'";
-      storyChoicesEl.innerHTML = `
-        <div class="story-choice" onclick="makeStoryChoice(1)">Accetta la sfida</div>
-        <div class="story-choice" onclick="makeStoryChoice(2)">Cerca un'altra strada</div>
-      `;
-      break;
-    case 3:
-      storyTitle.innerText = "Capitolo 3: L'Enigma";
-      storyText.innerText = "Il guardiano ti presenta l'enigma: 'Sono un numero primo. Se mi aggiungi 2, otterrai un altro numero primo. Quale numero sono?' Rifletti attentamente...";
-      storyChoicesEl.innerHTML = `
-        <div class="story-choice" onclick="makeStoryChoice(1)">3</div>
-        <div class="story-choice" onclick="makeStoryChoice(2)">5</div>
-        <div class="story-choice" onclick="makeStoryChoice(3)">7</div>
-      `;
-      break;
-    case 4:
-      if (storyChoices[3] === 3) {
-        storyTitle.innerText = "Capitolo 4: La Scoperta";
-        storyText.innerText = "'Corretto!' esclama il guardiano. '3 + 2 = 5, entrambi numeri primi.' Ti consegna il primo Numero Primo perduto, che brilla di luce propria. 'Ora vai alle Montagne Binarie per trovare il prossimo.'";
-      } else {
-        storyTitle.innerText = "Capitolo 4: Il Tentativo";
-        storyText.innerText = "'Sbagliato,' dice il guardiano. 'Ma apprezzo il tuo coraggio.' Ti permette comunque di passare. 'Vai alle Montagne Binarie, ma stai attento. Il percorso sarà più difficile per te.'";
-      }
-      storyChoicesEl.innerHTML = `
-        <div class="story-choice" onclick="makeStoryChoice(1)">Continua l'avventura</div>
-      `;
-      break;
-    case 5:
-      storyTitle.innerText = "Continua...";
-      storyText.innerText = "La tua avventura nel Regno dei Numeri continuerà presto! Nuovi capitoli in arrivo...";
-      storyChoicesEl.innerHTML = `
-        <div class="story-choice" onclick="goToMainScreen()">Torna al menu</div>
-      `;
-      
-      // Sblocca achievement
-      unlockAchievement("storyProgress", "Narratore", "Hai iniziato l'avventura nel Regno dei Numeri!");
-      break;
-  }
-}
-
-// Funzioni di utilità
-function toggleMusic() {
-  const bgMusic = document.getElementById("bgMusic");
-  const musicBtn = document.getElementById("musicBtn");
-  
-  if (isMusicPlaying) {
-    bgMusic.pause();
-    isMusicPlaying = false;
-    musicBtn.innerText = "🔇 Musica";
-  } else {
-    bgMusic.play().catch(e => console.log("Autoplay prevented:", e));
-    isMusicPlaying = true;
-    musicBtn.innerText = "🎵 Musica";
-  }
-}
-
-function changeTheme(theme) {
-  document.body.className = "";
-  document.body.classList.add(`${theme}-theme`);
-  
-  // Salva il tema nelle preferenze
-  const playerData = loadPlayerData();
-  playerData.theme = theme;
-  savePlayerData(playerData);
-}
-
-function playSound(soundId) {
-  const sound = document.getElementById(soundId);
-  if (sound) {
-    sound.currentTime = 0;
-    sound.play().catch(e => console.log("Autoplay prevented:", e));
-  }
-}
-
-function shakeElement(elementId) {
-  const element = document.getElementById(elementId);
-  element.classList.add("shake");
-  
-  setTimeout(() => {
-    element.classList.remove("shake");
-  }, 500);
-}
-
-// Gestione dati giocatore
-function loadPlayerData() {
-  const playerData = JSON.parse(localStorage.getItem("numeroquest_player") || "{}");
-  
-  // Applica tema salvato SENZA chiamare changeTheme
-  if (playerData.theme) {
-    applyTheme(playerData.theme); // Chiama direttamente la funzione che applica il tema
-  }
-  
-  return playerData;
-}
-
-function savePlayerData(data) {
-  if (!data) {
-    data = {
-      achievements: achievements,
-      livingNumber: livingNumberData,
-      storyProgress: storyProgress,
-      storyChoices: storyChoices,
-      theme: document.body.className.replace("-theme", "")
-    };
-  }
-  
-  localStorage.setItem("numeroquest_player", JSON.stringify(data));
-}
-
-// Funzione per salvare il punteggio nel localStorage
-function saveScore(name, level, gameMode) {
-  // Recupera la lista dei punteggi dal localStorage (o crea una lista vuota se non ci sono punteggi)
-  const scores = JSON.parse(localStorage.getItem("scores") || "[]");
-
-  // Aggiungi il nuovo punteggio con modalità
-  scores.push({ 
-    name, 
-    level,
-    mode: gameMode,
-    date: new Date().toLocaleDateString()
-  });
-
-  // Ordina i punteggi in ordine decrescente (dal più alto al più basso)
-  scores.sort((a, b) => b.level - a.level);
-
-  // Salva di nuovo i punteggi nel localStorage
-  localStorage.setItem("scores", JSON.stringify(scores));
-
-  // Rende visibile la classifica aggiornata
-  renderScores();
-}
-
-// Funzione per visualizzare la classifica
-function renderScores() {
-  const scoreList = document.getElementById("scoreList");
-  const scores = JSON.parse(localStorage.getItem("scores") || "[]");
-
-  // Mostra solo i primi 10 punteggi
-  scoreList.innerHTML = scores
-    .slice(0, 10)
-    .map((s, index) => `
-      <li class="leaderboard-item">
-        <div class="player-info">
-          <div class="rank">${index + 1}</div>
-          <div>${s.name}</div>
+    <!-- CONTROLLI SUPERIORI -->
+    <div class="top-controls">
+        <div class="control-btn" id="musicBtn" title="Musica">🎵</div>
+        <div class="control-btn" id="themeBtn" title="Temi">🎨</div>
+        <div class="control-btn" id="settingsBtn" title="Impostazioni">⚙️</div>
+        <div class="volume-control hidden" id="volumeControl">
+            <span>🔊</span>
+            <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="50">
         </div>
-        <div class="score-info">
-          Liv. ${s.level} (${s.mode || 'classic'})
+    </div>
+
+    <!-- MENU TEMI -->
+    <div class="theme-menu" id="themeMenu">
+        <h3 style="margin-bottom: 1rem; color: var(--accent-gold);">🎨 Scegli Tema</h3>
+        <div class="theme-option active" data-theme="neon">
+            <div class="theme-preview" style="background: linear-gradient(45deg, #00fff2, #ff6b6b);"></div>
+            <span>Neon Classico</span>
         </div>
-      </li>
-    `)
-    .join("");
-}
+        <div class="theme-option" data-theme="cyberpunk">
+            <div class="theme-preview" style="background: linear-gradient(45deg, #ff0080, #00ff80);"></div>
+            <span>Cyberpunk</span>
+        </div>
+        <div class="theme-option" data-theme="retro">
+            <div class="theme-preview" style="background: linear-gradient(45deg, #ff6600, #ff3366);"></div>
+            <span>Retro Wave</span>
+        </div>
+        <div class="theme-option" data-theme="ocean">
+            <div class="theme-preview" style="background: linear-gradient(45deg, #00ccff, #0066cc);"></div>
+            <span>Oceano Profondo</span>
+        </div>
+        <div class="theme-option" data-theme="forest">
+            <div class="theme-preview" style="background: linear-gradient(45deg, #00ff66, #66ff00);"></div>
+            <span>Foresta Magica</span>
+        </div>
+        <div class="theme-option" data-theme="galaxy">
+            <div class="theme-preview" style="background: linear-gradient(45deg, #9966ff, #ff66cc);"></div>
+            <span>Galassia</span>
+        </div>
+        <div class="theme-option" data-theme="fire">
+            <div class="theme-preview" style="background: linear-gradient(45deg, #ff4400, #ff8800);"></div>
+            <span>Fuoco Ardente</span>
+        </div>
+    </div>
 
-// ANIMAZIONE NUMERI COLORATI
-const canvas = document.getElementById("numberCanvas");
-const ctx = canvas.getContext("2d");
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+    <div id="particles-js"></div>
+    <div class="stars" id="stars"></div>
+    <div class="matrix-rain" id="matrixRain"></div>
 
-const numbers = "0123456789";
-const fallingNumbers = [];
+    <!-- HEADER EPICO -->
+    <header class="epic-header">
+        <h1 class="main-title">🎮 NUMERO QUEST</h1>
+        <p class="subtitle">L'Avventura Numerica Definitiva</p>
+    </header>
 
-function createNumber() {
-  return {
-    value: numbers[Math.floor(Math.random() * numbers.length)],
-    x: Math.random() * canvas.width,
-    y: -30,
-    speed: 1 + Math.random() * 3,
-    size: 16 + Math.random() * 24,
-    color: `hsl(${Math.random() * 360}, 100%, 60%)`,
-    rotation: Math.random() * 30 - 15
-  };
-}
+    <!-- SCHERMATA PRINCIPALE -->
+    <div id="mainScreen" class="screen active">
+        <div class="main-container">
+            <section class="special-section">
+                <h2 class="section-title">🎯 Scegli la Tua Avventura Epica</h2>
+                <div class="game-modes-grid">
+                    <!-- MODALITÀ EPICHE ORIGINALI -->
+                    <div class="mode-card" onclick="startMode('chronicles')">
+                        <div class="mode-icon">⚔️</div>
+                        <div class="mode-title">Chronicles of Arithmos</div>
+                        <div class="mode-description">
+                            Epica avventura RPG nel regno matematico! Esplora 5 regioni, combatti 50+ nemici, completa 20 missioni principali e salva il mondo dai Numeri del Caos!
+                        </div>
+                        <ul class="mode-features">
+                            <li>Storia cinematografica di 3+ ore</li>
+                            <li>Sistema RPG completo con livelli</li>
+                            <li>20+ boss unici con meccaniche speciali</li>
+                            <li>Sistema crafting e equipaggiamenti</li>
+                            <li>Dialoghi ramificati e scelte morali</li>
+                        </ul>
+                    </div>
 
-for (let i = 0; i < 100; i++) fallingNumbers.push(createNumber());
+                    <div class="mode-card" onclick="startMode('shadowlands')">
+                        <div class="mode-icon">🌙</div>
+                        <div class="mode-title">The Shadowlands Conspiracy</div>
+                        <div class="mode-description">
+                            Infiltrati come spia matematica! Missioni stealth, assassinii strategici, hacking di sistemi numerici e una cospirazione che minaccia l'universo!
+                        </div>
+                        <ul class="mode-features">
+                            <li>Missioni stealth con multiple soluzioni</li>
+                            <li>Sistema di hacking matematico</li>
+                            <li>Albero delle abilità da spia</li>
+                            <li>Trama thriller con colpi di scena</li>
+                            <li>Scelte che influenzano il finale</li>
+                        </ul>
+                    </div>
 
-function animateNumbers() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  for (let n of fallingNumbers) {
-    ctx.save();
-    ctx.translate(n.x, n.y);
-    ctx.rotate(n.rotation * Math.PI / 180);
-    ctx.fillStyle = n.color;
-    ctx.font = `${n.size}px Bangers, sans-serif`;
-    ctx.fillText(n.value, 0, 0);
-    ctx.restore();
-    
-    n.y += n.speed;
-    n.rotation += 0.1;
-    
-    if (n.y > canvas.height) {
-      n.y = -30;
-      n.x = Math.random() * canvas.width;
-      n.value = numbers[Math.floor(Math.random() * numbers.length)];
-      n.color = `hsl(${Math.random() * 360}, 100%, 60%)`;
-    }
-  }
-  requestAnimationFrame(animateNumbers);
-}
+                    <div class="mode-card" onclick="startMode('timerift')">
+                        <div class="mode-icon">⏰</div>
+                        <div class="mode-title">Time Rift Chronicles</div>
+                        <div class="mode-description">
+                            Viaggia attraverso 7 ere temporali! Dall'Antico Egitto al futuro cyberpunk, risolvi paradossi matematici e salva la linea temporale!
+                        </div>
+                        <ul class="mode-features">
+                            <li>7 ere storiche completamente diverse</li>
+                            <li>Meccaniche di viaggio nel tempo</li>
+                            <li>Paradossi matematici complessi</li>
+                            <li>Personaggi storici matematici</li>
+                            <li>Conseguenze temporali delle azioni</li>
+                        </ul>
+                    </div>
 
-animateNumbers();
+                    <div class="mode-card" onclick="startMode('elemental')">
+                        <div class="mode-icon">🔥</div>
+                        <div class="mode-title">Elemental Math Wars</div>
+                        <div class="mode-description">
+                            Controlla i 4 elementi attraverso equazioni! Guerra epica tra regni elementali, magie di fusione e battaglie spettacolari!
+                        </div>
+                        <ul class="mode-features">
+                            <li>4 regni elementali unici</li>
+                            <li>Sistema di magia matematica</li>
+                            <li>Fusioni elementali avanzate</li>
+                            <li>Guerre su larga scala</li>
+                            <li>Draghi elementali come boss finali</li>
+                        </ul>
+                    </div>
 
-window.addEventListener('resize', () => {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-});
+                    <div class="mode-card" onclick="startMode('cyberpunk')">
+                        <div class="mode-icon">🤖</div>
+                        <div class="mode-title">Neon Numbers 2087</div>
+                        <div class="mode-description">
+                            Futuro cyberpunk! Hacker matematico in una megalopoli neon, IA ribelli, corporazioni malvagie e una rivoluzione digitale!
+                        </div>
+                        <ul class="mode-features">
+                            <li>Megalopoli cyberpunk immersiva</li>
+                            <li>Hacking di sistemi IA</li>
+                            <li>Impianti cibernetici matematici</li>
+                            <li>Fazioni in guerra</li>
+                            <li>Multiple ending basati su scelte</li>
+                        </ul>
+                    </div>
 
-// Inizializzazione particelle
-function initializeParticles() {
-  particlesJS("particles-js", {
-    particles: {
-      number: { value: 80, density: { enable: true, value_area: 800 } },
-      color: { value: "#ffffff" },
-      shape: { type: "circle" },
-      opacity: { value: 0.5, random: true },
-      size: { value: 3, random: true },
-      line_linked: {
-        enable: true,
-        distance: 150,
-        color: "#ffffff",
-        opacity: 0.4,
-        width: 1
-      },
-      move: {
-        enable: true,
-        speed: 2,
-        direction: "none",
-        random: true,
-        straight: false,
-        out_mode: "out",
-        bounce: false
-      }
-    },
-    interactivity: {
-      detect_on: "canvas",
-      events: {
-        onhover: { enable: true, mode: "repulse" },
-        onclick: { enable: true, mode: "push" },
-        resize: true
-      },
-      modes: {
-        repulse: { distance: 100, duration: 0.4 },
-        push: { particles_nb: 4 }
-      }
-    },
-    retina_detect: true
-  });
-}
-</script>
+                    <div class="mode-card" onclick="startMode('space')">
+                        <div class="mode-icon">🚀</div>
+                        <div class="mode-title">Galactic Math Empire</div>
+                        <div class="mode-description">
+                            Esplora la galassia! Comandante di una flotta spaziale, colonizza pianeti, combatti alieni e scopri antichi segreti matematici!
+                        </div>
+                        <ul class="mode-features">
+                            <li>12 sistemi solari da esplorare</li>
+                            <li>Combattimenti spaziali tattici</li>
+                            <li>Gestione risorse e colonie</li>
+                            <li>Razze aliene con culture uniche</li>
+                            <li>Tecnologie matematiche avanzate</li>
+                        </ul>
+                    </div>
 
+                    <!-- MODALITÀ CLASSICHE MANTENUTE -->
+                    <div class="mode-card" onclick="startMode('classic')">
+                        <div class="mode-icon">🎲</div>
+                        <div class="mode-title">Modalità Classica Pro</div>
+                        <div class="mode-description">
+                            Il gioco originale completamente rinnovato con power-up, suggerimenti intelligenti e progressione infinita!
+                        </div>
+                        <ul class="mode-features">
+                            <li>4 difficoltà progressive</li>
+                            <li>Power-ups strategici</li>
+                            <li>Sistema punteggi avanzato</li>
+                            <li>Suggerimenti intelligenti</li>
+                        </ul>
+                    </div>
+
+                    <div class="mode-card" onclick="goToMultiplayer()">
+                        <div class="mode-icon">👥</div>
+                        <div class="mode-title">Multiplayer Online</div>
+                        <div class="mode-description">
+                            Sfida giocatori da tutto il mondo in epiche battaglie numeriche con chat, tornei e classifiche globali!
+                        </div>
+                        <ul class="mode-features">
+                            <li>Fino a 6 giocatori per stanza</li>
+                            <li>10 livelli progressivi</li>
+                            <li>Chat in tempo reale</li>
+                            <li>Sistema auto-start intelligente</li>
+                        </ul>
+                    </div>
+
+                    <div class="mode-card" onclick="startMode('battle-royale')">
+                        <div class="mode-icon">⚔️</div>
+                        <div class="mode-title">Number Battle Royale</div>
+                        <div class="mode-description">
+                            Sopravvivi in un'arena che si restringe! 100 giocatori, domande matematiche rapide, ultimo numero in piedi vince tutto!
+                        </div>
+                        <ul class="mode-features">
+                            <li>Arena dinamica che si restringe</li>
+                            <li>Power-ups strategici</li>
+                            <li>Ranking globale in tempo reale</li>
+                            <li>Sfide matematiche intense</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section class="special-section">
+                <h2 class="section-title">✨ Caratteristiche Rivoluzionarie</h2>
+                <div class="game-modes-grid">
+                    <div class="mode-card" onclick="toggleEasterEgg('rainbow')">
+                        <div class="mode-icon">🌈</div>
+                        <div class="mode-title">Modalità Arcobaleno</div>
+                        <div class="mode-description">
+                            Attiva effetti visivi psichedelici per un'esperienza di gioco completamente nuova!
+                        </div>
+                    </div>
+
+                    <div class="mode-card" onclick="toggleEasterEgg('matrix')">
+                        <div class="mode-icon">💊</div>
+                        <div class="mode-title">Matrix Mode</div>
+                        <div class="mode-description">
+                            Entra nella Matrix con effetti di codice che cadono e atmosfera cyberpunk!
+                        </div>
+                    </div>
+
+                    <div class="mode-card" onclick="showCredits()">
+                        <div class="mode-icon">🏆</div>
+                        <div class="mode-title">Crediti & Info</div>
+                        <div class="mode-description">
+                            Scopri chi ha creato questo capolavoro e tutte le tecnologie utilizzate!
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- SCHERMATA CHRONICLES OF ARITHMOS -->
+    <div id="chroniclesScreen" class="screen">
+        <div class="main-container">
+            <h2 class="section-title">⚔️ Chronicles of Arithmos</h2>
+            
+            <div class="game-interface">
+                <!-- HUD del gioco -->
+                <div class="game-hud">
+                    <div class="hud-stat">
+                        <span>❤️</span>
+                        <div class="health-bar">
+                            <div class="bar-fill health-fill" id="playerHealth" style="width: 100%"></div>
+                        </div>
+                        <span id="healthText">100/100</span>
+                    </div>
+                    <div class="hud-stat">
+                        <span>🔮</span>
+                        <div class="mana-bar">
+                            <div class="bar-fill mana-fill" id="playerMana" style="width: 100%"></div>
+                        </div>
+                        <span id="manaText">50/50</span>
+                    </div>
+                    <div class="hud-stat">
+                        <span>⭐</span>
+                        <div class="exp-bar">
+                            <div class="bar-fill exp-fill" id="playerExp" style="width: 0%"></div>
+                        </div>
+                        <span id="expText">Lv.1 (0/100)</span>
+                    </div>
+                    <div class="hud-stat">
+                        <span>💰</span>
+                        <span id="goldText">0</span>
+                    </div>
+                </div>
+
+                <!-- Canvas del gioco -->
+                <div class="game-canvas" id="gameCanvas">
+                    <div class="player" id="player">🧙‍♂️</div>
+                </div>
+
+                <!-- Controlli -->
+                <div style="text-align: center; margin-top: 1rem;">
+                    <p><strong>Controlli:</strong> WASD = Movimento | Click = Interagisci | I = Inventario | Q = Quest</p>
+                </div>
+            </div>
+
+            <button class="btn btn-back" onclick="goToMain()">🔙 Torna al Menu</button>
+        </div>
+    </div>
+
+    <!-- MODALITÀ CLASSICA -->
+    <div id="classicScreen" class="screen">
+        <div class="main-container">
+            <h2 class="section-title">🎲 Modalità Classica Pro</h2>
+            
+            <div class="game-interface">
+                <div class="game-stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="classicLevel">1</div>
+                        <div class="stat-label">Livello</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="classicAttempts">10</div>
+                        <div class="stat-label">Tentativi</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="classicScore">0</div>
+                        <div class="stat-label">Punteggio</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="classicRange">1-30</div>
+                        <div class="stat-label">Range</div>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin: 2rem 0;">
+                    <h3 style="margin-bottom: 1rem;">🎯 Indovina il numero segreto!</h3>
+                    <select id="classicDifficulty" onchange="setClassicDifficulty()" style="margin-bottom: 1.5rem;">
+                        <option value="easy">🧩 Facile (1-30, 10 tentativi)</option>
+                        <option value="medium">⚔️ Medio (1-60, 8 tentativi)</option>
+                        <option value="hard">🔥 Difficile (1-150, 7 tentativi)</option>
+                        <option value="hardcore">💀 Hardcore (1-300, 5 tentativi)</option>
+                    </select>
+                    
+                    <div style="margin: 2rem 0;">
+                        <input type="number" id="classicGuess" placeholder="Il tuo numero magico" style="font-size: 1.5rem; text-align: center;">
+                        <button class="btn" onclick="makeClassicGuess()" style="font-size: 1.2rem;">🔍 Verifica Numero</button>
+                    </div>
+
+                    <div id="classicMessage" style="font-size: 1.3rem; margin: 1.5rem 0; min-height: 3rem; color: var(--accent-gold);"></div>
+                    
+                    <div class="progress-container">
+                        <div class="progress-bar" id="classicProgress"></div>
+                    </div>
+                </div>
+
+                <div id="classicPowerups" style="margin: 2rem 0; text-align: center;">
+                    <h4 style="margin-bottom: 1rem;">⚡ Power-ups Strategici:</h4>
+                    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                        <button class="btn btn-gold" onclick="useClassicPowerup('hint')" id="hintBtn">💡 Suggerimento (3)</button>
+                        <button class="btn btn-secondary" onclick="useClassicPowerup('range')" id="rangeBtn">📏 Riduci Range (2)</button>
+                        <button class="btn" onclick="useClassicPowerup('attempts')" id="attemptsBtn">➕ +3 Tentativi (1)</button>
+                    </div>
+                </div>
+
+                <div id="classicHistory" style="background: rgba(0,0,0,0.4); padding: 1.5rem; border-radius: 15px; max-height: 250px; overflow-y: auto; border: 2px solid var(--primary-neon);">
+                    <h4 style="margin-bottom: 1rem;">📊 Cronologia Tentativi:</h4>
+                    <div id="classicHistoryList"></div>
+                </div>
+            </div>
+
+            <button class="btn btn-back" onclick="goToMain()">🔙 Torna al Menu Principale</button>
+        </div>
+    </div>
+
+    <!-- MODALITÀ BATTLE ROYALE -->
+    <div id="battleRoyaleScreen" class="screen">
+        <div class="main-container">
+            <h2 class="section-title">⚔️ Number Battle Royale</h2>
+            
+            <div class="game-interface">
+                <div class="game-stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="playersAlive">100</div>
+                        <div class="stat-label">Giocatori Vivi</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="yourRank">42</div>
+                        <div class="stat-label">La Tua Posizione</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="zoneTimer">120</div>
+                        <div class="stat-label">Zona si Restringe</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="brKills">0</div>
+                        <div class="stat-label">Eliminazioni</div>
+                    </div>
+                </div>
+
+                <div style="width: 100%; height: 450px; background: linear-gradient(45deg, var(--dark-bg), #1a1a2e); border-radius: 25px; margin: 2rem 0; overflow: hidden; border: 3px solid var(--secondary-neon); box-shadow: inset 0 0 30px rgba(255,107,107,0.3); position: relative;" id="battleArena">
+                    <div style="position: absolute; border: 4px solid var(--secondary-neon); border-radius: 50%; background: radial-gradient(circle, rgba(255,107,107,0.1), transparent); transition: all 3s ease; box-shadow: 0 0 30px var(--secondary-neon);" id="safeZone"></div>
+                    <div style="position: absolute; width: 15px; height: 15px; background: var(--accent-gold); border-radius: 50%; transition: all 0.5s ease; box-shadow: 0 0 15px var(--accent-gold); animation: playerPulse 1.5s ease-in-out infinite;" id="playerDot"></div>
+                </div>
+
+                <div id="brChallenge" style="text-align: center; margin: 2rem 0;">
+                    <h3 style="margin-bottom: 1rem;">🎯 Sfida Matematica Rapida!</h3>
+                    <p id="brQuestion" style="font-size: 1.3rem; margin-bottom: 1rem; color: var(--accent-gold);">Risolvi velocemente: 15 × 3 = ?</p>
+                    <input type="number" id="brAnswer" placeholder="Risposta veloce!" style="text-align: center;">
+                    <button class="btn" onclick="submitBRAnswer()">⚡ Invia Risposta!</button>
+                    <div id="brTimer" style="margin-top: 1rem; font-size: 1.2rem;">Tempo: <span id="brTimeLeft" style="color: var(--secondary-neon);">10</span>s</div>
+                </div>
+
+                <div id="brPowerups" style="margin: 2rem 0; text-align: center;">
+                    <h4 style="margin-bottom: 1rem;">⚡ Power-ups Disponibili:</h4>
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
+                        <button class="btn btn-gold" onclick="usePowerup('shield')" id="shieldBtn">🛡️ Scudo (2)</button>
+                        <button class="btn btn-secondary" onclick="usePowerup('speed')" id="speedBtn">⚡ Velocità (1)</button>
+                        <button class="btn" onclick="usePowerup('vision')" id="visionBtn">👁️ Visione (3)</button>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn btn-back" onclick="goToMain()">🔙 Torna al Menu Principale</button>
+        </div>
+    </div>
+
+    <!-- DIALOG OVERLAY -->
+    <div class="dialog-overlay" id="dialogOverlay">
+        <div class="dialog-box">
+            <div class="dialog-character" id="dialogCharacter">Mago Algebros</div>
+            <div class="dialog-text" id="dialogText">
+                Benvenuto, giovane matematico! Il regno di Arithmos è in grave pericolo. I Numeri del Caos hanno invaso le nostre terre e solo tu puoi fermarli!
+            </div>
+            <div class="dialog-choices" id="dialogChoices">
+                <div class="dialog-choice" onclick="selectDialogChoice(0)">Accetto la missione!</div>
+                <div class="dialog-choice" onclick="selectDialogChoice(1)">Dimmi di più sui Numeri del Caos</div>
+                <div class="dialog-choice" onclick="selectDialogChoice(2)">Non sono pronto</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- COMBAT OVERLAY -->
+    <div class="combat-overlay" id="combatOverlay">
+        <div class="combat-interface">
+            <div class="combat-enemy">
+                <div class="enemy-avatar" id="combatEnemyAvatar">👹</div>
+                <div class="enemy-name" id="combatEnemyName">Goblin Matematico</div>
+                <div class="enemy-hp" id="combatEnemyHP">HP: 50/50</div>
+            </div>
+            
+            <div class="combat-question">
+                <div class="question-text" id="combatQuestion">Risolvi per attaccare: 15 + 23 = ?</div>
+                <input type="number" class="answer-input" id="combatAnswer" placeholder="Risposta">
+            </div>
+            
+            <div class="combat-actions">
+                <button class="combat-btn" onclick="performCombatAction('attack')">⚔️ Attacco</button>
+                <button class="combat-btn" onclick="performCombatAction('magic')">🔮 Magia</button>
+                <button class="combat-btn" onclick="performCombatAction('defend')">🛡️ Difesa</button>
+                <button class="combat-btn" onclick="performCombatAction('flee')">🏃‍♂️ Fuga</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AUDIO ELEMENT -->
+    <audio id="backgroundMusic" loop>
+        <source src="musica.mp3" type="audio/mpeg">
+        Il tuo browser non supporta l'audio HTML5.
+    </audio>
+
+    <!-- SCRIPTS -->
+    <script>
+        // STATO DEL GIOCO
+        let gameState = {
+            currentMode: null,
+            player: {
+                x: 250,
+                y: 250,
+                level: 1,
+                hp: 100,
+                maxHP: 100,
+                mp: 50,
+                maxMP: 50,
+                exp: 0,
+                expToNext: 100,
+                gold: 0,
+                inventory: ['sword', 'shield', 'potion'],
+                quests: []
+            },
+            world: {
+                currentMap: 'village',
+                npcs: [],
+                enemies: [],
+                items: [],
+                discovered: []
+            },
+            dialog: {
+                active: false,
+                currentNPC: null,
+                currentDialog: 0
+            },
+            combat: {
+                active: false,
+                enemy: null,
+                turn: 'player'
+            },
+            classic: {
+                level: 1,
+                attempts: 10,
+                score: 0,
+                targetNumber: null,
+                difficulty: 'easy',
+                powerups: { hint: 3, range: 2, attempts: 1 },
+                history: []
+            },
+            battleRoyale: {
+                playersAlive: 100,
+                rank: 42,
+                kills: 0,
+                powerups: { shield: 2, speed: 1, vision: 3 },
+                zoneTimer: 120,
+                currentAnswer: null,
+                questionTimer: null
+            }
+        };
+
+        // DATI DELLE MODALITÀ EPICHE
+        const gameModes = {
+            chronicles: {
+                name: "Chronicles of Arithmos",
+                maps: {
+                    village: {
+                        name: "Villaggio di Numeropoli",
+                        background: "linear-gradient(135deg, #2d5016, #4a7c59)",
+                        npcs: [
+                            { x: 150, y: 200, name: "Mago Algebros", avatar: "🧙‍♂️", dialog: "algebros_intro" },
+                            { x: 350, y: 300, name: "Mercante Fibonacci", avatar: "🧑‍💼", dialog: "merchant_intro" },
+                            { x: 200, y: 400, name: "Guardia Pitagora", avatar: "🛡️", dialog: "guard_intro" }
+                        ],
+                        enemies: [
+                            { x: 400, y: 150, name: "Goblin Matematico", avatar: "👹", hp: 30, problem: "addition" },
+                            { x: 500, y: 350, name: "Orco delle Moltiplicazioni", avatar: "👺", hp: 50, problem: "multiplication" }
+                        ],
+                        items: [
+                            { x: 300, y: 100, name: "Pozione di Saggezza", avatar: "🧪", type: "consumable" },
+                            { x: 450, y: 200, name: "Monete d'Oro", avatar: "💰", type: "currency", value: 25 }
+                        ]
+                    },
+                    forest: {
+                        name: "Foresta dei Numeri Primi",
+                        background: "linear-gradient(135deg, #1a4a1a, #2e6b2e)",
+                        npcs: [
+                            { x: 100, y: 300, name: "Druido Euclide", avatar: "🧙‍♂️", dialog: "druid_intro" }
+                        ],
+                        enemies: [
+                            { x: 300, y: 200, name: "Lupo Algebrico", avatar: "🐺", hp: 40, problem: "algebra" },
+                            { x: 450, y: 350, name: "Ent delle Equazioni", avatar: "🌳", hp: 80, problem: "equations" }
+                        ],
+                        items: [
+                            { x: 200, y: 150, name: "Cristallo della Saggezza", avatar: "💎", type: "quest" }
+                        ]
+                    }
+                },
+                dialogs: {
+                    algebros_intro: [
+                        {
+                            text: "Benvenuto, giovane matematico! Sono Algebros, il Grande Mago dei Numeri. Il nostro regno è in pericolo!",
+                            choices: [
+                                { text: "Che tipo di pericolo?", next: 1 },
+                                { text: "Come posso aiutare?", next: 2 },
+                                { text: "Non mi interessa", next: 3 }
+                            ]
+                        },
+                        {
+                            text: "I Numeri del Caos hanno invaso le nostre terre! Stanno corrompendo le equazioni e distruggendo l'equilibrio matematico!",
+                            choices: [
+                                { text: "Cosa devo fare?", next: 2 },
+                                { text: "Sembra pericoloso...", next: 4 }
+                            ]
+                        },
+                        {
+                            text: "Devi trovare il Cristallo della Saggezza nella Foresta dei Numeri Primi. Solo con esso potremo fermare il Caos!",
+                            choices: [
+                                { text: "Accetto la missione!", action: "start_quest", quest: "crystal_quest" },
+                                { text: "Ho bisogno di prepararmi", next: 5 }
+                            ]
+                        }
+                    ]
+                }
+            }
+        };
+
+        // INIZIALIZZAZIONE
+        document.addEventListener('DOMContentLoaded', function() {
+            showLoadingScreen();
+            setTimeout(() => {
+                initializeGame();
+                hideLoadingScreen();
+            }, 2000);
+        });
+
+        function initializeGame() {
+            initializeStars();
+            initializeParticles();
+            setupEventListeners();
+            setupKeyboardControls();
+            loadSavedSettings();
+            showNotification('🎮 Benvenuto in Numero Quest!', 3000);
+        }
+
+        function showLoadingScreen() {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+        }
+
+        function hideLoadingScreen() {
+            document.getElementById('loadingOverlay').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('loadingOverlay').style.display = 'none';
+            }, 500);
+        }
+
+        // SETUP EVENT LISTENERS
+        function setupEventListeners() {
+            document.getElementById('musicBtn').addEventListener('click', toggleMusic);
+            document.getElementById('themeBtn').addEventListener('click', toggleThemeMenu);
+            document.getElementById('settingsBtn').addEventListener('click', showSettings);
+            document.getElementById('volumeSlider').addEventListener('input', adjustVolume);
+
+            document.querySelectorAll('.theme-option').forEach(option => {
+                option.addEventListener('click', () => changeTheme(option.dataset.theme));
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.theme-menu') && !e.target.closest('#themeBtn')) {
+                    document.getElementById('themeMenu').classList.remove('open');
+                }
+            });
+        }
+
+        // CONTROLLI TASTIERA
+        function setupKeyboardControls() {
+            const keys = {};
+            
+            document.addEventListener('keydown', (e) => {
+                keys[e.key.toLowerCase()] = true;
+                
+                switch(e.key.toLowerCase()) {
+                    case 'escape':
+                        if (gameState.dialog.active) {
+                            hideDialog();
+                        } else if (gameState.combat.active) {
+                            // Non permettere fuga durante combattimento
+                        } else {
+                            goToMain();
+                        }
+                        break;
+                    case 'enter':
+                        if (gameState.combat.active) {
+                            performCombatAction('attack');
+                        } else if (document.getElementById('classicScreen').classList.contains('active')) {
+                            makeClassicGuess();
+                        } else if (document.getElementById('battleRoyaleScreen').classList.contains('active')) {
+                            submitBRAnswer();
+                        }
+                        break;
+                }
+            });
+
+            document.addEventListener('keyup', (e) => {
+                keys[e.key.toLowerCase()] = false;
+            });
+
+            // Movimento del giocatore per Chronicles
+            setInterval(() => {
+                if (gameState.currentMode === 'chronicles' && !gameState.dialog.active && !gameState.combat.active) {
+                    let moved = false;
+                    const speed = 5;
+                    
+                    if (keys['w'] || keys['arrowup']) {
+                        gameState.player.y = Math.max(50, gameState.player.y - speed);
+                        moved = true;
+                    }
+                    if (keys['s'] || keys['arrowdown']) {
+                        gameState.player.y = Math.min(450, gameState.player.y + speed);
+                        moved = true;
+                    }
+                    if (keys['a'] || keys['arrowleft']) {
+                        gameState.player.x = Math.max(20, gameState.player.x - speed);
+                        moved = true;
+                    }
+                    if (keys['d'] || keys['arrowright']) {
+                        gameState.player.x = Math.min(580, gameState.player.x + speed);
+                        moved = true;
+                    }
+                    
+                    if (moved) {
+                        updatePlayerPosition();
+                        checkCollisions();
+                    }
+                }
+            }, 16);
+        }
+
+        // SISTEMA MUSICA
+        function toggleMusic() {
+            const musicBtn = document.getElementById('musicBtn');
+            const volumeControl = document.getElementById('volumeControl');
+            const music = document.getElementById('backgroundMusic');
+
+            if (music.paused) {
+                music.play().then(() => {
+                    musicBtn.classList.add('active');
+                    volumeControl.classList.remove('hidden');
+                    showNotification('🎵 Musica attivata', 2000);
+                }).catch(error => {
+                    showNotification('❌ Errore riproduzione audio', 2000);
+                });
+            } else {
+                music.pause();
+                musicBtn.classList.remove('active');
+                volumeControl.classList.add('hidden');
+                showNotification('🔇 Musica disattivata', 2000);
+            }
+        }
+
+        function adjustVolume() {
+            const volume = document.getElementById('volumeSlider').value / 100;
+            document.getElementById('backgroundMusic').volume = volume;
+        }
+
+        // SISTEMA TEMI
+        function toggleThemeMenu() {
+            document.getElementById('themeMenu').classList.toggle('open');
+        }
+
+        function changeTheme(theme) {
+            document.body.setAttribute('data-theme', theme);
+            
+            document.querySelectorAll('.theme-option').forEach(option => {
+                option.classList.remove('active');
+            });
+            document.querySelector(`[data-theme="${theme}"]`).classList.add('active');
+            
+            document.getElementById('themeMenu').classList.remove('open');
+            initializeParticles();
+            localStorage.setItem('numeroquest_theme', theme);
+            showNotification(`🎨 Tema ${theme} attivato!`, 2000);
+        }
+
+        // INIZIALIZZAZIONE STELLE
+        function initializeStars() {
+            const starsContainer = document.getElementById('stars');
+            starsContainer.innerHTML = '';
+            const numStars = 150;
+
+            for (let i = 0; i < numStars; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.width = star.style.height = (Math.random() * 4 + 1) + 'px';
+                star.style.animationDelay = Math.random() * 2 + 's';
+                star.style.animationDuration = (Math.random() * 3 + 1) + 's';
+                starsContainer.appendChild(star);
+            }
+
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    createShootingStar();
+                }, Math.random() * 10000);
+            }
+        }
+
+        function createShootingStar() {
+            const star = document.createElement('div');
+            star.className = 'shooting-star';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 50 + '%';
+            document.getElementById('stars').appendChild(star);
+
+            setTimeout(() => {
+                star.remove();
+                setTimeout(createShootingStar, Math.random() * 15000 + 5000);
+            }, 3000);
+        }
+
+        // INIZIALIZZAZIONE PARTICELLE
+        function initializeParticles() {
+            const colors = getThemeColors();
+            
+            particlesJS("particles-js", {
+                particles: {
+                    number: { value: 80, density: { enable: true, value_area: 800 } },
+                    color: { value: colors },
+                    shape: { type: ["circle", "triangle"] },
+                    opacity: { value: 0.7, random: true },
+                    size: { value: 4, random: true },
+                    line_linked: {
+                        enable: true,
+                        distance: 150,
+                        color: colors[0],
+                        opacity: 0.5,
+                        width: 1
+                    },
+                    move: {
+                        enable: true,
+                        speed: 3,
+                        direction: "none",
+                        random: true,
+                        straight: false,
+                        out_mode: "out",
+                        bounce: false
+                    }
+                },
+                interactivity: {
+                    detect_on: "canvas",
+                    events: {
+                        onhover: { enable: true, mode: "repulse" },
+                        onclick: { enable: true, mode: "push" },
+                        resize: true
+                    }
+                },
+                retina_detect: true
+            });
+        }
+
+        function getThemeColors() {
+            const themeColors = {
+                neon: ["#00fff2", "#ff6b6b", "#ffd93d"],
+                cyberpunk: ["#ff0080", "#00ff80", "#ffff00"],
+                retro: ["#ff6600", "#ff3366", "#ffcc00"],
+                ocean: ["#00ccff", "#0066cc", "#66ffcc"],
+                forest: ["#00ff66", "#66ff00", "#ffff66"],
+                galaxy: ["#9966ff", "#ff66cc", "#66ccff"],
+                fire: ["#ff4400", "#ff8800", "#ffcc44"]
+            };
+            return themeColors[document.body.getAttribute('data-theme')] || themeColors.neon;
+        }
+
+        // NAVIGAZIONE
+        function startMode(mode) {
+            gameState.currentMode = mode;
+            hideAllScreens();
+            
+            switch(mode) {
+                case 'chronicles':
+                    showScreen('chroniclesScreen');
+                    initializeChronicles();
+                    break;
+                case 'classic':
+                    showScreen('classicScreen');
+                    initClassicGame();
+                    break;
+                case 'battle-royale':
+                    showScreen('battleRoyaleScreen');
+                    initBattleRoyale();
+                    break;
+                case 'shadowlands':
+                case 'timerift':
+                case 'elemental':
+                case 'cyberpunk':
+                case 'space':
+                    showNotification(`🚀 ${mode} - Modalità epica in sviluppo!`, 3000);
+                    break;
+            }
+        }
+
+        function goToMultiplayer() {
+            window.location.href = 'multiplayer.html';
+        }
+
+        function hideAllScreens() {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+        }
+
+        function showScreen(screenId) {
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function goToMain() {
+            hideAllScreens();
+            showScreen('mainScreen');
+            gameState.currentMode = null;
+            hideDialog();
+            hideCombat();
+        }
+
+        // INIZIALIZZAZIONE CHRONICLES
+        function initializeChronicles() {
+            loadMap('village');
+            updateHUD();
+            showNotification('⚔️ Benvenuto nel Regno di Arithmos!', 3000);
+            
+            setTimeout(() => {
+                const algebros = gameState.world.npcs.find(npc => npc.name === "Mago Algebros");
+                if (algebros) {
+                    startDialog(algebros);
+                }
+            }, 2000);
+        }
+
+        function loadMap(mapName) {
+            const mapData = gameModes.chronicles.maps[mapName];
+            gameState.world.currentMap = mapName;
+            gameState.world.npcs = [...mapData.npcs];
+            gameState.world.enemies = [...mapData.enemies];
+            gameState.world.items = [...mapData.items];
+            
+            const canvas = document.getElementById('gameCanvas');
+            canvas.style.background = mapData.background;
+            canvas.innerHTML = '<div class="player" id="player">🧙‍♂️</div>';
+            
+            // Aggiungi NPCs
+            gameState.world.npcs.forEach(npc => {
+                const npcEl = document.createElement('div');
+                npcEl.className = 'npc';
+                npcEl.style.left = npc.x + 'px';
+                npcEl.style.top = npc.y + 'px';
+                npcEl.textContent = npc.avatar;
+                npcEl.title = npc.name;
+                npcEl.onclick = () => startDialog(npc);
+                canvas.appendChild(npcEl);
+            });
+            
+            // Aggiungi nemici
+            gameState.world.enemies.forEach(enemy => {
+                const enemyEl = document.createElement('div');
+                enemyEl.className = 'enemy';
+                enemyEl.style.left = enemy.x + 'px';
+                enemyEl.style.top = enemy.y + 'px';
+                enemyEl.textContent = enemy.avatar;
+                enemyEl.title = enemy.name;
+                enemyEl.onclick = () => startCombat(enemy);
+                canvas.appendChild(enemyEl);
+            });
+            
+            updatePlayerPosition();
+        }
+
+        function updatePlayerPosition() {
+            const player = document.getElementById('player');
+            if (player) {
+                player.style.left = gameState.player.x + 'px';
+                player.style.top = gameState.player.y + 'px';
+            }
+        }
+
+        function checkCollisions() {
+            // Implementazione collisioni base
+        }
+
+        // SISTEMA DIALOGHI
+        function startDialog(npc) {
+            gameState.dialog.active = true;
+            gameState.dialog.currentNPC = npc;
+            gameState.dialog.currentDialog = 0;
+            
+            const dialogData = gameModes.chronicles.dialogs[npc.dialog];
+            if (dialogData) {
+                showDialog(dialogData[0]);
+            }
+        }
+
+        function showDialog(dialog) {
+            document.getElementById('dialogCharacter').textContent = gameState.dialog.currentNPC.name;
+            document.getElementById('dialogText').textContent = dialog.text;
+            
+            const choicesContainer = document.getElementById('dialogChoices');
+            choicesContainer.innerHTML = '';
+            
+            dialog.choices.forEach((choice, index) => {
+                const choiceEl = document.createElement('div');
+                choiceEl.className = 'dialog-choice';
+                choiceEl.textContent = choice.text;
+                choiceEl.onclick = () => selectDialogChoice(index);
+                choicesContainer.appendChild(choiceEl);
+            });
+            
+            document.getElementById('dialogOverlay').style.display = 'flex';
+        }
+
+        function selectDialogChoice(choiceIndex) {
+            const dialogData = gameModes.chronicles.dialogs[gameState.dialog.currentNPC.dialog];
+            const currentDialog = dialogData[gameState.dialog.currentDialog];
+            const choice = currentDialog.choices[choiceIndex];
+            
+            if (choice.action) {
+                executeDialogAction(choice.action, choice);
+            } else if (choice.next !== undefined) {
+                gameState.dialog.currentDialog = choice.next;
+                showDialog(dialogData[choice.next]);
+            }
+        }
+
+        function executeDialogAction(action, choice) {
+            switch(action) {
+                case 'start_quest':
+                    hideDialog();
+                    showNotification(`📜 Nuova missione iniziata!`, 3000);
+                    break;
+                default:
+                    hideDialog();
+                    break;
+            }
+        }
+
+        function hideDialog() {
+            gameState.dialog.active = false;
+            document.getElementById('dialogOverlay').style.display = 'none';
+        }
+
+        // SISTEMA COMBATTIMENTO
+        function startCombat(enemy) {
+            gameState.combat.active = true;
+            gameState.combat.enemy = { ...enemy };
+            
+            document.getElementById('combatEnemyAvatar').textContent = enemy.avatar;
+            document.getElementById('combatEnemyName').textContent = enemy.name;
+            document.getElementById('combatEnemyHP').textContent = `HP: ${enemy.hp}/${enemy.hp}`;
+            
+            generateCombatQuestion(enemy.problem);
+            document.getElementById('combatOverlay').style.display = 'flex';
+            document.getElementById('combatAnswer').focus();
+        }
+
+        function generateCombatQuestion(problemType) {
+            let question, answer;
+            
+            switch(problemType) {
+                case 'addition':
+                    const a = Math.floor(Math.random() * 50) + 1;
+                    const b = Math.floor(Math.random() * 50) + 1;
+                    question = `${a} + ${b}`;
+                    answer = a + b;
+                    break;
+                case 'multiplication':
+                    const x = Math.floor(Math.random() * 12) + 1;
+                    const y = Math.floor(Math.random() * 12) + 1;
+                    question = `${x} × ${y}`;
+                    answer = x * y;
+                    break;
+                default:
+                    const c = Math.floor(Math.random() * 20) + 1;
+                    const d = Math.floor(Math.random() * 20) + 1;
+                    question = `${c} + ${d}`;
+                    answer = c + d;
+                    break;
+            }
+            
+            document.getElementById('combatQuestion').textContent = `Risolvi per attaccare: ${question} = ?`;
+            gameState.combat.correctAnswer = answer;
+        }
+
+        function performCombatAction(action) {
+            const userAnswer = parseInt(document.getElementById('combatAnswer').value);
+            
+            if (action === 'flee') {
+                hideCombat();
+                showNotification('🏃‍♂️ Sei fuggito dal combattimento!', 2000);
+                return;
+            }
+            
+            if (userAnswer === gameState.combat.correctAnswer) {
+                let damage = 0;
+                switch(action) {
+                    case 'attack':
+                        damage = 20 + Math.floor(Math.random() * 10);
+                        showNotification(`⚔️ Attacco riuscito! -${damage} HP`, 2000);
+                        break;
+                    case 'magic':
+                        damage = 30 + Math.floor(Math.random() * 15);
+                        gameState.player.mp -= 10;
+                        showNotification(`🔮 Incantesimo potente! -${damage} HP`, 2000);
+                        break;
+                    case 'defend':
+                        gameState.player.hp = Math.min(gameState.player.maxHP, gameState.player.hp + 15);
+                        showNotification('🛡️ Difesa perfetta! +15 HP', 2000);
+                        updateHUD();
+                        break;
+                }
+                
+                if (damage > 0) {
+                    gameState.combat.enemy.hp -= damage;
+                    document.getElementById('combatEnemyHP').textContent = 
+                        `HP: ${Math.max(0, gameState.combat.enemy.hp)}/${gameState.combat.enemy.hp + damage}`;
+                    
+                    if (gameState.combat.enemy.hp <= 0) {
+                        winCombat();
+                        return;
+                    }
+                }
+                
+                setTimeout(() => {
+                    enemyTurn();
+                }, 1000);
+                
+            } else {
+                showNotification(`❌ Risposta sbagliata! La risposta era ${gameState.combat.correctAnswer}`, 2000);
+                setTimeout(() => {
+                    enemyTurn();
+                }, 1000);
+            }
+            
+            document.getElementById('combatAnswer').value = '';
+            generateCombatQuestion(gameState.combat.enemy.problem);
+        }
+
+        function enemyTurn() {
+            const damage = 10 + Math.floor(Math.random() * 10);
+            gameState.player.hp -= damage;
+            showNotification(`💥 Il nemico ti attacca! -${damage} HP`, 2000);
+            
+            if (gameState.player.hp <= 0) {
+                gameState.player.hp = 1;
+                showNotification('💀 Sei stato sconfitto! Torni al villaggio...', 3000);
+                hideCombat();
+                loadMap('village');
+            }
+            
+            updateHUD();
+        }
+
+        function winCombat() {
+            const expGain = 50 + Math.floor(Math.random() * 30);
+            const goldGain = 25 + Math.floor(Math.random() * 25);
+            
+            gameState.player.exp += expGain;
+            gameState.player.gold += goldGain;
+            
+            // Rimuovi nemico dalla mappa
+            const enemyIndex = gameState.world.enemies.findIndex(e => 
+                e.name === gameState.combat.enemy.name
+            );
+            if (enemyIndex > -1) {
+                gameState.world.enemies.splice(enemyIndex, 1);
+                const enemyElements = document.querySelectorAll('.enemy');
+                enemyElements.forEach(el => {
+                    if (el.title === gameState.combat.enemy.name) {
+                        el.remove();
+                    }
+                });
+            }
+            
+            confetti();
+            showNotification(`🎉 Vittoria! +${expGain} EXP, +${goldGain} Oro`, 3000);
+            
+            if (gameState.player.exp >= gameState.player.expToNext) {
+                levelUp();
+            }
+            
+            hideCombat();
+            updateHUD();
+        }
+
+        function hideCombat() {
+            gameState.combat.active = false;
+            document.getElementById('combatOverlay').style.display = 'none';
+        }
+
+        function levelUp() {
+            gameState.player.level++;
+            gameState.player.exp = 0;
+            gameState.player.expToNext = gameState.player.level * 100;
+            gameState.player.maxHP += 20;
+            gameState.player.hp = gameState.player.maxHP;
+            gameState.player.maxMP += 10;
+            gameState.player.mp = gameState.player.maxMP;
+            
+            confetti();
+            showNotification(`🌟 LEVEL UP! Livello ${gameState.player.level}! +20 HP, +10 MP`, 4000);
+        }
+
+        function updateHUD() {
+            document.getElementById('healthText').textContent = `${gameState.player.hp}/${gameState.player.maxHP}`;
+            document.getElementById('manaText').textContent = `${gameState.player.mp}/${gameState.player.maxMP}`;
+            document.getElementById('expText').textContent = `Lv.${gameState.player.level} (${gameState.player.exp}/${gameState.player.expToNext})`;
+            document.getElementById('goldText').textContent = gameState.player.gold;
+            
+            document.getElementById('playerHealth').style.width = (gameState.player.hp / gameState.player.maxHP * 100) + '%';
+            document.getElementById('playerMana').style.width = (gameState.player.mp / gameState.player.maxMP * 100) + '%';
+            document.getElementById('playerExp').style.width = (gameState.player.exp / gameState.player.expToNext * 100) + '%';
+        }
+
+        // MODALITÀ CLASSICA
+        function initClassicGame() {
+            const state = gameState.classic;
+            state.targetNumber = generateRandomNumber(state.difficulty, state.level);
+            updateClassicUI();
+            showNotification('🎲 Modalità Classica iniziata!', 2000);
+        }
+
+        function generateRandomNumber(difficulty, level = 1) {
+            const baseRanges = {
+                easy: 30,
+                medium: 60,
+                hard: 150,
+                hardcore: 300
+            };
+            
+            const maxRange = baseRanges[difficulty] * level;
+            return Math.floor(Math.random() * maxRange) + 1;
+        }
+
+        function getClassicRange(difficulty, level = 1) {
+            const baseRanges = {
+                easy: 30,
+                medium: 60,
+                hard: 150,
+                hardcore: 300
+            };
+            
+            const maxRange = baseRanges[difficulty] * level;
+            return `1-${maxRange}`;
+        }
+
+        function setClassicDifficulty() {
+            const difficulty = document.getElementById('classicDifficulty').value;
+            gameState.classic.difficulty = difficulty;
+            gameState.classic.level = 1;
+            
+            const attempts = {
+                easy: 10,
+                medium: 8,
+                hard: 7,
+                hardcore: 5
+            };
+            
+            gameState.classic.attempts = attempts[difficulty];
+            gameState.classic.targetNumber = generateRandomNumber(difficulty, gameState.classic.level);
+            gameState.classic.history = [];
+            
+            updateClassicUI();
+            updateClassicHistory();
+            showNotification(`🎯 Difficoltà cambiata: ${difficulty} - Livello resettato a 1`, 2000);
+        }
+
+        function makeClassicGuess() {
+            const guess = parseInt(document.getElementById('classicGuess').value);
+            const state = gameState.classic;
+            
+            if (isNaN(guess)) {
+                showNotification('❌ Inserisci un numero valido!', 2000);
+                return;
+            }
+            
+            state.attempts--;
+            
+            let result;
+            if (guess === state.targetNumber) {
+                result = '🎉 CORRETTO!';
+                const points = state.attempts * 10 + state.level * 5;
+                state.score += points;
+                confetti();
+                
+                setTimeout(() => {
+                    showNotification(`🎊 Hai vinto! +${points} punti!`, 3000);
+                    nextClassicLevel();
+                }, 500);
+            } else if (guess < state.targetNumber) {
+                result = '⬆️ Troppo basso';
+            } else {
+                result = '⬇️ Troppo alto';
+            }
+            
+            state.history.push({ guess, result });
+            
+            if (state.attempts <= 0 && guess !== state.targetNumber) {
+                document.getElementById('classicMessage').textContent = 
+                    `😞 Hai perso! Il numero era ${state.targetNumber}`;
+                
+                setTimeout(() => {
+                    if (confirm('Vuoi riprovare questo livello?')) {
+                        resetClassicLevel();
+                    }
+                }, 1500);
+            } else {
+                document.getElementById('classicMessage').textContent = result;
+            }
+            
+            document.getElementById('classicGuess').value = '';
+            updateClassicUI();
+            updateClassicHistory();
+        }
+
+        function nextClassicLevel() {
+            gameState.classic.level++;
+            resetClassicLevel();
+            
+            const newRange = getClassicRange(gameState.classic.difficulty, gameState.classic.level);
+            showNotification(`🎉 Livello ${gameState.classic.level}! Nuovo range: ${newRange}`, 3000);
+        }
+
+        function resetClassicLevel() {
+            const state = gameState.classic;
+            const attempts = {
+                easy: 10,
+                medium: 8,
+                hard: 7,
+                hardcore: 5
+            };
+            
+            state.attempts = attempts[state.difficulty];
+            state.targetNumber = generateRandomNumber(state.difficulty, state.level);
+            state.history = [];
+            
+            document.getElementById('classicMessage').textContent = '';
+            updateClassicUI();
+            updateClassicHistory();
+        }
+
+        function updateClassicUI() {
+            const state = gameState.classic;
+            document.getElementById('classicLevel').textContent = state.level;
+            document.getElementById('classicAttempts').textContent = state.attempts;
+            document.getElementById('classicScore').textContent = state.score;
+            
+            const currentRange = getClassicRange(state.difficulty, state.level);
+            document.getElementById('classicRange').textContent = currentRange;
+            
+            const maxAttempts = {
+                easy: 10,
+                medium: 8,
+                hard: 7,
+                hardcore: 5
+            };
+            
+            const progress = ((maxAttempts[state.difficulty] - state.attempts) / maxAttempts[state.difficulty]) * 100;
+            document.getElementById('classicProgress').style.width = progress + '%';
+            
+            document.getElementById('hintBtn').textContent = `💡 Suggerimento (${state.powerups.hint})`;
+            document.getElementById('rangeBtn').textContent = `📏 Riduci Range (${state.powerups.range})`;
+            document.getElementById('attemptsBtn').textContent = `➕ +3 Tentativi (${state.powerups.attempts})`;
+        }
+
+        function updateClassicHistory() {
+            const historyList = document.getElementById('classicHistoryList');
+            const state = gameState.classic;
+            
+            historyList.innerHTML = '';
+            
+            state.history.forEach((entry, index) => {
+                const historyItem = document.createElement('div');
+                historyItem.style.display = 'flex';
+                historyItem.style.justifyContent = 'space-between';
+                historyItem.style.padding = '0.8rem';
+                historyItem.style.borderBottom = '1px solid rgba(255,255,255,0.1)';
+                historyItem.style.borderRadius = '5px';
+                historyItem.style.margin = '5px 0';
+                historyItem.style.background = 'rgba(255,255,255,0.05)';
+                
+                historyItem.innerHTML = `
+                    <span style="font-weight: bold;">#${index + 1}: ${entry.guess}</span>
+                    <span style="color: ${entry.result.includes('CORRETTO') ? '#4caf50' : '#ff9800'}; font-weight: bold;">${entry.result}</span>
+                `;
+                
+                historyList.appendChild(historyItem);
+            });
+        }
+
+        function useClassicPowerup(type) {
+            const state = gameState.classic;
+            
+            if (state.powerups[type] <= 0) {
+                showNotification(`❌ Non hai più power-up ${type}!`, 2000);
+                return;
+            }
+            
+            state.powerups[type]--;
+            
+            switch(type) {
+                case 'hint':
+                    giveClassicHint();
+                    break;
+                case 'range':
+                    reduceClassicRange();
+                    break;
+                case 'attempts':
+                    state.attempts += 3;
+                    showNotification('➕ +3 tentativi aggiunti!', 2000);
+                    break;
+            }
+            
+            updateClassicUI();
+        }
+
+        function giveClassicHint() {
+            const target = gameState.classic.targetNumber;
+            let hint = '';
+            
+            if (target % 2 === 0) {
+                hint = 'Il numero è pari';
+            } else {
+                hint = 'Il numero è dispari';
+            }
+            
+            if (target < 10) {
+                hint += ' e ha una sola cifra';
+            } else if (target < 100) {
+                hint += ' e ha due cifre';
+            } else {
+                hint += ' e ha tre cifre';
+            }
+
+            if (target % 5 === 0) {
+                hint += ' ed è divisibile per 5';
+            }
+            
+            showNotification(`💡 Suggerimento: ${hint}`, 4000);
+        }
+
+        function reduceClassicRange() {
+            const target = gameState.classic.targetNumber;
+            const currentRange = document.getElementById('classicRange').textContent;
+            const maxNum = parseInt(currentRange.split('-')[1]);
+            
+            const newMax = Math.max(target, Math.floor(maxNum * 0.6));
+            document.getElementById('classicRange').textContent = `1-${newMax}`;
+            
+            showNotification(`📏 Range ridotto a 1-${newMax}!`, 3000);
+        }
+
+        // MODALITÀ BATTLE ROYALE
+        function initBattleRoyale() {
+            updateBattleRoyaleUI();
+            startBRTimer();
+            generateBRQuestion();
+            positionPlayerInArena();
+            showNotification('⚔️ Battle Royale iniziato!', 2000);
+        }
+
+        function updateBattleRoyaleUI() {
+            const state = gameState.battleRoyale;
+            document.getElementById('playersAlive').textContent = state.playersAlive;
+            document.getElementById('yourRank').textContent = state.rank;
+            document.getElementById('zoneTimer').textContent = state.zoneTimer;
+            document.getElementById('brKills').textContent = state.kills;
+            
+            document.getElementById('shieldBtn').textContent = `🛡️ Scudo (${state.powerups.shield})`;
+            document.getElementById('speedBtn').textContent = `⚡ Velocità (${state.powerups.speed})`;
+            document.getElementById('visionBtn').textContent = `👁️ Visione (${state.powerups.vision})`;
+        }
+
+        function startBRTimer() {
+            setInterval(() => {
+                gameState.battleRoyale.zoneTimer--;
+                if (gameState.battleRoyale.zoneTimer <= 0) {
+                    shrinkZone();
+                    gameState.battleRoyale.zoneTimer = 120;
+                }
+                updateBattleRoyaleUI();
+            }, 1000);
+        }
+
+        function generateBRQuestion() {
+            const operations = [
+                () => {
+                    const a = Math.floor(Math.random() * 75) + 1;
+                    const b = Math.floor(Math.random() * 75) + 1;
+                    return { question: `${a} + ${b}`, answer: a + b };
+                },
+                () => {
+                    const a = Math.floor(Math.random() * 25) + 1;
+                    const b = Math.floor(Math.random() * 25) + 1;
+                    return { question: `${a} × ${b}`, answer: a * b };
+                }
+            ];
+            
+            const op = operations[Math.floor(Math.random() * operations.length)]();
+            document.getElementById('brQuestion').textContent = `Risolvi velocemente: ${op.question} = ?`;
+            gameState.battleRoyale.currentAnswer = op.answer;
+            
+            let timeLeft = 10;
+            document.getElementById('brTimeLeft').textContent = timeLeft;
+            
+            const timer = setInterval(() => {
+                timeLeft--;
+                document.getElementById('brTimeLeft').textContent = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    gameState.battleRoyale.rank += 5;
+                    showNotification('⏰ Tempo scaduto!', 1500);
+                    generateBRQuestion();
+                }
+            }, 1000);
+            
+            gameState.battleRoyale.questionTimer = timer;
+        }
+
+        function submitBRAnswer() {
+            const userAnswer = parseInt(document.getElementById('brAnswer').value);
+            const correctAnswer = gameState.battleRoyale.currentAnswer;
+            
+            clearInterval(gameState.battleRoyale.questionTimer);
+            
+            if (userAnswer === correctAnswer) {
+                gameState.battleRoyale.kills++;
+                gameState.battleRoyale.rank = Math.max(1, gameState.battleRoyale.rank - 2);
+                gameState.battleRoyale.playersAlive = Math.max(1, gameState.battleRoyale.playersAlive - 1);
+                confetti();
+                showNotification('🎯 Eliminazione!', 1500);
+            } else {
+                gameState.battleRoyale.rank += 3;
+                showNotification('❌ Risposta sbagliata!', 1500);
+            }
+            
+            document.getElementById('brAnswer').value = '';
+            updateBattleRoyaleUI();
+            
+            setTimeout(() => {
+                generateBRQuestion();
+            }, 1000);
+        }
+
+        function positionPlayerInArena() {
+            const arena = document.getElementById('battleArena');
+            const player = document.getElementById('playerDot');
+            
+            const x = Math.random() * (arena.offsetWidth - 15);
+            const y = Math.random() * (arena.offsetHeight - 15);
+            
+            player.style.left = x + 'px';
+            player.style.top = y + 'px';
+        }
+
+        function shrinkZone() {
+            const zone = document.getElementById('safeZone');
+            const currentSize = parseInt(zone.style.width) || 350;
+            const newSize = Math.max(80, currentSize - 60);
+            
+            zone.style.width = newSize + 'px';
+            zone.style.height = newSize + 'px';
+            zone.style.left = '50%';
+            zone.style.top = '50%';
+            zone.style.transform = 'translate(-50%, -50%)';
+            
+            gameState.battleRoyale.playersAlive = Math.max(1, gameState.battleRoyale.playersAlive - Math.floor(Math.random() * 15) - 5);
+            showNotification('🔥 La zona si restringe!', 2000);
+        }
+
+        function usePowerup(type) {
+            const state = gameState.battleRoyale;
+            
+            if (state.powerups[type] > 0) {
+                state.powerups[type]--;
+                
+                switch(type) {
+                    case 'shield':
+                        showNotification('🛡️ Scudo attivato! Protetto per 30 secondi!', 3000);
+                        break;
+                    case 'speed':
+                        showNotification('⚡ Velocità aumentata! Tempo extra per le risposte!', 3000);
+                        break;
+                    case 'vision':
+                        showNotification('👁️ Visione potenziata! Vedi tutti i nemici nell\'arena!', 3000);
+                        break;
+                }
+                
+                updateBattleRoyaleUI();
+            } else {
+                showNotification(`❌ Non hai più power-up ${type}!`, 2000);
+            }
+        }
+
+        // SISTEMA NOTIFICHE
+        function showNotification(message, duration = 3000) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.animation = 'notificationSlide 0.5s ease reverse';
+                setTimeout(() => notification.remove(), 500);
+            }, duration);
+        }
+
+        // EASTER EGGS
+        function toggleEasterEgg(type) {
+            if (type === 'rainbow') {
+                document.body.classList.toggle('rainbow-mode');
+                showNotification('🌈 Modalità Arcobaleno!', 3000);
+            } else if (type === 'matrix') {
+                startMatrixRain();
+                showNotification('💊 Benvenuto nella Matrix!', 3000);
+            }
+        }
+
+        function startMatrixRain() {
+            const matrixContainer = document.getElementById('matrixRain');
+            matrixContainer.innerHTML = '';
+            
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    createMatrixChar();
+                }, Math.random() * 2000);
+            }
+        }
+
+        function createMatrixChar() {
+            const chars = '0123456789+-×÷=<>≤≥∞π∑∆∇∂∫';
+            const char = document.createElement('div');
+            char.className = 'matrix-char';
+            char.textContent = chars[Math.floor(Math.random() * chars.length)];
+            char.style.left = Math.random() * 100 + '%';
+            char.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            
+            document.getElementById('matrixRain').appendChild(char);
+            
+            setTimeout(() => {
+                char.remove();
+                setTimeout(createMatrixChar, Math.random() * 1000);
+            }, 5000);
+        }
+
+        // CREDITI
+        function showCredits() {
+            const creditsText = `
+🎮 NUMERO QUEST - L'AVVENTURA DEFINITIVA
+
+👨‍💻 Sviluppato con passione da v0
+🎨 Design: Ultra-moderno con 7 temi unici
+🎵 Sistema Audio: Musica di sottofondo dinamica
+⚡ Tecnologie: HTML5, CSS3, JavaScript ES6+
+🌟 Effetti: Particles.js, Canvas Confetti
+🎯 Modalità: Epiche avventure originali
+🎨 Temi: Neon, Cyberpunk, Retro, Oceano, Foresta, Galassia, Fuoco
+
+🚀 Modalità Epiche:
+- Chronicles of Arithmos: RPG completo
+- The Shadowlands Conspiracy: Stealth matematico
+- Time Rift Chronicles: Viaggi temporali
+- Elemental Math Wars: Magia elementale
+- Neon Numbers 2087: Cyberpunk futuristico
+- Galactic Math Empire: Esplorazione spaziale
+
+💝 Grazie per aver giocato!
+            `;
+            
+            alert(creditsText);
+        }
+
+        // SALVATAGGIO IMPOSTAZIONI
+        function loadSavedSettings() {
+            const savedTheme = localStorage.getItem('numeroquest_theme');
+            const savedVolume = localStorage.getItem('numeroquest_volume');
+            
+            if (savedTheme) {
+                changeTheme(savedTheme);
+            }
+            
+            if (savedVolume) {
+                document.getElementById('volumeSlider').value = savedVolume;
+                adjustVolume();
+            }
+        }
+
+        function showSettings() {
+            const settings = `
+⚙️ IMPOSTAZIONI NUMERO QUEST
+
+🎮 Controlli:
+- WASD: Movimento (Chronicles)
+- Click: Interagisci
+- ENTER: Conferma risposta
+- ESC: Menu principale
+
+🎯 Modalità Disponibili:
+- Chronicles of Arithmos (Completa)
+- Modalità Classica (Completa)
+- Battle Royale (Completa)
+- Altre modalità epiche (In sviluppo)
+
+💾 Il progresso viene salvato automaticamente!
+            `;
+            
+            alert(settings);
+        }
+
+        // Salva volume quando cambia
+        document.getElementById('volumeSlider').addEventListener('change', function() {
+            localStorage.setItem('numeroquest_volume', this.value);
+        });
+
+        console.log("🎮 Numero Quest Epic Adventures caricato!");
+        console.log("Modalità disponibili:", Object.keys(gameModes));
+    </script>
 </body>
 </html>
