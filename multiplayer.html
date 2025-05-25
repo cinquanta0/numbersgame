@@ -2,204 +2,1383 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <title>Gioco Multiplayer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌌 Numero Quest: Battaglia Galattica Multiplayer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Orbitron:wght@400;700;900&family=Roboto:wght@400;700&family=Press+Start+2P&family=Fredoka+One&family=Righteous&family=Exo+2:wght@400;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="script.js" defer></script>
+    
+    <style>
+        :root {
+            /* TEMA GALATTICO PRINCIPALE */
+            --primary-cosmic: #00fff2;
+            --secondary-cosmic: #ff6b6b;
+            --accent-cosmic: #ffd93d;
+            --purple-cosmic: #9966ff;
+            --green-cosmic: #00ff66;
+            --orange-cosmic: #ff6600;
+            
+            /* GRADIENTS COSMICI */
+            --cosmic-bg: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #533483 100%);
+            --nebula-bg: radial-gradient(ellipse at center, rgba(153,102,255,0.3) 0%, rgba(0,255,242,0.2) 50%, transparent 100%);
+            --card-cosmic: rgba(255,255,255,0.08);
+            --card-glow: 0 0 30px rgba(0,255,242,0.3);
+            
+            /* ANIMAZIONI */
+            --glow-animation: 0 0 20px currentColor;
+        }
+        
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Exo 2', sans-serif;
+            background: var(--cosmic-bg);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            position: relative;
+            overflow-x: hidden;
+            animation: cosmicPulse 8s ease-in-out infinite;
+        }
+
+        @keyframes cosmicPulse {
+            0%, 100% { background: var(--cosmic-bg); }
+            50% { background: linear-gradient(135deg, #0c0c0c 0%, #2e1a4a 25%, #1e2a5e 50%, #0f4060 75%, #634a93 100%); }
+        }
+
+        /* BACKGROUND EFFECTS */
+        #particles-js {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -3;
+        }
+
+        .cosmic-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: var(--nebula-bg);
+            z-index: -2;
+            animation: nebulaFloat 15s ease-in-out infinite;
+        }
+
+        @keyframes nebulaFloat {
+            0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.6; }
+            50% { transform: scale(1.1) rotate(2deg); opacity: 0.8; }
+        }
+
+        .stars-field {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: starTwinkle 3s ease-in-out infinite;
+        }
+
+        @keyframes starTwinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.5); }
+        }
+
+        .shooting-star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--accent-cosmic);
+            border-radius: 50%;
+            animation: shootingStar 4s linear infinite;
+        }
+
+        @keyframes shootingStar {
+            0% {
+                transform: translateX(-100px) translateY(-100px);
+                opacity: 0;
+            }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% {
+                transform: translateX(100vw) translateY(100vh);
+                opacity: 0;
+            }
+        }
+
+        /* LOGO COSMICO */
+        .cosmic-logo {
+            width: 180px;
+            height: 180px;
+            margin-bottom: 2rem;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary-cosmic), var(--purple-cosmic), var(--accent-cosmic));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            animation: logoRotate 10s linear infinite, logoGlow 3s ease-in-out infinite alternate;
+            box-shadow: 
+                0 0 50px rgba(0,255,242,0.5),
+                inset 0 0 30px rgba(255,255,255,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cosmic-logo::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(transparent, var(--primary-cosmic), transparent);
+            animation: logoSpin 3s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes logoRotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes logoGlow {
+            0% { box-shadow: 0 0 50px rgba(0,255,242,0.5), inset 0 0 30px rgba(255,255,255,0.2); }
+            100% { box-shadow: 0 0 80px rgba(0,255,242,0.8), inset 0 0 50px rgba(255,255,255,0.4); }
+        }
+
+        @keyframes logoSpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* TITOLI EPICI */
+        h1 {
+            font-family: 'Bangers', cursive;
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            margin: 0 0 1rem;
+            background: linear-gradient(45deg, var(--primary-cosmic), var(--accent-cosmic), var(--purple-cosmic), var(--primary-cosmic));
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 4s ease-in-out infinite, titleFloat 6s ease-in-out infinite;
+            text-shadow: 0 0 30px rgba(0,255,242,0.5);
+            position: relative;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        @keyframes titleFloat {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-10px) scale(1.02); }
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: titleSweep 3s ease-in-out infinite;
+            z-index: 1;
+        }
+
+        @keyframes titleSweep {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* CONTAINERS FUTURISTICI */
+        .container {
+            background: var(--card-cosmic);
+            padding: 2rem;
+            border-radius: 25px;
+            backdrop-filter: blur(20px);
+            box-shadow: 
+                var(--card-glow),
+                inset 0 0 20px rgba(255,255,255,0.1);
+            width: 100%;
+            max-width: 500px;
+            margin: 1rem 0;
+            animation: containerFloat 8s ease-in-out infinite;
+            border: 2px solid rgba(0,255,242,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(transparent, rgba(0,255,242,0.1), transparent);
+            animation: containerRotate 15s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes containerFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+
+        @keyframes containerRotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* INPUTS E BUTTONS FUTURISTICI */
+        input, select, button {
+            width: 100%;
+            padding: 1rem;
+            margin: 0.8rem 0;
+            font-size: 1.1rem;
+            border-radius: 15px;
+            border: 2px solid var(--primary-cosmic);
+            font-weight: 600;
+            font-family: 'Exo 2', sans-serif;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        input, select {
+            background: rgba(0,0,0,0.4);
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            box-shadow: 
+                0 0 25px var(--primary-cosmic),
+                inset 0 0 15px rgba(0,255,242,0.2);
+            transform: scale(1.02);
+            border-color: var(--accent-cosmic);
+        }
+
+        button {
+            background: linear-gradient(45deg, var(--primary-cosmic), var(--green-cosmic));
+            color: black;
+            cursor: pointer;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 15px rgba(0,255,242,0.3);
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.6s ease;
+        }
+
+        button:hover::before {
+            left: 100%;
+        }
+
+        button:hover { 
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 10px 25px rgba(0,255,242,0.5);
+        }
+
+        button:active {
+            transform: translateY(-1px) scale(1.01);
+        }
+
+        button:disabled {
+            background: linear-gradient(45deg, #666, #888);
+            color: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* BUTTONS SPECIALI */
+        .btn-secondary {
+            background: linear-gradient(45deg, var(--secondary-cosmic), var(--orange-cosmic));
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, var(--green-cosmic), #4caf50);
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, var(--secondary-cosmic), #e74c3c);
+        }
+
+        .btn-warning {
+            background: linear-gradient(45deg, var(--accent-cosmic), #f39c12);
+        }
+
+        /* STATUS INDICATORS COSMICI */
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 10px;
+            position: relative;
+            box-shadow: 0 0 10px currentColor;
+        }
+
+        .status-indicator::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border-radius: 50%;
+            border: 2px solid currentColor;
+            animation: statusPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes statusPulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.5; }
+        }
+
+        .status-online { 
+            background-color: var(--green-cosmic);
+            color: var(--green-cosmic);
+        }
+        
+        .status-offline { 
+            background-color: var(--secondary-cosmic);
+            color: var(--secondary-cosmic);
+        }
+        
+        .status-connecting { 
+            background-color: var(--accent-cosmic);
+            color: var(--accent-cosmic);
+            animation: connectingPulse 1s infinite;
+        }
+
+        @keyframes connectingPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+
+        /* LISTE E CARDS MIGLIORATE */
+        .cosmic-card {
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border: 2px solid rgba(0,255,242,0.2);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cosmic-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0,255,242,0.1), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .cosmic-card:hover {
+            border-color: var(--primary-cosmic);
+            box-shadow: 0 0 20px rgba(0,255,242,0.3);
+            transform: translateY(-2px);
+        }
+
+        .cosmic-card:hover::before {
+            left: 100%;
+        }
+
+        .player-list {
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border: 2px solid var(--purple-cosmic);
+            backdrop-filter: blur(10px);
+        }
+
+        .player-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            margin: 0.8rem 0;
+            background: rgba(255,255,255,0.08);
+            border-radius: 12px;
+            border: 1px solid rgba(0,255,242,0.2);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .player-item:hover {
+            background: rgba(0,255,242,0.1);
+            transform: scale(1.02);
+            box-shadow: 0 0 15px rgba(0,255,242,0.3);
+        }
+
+        .player-item.host {
+            border-color: var(--accent-cosmic);
+            background: rgba(255,215,61,0.1);
+        }
+
+        .player-item.host::before {
+            content: '👑';
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            font-size: 1.2rem;
+            animation: crownFloat 2s ease-in-out infinite;
+        }
+
+        @keyframes crownFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-3px) rotate(5deg); }
+        }
+
+        /* CHAT FUTURISTICO */
+        .chat-container {
+            height: 250px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.4);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border: 2px solid var(--green-cosmic);
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        .chat-container::before {
+            content: '💬 CHAT GALATTICO';
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: var(--cosmic-bg);
+            padding: 0 10px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: var(--green-cosmic);
+        }
+
+        .chat-message {
+            margin: 0.8rem 0;
+            padding: 1rem;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.08);
+            border-left: 4px solid var(--primary-cosmic);
+            animation: messageSlide 0.5s ease-out;
+            position: relative;
+        }
+
+        @keyframes messageSlide {
+            from { 
+                opacity: 0; 
+                transform: translateX(-20px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateX(0); 
+            }
+        }
+
+        .chat-message.system {
+            border-left-color: var(--accent-cosmic);
+            background: rgba(255,215,61,0.1);
+            font-style: italic;
+        }
+
+        .chat-message.own {
+            border-left-color: var(--green-cosmic);
+            background: rgba(0,255,102,0.1);
+            margin-left: 20px;
+        }
+
+        /* LEADERBOARD EPICA */
+        .leaderboard {
+            background: rgba(0,0,0,0.4);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 1.5rem 0;
+            border: 3px solid var(--accent-cosmic);
+            backdrop-filter: blur(15px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .leaderboard::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(transparent, rgba(255,215,61,0.1), transparent);
+            animation: leaderboardRotate 20s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes leaderboardRotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .leaderboard h3, .leaderboard h4 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-family: 'Bangers', cursive;
+            font-size: 1.8rem;
+            color: var(--accent-cosmic);
+            text-shadow: 0 0 15px var(--accent-cosmic);
+        }
+
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.2rem;
+            margin: 1rem 0;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            position: relative;
+            font-weight: 600;
+            border: 2px solid transparent;
+        }
+
+        .leaderboard-item:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 20px rgba(255,255,255,0.3);
+        }
+
+        .leaderboard-item.first {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: black;
+            border-color: #ffd700;
+            box-shadow: 0 0 25px rgba(255,215,0,0.5);
+            animation: goldGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes goldGlow {
+            0% { box-shadow: 0 0 25px rgba(255,215,0,0.5); }
+            100% { box-shadow: 0 0 40px rgba(255,215,0,0.8); }
+        }
+
+        .leaderboard-item.first::before {
+            content: '🥇';
+            position: absolute;
+            left: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2rem;
+            animation: medalFloat 2s ease-in-out infinite;
+        }
+
+        @keyframes medalFloat {
+            0%, 100% { transform: translateY(-50%) rotate(0deg); }
+            50% { transform: translateY(-60%) rotate(10deg); }
+        }
+
+        .leaderboard-item.second {
+            background: linear-gradient(45deg, #c0c0c0, #e8e8e8);
+            color: black;
+            border-color: #c0c0c0;
+            box-shadow: 0 0 20px rgba(192,192,192,0.5);
+        }
+
+        .leaderboard-item.second::before {
+            content: '🥈';
+            position: absolute;
+            left: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2rem;
+        }
+
+        .leaderboard-item.third {
+            background: linear-gradient(45deg, #cd7f32, #daa520);
+            color: black;
+            border-color: #cd7f32;
+            box-shadow: 0 0 20px rgba(205,127,50,0.5);
+        }
+
+        .leaderboard-item.third::before {
+            content: '🥉';
+            position: absolute;
+            left: -15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2rem;
+        }
+
+        /* NOTIFICHE SPECIALI */
+        .auto-start-notification {
+            background: rgba(255, 193, 7, 0.2);
+            border: 3px solid var(--accent-cosmic);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            animation: notificationPulse 2s ease-in-out infinite;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auto-start-notification::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: notificationSweep 3s ease-in-out infinite;
+        }
+
+        @keyframes notificationPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(255,193,7,0.3); }
+            50% { transform: scale(1.02); box-shadow: 0 0 30px rgba(255,193,7,0.5); }
+        }
+
+        @keyframes notificationSweep {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .countdown {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--accent-cosmic);
+            text-shadow: 0 0 15px var(--accent-cosmic);
+            animation: countdownPulse 1s ease-in-out infinite;
+        }
+
+        @keyframes countdownPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .level-completed {
+            background: rgba(76, 175, 80, 0.2);
+            border: 3px solid var(--green-cosmic);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 1.5rem 0;
+            animation: levelCompletedCelebration 3s ease-in-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        @keyframes levelCompletedCelebration {
+            0% { transform: scale(0.8); opacity: 0; }
+            20% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .winner-announcement {
+            background: linear-gradient(45deg, var(--accent-cosmic), var(--secondary-cosmic));
+            color: black;
+            padding: 2.5rem;
+            border-radius: 25px;
+            margin: 2rem 0;
+            font-weight: 900;
+            animation: winnerCelebration 4s ease-in-out infinite;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 40px rgba(255,215,61,0.6);
+        }
+
+        @keyframes winnerCelebration {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.05) rotate(1deg); }
+            75% { transform: scale(1.05) rotate(-1deg); }
+        }
+
+        .winner-announcement::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(transparent, rgba(255,255,255,0.3), transparent);
+            animation: winnerRotate 2s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes winnerRotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* GAME HISTORY MIGLIORATA */
+        .game-history {
+            height: 200px;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.4);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border: 2px solid var(--purple-cosmic);
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        .game-history::before {
+            content: '📊 CRONOLOGIA BATTAGLIA';
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: var(--cosmic-bg);
+            padding: 0 10px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: var(--purple-cosmic);
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.8rem;
+            margin: 0.5rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .history-item:hover {
+            background: rgba(0,255,242,0.1);
+            transform: translateX(5px);
+        }
+
+        /* ROOM CODE DISPLAY */
+        .room-code-display {
+            background: rgba(0,0,0,0.5);
+            padding: 1.5rem;
+            border-radius: 15px;
+            font-family: 'Orbitron', monospace;
+            font-size: 1.5rem;
+            font-weight: 900;
+            letter-spacing: 3px;
+            margin: 1rem 0;
+            border: 3px solid var(--primary-cosmic);
+            text-align: center;
+            color: var(--primary-cosmic);
+            text-shadow: 0 0 15px var(--primary-cosmic);
+            animation: codeGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes codeGlow {
+            0% { 
+                box-shadow: 0 0 20px rgba(0,255,242,0.3);
+                text-shadow: 0 0 15px var(--primary-cosmic);
+            }
+            100% { 
+                box-shadow: 0 0 40px rgba(0,255,242,0.6);
+                text-shadow: 0 0 25px var(--primary-cosmic);
+            }
+        }
+
+        /* LEVEL DISPLAY MIGLIORATO */
+        .level-display {
+            background: rgba(0,255,242,0.1);
+            border: 3px solid var(--primary-cosmic);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .level-display::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0,255,242,0.2), transparent);
+            animation: levelSweep 4s ease-in-out infinite;
+        }
+
+        @keyframes levelSweep {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .level-display h4 {
+            margin: 0 0 1rem 0;
+            color: var(--primary-cosmic);
+            font-family: 'Bangers', cursive;
+            font-size: 1.4rem;
+            text-shadow: 0 0 10px var(--primary-cosmic);
+        }
+
+        /* PROGRESS BARS COSMICHE */
+        .cosmic-progress {
+            background: rgba(0,0,0,0.4);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border: 2px solid var(--accent-cosmic);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cosmic-progress::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,215,61,0.1), transparent);
+            animation: progressSweep 3s ease-in-out infinite;
+        }
+
+        @keyframes progressSweep {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        /* UTILITIES */
+        .hidden { display: none !important; }
+
+        .text-center { text-align: center; }
+
+        .glow-text {
+            text-shadow: 0 0 15px currentColor;
+            animation: textGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes textGlow {
+            0% { text-shadow: 0 0 15px currentColor; }
+            100% { text-shadow: 0 0 25px currentColor; }
+        }
+
+        /* RESPONSIVE DESIGN */
+        @media screen and (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            .container { 
+                padding: 1.5rem; 
+                max-width: 95%;
+            }
+            .cosmic-logo {
+                width: 120px;
+                height: 120px;
+                font-size: 3rem;
+            }
+            .leaderboard-item {
+                padding: 1rem;
+                font-size: 0.9rem;
+            }
+            .chat-container {
+                height: 200px;
+            }
+            .game-history {
+                height: 150px;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            h1 { font-size: 2rem; }
+            .container { padding: 1rem; }
+            .cosmic-logo {
+                width: 100px;
+                height: 100px;
+                font-size: 2.5rem;
+            }
+            input, select, button {
+                padding: 0.8rem;
+                font-size: 1rem;
+            }
+        }
+
+        /* SCROLLBAR PERSONALIZZATA */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(45deg, var(--primary-cosmic), var(--purple-cosmic));
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(45deg, var(--accent-cosmic), var(--secondary-cosmic));
+        }
+
+        /* EFFETTI SPECIALI */
+        .cosmic-sparkle {
+            position: relative;
+        }
+
+        .cosmic-sparkle::after {
+            content: '✨';
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            animation: sparkleFloat 2s ease-in-out infinite;
+        }
+
+        @keyframes sparkleFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.7; }
+            50% { transform: translateY(-5px) rotate(180deg); opacity: 1; }
+        }
+
+        /* LOADING ANIMATIONS */
+        .cosmic-loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0,255,242,0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary-cosmic);
+            animation: cosmicSpin 1s ease-in-out infinite;
+        }
+
+        @keyframes cosmicSpin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
-    <div id="lobby">
-        <h1>Gioco Multiplayer</h1>
-        <input id="playerName" placeholder="Nome giocatore"><br><br>
-        <button id="create-game-btn">Crea Stanza</button>
-        <br><br>
-        <input id="room-code" placeholder="Codice stanza">
-        <button id="join-game-btn">Unisciti</button>
-    </div>
 
-    <div id="game" style="display:none;">
-        <h2>Stanza: <span id="room-code-display"></span></h2>
-        <h3 id="level-info"></h3>
-        <p id="turnMessage"></p>
-        <input id="userGuess" placeholder="Il tuo numero" type="number">
-        <button id="submitGuess">Verifica</button>
-        <p id="tentativi"></p>
-        <p id="message"></p>
-    </div>
-<style>
-    :root {
-      --default-bg: linear-gradient(to right, #2c3e50, #3498db);
-      --sunset-bg: linear-gradient(to right, #ff7e5f, #feb47b);
-      --forest-bg: linear-gradient(to right, #11998e, #38ef7d);
-      --neon-bg: linear-gradient(to right, #8e2de2, #4a00e0);
-    }
-    * { box-sizing: border-box; }
-    body {
-      font-family: 'Roboto', sans-serif;
-      background: var(--default-bg);
-      color: white;
-      margin: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 1rem;
-      text-align: center;
-      transition: background 1s;
-      position: relative;
-      overflow-x: hidden;
-    }
-    body.default-theme {
-  background-color: #2c3e50;
-  background-image: linear-gradient(to right, #2c3e50, #3498db);
-  color: white;
-}
-
-body.sunset-theme {
-  background-color: #ff7e5f;
-  background-image: linear-gradient(to right, #ff7e5f, #feb47b);
-  color: #2c3e50;
-}
-
-body.forest-theme {
-  background-color: #11998e;
-  background-image: linear-gradient(to right, #11998e, #38ef7d);
-  color: #1b1b1b;
-}
-
-body.neon-theme {
-  background-color: #8e2de2;
-  background-image: linear-gradient(to right, #8e2de2, #4a00e0);
-  color: #ffffff;
-}
-
-    #particles-js {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      z-index: -2;
-    }
-
-    #numberCanvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: -1;
-    }
-
-    h1 {
-      font-family: 'Bangers', cursive;
-      font-size: 3rem;
-      margin: 0 0 20px;
-      color: #FF6347;
-      text-shadow: 2px 2px 10px rgba(0,0,0,0.6);
-      animation: shine 1.5s linear infinite alternate;
-    }
-
-    @keyframes shine {
-      0% {
-        text-shadow: 0 0 20px rgba(255, 255, 255, 0.6), 0 0 30px rgba(255, 255, 255, 0.6);
-      }
-      100% {
-        text-shadow: 0 0 40px rgba(255, 255, 255, 0.9), 0 0 60px rgba(255, 255, 255, 0.9);
-      }
-    }
-
-    .container {
-      background: rgba(255,255,255,0.1);
-      padding: 1.5rem;
-      border-radius: 20px;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 0 15px rgba(0,0,0,0.4);
-      width: 100%;
-      max-width: 400px;
-      margin: 1rem 0;
-      animation: fadeIn 1s ease-out;
-    }
-
-    @keyframes fadeIn {
-      0% { opacity: 0; transform: scale(0.95); }
-      100% { opacity: 1; transform: scale(1); }
-    }
-
-    input, select, button {
-      width: 100%;
-      padding: 0.75rem;
-      margin: 0.5rem 0;
-      font-size: 1rem;
-      border-radius: 10px;
-      border: none;
-      font-weight: bold;
-      box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
-    }
-
-    button {
-      background: #00fff2;
-      color: black;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    button:hover { background: #00cfc4; }
-    .music-btn { background: #e74c3c; color: white; }
-    .home-btn { background: #f39c12; color: black; }
-    .theme-selector { background: #9b59b6; color: white; }
-    .hidden { display: none; }
-
-    #rules {
-      background: rgba(255,255,255,0.1);
-      padding: 1rem;
-      border-radius: 12px;
-      text-align: left;
-      animation: fadeIn 1s ease-out;
-    }
-
-    #rules ul { padding-left: 20px; }
-    #finalMessage h2 {
-      font-size: 2rem;
-      color: gold;
-      text-shadow: 1px 1px 6px #000;
-    }
-
-    img.logo {
-      width: 150px;
-      margin-bottom: 20px;
-    }
-
-    @media screen and (max-width: 480px) {
-      h1 { font-size: 2.2rem; }
-      .container { padding: 1rem; }
-      input, select, button { font-size: 1rem; }
-    }
-  </style>
-</head>
-<body class="default-theme">
-
-<canvas id="numberCanvas"></canvas>
+<!-- BACKGROUND EFFECTS -->
 <div id="particles-js"></div>
-<div id="rules">
-    <h3>📜 Regole:</h3>
-    <ul>
-      <li>Indovina il numero segreto ad ogni livello!</li>
-      <li>Modalità multiplayer con 4 livelli di difficoltà!</li>
-      <li>La modalità hardcore è perfetta da giocare con gli amici!</li>
-    </ul>
-  </div>
-<img src="logo-gioco.png" alt="Logo del Gioco" class="logo">
-<div id="chat" class="container">
-  <h3>💬 Chat</h3>
-  <div id="chat-messages" style="height: 150px; overflow-y: auto; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 10px; margin-bottom: 10px;"></div>
-  <input type="text" id="chat-input" placeholder="Scrivi un messaggio...">
-  <button id="send-chat">Invia</button>
-</div>
-<label for="difficulty">Difficoltà:</label>
-<select id="difficulty">
-  <option value="easy">Facile</option>
-  <option value="medium">Media</option>
-  <option value="hard">Difficile</option>
-  <option value="hardcore">Hardcore</option>
-</select>
+<div class="cosmic-overlay"></div>
+<div class="stars-field" id="starsField"></div>
 
+<!-- LOGO COSMICO -->
+<div class="cosmic-logo">🌌</div>
+
+<!-- Lobby Screen -->
+<div class="container" id="lobby">
+    <h1>🌌 BATTAGLIA GALATTICA</h1>
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <div style="font-family: 'Orbitron', monospace; font-size: 1.2rem; color: var(--accent-cosmic); text-shadow: 0 0 10px var(--accent-cosmic);">
+            MULTIPLAYER INTERGALATTICO
+        </div>
+    </div>
+    
+    <div style="display: flex; align-items: center; justify-content: center; margin: 1.5rem 0;">
+        <span class="status-indicator" id="connectionStatus"></span>
+        <span id="connectionText" style="font-weight: 600; font-size: 1.1rem;">Connessione al Network Galattico...</span>
+    </div>
+
+    <div class="cosmic-card">
+        <h3 style="color: var(--primary-cosmic); margin-bottom: 1rem; font-family: 'Bangers', cursive; font-size: 1.5rem;">🚀 MODALITÀ BATTAGLIA COSMICA</h3>
+        <div style="text-align: left;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1rem 0;">
+                <div style="background: rgba(0,255,242,0.1); padding: 1rem; border-radius: 10px; border: 1px solid var(--primary-cosmic);">
+                    <strong style="color: var(--primary-cosmic);">🎯 OBIETTIVO</strong><br>
+                    <small>10 livelli progressivi<br>Difficoltà crescente<br>Battaglia fino alla fine</small>
+                </div>
+                <div style="background: rgba(255,107,107,0.1); padding: 1rem; border-radius: 10px; border: 1px solid var(--secondary-cosmic);">
+                    <strong style="color: var(--secondary-cosmic);">⚡ FEATURES</strong><br>
+                    <small>Auto-start intelligente<br>Chat tempo reale<br>Classifiche live</small>
+                </div>
+            </div>
+            
+            <div style="background: rgba(255,215,61,0.1); padding: 1.5rem; border-radius: 15px; border: 2px solid var(--accent-cosmic); margin: 1rem 0;">
+                <strong style="color: var(--accent-cosmic); font-size: 1.1rem;">📊 PROGRESSIONE DIFFICOLTÀ GALATTICA:</strong><br><br>
+                <div style="display: grid; grid-template-columns: 1fr; gap: 0.5rem; font-size: 0.9rem;">
+                    <div>🧩 <strong style="color: var(--green-cosmic);">FACILE:</strong> 1-30 → 1-60 → 1-90 → ... → 1-300</div>
+                    <div>⚔️ <strong style="color: var(--primary-cosmic);">MEDIO:</strong> 1-60 → 1-120 → 1-180 → ... → 1-600</div>
+                    <div>🔥 <strong style="color: var(--orange-cosmic);">DIFFICILE:</strong> 1-150 → 1-300 → 1-450 → ... → 1-1500</div>
+                    <div>💀 <strong style="color: var(--secondary-cosmic);">HARDCORE:</strong> 1-300 → 1-600 → 1-900 → ... → 1-3000</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <input type="text" id="playerName" placeholder="🚀 Il tuo nome da Comandante Galattico" maxlength="20" />
+    
+    <select id="difficulty">
+        <option value="easy">🧩 FACILE - Esploratore Spaziale (1-30, 10 tentativi)</option>
+        <option value="medium">⚔️ MEDIO - Guerriero Cosmico (1-60, 8 tentativi)</option>
+        <option value="hard">🔥 DIFFICILE - Maestro Galattico (1-150, 7 tentativi)</option>
+        <option value="hardcore">💀 HARDCORE - Leggenda Universale (1-300, 5 tentativi)</option>
+    </select>
+    
+    <button id="create-game-btn" class="cosmic-sparkle">🏠 CREA STAZIONE SPAZIALE</button>
+    
+    <div style="margin: 2rem 0;">
+        <input type="text" id="room-code" placeholder="🔑 Codice Stazione (es: GALAXY123)" maxlength="10" style="text-transform: uppercase;" />
+        <button id="join-game-btn" class="btn-secondary">🚪 ENTRA NELLA STAZIONE</button>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <button id="random-room-btn" class="btn-warning">🎲 STAZIONE CASUALE</button>
+        <button id="public-rooms-btn" class="btn-success">📋 STAZIONI PUBBLICHE</button>
+    </div>
+    
+    <div id="publicRoomsList" class="hidden cosmic-card">
+        <h3 style="color: var(--green-cosmic); font-family: 'Bangers', cursive;">🌍 STAZIONI GALATTICHE DISPONIBILI:</h3>
+        <div id="roomsList"></div>
+    </div>
+    
+    <button onclick="goHome()" class="btn-danger" style="margin-top: 2rem;">🔙 RITORNA ALLA BASE</button>
+</div>
+
+<!-- Game Screen -->
+<div class="container hidden" id="game">
+    <h2 style="font-family: 'Bangers', cursive; color: var(--primary-cosmic); text-shadow: 0 0 15px var(--primary-cosmic);">
+        🚀 STAZIONE: <span id="room-code-display" class="room-code-display"></span>
+    </h2>
+    
+    <!-- Livello e Punteggi -->
+    <div class="cosmic-progress">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <span style="font-size: 1.3rem; font-weight: 900; color: var(--primary-cosmic);">
+                    🎯 SETTORE <span id="current-level">1</span>/10
+                </span>
+            </div>
+            <div>
+                <span style="font-size: 1rem; opacity: 0.8;">PUNTEGGIO COMANDANTE:</span><br>
+                <span id="my-score" style="font-size: 1.5rem; font-weight: 900; color: var(--accent-cosmic); text-shadow: 0 0 10px var(--accent-cosmic);">0</span>
+            </div>
+        </div>
+    </div>
+    
+    <h3 id="level-info" class="glow-text" style="color: var(--accent-cosmic); font-family: 'Orbitron', monospace;"></h3>
+    
+    <!-- Auto-start notification -->
+    <div id="auto-start-notification" class="auto-start-notification hidden">
+        <div style="text-align: center;">
+            <div style="font-size: 1.3rem; font-weight: 900; margin-bottom: 1rem;">⚡ INIZIALIZZAZIONE BATTAGLIA AUTOMATICA</div>
+            <div style="font-size: 2rem; margin: 1rem 0;">
+                <span id="countdown" class="countdown">10</span>
+            </div>
+            <div style="font-size: 1rem; opacity: 0.9;">Il Comandante della Stazione può iniziare immediatamente</div>
+        </div>
+    </div>
+
+    <!-- Level completed notification -->
+    <div id="level-completed-notification" class="level-completed hidden">
+        <div style="text-align: center;">
+            <h4 style="margin: 0 0 1rem 0; font-family: 'Bangers', cursive; font-size: 1.8rem; color: var(--green-cosmic);">
+                🎉 SETTORE CONQUISTATO!
+            </h4>
+            <p id="level-winner" style="margin: 0; font-size: 1.2rem; font-weight: 700;"></p>
+            <p id="level-score-info" style="margin: 1rem 0 0 0; font-size: 1rem; opacity: 0.9;"></p>
+        </div>
+    </div>
+    
+    <!-- Classifica Live -->
+    <div class="leaderboard">
+        <h4>🏆 CLASSIFICA GALATTICA LIVE</h4>
+        <div id="live-leaderboard"></div>
+    </div>
+    
+    <div class="player-list">
+        <h4 style="color: var(--purple-cosmic); font-family: 'Bangers', cursive;">👥 COMANDANTI IN BATTAGLIA:</h4>
+        <div id="players-list"></div>
+    </div>
+    
+    <div id="game-status" style="margin: 2rem 0;">
+        <!-- Informazioni del livello -->
+        <div id="level-display" class="level-display">
+            <h4>🎯 OBIETTIVO SETTORE GALATTICO</h4>
+            <p id="level-range" style="margin: 0; font-size: 1.3rem; font-weight: 900; color: var(--accent-cosmic);"></p>
+            <p id="level-attempts" style="margin: 1rem 0 0 0; font-size: 1rem; opacity: 0.8;"></p>
+        </div>
+        
+        <!-- Stato del turno -->
+        <div class="cosmic-card">
+            <p id="turnMessage" style="margin: 0; font-weight: 700; font-size: 1.2rem; text-align: center;"></p>
+            <p id="gameInfo" style="margin: 1rem 0 0 0; font-size: 1rem; opacity: 0.8; text-align: center;"></p>
+        </div>
+    </div>
+    
+    <input type="number" id="userGuess" placeholder="🎯 Inserisci coordinate numeriche" style="text-align: center; font-size: 1.2rem;" />
+    <button id="submitGuess" class="cosmic-sparkle">🚀 LANCIA ATTACCO</button>
+    
+    <div id="game-progress" class="cosmic-progress">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <span style="font-size: 1rem; opacity: 0.8;">ATTACCHI LANCIATI:</span><br>
+                <span id="tentativi" style="font-size: 1.5rem; font-weight: 900; color: var(--accent-cosmic);">0</span>
+                <span id="max-attempts" style="font-size: 1rem; opacity: 0.8;"></span>
+            </div>
+            <div id="attempts-remaining" style="font-size: 1.1rem; color: var(--secondary-cosmic); font-weight: 700;"></div>
+        </div>
+        <p id="message" style="font-weight: 700; text-align: center; margin: 1.5rem 0; font-size: 1.2rem; color: var(--primary-cosmic);"></p>
+    </div>
+    
+    <div class="game-history">
+        <div id="history-list"></div>
+    </div>
+    
+    <div class="chat-container">
+        <div id="chat-messages"></div>
+    </div>
+    
+    <div style="display: flex; gap: 0.5rem; margin: 1rem 0;">
+        <input type="text" id="chat-input" placeholder="💬 Messaggio per la flotta..." style="flex: 1;" />
+        <button id="send-chat" style="width: auto; padding: 1rem 1.5rem; background: linear-gradient(45deg, var(--green-cosmic), #4caf50);">📤</button>
+    </div>
+    
+    <div style="margin-top: 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+        <button id="leave-room-btn" class="btn-danger">🚪 ABBANDONA STAZIONE</button>
+        <button id="start-game-btn" class="hidden btn-success">🚀 INIZIA BATTAGLIA</button>
+        <button id="next-level-btn" class="hidden btn-success">➡️ SETTORE SUCCESSIVO</button>
+        <button id="new-game-btn" class="hidden btn-success">🔄 NUOVA BATTAGLIA</button>
+    </div>
+</div>
+
+<!-- Final Leaderboard Screen -->
+<div class="container hidden" id="final-leaderboard-screen">
+    <div class="winner-announcement">
+        <h2 style="font-family: 'Bangers', cursive; font-size: 2.5rem; margin-bottom: 1rem;">
+            🏆 BATTAGLIA GALATTICA COMPLETATA!
+        </h2>
+        <p style="font-size: 1.3rem; font-weight: 700;">Tutti i 10 settori sono stati conquistati!</p>
+        <div style="margin-top: 1rem; font-size: 3rem;">🌌✨🚀</div>
+    </div>
+    
+    <div class="leaderboard">
+        <h3>🥇 HALL OF FAME GALATTICA</h3>
+        <div id="final-leaderboard"></div>
+    </div>
+    
+    <div class="cosmic-card">
+        <h4 style="color: var(--accent-cosmic); font-family: 'Bangers', cursive; margin-bottom: 1rem;">📈 STATISTICHE BATTAGLIA FINALE:</h4>
+        <div id="game-stats"></div>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 2rem;">
+        <button id="play-again-btn" class="btn-success cosmic-sparkle">🔄 NUOVA BATTAGLIA</button>
+        <button id="back-to-lobby-btn" class="btn-warning">🏠 RITORNA ALLA BASE</button>
+    </div>
+</div>
+
+<script>
+// INIZIALIZZAZIONE EFFETTI COSMICI
+document.addEventListener('DOMContentLoaded', function() {
+    initializeCosmicEffects();
+    initializeParticles();
+    createStarField();
+    createShootingStars();
+});
+
+function initializeCosmicEffects() {
+    // Aggiungi effetti di hover dinamici
+    const cards = document.querySelectorAll('.cosmic-card, .container');
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px) scale(1.02)';
+            this.style.boxShadow = '0 0 40px rgba(0,255,242,0.4)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+            this.style.boxShadow = '0 0 30px rgba(0,255,242,0.3)';
+        });
+    });
+}
+
+function initializeParticles() {
+    particlesJS("particles-js", {
+        particles: {
+            number: { value: 120, density: { enable: true, value_area: 800 } },
+            color: { value: ["#00fff2", "#ff6b6b", "#ffd93d", "#9966ff", "#00ff66"] },
+            shape: { 
+                type: ["circle", "triangle", "polygon"],
+                polygon: { nb_sides: 6 }
+            },
+            opacity: { 
+                value: 0.8, 
+                random: true,
+                anim: { enable: true, speed: 1.5, opacity_min: 0.2 }
+            },
+            size: { 
+                value: 5, 
+                random: true,
+                anim: { enable: true, speed: 3, size_min: 1 }
+            },
+            line_linked: {
+                enable: true,
+                distance: 180,
+                color: "#00fff2",
+                opacity: 0.6,
+                width: 2
+            },
+            move: {
+                enable: true,
+                speed: 4,
+                direction: "none",
+                random: true,
+                straight: false,
+                out_mode: "out",
+                bounce: false,
+                attract: { enable: true, rotateX: 800, rotateY: 1600 }
+            }
+        },
+        interactivity: {
+            detect_on: "canvas",
+            events: {
+                onhover: { enable: true, mode: "repulse" },
+                onclick: { enable: true, mode: "push" },
+                resize: true
+            },
+            modes: {
+                repulse: { distance: 150, duration: 0.4 },
+                push: { particles_nb: 8 }
+            }
+        },
+        retina_detect: true
+    });
+}
+
+function createStarField() {
+    const starsField = document.getElementById('starsField');
+    const numStars = 200;
+    
+    for (let i = 0; i < numStars; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.width = star.style.height = (Math.random() * 3 + 1) + 'px';
+        star.style.animationDelay = Math.random() * 3 + 's';
+        star.style.animationDuration = (Math.random() * 4 + 2) + 's';
+        starsField.appendChild(star);
+    }
+}
+
+function createShootingStars() {
+    setInterval(() => {
+        const shootingStar = document.createElement('div');
+        shootingStar.className = 'shooting-star';
+        shootingStar.style.left = Math.random() * 100 + '%';
+        shootingStar.style.top = Math.random() * 50 + '%';
+        document.getElementById('starsField').appendChild(shootingStar);
+        
+        setTimeout(() => {
+            shootingStar.remove();
+        }, 4000);
+    }, 3000);
+}
+
+// FUNZIONE PER TORNARE AL MENU PRINCIPALE
+function goHome() {
+    // Controlla se esiste un URL di ritorno salvato
+    const returnUrl = localStorage.getItem('numeroquest_return_url');
+    if (returnUrl) {
+        window.location.href = returnUrl;
+    } else {
+        // Fallback al file index.html
+        window.location.href = 'index.html';
+    }
+}
+
+// EFFETTI CONFETTI COSMICI
+function triggerCosmicConfetti() {
+    const colors = ['#00fff2', '#ff6b6b', '#ffd93d', '#9966ff', '#00ff66'];
+    
+    confetti({
+        particleCount: 200,
+        spread: 100,
+        origin: { y: 0.6 },
+        colors: colors,
+        shapes: ['star', 'circle'],
+        gravity: 0.8,
+        drift: 0.1
+    });
+    
+    // Secondo burst
+    setTimeout(() => {
+        confetti({
+            particleCount: 150,
+            spread: 80,
+            origin: { y: 0.7 },
+            colors: colors,
+            shapes: ['star'],
+            gravity: 0.6
+        });
+    }, 300);
+}
+
+// NOTIFICHE COSMICHE
+function showCosmicNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: rgba(0,0,0,0.9);
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 15px;
+        border: 2px solid var(--primary-cosmic);
+        backdrop-filter: blur(10px);
+        z-index: 10000;
+        animation: slideInRight 0.5s ease-out;
+        font-weight: 600;
+        box-shadow: 0 0 20px rgba(0,255,242,0.5);
+    `;
+    
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOutRight 0.5s ease-in';
+        setTimeout(() => notification.remove(), 500);
+    }, 3000);
+}
+
+// AGGIUNGI STILI PER LE ANIMAZIONI DELLE NOTIFICHE
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideInRight {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    
+    @keyframes slideOutRight {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+    }
+`;
+document.head.appendChild(style);
+</script>
+
+</body>
+</html>
