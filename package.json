@@ -1,13 +1,24 @@
 {
-  "name": "socket-room-example",
+  "name": "numero-quest-multiplayer",
   "version": "1.0.0",
+  "description": "🌌 Numero Quest: Battaglia Galattica Multiplayer - Un gioco di indovinare numeri multiplayer con Socket.io",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "keywords": ["game", "multiplayer", "socket.io", "nodejs", "guessing-game", "realtime"],
+  "author": "Numero Quest Team",
+  "license": "MIT",
   "dependencies": {
     "express": "^4.18.2",
-    "nanoid": "^5.1.5",
-    "socket.io": "^4.5.0"
+    "socket.io": "^4.7.4"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
