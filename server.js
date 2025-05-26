@@ -39,44 +39,48 @@ const wss = new WebSocket.Server({ server })
 const rooms = new Map()
 const players = new Map()
 
-// Configurazioni difficoltà
+// Configurazioni difficoltà EPICHE! 🚀
 const DIFFICULTY_CONFIGS = {
   easy: {
-    name: "Principiante",
+    name: "🌟 Principiante",
     maxNumber: 50,
     maxAttempts: 5,
     turnTimeLimit: 45,
     pointsBase: 5,
     pointsBonus: 3,
-    levelsToWin: 10
+    levelsToWin: 10,
+    levelMultiplier: 5, // Aumenta range di 5 per livello
   },
   normal: {
-    name: "Guerriero", 
+    name: "⚡ Guerriero",
     maxNumber: 100,
     maxAttempts: 3,
     turnTimeLimit: 30,
     pointsBase: 10,
     pointsBonus: 5,
-    levelsToWin: 10
+    levelsToWin: 10,
+    levelMultiplier: 10,
   },
   hard: {
-    name: "Comandante",
+    name: "🔥 Comandante",
     maxNumber: 200,
     maxAttempts: 2,
     turnTimeLimit: 20,
     pointsBase: 15,
     pointsBonus: 8,
-    levelsToWin: 10
+    levelsToWin: 10,
+    levelMultiplier: 20,
   },
   expert: {
-    name: "Leggenda",
+    name: "💀 Leggenda",
     maxNumber: 500,
     maxAttempts: 1,
     turnTimeLimit: 15,
     pointsBase: 25,
     pointsBonus: 15,
-    levelsToWin: 10
-  }
+    levelsToWin: 10,
+    levelMultiplier: 50,
+  },
 }
 
 function generateRoomCode() {
@@ -107,51 +111,69 @@ function broadcastToRoom(roomCode, message) {
 
 function checkLevelComplete(room) {
   // Controlla se qualcuno ha raggiunto il punteggio per il prossimo livello
-  const config = DIFFICULTY_CONFIGS[room.difficulty]
-  const pointsNeeded = room.currentLevel * 50 // 50 punti per livello
-  
-  const levelWinner = room.players.find(player => player.score >= pointsNeeded)
-  
+  const config = room.config
+  const pointsNeeded = room.currentLevel * 100 // 100 punti per livello
+
+  const levelWinner = room.players.find((player) => player.score >= pointsNeeded)
+
   if (levelWinner && room.currentLevel < config.levelsToWin) {
     room.currentLevel++
-    room.secretNumber = generateSecretNumber(config.maxNumber + (room.currentLevel * 10)) // Aumenta difficoltà
+
+    // Aumenta difficoltà per il nuovo livello
+    const newMaxNumber = config.maxNumber + (room.currentLevel - 1) * config.levelMultiplier
+    room.secretNumber = generateSecretNumber(newMaxNumber)
     room.currentPlayerIndex = 0
     room.currentAttempts = 0
-    
+    room.currentRound = 1
+
     room.chat.push({
       playerName: "Sistema",
       message: `🎉 ${levelWinner.name} ha completato il livello ${room.currentLevel - 1}!`,
       timestamp: Date.now(),
     })
-    
-    room.chat.push({
-      playerName: "Sistema", 
-      message: `🆙 LIVELLO ${room.currentLevel}! Nuovo numero segreto (1-${config.maxNumber + (room.currentLevel * 10)})`,
-      timestamp: Date.now(),
-    })
-    
-    return true
-  }
-  
-  // Controlla vittoria finale
-  if (room.currentLevel >= config.levelsToWin) {
-    const winner = room.players.reduce((prev, current) => 
-      (prev.score > current.score) ? prev : current
-    )
-    
-    room.gameEnded = true
-    room.winner = winner
-    
+
     room.chat.push({
       playerName: "Sistema",
-      message: `🏆 VITTORIA! ${winner.name} è il COMANDANTE SUPREMO con ${winner.score} punti!`,
+      message: `🆙 LIVELLO ${room.currentLevel}! Nuovo numero segreto (1-${newMaxNumber})`,
       timestamp: Date.now(),
     })
-    
+
+    room.chat.push({
+      playerName: "Sistema",
+      message: `🎯 È il turno di ${room.players[0].name}! Difficoltà aumentata!`,
+      timestamp: Date.now(),
+    })
+
     return true
   }
-  
+
+  // Controlla vittoria finale
+  if (room.currentLevel >= config.levelsToWin) {
+    const winner = room.players.reduce((prev, current) => (prev.score > current.score ? prev : current))
+
+    room.gameEnded = true
+    room.winner = winner
+
+    room.chat.push({
+      playerName: "Sistema",
+      message: `🏆 VITTORIA EPICA! ${winner.name} è il COMANDANTE SUPREMO GALATTICO!`,
+      timestamp: Date.now(),
+    })
+
+    room.chat.push({
+      playerName: "Sistema",
+      message: `👑 Punteggio finale: ${winner.score} punti! Una leggenda è nata!`,
+      timestamp: Date.now(),
+    })
+
+    return true
+  }
+
   return false
+}
+
+function getCurrentMaxNumber(room) {
+  return room.config.maxNumber + (room.currentLevel - 1) * room.config.levelMultiplier
 }
 
 // WebSocket connection handler
@@ -161,7 +183,7 @@ wss.on("connection", (ws) => {
   ws.send(
     JSON.stringify({
       type: "connected",
-      message: "Connected to server!",
+      message: "Connected to Galactic Server!",
     }),
   )
 
@@ -176,9 +198,9 @@ wss.on("connection", (ws) => {
             console.log(`🏠 Creating room for ${message.playerName}`)
 
             const roomCode = generateRoomCode()
-            const difficulty = message.difficulty || 'normal'
+            const difficulty = message.difficulty || "normal"
             const config = DIFFICULTY_CONFIGS[difficulty]
-            
+
             const room = {
               roomCode,
               difficulty,
@@ -198,11 +220,17 @@ wss.on("connection", (ws) => {
               chat: [
                 {
                   playerName: "Sistema",
-                  message: `🚀 Stanza ${roomCode} creata in modalità ${config.name}!`,
+                  message: `🚀 Stazione Galattica ${roomCode} creata in modalità ${config.name}!`,
+                  timestamp: Date.now(),
+                },
+                {
+                  playerName: "Sistema",
+                  message: `⚔️ Preparatevi per 10 livelli di battaglia epica!`,
                   timestamp: Date.now(),
                 },
               ],
               currentLevel: 1,
+              currentRound: 0,
               currentPlayerIndex: 0,
               maxAttempts: config.maxAttempts,
               currentAttempts: 0,
@@ -233,7 +261,17 @@ wss.on("connection", (ws) => {
               ws.send(
                 JSON.stringify({
                   type: "error",
-                  message: "❌ Stanza non trovata!",
+                  message: "❌ Stazione Galattica non trovata!",
+                }),
+              )
+              break
+            }
+
+            if (room.gameStarted) {
+              ws.send(
+                JSON.stringify({
+                  type: "error",
+                  message: "❌ Battaglia già in corso! Aspetta la prossima!",
                 }),
               )
               break
@@ -251,7 +289,7 @@ wss.on("connection", (ws) => {
 
               room.chat.push({
                 playerName: "Sistema",
-                message: `🚀 ${message.playerName} si è unito alla battaglia ${room.config.name}!`,
+                message: `🚀 Comandante ${message.playerName} si è unito alla battaglia ${room.config.name}!`,
                 timestamp: Date.now(),
               })
             }
@@ -286,7 +324,7 @@ wss.on("connection", (ws) => {
               ws.send(
                 JSON.stringify({
                   type: "error",
-                  message: "❌ Stanza non trovata!",
+                  message: "❌ Stazione non trovata!",
                 }),
               )
               break
@@ -297,7 +335,7 @@ wss.on("connection", (ws) => {
               ws.send(
                 JSON.stringify({
                   type: "error",
-                  message: "❌ Solo l'host può iniziare!",
+                  message: "❌ Solo il comandante principale può iniziare!",
                 }),
               )
               break
@@ -307,7 +345,7 @@ wss.on("connection", (ws) => {
               ws.send(
                 JSON.stringify({
                   type: "error",
-                  message: "❌ Servono almeno 2 giocatori!",
+                  message: "❌ Servono almeno 2 comandanti per la battaglia!",
                 }),
               )
               break
@@ -317,40 +355,41 @@ wss.on("connection", (ws) => {
               ws.send(
                 JSON.stringify({
                   type: "error",
-                  message: "❌ Gioco già iniziato!",
+                  message: "❌ Battaglia già in corso!",
                 }),
               )
               break
             }
 
-            // START THE GAME!
-            console.log(`🚀 Starting game for room ${message.roomCode}`)
+            // START THE EPIC BATTLE! 🚀
+            console.log(`🚀 Starting EPIC battle for room ${message.roomCode}`)
 
             room.gameStarted = true
             room.secretNumber = generateSecretNumber(room.config.maxNumber)
             room.currentLevel = 1
+            room.currentRound = 1
             room.currentPlayerIndex = 0
             room.currentAttempts = 0
 
             room.chat.push({
               playerName: "Sistema",
-              message: `🎯 BATTAGLIA ${room.config.name.toUpperCase()} INIZIATA!`,
+              message: `⚔️ BATTAGLIA GALATTICA ${room.config.name.toUpperCase()} INIZIATA!`,
               timestamp: Date.now(),
             })
 
             room.chat.push({
               playerName: "Sistema",
-              message: `📊 LIVELLO 1 - Indovinate il numero (1-${room.config.maxNumber})`,
+              message: `🎯 LIVELLO 1 - Indovinate il numero segreto (1-${room.config.maxNumber})`,
               timestamp: Date.now(),
             })
 
             room.chat.push({
               playerName: "Sistema",
-              message: `🎮 È il turno di ${room.players[0].name}! (${room.config.maxAttempts} tentativi, ${room.config.turnTimeLimit}s)`,
+              message: `🎮 È il turno del comandante ${room.players[0].name}! (${room.config.maxAttempts} tentativi, ${room.config.turnTimeLimit}s)`,
               timestamp: Date.now(),
             })
 
-            console.log(`✅ Game started! Secret number: ${room.secretNumber}`)
+            console.log(`✅ Epic battle started! Secret number: ${room.secretNumber}`)
 
             // Broadcast to all players
             broadcastToRoom(message.roomCode, {
@@ -369,7 +408,7 @@ wss.on("connection", (ws) => {
               ws.send(
                 JSON.stringify({
                   type: "error",
-                  message: "❌ Gioco non attivo!",
+                  message: "❌ Battaglia non attiva!",
                 }),
               )
               break
@@ -380,7 +419,7 @@ wss.on("connection", (ws) => {
               ws.send(
                 JSON.stringify({
                   type: "error",
-                  message: `❌ Non è il tuo turno! È il turno di ${currentPlayer?.name || "qualcuno"}`,
+                  message: `❌ Non è il tuo turno! È il turno del comandante ${currentPlayer?.name || "sconosciuto"}`,
                 }),
               )
               break
@@ -390,7 +429,7 @@ wss.on("connection", (ws) => {
               ws.send(
                 JSON.stringify({
                   type: "error",
-                  message: "❌ Hai esaurito i tentativi!",
+                  message: "❌ Hai esaurito i tuoi tentativi!",
                 }),
               )
               break
@@ -398,45 +437,54 @@ wss.on("connection", (ws) => {
 
             room.currentAttempts++
             const guess = Number.parseInt(message.guess)
+            const currentMaxNumber = getCurrentMaxNumber(room)
             let hint = ""
             let correct = false
 
             if (guess === room.secretNumber) {
               correct = true
-              hint = "🎉 CORRETTO!"
+              hint = "🎉 VITTORIA GALATTICA!"
 
-              // Calcola punti con bonus
-              const bonusPoints = (room.config.maxAttempts - room.currentAttempts + 1) * room.config.pointsBonus
-              const totalPoints = room.config.pointsBase + bonusPoints + (room.currentLevel * 5)
+              // Calcola punti con bonus epici
+              const speedBonus = (room.config.maxAttempts - room.currentAttempts + 1) * room.config.pointsBonus
+              const levelBonus = room.currentLevel * 10
+              const totalPoints = room.config.pointsBase + speedBonus + levelBonus
               currentPlayer.score += totalPoints
 
               room.chat.push({
                 playerName: "Sistema",
-                message: `🏆 ${message.playerName} ha indovinato ${guess}! +${totalPoints} punti (Livello ${room.currentLevel})`,
+                message: `🏆 EPICO! ${message.playerName} ha indovinato ${guess}! +${totalPoints} punti (Livello ${room.currentLevel})`,
                 timestamp: Date.now(),
               })
 
               // Controlla se il livello è completato
               setTimeout(() => {
                 const levelChanged = checkLevelComplete(room)
-                
+
                 if (!room.gameEnded) {
                   if (levelChanged) {
-                    // Nuovo livello
+                    // Nuovo livello - ricomincia dal primo giocatore
                     room.chat.push({
                       playerName: "Sistema",
-                      message: `🎮 È il turno di ${room.players[0].name}!`,
+                      message: `🎮 È il turno del comandante ${room.players[0].name}! Nuova sfida!`,
                       timestamp: Date.now(),
                     })
                   } else {
                     // Nuovo round stesso livello
-                    room.secretNumber = generateSecretNumber(room.config.maxNumber + (room.currentLevel * 10))
+                    room.secretNumber = generateSecretNumber(currentMaxNumber)
+                    room.currentRound++
                     room.currentPlayerIndex = 0
                     room.currentAttempts = 0
 
                     room.chat.push({
                       playerName: "Sistema",
-                      message: `🔄 Nuovo numero generato per il Livello ${room.currentLevel}!`,
+                      message: `🔄 Round ${room.currentRound} - Livello ${room.currentLevel}! Nuovo numero generato!`,
+                      timestamp: Date.now(),
+                    })
+
+                    room.chat.push({
+                      playerName: "Sistema",
+                      message: `🎯 È il turno del comandante ${room.players[0].name}!`,
                       timestamp: Date.now(),
                     })
                   }
@@ -446,19 +494,19 @@ wss.on("connection", (ws) => {
                   type: "gameUpdate",
                   gameData: room,
                 })
-              }, 2000)
+              }, 3000)
             } else if (guess < room.secretNumber) {
-              hint = "📈 Troppo basso!"
+              hint = "📈 Troppo basso, comandante!"
               room.chat.push({
                 playerName: "Sistema",
-                message: `${message.playerName}: ${guess} - Troppo basso! (${room.config.maxAttempts - room.currentAttempts} tentativi rimasti)`,
+                message: `${message.playerName}: ${guess} - Troppo basso! 📈 (${room.config.maxAttempts - room.currentAttempts} tentativi rimasti)`,
                 timestamp: Date.now(),
               })
             } else {
-              hint = "📉 Troppo alto!"
+              hint = "📉 Troppo alto, comandante!"
               room.chat.push({
                 playerName: "Sistema",
-                message: `${message.playerName}: ${guess} - Troppo alto! (${room.config.maxAttempts - room.currentAttempts} tentativi rimasti)`,
+                message: `${message.playerName}: ${guess} - Troppo alto! 📉 (${room.config.maxAttempts - room.currentAttempts} tentativi rimasti)`,
                 timestamp: Date.now(),
               })
             }
@@ -475,7 +523,7 @@ wss.on("connection", (ws) => {
             if (room.currentAttempts >= room.config.maxAttempts && !correct) {
               room.chat.push({
                 playerName: "Sistema",
-                message: `❌ ${message.playerName} ha esaurito i tentativi!`,
+                message: `❌ Il comandante ${message.playerName} ha esaurito i tentativi!`,
                 timestamp: Date.now(),
               })
 
@@ -485,7 +533,7 @@ wss.on("connection", (ws) => {
 
                 room.chat.push({
                   playerName: "Sistema",
-                  message: `🎯 È il turno di ${room.players[room.currentPlayerIndex].name}!`,
+                  message: `🎯 È il turno del comandante ${room.players[room.currentPlayerIndex].name}!`,
                   timestamp: Date.now(),
                 })
 
@@ -493,7 +541,7 @@ wss.on("connection", (ws) => {
                   type: "gameUpdate",
                   gameData: room,
                 })
-              }, 1500)
+              }, 2000)
             }
 
             // Broadcast update
@@ -513,6 +561,11 @@ wss.on("connection", (ws) => {
                 message: message.message,
                 timestamp: Date.now(),
               })
+
+              // Keep only last 50 messages
+              if (room.chat.length > 50) {
+                room.chat = room.chat.slice(-50)
+              }
 
               broadcastToRoom(message.roomCode, {
                 type: "gameUpdate",
@@ -534,7 +587,7 @@ wss.on("connection", (ws) => {
       ws.send(
         JSON.stringify({
           type: "error",
-          message: "Server error: " + error.message,
+          message: "Errore del server: " + error.message,
         }),
       )
     }
@@ -555,12 +608,33 @@ wss.on("connection", (ws) => {
             const player = room.players[playerIndex]
             room.players.splice(playerIndex, 1)
 
+            room.chat.push({
+              playerName: "Sistema",
+              message: `👋 Il comandante ${player.name} ha abbandonato la stazione`,
+              timestamp: Date.now(),
+            })
+
             if (room.players.length === 0) {
               rooms.delete(roomCode)
               console.log(`🗑️ Room ${roomCode} deleted (empty)`)
             } else {
               if (player.isHost && room.players.length > 0) {
                 room.players[0].isHost = true
+                room.chat.push({
+                  playerName: "Sistema",
+                  message: `👑 ${room.players[0].name} è ora il nuovo comandante principale`,
+                  timestamp: Date.now(),
+                })
+              }
+
+              if (room.gameStarted && room.players.length === 1) {
+                room.gameStarted = false
+                room.gameEnded = true
+                room.chat.push({
+                  playerName: "Sistema",
+                  message: `⏸️ Battaglia sospesa - Serve almeno 2 comandanti`,
+                  timestamp: Date.now(),
+                })
               }
 
               broadcastToRoom(roomCode, {
@@ -581,10 +655,21 @@ wss.on("connection", (ws) => {
   })
 })
 
+// Cleanup periodico delle stanze vuote
+setInterval(() => {
+  for (const [roomCode, room] of rooms.entries()) {
+    if (room.players.length === 0) {
+      rooms.delete(roomCode)
+      console.log(`🧹 Pulizia stanza vuota: ${roomCode}`)
+    }
+  }
+}, 300000) // Ogni 5 minuti
+
 const PORT = process.env.PORT || 3000
 const HOST = process.env.HOST || "0.0.0.0"
 
 server.listen(PORT, HOST, () => {
-  console.log(`🚀 Server running on ${HOST}:${PORT}`)
-  console.log(`🌐 Open http://localhost:${PORT} to play`)
+  console.log(`🚀 Galactic Server running on ${HOST}:${PORT}`)
+  console.log(`🌐 Open http://localhost:${PORT}/cristo.html for home`)
+  console.log(`🎮 Open http://localhost:${PORT}/index.html for multiplayer`)
 })
