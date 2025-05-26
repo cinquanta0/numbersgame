@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Battaglia Galattica - Debug</title>
+    <title>Battaglia Galattica - Multiplayer a Turni</title>
     <style>
         * {
             margin: 0;
@@ -56,6 +56,11 @@
 
         .input::placeholder {
             color: rgba(156, 163, 175, 1);
+        }
+
+        .input:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         .button {
@@ -130,15 +135,53 @@
             color: #fbbf24;
         }
 
-        .debug {
-            background: rgba(0, 0, 0, 0.6);
+        .turn-indicator {
+            text-align: center;
             padding: 1rem;
             border-radius: 0.5rem;
             margin-bottom: 1rem;
-            font-family: monospace;
-            font-size: 0.9rem;
-            max-height: 200px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .turn-active {
+            background: rgba(16, 185, 129, 0.3);
+            border: 2px solid #10b981;
+            color: #10b981;
+            animation: pulse 2s infinite;
+        }
+
+        .turn-waiting {
+            background: rgba(251, 191, 36, 0.2);
+            border: 1px solid #fbbf24;
+            color: #fbbf24;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        .chat {
+            height: 200px;
             overflow-y: auto;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .chat-message {
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .chat-message.system {
+            background: rgba(34, 211, 238, 0.2);
+            border-left: 3px solid #22d3ee;
         }
 
         .leaderboard {
@@ -154,6 +197,13 @@
             margin-bottom: 0.5rem;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 0.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .player.current-turn {
+            background: rgba(16, 185, 129, 0.3);
+            border: 2px solid #10b981;
+            transform: scale(1.02);
         }
 
         .notification {
@@ -198,18 +248,12 @@
         <!-- Notification -->
         <div id="notification" class="notification hidden"></div>
 
-        <!-- Debug Console -->
-        <div class="card">
-            <h3>🐛 Debug Console</h3>
-            <div id="debug-console" class="debug"></div>
-            <button onclick="clearDebug()" class="button button-secondary" style="width: auto; padding: 0.5rem 1rem;">
-                Pulisci Console
-            </button>
-        </div>
-
         <!-- Lobby Screen -->
         <div id="lobby-screen">
-            <h1 class="title">🌌 BATTAGLIA GALATTICA (DEBUG)</h1>
+            <h1 class="title">🌌 BATTAGLIA GALATTICA</h1>
+            <p style="text-align: center; margin-bottom: 2rem; font-size: 1.1rem; opacity: 0.8;">
+                🎯 Gioco a turni - Indovina il numero segreto prima degli altri!
+            </p>
             
             <!-- Connection Status -->
             <div id="connection-status" class="status status-connecting">
@@ -232,6 +276,18 @@
                     🚪 Entra nella Stazione
                 </button>
             </div>
+
+            <!-- Info -->
+            <div class="card">
+                <h3 style="margin-bottom: 1rem;">ℹ️ Come Giocare</h3>
+                <ul style="line-height: 1.6;">
+                    <li>🎯 <strong>Obiettivo:</strong> Indovina il numero segreto (1-100)</li>
+                    <li>⏰ <strong>Turni:</strong> 30 secondi e 3 tentativi per turno</li>
+                    <li>🏆 <strong>Punteggio:</strong> Più veloce indovini, più punti ottieni</li>
+                    <li>👥 <strong>Multiplayer:</strong> Servono almeno 2 giocatori</li>
+                    <li>💬 <strong>Chat:</strong> Comunica con gli altri comandanti</li>
+                </ul>
+            </div>
         </div>
 
         <!-- Game Screen -->
@@ -246,24 +302,40 @@
                 </div>
             </div>
 
+            <!-- Turn Indicator -->
+            <div id="turn-indicator" class="turn-indicator hidden">
+                <div id="turn-text">In attesa...</div>
+            </div>
+
             <div class="grid">
                 <!-- Game Area -->
                 <div>
                     <!-- Game Info -->
                     <div class="card">
-                        <h3 style="margin-bottom: 1rem;">🎯 Controlli Gioco</h3>
+                        <h3 style="margin-bottom: 1rem;">🎯 Obiettivo</h3>
+                        <p style="margin-bottom: 1rem;">Indovina il numero segreto tra 1 e 100!</p>
+                        
+                        <div id="game-controls" class="hidden">
+                            <input type="number" id="guess-input" class="input" placeholder="Il tuo numero" min="1" max="100" disabled>
+                            <button id="submit-guess" class="button button-success" disabled>🚀 Attacca!</button>
+                            <div id="attempts-info" style="text-align: center; margin-top: 0.5rem; opacity: 0.8;"></div>
+                        </div>
                         
                         <div id="start-controls">
                             <button id="start-game" class="button button-success">🎮 Inizia Battaglia</button>
-                            <p id="player-count" style="text-align: center; margin-top: 0.5rem; opacity: 0.8; font-size: 0.9rem;">
-                                Caricamento...
+                            <p style="text-align: center; margin-top: 0.5rem; opacity: 0.8; font-size: 0.9rem;">
+                                Servono almeno 2 giocatori per iniziare
                             </p>
                         </div>
+                    </div>
 
-                        <div id="game-status" style="margin-top: 1rem; padding: 1rem; background: rgba(0,0,0,0.3); border-radius: 0.5rem;">
-                            <div>Stato gioco: <span id="game-state">Non iniziato</span></div>
-                            <div>Giocatori: <span id="players-count">0</span></div>
-                            <div>Round: <span id="current-round">0</span></div>
+                    <!-- Chat -->
+                    <div class="card">
+                        <h3 style="margin-bottom: 1rem;">💬 Chat Galattica</h3>
+                        <div id="chat-messages" class="chat"></div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <input type="text" id="chat-input" class="input" placeholder="Scrivi un messaggio..." style="margin-bottom: 0;">
+                            <button id="send-chat" class="button button-success" style="width: auto; padding: 0.75rem;">📤</button>
                         </div>
                     </div>
                 </div>
@@ -271,7 +343,7 @@
                 <!-- Leaderboard -->
                 <div>
                     <div class="card">
-                        <h3 style="margin-bottom: 1rem;">🏆 Giocatori</h3>
+                        <h3 style="margin-bottom: 1rem;">🏆 Classifica</h3>
                         <div id="leaderboard" class="leaderboard"></div>
                     </div>
                 </div>
@@ -287,22 +359,8 @@
         let playerName = '';
         let connectionStatus = 'connecting';
 
-        // Debug function
-        function debugLog(message) {
-            const console = document.getElementById('debug-console');
-            const time = new Date().toLocaleTimeString();
-            console.innerHTML += `[${time}] ${message}\n`;
-            console.scrollTop = console.scrollHeight;
-            console.log(message);
-        }
-
-        function clearDebug() {
-            document.getElementById('debug-console').innerHTML = '';
-        }
-
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            debugLog('🚀 Applicazione caricata');
             setupEventListeners();
             connectToServer();
         });
@@ -311,9 +369,18 @@
             document.getElementById('create-room').addEventListener('click', createRoom);
             document.getElementById('join-room').addEventListener('click', joinRoom);
             document.getElementById('start-game').addEventListener('click', startGame);
+            document.getElementById('submit-guess').addEventListener('click', submitGuess);
+            document.getElementById('send-chat').addEventListener('click', sendChat);
             document.getElementById('leave-room').addEventListener('click', leaveRoom);
             
-            debugLog('✅ Event listeners configurati');
+            // Enter key handlers
+            document.getElementById('guess-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !this.disabled) submitGuess();
+            });
+            
+            document.getElementById('chat-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') sendChat();
+            });
         }
 
         function connectToServer() {
@@ -321,12 +388,12 @@
                 const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
                 const wsUrl = `${protocol}//${window.location.host}`;
                 
-                debugLog(`🔗 Connessione a: ${wsUrl}`);
+                console.log('🔗 Connessione a:', wsUrl);
                 
                 ws = new WebSocket(wsUrl);
                 
                 ws.onopen = function() {
-                    debugLog('✅ Connesso al server!');
+                    console.log('✅ Connesso al server!');
                     connectionStatus = 'online';
                     updateConnectionStatus();
                     showNotification('🌐 Connesso al server!', 'success');
@@ -335,15 +402,14 @@
                 ws.onmessage = function(event) {
                     try {
                         const data = JSON.parse(event.data);
-                        debugLog(`📨 Messaggio ricevuto: ${data.type}`);
                         handleServerMessage(data);
                     } catch (e) {
-                        debugLog(`❌ Errore parsing messaggio: ${e.message}`);
+                        console.error('Errore parsing messaggio:', e);
                     }
                 };
                 
                 ws.onclose = function() {
-                    debugLog('🔌 Connessione chiusa');
+                    console.log('🔌 Connessione chiusa');
                     connectionStatus = 'offline';
                     updateConnectionStatus();
                     showNotification('🔴 Connessione persa', 'error');
@@ -353,13 +419,13 @@
                 };
                 
                 ws.onerror = function(error) {
-                    debugLog(`❌ Errore WebSocket: ${error}`);
+                    console.error('❌ Errore WebSocket:', error);
                     connectionStatus = 'offline';
                     updateConnectionStatus();
                 };
                 
             } catch (error) {
-                debugLog(`❌ Errore connessione: ${error.message}`);
+                console.error('❌ Errore connessione:', error);
                 connectionStatus = 'offline';
                 updateConnectionStatus();
                 showNotification('❌ Errore di connessione', 'error');
@@ -367,35 +433,35 @@
         }
 
         function handleServerMessage(data) {
-            debugLog(`📨 Gestendo messaggio: ${data.type}`);
+            console.log('📨 Messaggio ricevuto:', data.type);
             
             switch (data.type) {
                 case 'connected':
-                    debugLog('✅ Connessione confermata dal server');
+                    console.log('✅ Connessione confermata');
                     break;
                     
                 case 'roomCreated':
-                    debugLog(`🏠 Stanza creata: ${data.gameData.roomCode}`);
                     gameData = data.gameData;
                     showGameScreen();
                     showNotification('🚀 Stazione creata!', 'success');
                     break;
                     
                 case 'roomJoined':
-                    debugLog(`🚪 Entrato nella stanza: ${data.gameData.roomCode}`);
                     gameData = data.gameData;
                     showGameScreen();
                     showNotification('🚪 Ti sei unito alla stazione!', 'success');
                     break;
                     
                 case 'gameUpdate':
-                    debugLog(`🔄 Aggiornamento gioco ricevuto`);
                     gameData = data.gameData;
                     updateGameDisplay();
                     break;
                     
+                case 'guessResult':
+                    showNotification(data.result.hint, data.result.correct ? 'success' : 'info');
+                    break;
+                    
                 case 'error':
-                    debugLog(`❌ Errore dal server: ${data.message}`);
                     showNotification(data.message, 'error');
                     break;
                     
@@ -404,17 +470,15 @@
                     break;
                     
                 default:
-                    debugLog(`❓ Tipo messaggio sconosciuto: ${data.type}`);
+                    console.log('❓ Tipo messaggio sconosciuto:', data.type);
             }
         }
 
         function sendMessage(message) {
             if (ws && ws.readyState === WebSocket.OPEN) {
-                debugLog(`📤 Invio messaggio: ${message.type}`);
                 ws.send(JSON.stringify(message));
                 return true;
             } else {
-                debugLog('❌ WebSocket non connesso');
                 showNotification('❌ Non connesso al server', 'error');
                 return false;
             }
@@ -446,18 +510,15 @@
         function createRoom() {
             playerName = document.getElementById('player-name').value.trim();
             if (!playerName) {
-                debugLog('❌ Nome giocatore mancante');
                 showNotification('Inserisci il tuo nome!', 'error');
                 return;
             }
 
             if (connectionStatus !== 'online') {
-                debugLog('❌ Non connesso al server');
                 showNotification('Non connesso al server!', 'error');
                 return;
             }
 
-            debugLog(`🏠 Creando stanza per: ${playerName}`);
             sendMessage({
                 type: 'createRoom',
                 playerId: playerId,
@@ -470,24 +531,20 @@
             const roomCode = document.getElementById('room-code').value.trim().toUpperCase();
             
             if (!playerName) {
-                debugLog('❌ Nome giocatore mancante');
                 showNotification('Inserisci il tuo nome!', 'error');
                 return;
             }
             
             if (!roomCode) {
-                debugLog('❌ Codice stanza mancante');
                 showNotification('Inserisci il codice stanza!', 'error');
                 return;
             }
 
             if (connectionStatus !== 'online') {
-                debugLog('❌ Non connesso al server');
                 showNotification('Non connesso al server!', 'error');
                 return;
             }
 
-            debugLog(`🚪 Tentativo di unirsi alla stanza: ${roomCode}`);
             sendMessage({
                 type: 'joinRoom',
                 playerId: playerId,
@@ -497,16 +554,7 @@
         }
 
         function startGame() {
-            if (!gameData) {
-                debugLog('❌ Nessun dato di gioco disponibile');
-                showNotification('Errore: nessun dato di gioco', 'error');
-                return;
-            }
-            
-            debugLog(`🎮 Tentativo di avvio gioco per stanza: ${gameData.roomCode}`);
-            debugLog(`👤 Player ID: ${playerId}`);
-            debugLog(`🏠 È host: ${gameData.players.find(p => p.id === playerId)?.isHost}`);
-            debugLog(`👥 Numero giocatori: ${gameData.players.length}`);
+            if (!gameData) return;
             
             sendMessage({
                 type: 'startGame',
@@ -515,8 +563,42 @@
             });
         }
 
+        function submitGuess() {
+            const guess = parseInt(document.getElementById('guess-input').value);
+            
+            if (isNaN(guess) || guess < 1 || guess > 100) {
+                showNotification('Inserisci un numero tra 1 e 100!', 'error');
+                return;
+            }
+
+            sendMessage({
+                type: 'guess',
+                roomCode: gameData.roomCode,
+                playerId: playerId,
+                playerName: playerName,
+                guess: guess
+            });
+
+            document.getElementById('guess-input').value = '';
+        }
+
+        function sendChat() {
+            const message = document.getElementById('chat-input').value.trim();
+            
+            if (!message) return;
+
+            sendMessage({
+                type: 'chat',
+                roomCode: gameData.roomCode,
+                playerId: playerId,
+                playerName: playerName,
+                message: message
+            });
+
+            document.getElementById('chat-input').value = '';
+        }
+
         function leaveRoom() {
-            debugLog('🚪 Uscita dalla stanza');
             showLobbyScreen();
             gameData = null;
             showNotification('🚪 Hai lasciato la stazione', 'info');
@@ -534,47 +616,71 @@
         }
 
         function updateGameDisplay() {
-            if (!gameData) {
-                debugLog('⚠️ Nessun dato di gioco per aggiornamento display');
-                return;
-            }
-
-            debugLog(`🔄 Aggiornamento display per stanza: ${gameData.roomCode}`);
+            if (!gameData) return;
 
             // Update room code
             document.getElementById('room-display').textContent = gameData.roomCode;
 
-            // Update game status
-            document.getElementById('game-state').textContent = gameData.gameStarted ? 'In corso' : 'In attesa';
-            document.getElementById('players-count').textContent = gameData.players.length;
-            document.getElementById('current-round').textContent = gameData.currentRound || 0;
-
-            // Update player count
-            const playerCountEl = document.getElementById('player-count');
-            playerCountEl.textContent = `Giocatori: ${gameData.players.length}/∞ (min. 2 per iniziare)`;
-
-            // Update start button
+            // Update game controls
+            const currentPlayer = gameData.players[gameData.currentPlayerIndex];
             const isHost = gameData.players.find(p => p.id === playerId)?.isHost;
-            const startButton = document.getElementById('start-game');
+            const isMyTurn = currentPlayer && currentPlayer.id === playerId;
             
             if (gameData.gameStarted) {
-                startButton.textContent = '🎮 Gioco in corso...';
-                startButton.disabled = true;
-            } else if (isHost) {
-                if (gameData.players.length >= 2) {
-                    startButton.textContent = '🎮 Inizia Battaglia';
-                    startButton.disabled = false;
+                document.getElementById('game-controls').classList.remove('hidden');
+                document.getElementById('start-controls').classList.add('hidden');
+                document.getElementById('turn-indicator').classList.remove('hidden');
+                
+                // Update turn controls
+                const guessInput = document.getElementById('guess-input');
+                const submitButton = document.getElementById('submit-guess');
+                
+                guessInput.disabled = !isMyTurn;
+                submitButton.disabled = !isMyTurn;
+                
+                // Update attempts info
+                const attemptsInfo = document.getElementById('attempts-info');
+                if (isMyTurn) {
+                    const attemptsLeft = gameData.maxAttempts - gameData.currentAttempts;
+                    attemptsInfo.textContent = `Tentativi rimasti: ${attemptsLeft}/${gameData.maxAttempts}`;
                 } else {
-                    startButton.textContent = '🎮 Aspetta altri giocatori';
-                    startButton.disabled = true;
+                    attemptsInfo.textContent = '';
                 }
+                
+                updateTurnIndicator();
             } else {
-                startButton.textContent = '⏳ Aspetta che l\'host inizi';
-                startButton.disabled = true;
+                document.getElementById('game-controls').classList.add('hidden');
+                document.getElementById('turn-indicator').classList.add('hidden');
+                
+                if (isHost && gameData.players.length >= 2) {
+                    document.getElementById('start-controls').classList.remove('hidden');
+                } else {
+                    document.getElementById('start-controls').classList.add('hidden');
+                }
             }
 
             // Update leaderboard
             updateLeaderboard();
+
+            // Update chat
+            updateChat();
+        }
+
+        function updateTurnIndicator() {
+            if (!gameData || !gameData.gameStarted) return;
+            
+            const turnIndicator = document.getElementById('turn-indicator');
+            const turnText = document.getElementById('turn-text');
+            const currentPlayer = gameData.players[gameData.currentPlayerIndex];
+            const isMyTurn = currentPlayer && currentPlayer.id === playerId;
+            
+            if (isMyTurn) {
+                turnIndicator.className = 'turn-indicator turn-active';
+                turnText.textContent = `🎯 È il tuo turno! (${gameData.maxAttempts} tentativi)`;
+            } else {
+                turnIndicator.className = 'turn-indicator turn-waiting';
+                turnText.textContent = `⏳ Turno di ${currentPlayer ? currentPlayer.name : 'Sconosciuto'}`;
+            }
         }
 
         function updateLeaderboard() {
@@ -586,23 +692,67 @@
                 return;
             }
 
+            const currentPlayer = gameData.gameStarted ? gameData.players[gameData.currentPlayerIndex] : null;
+
             gameData.players
                 .sort((a, b) => b.score - a.score)
                 .forEach((player, index) => {
                     const playerEl = document.createElement('div');
                     playerEl.className = 'player';
                     
+                    // Evidenzia il giocatore del turno corrente
+                    if (currentPlayer && player.id === currentPlayer.id) {
+                        playerEl.classList.add('current-turn');
+                    }
+                    
                     const icon = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '👤';
                     const hostIcon = player.isHost ? ' 👑' : '';
                     const isCurrentPlayer = player.id === playerId ? ' (Tu)' : '';
+                    const turnIcon = currentPlayer && player.id === currentPlayer.id ? ' 🎯' : '';
                     
                     playerEl.innerHTML = `
-                        <span>${icon} ${player.name}${hostIcon}${isCurrentPlayer}</span>
-                        <span style="color: #fbbf24; font-weight: bold;">${player.score || 0}</span>
+                        <span>${icon} ${player.name}${hostIcon}${isCurrentPlayer}${turnIcon}</span>
+                        <span style="color: #fbbf24; font-weight: bold;">${player.score}</span>
                     `;
                     
                     leaderboard.appendChild(playerEl);
                 });
+        }
+
+        function updateChat() {
+            const chatContainer = document.getElementById('chat-messages');
+            chatContainer.innerHTML = '';
+
+            if (!gameData.chat.length) {
+                chatContainer.innerHTML = '<p style="text-align: center; opacity: 0.6;">Nessun messaggio</p>';
+                return;
+            }
+
+            gameData.chat.slice(-20).forEach(msg => {
+                const msgEl = document.createElement('div');
+                msgEl.className = 'chat-message';
+                
+                // Evidenzia i messaggi di sistema
+                if (msg.playerName === 'Sistema') {
+                    msgEl.classList.add('system');
+                }
+                
+                const time = new Date(msg.timestamp || Date.now()).toLocaleTimeString('it-IT', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                
+                msgEl.innerHTML = `
+                    <div style="font-weight: bold; margin-bottom: 0.25rem;">
+                        ${msg.playerName} <span style="opacity: 0.6; font-size: 0.8rem;">${time}</span>
+                    </div>
+                    <div>${msg.message}</div>
+                `;
+                
+                chatContainer.appendChild(msgEl);
+            });
+
+            chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
         function showNotification(message, type = 'info') {
@@ -623,8 +773,7 @@
             }
         }, 30000);
 
-        debugLog('🎮 Battaglia Galattica Debug caricata!');
-        debugLog(`🆔 Player ID: ${playerId}`);
+        console.log('🎮 Battaglia Galattica caricata!');
     </script>
 </body>
 </html>
