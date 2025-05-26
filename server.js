@@ -598,11 +598,18 @@ function handleGuess(ws, data) {
       }, 2000)
     } else if (guessRoom.currentAttempts >= guessRoom.config.maxAttempts) {
       result.hint = `❌ Tentativi esauriti! Il numero era ${target}. Turno successivo!`
-      addChatMessage(
-        data.roomCode,
-        "Sistema",
-        `💥 ${data.playerName} ha esaurito i tentativi! Il numero era ${target}`
-      )
+     // Messaggio privato solo al giocatore che ha perso
+ws.send(JSON.stringify({
+  type: "privateMessage", 
+  message: `Il numero era ${target}`
+}))
+
+// Messaggio pubblico senza rivelare il numero
+addChatMessage(
+  data.roomCode,
+  "Sistema",
+  `💥 ${data.playerName} ha esaurito i tentativi senza indovinare!`
+)
 
       setTimeout(() => {
         nextPlayer(data.roomCode)
