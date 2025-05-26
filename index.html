@@ -233,135 +233,6 @@
             color: #fbbf24;
         }
 
-        .level-progress {
-            background: rgba(0, 0, 0, 0.6);
-            padding: 1.5rem;
-            border-radius: 20px;
-            margin-bottom: 1.5rem;
-            text-align: center;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .level-title {
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-bottom: 1rem;
-            background: linear-gradient(45deg, #4ecdc4, #44a08d);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .level-bar {
-            width: 100%;
-            height: 25px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            overflow: hidden;
-            margin: 1rem 0;
-            position: relative;
-        }
-
-        .level-fill {
-            height: 100%;
-            background: linear-gradient(45deg, #4ecdc4, #44a08d, #00f5ff);
-            border-radius: 15px;
-            transition: width 0.8s ease;
-            position: relative;
-        }
-
-        .level-fill::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-            animation: shimmer 2s infinite;
-        }
-
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-
-        .difficulty-badge {
-            display: inline-block;
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: bold;
-            margin-bottom: 1rem;
-        }
-
-        .easy { background: linear-gradient(45deg, #4ecdc4, #44a08d); }
-        .normal { background: linear-gradient(45deg, #667eea, #764ba2); }
-        .hard { background: linear-gradient(45deg, #ff6b6b, #ee5a24); }
-        .expert { background: linear-gradient(45deg, #a55eea, #26de81); }
-
-        .turn-indicator {
-            text-align: center;
-            padding: 1.5rem;
-            border-radius: 20px;
-            margin-bottom: 1rem;
-            font-weight: bold;
-            font-size: 1.2rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .turn-active {
-            background: rgba(16, 185, 129, 0.3);
-            border: 3px solid #10b981;
-            color: #10b981;
-            animation: pulse 2s infinite;
-        }
-
-        .turn-waiting {
-            background: rgba(251, 191, 36, 0.2);
-            border: 2px solid #fbbf24;
-            color: #fbbf24;
-        }
-
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-        }
-
-        .game-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .stat-card {
-            background: rgba(0, 0, 0, 0.6);
-            padding: 1rem;
-            border-radius: 15px;
-            text-align: center;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        .stat-card:hover {
-            border-color: #00f5ff;
-            transform: translateY(-2px);
-        }
-
-        .stat-value {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #00f5ff;
-        }
-
-        .stat-label {
-            font-size: 0.9rem;
-            opacity: 0.8;
-            margin-top: 0.5rem;
-        }
-
         .chat {
             height: 280px;
             overflow-y: auto;
@@ -370,20 +241,6 @@
             border-radius: 15px;
             margin-bottom: 1rem;
             border: 2px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .chat::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .chat::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-        }
-
-        .chat::-webkit-scrollbar-thumb {
-            background: rgba(0, 212, 255, 0.5);
-            border-radius: 10px;
         }
 
         .chat-message {
@@ -419,24 +276,6 @@
             background: rgba(255, 255, 255, 0.1);
             border-radius: 15px;
             transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .player::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            transform: translateX(-100%);
-            transition: transform 0.6s;
-        }
-
-        .player:hover::before {
-            transform: translateX(100%);
         }
 
         .player:hover {
@@ -487,42 +326,6 @@
             color: white;
         }
 
-        .victory-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            backdrop-filter: blur(10px);
-        }
-
-        .victory-content {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            padding: 3rem;
-            border-radius: 30px;
-            text-align: center;
-            border: 3px solid #00f5ff;
-            box-shadow: 0 20px 40px rgba(0, 245, 255, 0.3);
-        }
-
-        .victory-title {
-            font-size: 3rem;
-            font-weight: bold;
-            margin-bottom: 1rem;
-            animation: bounce 1s infinite;
-        }
-
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-            40% { transform: translateY(-10px); }
-            60% { transform: translateY(-5px); }
-        }
-
         @media (max-width: 768px) {
             .grid {
                 grid-template-columns: 1fr;
@@ -540,10 +343,6 @@
                 flex-direction: column;
                 gap: 1rem;
             }
-
-            .game-stats {
-                grid-template-columns: repeat(2, 1fr);
-            }
         }
     </style>
 </head>
@@ -554,7 +353,7 @@
     <div class="container">
         <!-- Header con pulsante Home -->
         <div class="header">
-            <a href="cristo.html" class="home-button">
+            <a href="/cristo.html" class="home-button">
                 🏠 Torna alla Home
             </a>
             <h1 class="title">🌌 ARENA GALATTICA</h1>
@@ -563,17 +362,6 @@
 
         <!-- Notification -->
         <div id="notification" class="notification hidden"></div>
-
-        <!-- Victory Screen -->
-        <div id="victory-screen" class="victory-screen hidden">
-            <div class="victory-content">
-                <div class="victory-title">🏆 VITTORIA EPICA!</div>
-                <div id="victory-text"></div>
-                <button class="button button-success" onclick="hideVictoryScreen()" style="margin-top: 2rem; width: auto; padding: 1rem 2rem;">
-                    🎮 Continua
-                </button>
-            </div>
-        </div>
 
         <!-- Lobby Screen -->
         <div id="lobby-screen">
@@ -585,10 +373,6 @@
             <!-- Game Form -->
             <div class="card">
                 <h3 style="margin-bottom: 1rem; text-align: center; font-size: 1.5rem;">🚀 Entra in Battaglia Multiplayer</h3>
-                
-                <div id="difficulty-display" class="difficulty-badge normal" style="display: block; text-align: center; margin-bottom: 1rem;">
-                    ⚡ Modalità Guerriero
-                </div>
                 
                 <input type="text" id="player-name" class="input" placeholder="Il tuo nome da comandante galattico" maxlength="20">
                 
@@ -623,49 +407,11 @@
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
                     <div>
                         <h2>🚀 Stazione: <span id="room-display"></span></h2>
-                        <div id="difficulty-info" class="difficulty-badge normal">⚡ Modalità Guerriero</div>
+                        <div>Livello: <span id="current-level">1</span>/10</div>
                     </div>
                     <button id="leave-room" class="button button-secondary" style="width: auto; padding: 0.8rem 1.5rem;">
                         🚪 Abbandona Battaglia
                     </button>
-                </div>
-            </div>
-
-            <!-- Level Progress -->
-            <div class="level-progress">
-                <div class="level-title">📊 Progresso Livelli Galattici</div>
-                <div style="display: flex; justify-content: space-between; margin: 0.5rem 0;">
-                    <span>Livello <span id="current-level">1</span>/10</span>
-                    <span id="level-info">Range: 1-100</span>
-                </div>
-                <div class="level-bar">
-                    <div class="level-fill" id="level-fill" style="width: 10%;"></div>
-                </div>
-                <div id="level-winner" style="margin-top: 0.5rem; font-weight: bold; color: #4ecdc4;"></div>
-            </div>
-
-            <!-- Turn Indicator -->
-            <div id="turn-indicator" class="turn-indicator hidden">
-                <div id="turn-text">In attesa di comandanti...</div>
-            </div>
-
-            <!-- Game Stats -->
-            <div class="game-stats">
-                <div class="stat-card">
-                    <div class="stat-value" id="players-count">0</div>
-                    <div class="stat-label">Comandanti</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="current-round">0</div>
-                    <div class="stat-label">Round</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="attempts-left">0</div>
-                    <div class="stat-label">Tentativi</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="time-left">30</div>
-                    <div class="stat-label">Secondi</div>
                 </div>
             </div>
 
@@ -719,7 +465,6 @@
         let playerId = 'player_' + Math.random().toString(36).substr(2, 9);
         let playerName = '';
         let connectionStatus = 'connecting';
-        let selectedDifficulty = 'normal';
 
         console.log(`🆔 Player ID: ${playerId}`);
 
@@ -743,43 +488,9 @@
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             createStars();
-            
-            // Carica difficoltà selezionata
-            selectedDifficulty = localStorage.getItem('selectedDifficulty') || 'normal';
-            updateDifficultyDisplay();
-            
             setupEventListeners();
             connectToServer();
         });
-
-        function updateDifficultyDisplay() {
-            const difficultyNames = {
-                easy: '🌟 Modalità Principiante',
-                normal: '⚡ Modalità Guerriero', 
-                hard: '🔥 Modalità Comandante',
-                expert: '💀 Modalità Leggenda'
-            };
-            
-            const difficultyClasses = {
-                easy: 'easy',
-                normal: 'normal',
-                hard: 'hard', 
-                expert: 'expert'
-            };
-            
-            const displayEl = document.getElementById('difficulty-display');
-            const infoEl = document.getElementById('difficulty-info');
-            
-            if (displayEl) {
-                displayEl.textContent = difficultyNames[selectedDifficulty];
-                displayEl.className = `difficulty-badge ${difficultyClasses[selectedDifficulty]}`;
-            }
-            
-            if (infoEl) {
-                infoEl.textContent = difficultyNames[selectedDifficulty];
-                infoEl.className = `difficulty-badge ${difficultyClasses[selectedDifficulty]}`;
-            }
-        }
 
         function setupEventListeners() {
             document.getElementById('create-room').addEventListener('click', createRoom);
@@ -817,7 +528,7 @@
                 ws.onmessage = function(event) {
                     try {
                         const data = JSON.parse(event.data);
-                        console.log('📨 Received:', data.type, data);
+                        console.log('📨 Received:', data.type);
                         handleServerMessage(data);
                     } catch (e) {
                         console.error('Parse error:', e);
@@ -870,11 +581,6 @@
                     console.log('🔄 Game update received');
                     gameData = data.gameData;
                     updateGameDisplay();
-                    
-                    // Controlla vittoria
-                    if (gameData.gameEnded && gameData.winner) {
-                        showVictoryScreen();
-                    }
                     break;
                     
                 case 'guessResult':
@@ -897,7 +603,7 @@
 
         function sendMessage(message) {
             if (ws && ws.readyState === WebSocket.OPEN) {
-                console.log('📤 Sending:', message.type, message);
+                console.log('📤 Sending:', message.type);
                 ws.send(JSON.stringify(message));
                 return true;
             } else {
@@ -933,12 +639,12 @@
                 return;
             }
 
-            console.log(`🏠 Creating room for: ${playerName} with difficulty: ${selectedDifficulty}`);
+            console.log(`🏠 Creating room for: ${playerName}`);
             sendMessage({
                 type: 'createRoom',
                 playerId: playerId,
                 playerName: playerName,
-                difficulty: selectedDifficulty
+                difficulty: 'normal'
             });
         }
 
@@ -977,10 +683,9 @@
 
         function submitGuess() {
             const guess = parseInt(document.getElementById('guess-input').value);
-            const maxNumber = getCurrentMaxNumber();
             
-            if (isNaN(guess) || guess < 1 || guess > maxNumber) {
-                showNotification(`Numero tra 1 e ${maxNumber}!`, 'error');
+            if (isNaN(guess) || guess < 1 || guess > 1000) {
+                showNotification('Numero valido richiesto!', 'error');
                 return;
             }
 
@@ -993,11 +698,6 @@
             });
 
             document.getElementById('guess-input').value = '';
-        }
-
-        function getCurrentMaxNumber() {
-            if (!gameData || !gameData.config) return 100;
-            return gameData.config.maxNumber + (gameData.currentLevel - 1) * gameData.config.levelMultiplier;
         }
 
         function sendChat() {
@@ -1032,35 +732,6 @@
             updateGameDisplay();
         }
 
-        function showVictoryScreen() {
-            if (!gameData || !gameData.winner) return;
-            
-            const victoryScreen = document.getElementById('victory-screen');
-            const victoryText = document.getElementById('victory-text');
-            
-            const isWinner = gameData.winner.id === playerId;
-            
-            if (isWinner) {
-                victoryText.innerHTML = `
-                    <div style="font-size: 2rem; margin-bottom: 1rem;">🎉 HAI VINTO! 🎉</div>
-                    <div style="font-size: 1.2rem;">Sei il COMANDANTE SUPREMO GALATTICO!</div>
-                    <div style="margin-top: 1rem; font-size: 1.5rem; color: #feca57;">Punteggio finale: ${gameData.winner.score} punti</div>
-                `;
-            } else {
-                victoryText.innerHTML = `
-                    <div style="font-size: 1.8rem; margin-bottom: 1rem;">🏆 Battaglia Completata!</div>
-                    <div style="font-size: 1.2rem;">Il vincitore è: <strong>${gameData.winner.name}</strong></div>
-                    <div style="margin-top: 1rem; font-size: 1.5rem; color: #feca57;">Punteggio finale: ${gameData.winner.score} punti</div>
-                `;
-            }
-            
-            victoryScreen.classList.remove('hidden');
-        }
-
-        function hideVictoryScreen() {
-            document.getElementById('victory-screen').classList.add('hidden');
-        }
-
         function updateGameDisplay() {
             if (!gameData) return;
 
@@ -1068,26 +739,7 @@
 
             // Update room code
             document.getElementById('room-display').textContent = gameData.roomCode;
-
-            // Update difficulty info
-            if (gameData.config) {
-                const difficultyInfo = document.getElementById('difficulty-info');
-                difficultyInfo.textContent = gameData.config.name;
-            }
-
-            // Update level progress
-            const currentLevel = gameData.currentLevel || 1;
-            const levelProgress = (currentLevel / 10) * 100;
-            document.getElementById('current-level').textContent = currentLevel;
-            document.getElementById('level-fill').style.width = levelProgress + '%';
-            
-            // Update level info
-            const maxNumber = getCurrentMaxNumber();
-            document.getElementById('level-info').textContent = `Range: 1-${maxNumber}`;
-
-            // Update game stats
-            document.getElementById('players-count').textContent = gameData.players.length;
-            document.getElementById('current-round').textContent = gameData.currentRound || 0;
+            document.getElementById('current-level').textContent = gameData.currentLevel || 1;
 
             // Update controls
             const isHost = gameData.players.find(p => p.id === playerId)?.isHost;
@@ -1097,35 +749,26 @@
             if (gameData.gameStarted && !gameData.gameEnded) {
                 document.getElementById('start-controls').classList.add('hidden');
                 document.getElementById('game-controls').classList.remove('hidden');
-                document.getElementById('turn-indicator').classList.remove('hidden');
                 
                 document.getElementById('guess-input').disabled = !isMyTurn;
                 document.getElementById('submit-guess').disabled = !isMyTurn;
                 
-                // Update input placeholder
-                const guessInput = document.getElementById('guess-input');
-                guessInput.placeholder = `Il tuo numero strategico (1-${maxNumber})`;
-                guessInput.max = maxNumber;
-                
                 // Update attempts info
                 const attemptsInfo = document.getElementById('attempts-info');
-                const attemptsLeft = document.getElementById('attempts-left');
                 if (isMyTurn) {
                     const remaining = (gameData.config?.maxAttempts || 3) - gameData.currentAttempts;
                     attemptsInfo.textContent = `Tentativi rimasti: ${remaining}/${gameData.config?.maxAttempts || 3}`;
-                    attemptsLeft.textContent = remaining;
                 } else {
-                    attemptsInfo.textContent = '';
-                    attemptsLeft.textContent = '0';
+                    attemptsInfo.textContent = `Turno di: ${currentPlayer?.name || 'Sconosciuto'}`;
                 }
-                
-                updateTurnIndicator();
             } else if (gameData.gameEnded) {
                 document.getElementById('game-controls').classList.add('hidden');
-                document.getElementById('turn-indicator').classList.add('hidden');
+                
+                if (gameData.winner) {
+                    showNotification(`🏆 ${gameData.winner.name} è il COMANDANTE SUPREMO!`, 'success');
+                }
             } else {
                 document.getElementById('game-controls').classList.add('hidden');
-                document.getElementById('turn-indicator').classList.add('hidden');
                 
                 if (isHost && gameData.players.length >= 2) {
                     document.getElementById('start-controls').classList.remove('hidden');
@@ -1145,23 +788,6 @@
 
             // Update chat
             updateChat();
-        }
-
-        function updateTurnIndicator() {
-            if (!gameData || !gameData.gameStarted) return;
-            
-            const turnIndicator = document.getElementById('turn-indicator');
-            const turnText = document.getElementById('turn-text');
-            const currentPlayer = gameData.players[gameData.currentPlayerIndex];
-            const isMyTurn = currentPlayer && currentPlayer.id === playerId;
-            
-            if (isMyTurn) {
-                turnIndicator.className = 'turn-indicator turn-active';
-                turnText.textContent = `🎯 È il tuo turno, Comandante! (${gameData.config?.maxAttempts || 3} tentativi)`;
-            } else {
-                turnIndicator.className = 'turn-indicator turn-waiting';
-                turnText.textContent = `⏳ Turno del Comandante ${currentPlayer ? currentPlayer.name : 'Sconosciuto'}`;
-            }
         }
 
         function updateLeaderboard() {
