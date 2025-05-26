@@ -358,6 +358,13 @@
                 </div>
             </div>
 
+            <!-- Server Configuration -->
+            <div class="card bg-cyan">
+                <h3 class="text-cyan" style="margin-bottom: 1rem;">🌐 CONFIGURAZIONE SERVER</h3>
+                <input type="text" id="server-url" class="input" placeholder="🔗 URL Server WebSocket (es: wss://your-server.com)" value="wss://echo.websocket.org">
+                <small style="opacity: 0.8;">Per il multiplayer reale, inserisci l'URL del tuo server WebSocket</small>
+            </div>
+
             <!-- Game Info -->
             <div class="card">
                 <h3 class="text-cyan" style="margin-bottom: 1rem;">🚀 MODALITÀ BATTAGLIA COSMICA</h3>
@@ -474,7 +481,7 @@
             <div class="grid grid-3">
                 <button id="leave-room" class="button button-secondary">🚪 ABBANDONA STAZIONE</button>
                 <button id="start-game" class="button button-success hidden">🚀 INIZIA BATTAGLIA</button>
-                <button id="view-leaderboard" class="button" style="background: linear-gradient(45deg, #f59e0b, #f97316); color: white; hidden">🏆 CLASSIFICA FINALE</button>
+                <button id="view-leaderboard" class="button" style="background: linear-gradient(45deg, #f59e0b, #f97316); color: white;">🏆 CLASSIFICA FINALE</button>
             </div>
         </div>
 
@@ -534,7 +541,8 @@
         let playerName = '';
         let connectionStatus = 'connecting';
         let attempts = 0;
-        let syncInterval = null;
+        let websocket = null;
+        let reconnectInterval = null;
 
         // Game Configuration
         const DIFFICULTIES = {
@@ -544,19 +552,11 @@
             hardcore: { name: "💀 HARDCORE - Leggenda Universale", baseRange: 300, attempts: 5 }
         };
 
-        // Simulated Backend (using localStorage + Firebase-like sync)
-        const gameRooms = new Map();
-
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             initializeGame();
             setupEventListeners();
-            
-            // Simulate connection
-            setTimeout(() => {
-                connectionStatus = 'online';
-                updateConnectionStatus();
-            }, 2000);
+            connectToServer();
         });
 
         function initializeGame() {
@@ -581,6 +581,7 @@
             document.getElementById('start-game').addEventListener('click', startGame);
             document.getElementById('next-level').addEventListener('click', nextLevel);
             document.getElementById('leave-room').addEventListener('click', leaveRoom);
+            document.getElementById('view-leaderboard').addEventListener('click', () => showScreen('leaderboard'));
             
             // Leaderboard events
             document.getElementById('new-battle').addEventListener('click', newBattle);
@@ -590,6 +591,96 @@
             document.getElementById('room-code').addEventListener('input', function(e) {
                 e.target.value = e.target.value.toUpperCase();
             });
+        }
+
+        function connectToServer() {
+            const serverUrl = document.getElementById('server-url').value || 'wss://echo.websocket.org';
+            
+            try {
+                websocket = new WebSocket(serverUrl);
+                
+                websocket.onopen = function() {
+                    connectionStatus = 'online';
+                    updateConnectionStatus();
+                    showNotification('🌐 Connesso al server!', 'success');
+                    
+                    if (reconnectInterval) {
+                        clearInterval(reconnectInterval);
+                        reconnectInterval = null;
+                    }
+                };
+                
+                websocket.onmessage = function(event) {
+                    try {
+                        const data = JSON.parse(event.data);
+                        handleServerMessage(data);
+                    } catch (e) {
+                        console.log('Received non-JSON message:', event.data);
+                    }
+                };
+                
+                websocket.onclose = function() {
+                    connectionStatus = 'offline';
+                    updateConnectionStatus();
+                    showNotification('🔴 Connessione persa. Tentativo di riconnessione...', 'warning');
+                    
+                    // Auto-reconnect
+                    if (!reconnectInterval) {
+                        reconnectInterval = setInterval(() => {
+                            if (connectionStatus === 'offline') {
+                                connectToServer();
+                            }
+                        }, 5000);
+                    }
+                };
+                
+                websocket.onerror = function() {
+                    connectionStatus = 'offline';
+                    updateConnectionStatus();
+                };
+                
+            } catch (error) {
+                connectionStatus = 'offline';
+                updateConnectionStatus();
+                showNotification('❌ Errore di connessione al server', 'error');
+            }
+        }
+
+        function sendToServer(data) {
+            if (websocket && websocket.readyState === WebSocket.OPEN) {
+                websocket.send(JSON.stringify(data));
+            } else {
+                showNotification('🔴 Connessione al server non disponibile', 'error');
+            }
+        }
+
+        function handleServerMessage(data) {
+            switch (data.type) {
+                case 'gameStateUpdate':
+                    if (data.roomCode === gameState?.roomCode) {
+                        gameState = data.gameState;
+                        updateGameDisplay();
+                    }
+                    break;
+                case 'playerJoined':
+                    if (data.roomCode === gameState?.roomCode) {
+                        showNotification(`🚪 ${data.playerName} è entrato nella stazione!`, 'info');
+                    }
+                    break;
+                case 'playerLeft':
+                    if (data.roomCode === gameState?.roomCode) {
+                        showNotification(`🚪 ${data.playerName} ha abbandonato la stazione`, 'info');
+                    }
+                    break;
+                case 'chatMessage':
+                    if (data.roomCode === gameState?.roomCode) {
+                        // Chat message will be included in gameStateUpdate
+                    }
+                    break;
+                case 'error':
+                    showNotification(data.message, 'error');
+                    break;
+            }
         }
 
         function updateConnectionStatus() {
@@ -684,12 +775,17 @@
                 gameHistory: []
             };
 
-            // Save to "backend"
-            saveGameState();
+            // Send to server
+            sendToServer({
+                type: 'createGame',
+                roomCode: roomCode,
+                playerId: playerId,
+                playerName: playerName,
+                gameState: gameState
+            });
             
             showScreen('game');
             updateGameDisplay();
-            startSync();
             showNotification('🚀 Stazione Spaziale creata con successo!', 'success');
         }
 
@@ -712,45 +808,47 @@
                 return;
             }
 
-            // Load from "backend"
-            const savedState = loadGameState(roomCode);
-            if (!savedState) {
-                showNotification('Stazione non trovata!', 'error');
-                return;
-            }
+            // Send join request to server
+            sendToServer({
+                type: 'joinGame',
+                roomCode: roomCode.toUpperCase(),
+                playerId: playerId,
+                playerName: playerName
+            });
 
-            gameState = savedState;
-
-            // Check if player already exists
-            const existingPlayer = gameState.players.find(p => p.name === playerName);
-            if (existingPlayer) {
-                existingPlayer.isOnline = true;
-                existingPlayer.lastSeen = Date.now();
-                existingPlayer.id = playerId;
-            } else {
-                gameState.players.push({
+            // For demo purposes, create a local game state
+            // In a real implementation, this would come from the server
+            gameState = {
+                roomCode: roomCode.toUpperCase(),
+                level: 1,
+                currentNumber: Math.floor(Math.random() * DIFFICULTIES.easy.baseRange) + 1,
+                maxAttempts: DIFFICULTIES.easy.attempts,
+                difficulty: 'easy',
+                players: [{
                     id: playerId,
                     name: playerName,
                     score: 0,
                     isHost: false,
                     isOnline: true,
                     lastSeen: Date.now()
-                });
-            }
+                }],
+                gameStarted: false,
+                gameCompleted: false,
+                levelCompleted: false,
+                winner: null,
+                chat: [{
+                    id: 'join_' + Date.now(),
+                    playerId: 'system',
+                    playerName: 'Sistema Galattico',
+                    message: `🚪 ${playerName} è entrato nella stazione!`,
+                    timestamp: Date.now(),
+                    isSystem: true
+                }],
+                gameHistory: []
+            };
 
-            gameState.chat.push({
-                id: 'join_' + Date.now(),
-                playerId: 'system',
-                playerName: 'Sistema Galattico',
-                message: `🚪 ${playerName} è entrato nella stazione!`,
-                timestamp: Date.now(),
-                isSystem: true
-            });
-
-            saveGameState();
             showScreen('game');
             updateGameDisplay();
-            startSync();
             showNotification('🚪 Entrato nella stazione con successo!', 'success');
         }
 
@@ -767,7 +865,14 @@
                 isSystem: true
             });
 
-            saveGameState();
+            // Send to server
+            sendToServer({
+                type: 'startGame',
+                roomCode: gameState.roomCode,
+                playerId: playerId,
+                gameState: gameState
+            });
+
             attempts = 0;
             updateGameDisplay();
             showNotification('🚀 Battaglia iniziata!', 'success');
@@ -839,8 +944,17 @@
                 showNotification(`💥 Attacchi esauriti! Il numero era ${gameState.currentNumber}`, 'error');
             }
 
+            // Send to server
+            sendToServer({
+                type: 'gameAction',
+                action: 'guess',
+                roomCode: gameState.roomCode,
+                playerId: playerId,
+                data: { guess, result, levelWon },
+                gameState: gameState
+            });
+
             document.getElementById('user-guess').value = '';
-            saveGameState();
             updateGameDisplay();
         }
 
@@ -849,7 +963,6 @@
 
             if (gameState.level >= 10) {
                 gameState.gameCompleted = true;
-                saveGameState();
                 showScreen('leaderboard');
                 updateLeaderboard();
                 return;
@@ -872,8 +985,15 @@
                 isSystem: true
             });
 
+            // Send to server
+            sendToServer({
+                type: 'nextLevel',
+                roomCode: gameState.roomCode,
+                playerId: playerId,
+                gameState: gameState
+            });
+
             attempts = 0;
-            saveGameState();
             updateGameDisplay();
             showNotification(`🚀 Settore ${newLevel} sbloccato!`, 'success');
         }
@@ -885,17 +1005,26 @@
             const message = input.value.trim();
             if (!message) return;
 
-            gameState.chat.push({
+            const chatMessage = {
                 id: 'msg_' + Date.now(),
                 playerId: playerId,
                 playerName: playerName,
                 message: message,
                 timestamp: Date.now(),
                 isSystem: false
+            };
+
+            gameState.chat.push(chatMessage);
+
+            // Send to server
+            sendToServer({
+                type: 'chatMessage',
+                roomCode: gameState.roomCode,
+                playerId: playerId,
+                message: chatMessage
             });
 
             input.value = '';
-            saveGameState();
             updateGameDisplay();
         }
 
@@ -906,19 +1035,15 @@
                     player.isOnline = false;
                 }
 
-                gameState.chat.push({
-                    id: 'leave_' + Date.now(),
-                    playerId: 'system',
-                    playerName: 'Sistema Galattico',
-                    message: `🚪 ${playerName} ha abbandonato la stazione`,
-                    timestamp: Date.now(),
-                    isSystem: true
+                // Send to server
+                sendToServer({
+                    type: 'leaveGame',
+                    roomCode: gameState.roomCode,
+                    playerId: playerId,
+                    playerName: playerName
                 });
-
-                saveGameState();
             }
 
-            stopSync();
             gameState = null;
             attempts = 0;
             showScreen('lobby');
@@ -926,7 +1051,6 @@
         }
 
         function newBattle() {
-            stopSync();
             gameState = null;
             attempts = 0;
             showScreen('lobby');
@@ -1134,63 +1258,19 @@
             }, 2000);
         }
 
-        // Simulated Backend Functions
-        function saveGameState() {
-            if (!gameState) return;
-            
-            // Update last activity
-            gameState.lastActivity = Date.now();
-            
-            // Save to localStorage (simulating backend)
-            localStorage.setItem(`game_${gameState.roomCode}`, JSON.stringify(gameState));
-            
-            // Also save to in-memory map for cross-tab simulation
-            gameRooms.set(gameState.roomCode, gameState);
-        }
-
-        function loadGameState(roomCode) {
-            // Try localStorage first
-            const saved = localStorage.getItem(`game_${roomCode}`);
-            if (saved) {
-                return JSON.parse(saved);
-            }
-            
-            // Try in-memory map
-            return gameRooms.get(roomCode) || null;
-        }
-
-        function startSync() {
-            if (syncInterval) clearInterval(syncInterval);
-            
-            syncInterval = setInterval(() => {
-                if (gameState && gameState.roomCode) {
-                    // Simulate fetching updates from other players
-                    const updated = loadGameState(gameState.roomCode);
-                    if (updated && JSON.stringify(updated) !== JSON.stringify(gameState)) {
-                        gameState = updated;
-                        updateGameDisplay();
-                    }
-                }
-            }, 2000);
-        }
-
-        function stopSync() {
-            if (syncInterval) {
-                clearInterval(syncInterval);
-                syncInterval = null;
-            }
-        }
-
         // Cleanup on page unload
         window.addEventListener('beforeunload', () => {
             if (gameState) {
-                const player = gameState.players.find(p => p.id === playerId);
-                if (player) {
-                    player.isOnline = false;
-                }
-                saveGameState();
+                sendToServer({
+                    type: 'leaveGame',
+                    roomCode: gameState.roomCode,
+                    playerId: playerId,
+                    playerName: playerName
+                });
             }
-            stopSync();
+            if (websocket) {
+                websocket.close();
+            }
         });
     </script>
 </body>
