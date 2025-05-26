@@ -731,97 +731,80 @@
             });
         }
 
-        function connectToServer() {
-            connectionStatus = 'connecting';
+function connectToServer() {
+    connectionStatus = 'connecting';
+    updateConnectionStatus();
+    
+    try {
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const wsUrl = `${protocol}//${window.location.host}`;
+        
+        console.log('Tentativo connessione a:', wsUrl);
+        
+        websocket = new WebSocket(wsUrl);
+        
+        websocket.onopen = function() {
+            console.log('WebSocket connesso!');
+            connectionStatus = 'online';
             updateConnectionStatus();
+            showNotification('🌐 Connesso al server multiplayer!', 'success');
             
+            if (reconnectInterval) {
+                clearInterval(reconnectInterval);
+                reconnectInterval = null;
+            }
+        };
+        
+        websocket.onmessage = function(event) {
             try {
-                const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-                const wsUrl = `${protocol}//${window.location.host}`;
-                
-                websocket = new WebSocket(wsUrl);
-                
-                websocket.onopen = function() {
-                    connectionStatus = 'online';
-                    updateConnectionStatus();
-                    showNotification('🌐 Connesso al server multiplayer!', 'success');
-                    
-                    // Clear reconnect interval
-                    if (reconnectInterval) {
-                        clearInterval(reconnectInterval);
-                        reconnectInterval = null;
-                    }
-
-                    // Start heartbeat
-                    startHeartbeat();
-                };
-                
-                websocket.onmessage = function(event) {
-                    try {
-                        const data = JSON.parse(event.data);
-                        handleServerMessage(data);
-                    } catch (e) {
-                        console.log('Received non-JSON message:', event.data);
-                    }
-                };
-                
-                websocket.onclose = function() {
-                    connectionStatus = 'offline';
-                    updateConnectionStatus();
-                    showNotification('🔴 Connessione persa. Tentativo di riconnessione...', 'warning');
-                    
-                    // Stop heartbeat
-                    stopHeartbeat();
-                    
-                    // Auto-reconnect
-                    if (!reconnectInterval) {
-                        reconnectInterval = setInterval(() => {
-                            if (websocket.readyState === WebSocket.CLOSED) {
-                                connectToServer();
-                            }
-                        }, 3000);
-                    }
-                };
-                
-                websocket.onerror = function(error) {
-                    console.error('WebSocket error:', error);
-                    connectionStatus = 'offline';
-                    updateConnectionStatus();
-                    showNotification('❌ Errore di connessione al server', 'error');
-                };
-                
-            } catch (error) {
-                connectionStatus = 'offline';
-                updateConnectionStatus();
-                showNotification('❌ Impossibile connettersi al server', 'error');
+                const data = JSON.parse(event.data);
+                handleServerMessage(data);
+            } catch (e) {
+                console.log('Messaggio ricevuto:', event.data);
             }
-        }
-
-        function startHeartbeat() {
-            heartbeatInterval = setInterval(() => {
-                if (websocket && websocket.readyState === WebSocket.OPEN) {
-                    websocket.send(JSON.stringify({ type: 'ping' }));
-                    lastHeartbeat = Date.now();
-                }
-            }, 30000); // Every 30 seconds
-        }
-
-        function stopHeartbeat() {
-            if (heartbeatInterval) {
-                clearInterval(heartbeatInterval);
-                heartbeatInterval = null;
+        };
+        
+        websocket.onclose = function() {
+            console.log('WebSocket disconnesso');
+            connectionStatus = 'offline';
+            updateConnectionStatus();
+            showNotification('🔴 Connessione persa. Riconnessione...', 'warning');
+            
+            if (!reconnectInterval) {
+                reconnectInterval = setInterval(() => {
+                    if (websocket.readyState === WebSocket.CLOSED) {
+                        connectToServer();
+                    }
+                }, 3000);
             }
-        }
+        };
+        
+        websocket.onerror = function(error) {
+            console.error('Errore WebSocket:', error);
+            connectionStatus = 'offline';
+            updateConnectionStatus();
+            showNotification('❌ Errore di connessione', 'error');
+        };
+        
+    } catch (error) {
+        console.error('Errore creazione WebSocket:', error);
+        connectionStatus = 'offline';
+        updateConnectionStatus();
+        showNotification('❌ Impossibile connettersi', 'error');
+    }
+}
 
-        function sendToServer(data) {
-            if (websocket && websocket.readyState === WebSocket.OPEN) {
-                websocket.send(JSON.stringify(data));
-                return true;
-            } else {
-                showNotification('❌ Connessione non disponibile', 'error');
-                return false;
-            }
-        }
+function sendToServer(data) {
+    if (websocket && websocket.readyState === WebSocket.OPEN) {
+        console.log('Invio messaggio:', data.type);
+        websocket.send(JSON.stringify(data));
+        return true;
+    } else {
+        console.log('WebSocket non disponibile, stato:', websocket ? websocket.readyState : 'null');
+        showNotification('❌ Connessione non disponibile', 'error');
+        return false;
+    }
+}
 
         function handleServerMessage(data) {
             switch (data.type) {
