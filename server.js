@@ -247,14 +247,26 @@ function joinGame(ws, data) {
     gameState.players[existingPlayerIndex].id = playerId
   } else {
     // Add new player
-    gameState.players.push({
+    const newPlayer = {
       id: playerId,
       name: playerName,
       score: 0,
       isHost: false,
       isOnline: true,
       lastSeen: Date.now(),
-    })
+      attempts: 0,
+      isEliminated: false,
+    }
+
+    gameState.players.push(newPlayer)
+
+    // Add to turn order if game hasn't started
+    if (!gameState.gameStarted) {
+      if (!gameState.turnOrder) {
+        gameState.turnOrder = [gameState.players[0].id]
+      }
+      gameState.turnOrder.push(playerId)
+    }
   }
 
   // Add welcome message
@@ -317,6 +329,19 @@ function startGame(ws, data) {
     return
   }
 
+  // Initialize turn system
+  const activePlayers = gameState.players.filter((p) => p.isOnline)
+  if (activePlayers.length > 0) {
+    gameState.currentPlayerTurn = activePlayers[0].id
+    gameState.turnOrder = activePlayers.map((p) => p.id)
+  }
+
+  // Reset all player attempts
+  gameState.players.forEach((p) => {
+    p.attempts = 0
+    p.isEliminated = false
+  })
+
   gameState.lastActivity = Date.now()
   gameRooms.set(roomCode, gameState)
 
@@ -326,13 +351,38 @@ function startGame(ws, data) {
     gameState: gameState,
   })
 
-  console.log(`🎮 Gioco iniziato nella stanza: ${roomCode}`)
+  console.log(`🎮 Gioco iniziato nella stanza: ${roomCode} - Primo turno: ${gameState.currentPlayerTurn}`)
+}
+
+function getNextPlayerTurn(gameState) {
+  const activePlayers = gameState.players.filter((p) => p.isOnline && !p.isEliminated)
+
+  if (activePlayers.length === 0) {
+    return null
+  }
+
+  const currentIndex = activePlayers.findIndex((p) => p.id === gameState.currentPlayerTurn)
+  const nextIndex = (currentIndex + 1) % activePlayers.length
+
+  return activePlayers[nextIndex].id
 }
 
 function handleGameAction(ws, data) {
   const { roomCode, playerId, gameState } = data
 
   if (!roomCode || !playerId || !gameState) {
+    return
+  }
+
+  // Validate it's the player's turn
+  const currentGameState = gameRooms.get(roomCode)
+  if (currentGameState && currentGameState.currentPlayerTurn !== playerId) {
+    ws.send(
+      JSON.stringify({
+        type: "error",
+        message: "Non è il tuo turno!",
+      }),
+    )
     return
   }
 
