@@ -74,6 +74,12 @@
             transform: translateY(-2px);
         }
 
+        .button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
         .button-primary {
             background: linear-gradient(45deg, #06b6d4, #3b82f6);
             color: black;
@@ -369,7 +375,7 @@
         }
 
         function handleServerMessage(data) {
-            console.log('📨 Messaggio ricevuto:', data.type);
+            console.log('📨 Messaggio ricevuto:', data.type, data);
             
             switch (data.type) {
                 case 'connected':
@@ -382,9 +388,19 @@
                     showNotification('🚀 Stazione creata!', 'success');
                     break;
                     
+                case 'roomJoined':
+                    gameData = data.gameData;
+                    showGameScreen();
+                    showNotification('🚪 Ti sei unito alla stazione!', 'success');
+                    break;
+                    
                 case 'gameUpdate':
                     gameData = data.gameData;
                     updateGameDisplay();
+                    break;
+                    
+                case 'guessResult':
+                    showNotification(data.result.hint, data.result.correct ? 'success' : 'info');
                     break;
                     
                 case 'error':
@@ -394,6 +410,9 @@
                 case 'pong':
                     // Heartbeat response
                     break;
+                    
+                default:
+                    console.log('❓ Tipo messaggio sconosciuto:', data.type);
             }
         }
 
@@ -409,19 +428,23 @@
 
         function updateConnectionStatus() {
             const statusEl = document.getElementById('connection-status');
+            const buttons = document.querySelectorAll('.button');
             
             switch (connectionStatus) {
                 case 'online':
                     statusEl.className = 'status status-online';
                     statusEl.textContent = '🟢 Connesso al server';
+                    buttons.forEach(btn => btn.disabled = false);
                     break;
                 case 'offline':
                     statusEl.className = 'status status-offline';
                     statusEl.textContent = '🔴 Disconnesso - Riconnessione...';
+                    buttons.forEach(btn => btn.disabled = true);
                     break;
                 case 'connecting':
                     statusEl.className = 'status status-connecting';
                     statusEl.textContent = '🟡 Connessione al server...';
+                    buttons.forEach(btn => btn.disabled = true);
                     break;
             }
         }
@@ -464,6 +487,7 @@
                 return;
             }
 
+            console.log('🚪 Tentativo di unirsi alla stanza:', roomCode);
             sendMessage({
                 type: 'joinRoom',
                 playerId: playerId,
@@ -566,6 +590,11 @@
             const leaderboard = document.getElementById('leaderboard');
             leaderboard.innerHTML = '';
 
+            if (!gameData.players.length) {
+                leaderboard.innerHTML = '<p style="text-align: center; opacity: 0.6;">Nessun giocatore</p>';
+                return;
+            }
+
             gameData.players
                 .sort((a, b) => b.score - a.score)
                 .forEach((player, index) => {
@@ -574,9 +603,10 @@
                     
                     const icon = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '👤';
                     const hostIcon = player.isHost ? ' 👑' : '';
+                    const isCurrentPlayer = player.id === playerId ? ' (Tu)' : '';
                     
                     playerEl.innerHTML = `
-                        <span>${icon} ${player.name}${hostIcon}</span>
+                        <span>${icon} ${player.name}${hostIcon}${isCurrentPlayer}</span>
                         <span style="color: #fbbf24; font-weight: bold;">${player.score}</span>
                     `;
                     
@@ -588,11 +618,16 @@
             const chatContainer = document.getElementById('chat-messages');
             chatContainer.innerHTML = '';
 
+            if (!gameData.chat.length) {
+                chatContainer.innerHTML = '<p style="text-align: center; opacity: 0.6;">Nessun messaggio</p>';
+                return;
+            }
+
             gameData.chat.slice(-20).forEach(msg => {
                 const msgEl = document.createElement('div');
                 msgEl.className = 'chat-message';
                 
-                const time = new Date().toLocaleTimeString('it-IT', { 
+                const time = new Date(msg.timestamp || Date.now()).toLocaleTimeString('it-IT', { 
                     hour: '2-digit', 
                     minute: '2-digit' 
                 });
