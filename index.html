@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Battaglia Galattica - Multiplayer</title>
+    <title>Battaglia Galattica - Multiplayer Online</title>
     <style>
         * {
             margin: 0;
@@ -30,6 +30,7 @@
             border-radius: 0.5rem;
             padding: 1.5rem;
             margin-bottom: 1.5rem;
+            backdrop-filter: blur(10px);
         }
 
         .logo {
@@ -105,6 +106,7 @@
 
         .button-primary:hover:not(:disabled) {
             background: linear-gradient(45deg, #0891b2, #2563eb);
+            transform: translateY(-2px);
         }
 
         .button-secondary {
@@ -114,6 +116,7 @@
 
         .button-secondary:hover:not(:disabled) {
             background: linear-gradient(45deg, #dc2626, #db2777);
+            transform: translateY(-2px);
         }
 
         .button-success {
@@ -123,6 +126,7 @@
 
         .button-success:hover:not(:disabled) {
             background: linear-gradient(45deg, #059669, #047857);
+            transform: translateY(-2px);
         }
 
         .select {
@@ -358,13 +362,6 @@
                 </div>
             </div>
 
-            <!-- Server Configuration -->
-            <div class="card bg-cyan">
-                <h3 class="text-cyan" style="margin-bottom: 1rem;">🌐 CONFIGURAZIONE SERVER</h3>
-                <input type="text" id="server-url" class="input" placeholder="🔗 URL Server WebSocket (opzionale)" value="">
-                <small style="opacity: 0.8;">Lascia vuoto per modalità demo locale. Per multiplayer reale inserisci URL WebSocket.</small>
-            </div>
-
             <!-- Game Info -->
             <div class="card">
                 <h3 class="text-cyan" style="margin-bottom: 1rem;">🚀 MODALITÀ BATTAGLIA COSMICA</h3>
@@ -404,6 +401,16 @@
 
                 <input type="text" id="room-code" class="input" placeholder="🔑 Codice Stazione (es: GALAXY123)" maxlength="12" style="text-transform: uppercase;">
                 <button id="join-game" class="button button-secondary">🚪 ENTRA NELLA STAZIONE</button>
+            </div>
+
+            <!-- Navigation -->
+            <div class="card">
+                <div class="text-center">
+                    <h3 class="text-purple" style="margin-bottom: 1rem;">🎮 ALTRE MODALITÀ</h3>
+                    <button class="button" style="background: linear-gradient(45deg, #f59e0b, #f97316); color: white;" onclick="window.location.href='/cristo'">
+                        👤 MODALITÀ SINGLE PLAYER
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -543,7 +550,6 @@
         let attempts = 0;
         let websocket = null;
         let reconnectInterval = null;
-        let isLocalMode = true;
 
         // Game Configuration
         const DIFFICULTIES = {
@@ -553,20 +559,11 @@
             hardcore: { name: "💀 HARDCORE - Leggenda Universale", baseRange: 300, attempts: 5 }
         };
 
-        // Local storage for demo mode
-        const localRooms = new Map();
-
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             initializeGame();
             setupEventListeners();
-            
-            // Simulate connection for demo mode
-            setTimeout(() => {
-                connectionStatus = 'online';
-                updateConnectionStatus();
-                showNotification('🌐 Modalità demo attiva! Per multiplayer reale inserisci URL WebSocket.', 'info');
-            }, 1000);
+            connectToServer();
         });
 
         function initializeGame() {
@@ -601,44 +598,23 @@
             document.getElementById('room-code').addEventListener('input', function(e) {
                 e.target.value = e.target.value.toUpperCase();
             });
-
-            // Server URL change
-            document.getElementById('server-url').addEventListener('change', function(e) {
-                const url = e.target.value.trim();
-                if (url) {
-                    isLocalMode = false;
-                    connectToServer(url);
-                } else {
-                    isLocalMode = true;
-                    if (websocket) {
-                        websocket.close();
-                        websocket = null;
-                    }
-                    connectionStatus = 'online';
-                    updateConnectionStatus();
-                    showNotification('🏠 Modalità demo locale attivata', 'info');
-                }
-            });
         }
 
-        function connectToServer(serverUrl) {
-            if (!serverUrl) return;
-            
+        function connectToServer() {
             connectionStatus = 'connecting';
             updateConnectionStatus();
             
             try {
-                if (websocket) {
-                    websocket.close();
-                }
+                // Use wss:// for HTTPS sites, ws:// for HTTP
+                const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+                const wsUrl = `${protocol}//${window.location.host}`;
                 
-                websocket = new WebSocket(serverUrl);
+                websocket = new WebSocket(wsUrl);
                 
                 websocket.onopen = function() {
                     connectionStatus = 'online';
                     updateConnectionStatus();
                     showNotification('🌐 Connesso al server multiplayer!', 'success');
-                    isLocalMode = false;
                     
                     if (reconnectInterval) {
                         clearInterval(reconnectInterval);
@@ -658,27 +634,33 @@
                 websocket.onclose = function() {
                     connectionStatus = 'offline';
                     updateConnectionStatus();
-                    showNotification('🔴 Connessione persa. Modalità locale attivata.', 'warning');
-                    isLocalMode = true;
+                    showNotification('🔴 Connessione persa. Tentativo di riconnessione...', 'warning');
+                    
+                    // Auto-reconnect
+                    if (!reconnectInterval) {
+                        reconnectInterval = setInterval(() => {
+                            if (websocket.readyState === WebSocket.CLOSED) {
+                                connectToServer();
+                            }
+                        }, 5000);
+                    }
                 };
                 
                 websocket.onerror = function() {
                     connectionStatus = 'offline';
                     updateConnectionStatus();
-                    showNotification('❌ Errore connessione. Modalità locale attivata.', 'error');
-                    isLocalMode = true;
+                    showNotification('❌ Errore di connessione al server', 'error');
                 };
                 
             } catch (error) {
                 connectionStatus = 'offline';
                 updateConnectionStatus();
-                showNotification('❌ URL WebSocket non valido. Modalità locale attivata.', 'error');
-                isLocalMode = true;
+                showNotification('❌ Impossibile connettersi al server', 'error');
             }
         }
 
         function sendToServer(data) {
-            if (!isLocalMode && websocket && websocket.readyState === WebSocket.OPEN) {
+            if (websocket && websocket.readyState === WebSocket.OPEN) {
                 websocket.send(JSON.stringify(data));
                 return true;
             }
@@ -717,17 +699,17 @@
                 case 'online':
                     icon.textContent = '🟢';
                     icon.className = 'status-online';
-                    text.textContent = isLocalMode ? 'Modalità Demo Locale Attiva' : 'Connesso al Network Galattico';
+                    text.textContent = 'Connesso al Server Galattico';
                     break;
                 case 'offline':
                     icon.textContent = '🔴';
                     icon.className = 'status-offline';
-                    text.textContent = 'Modalità Demo Locale (Offline)';
+                    text.textContent = 'Server Offline - Riconnessione...';
                     break;
                 case 'connecting':
                     icon.textContent = '🟡';
                     icon.className = 'status-connecting';
-                    text.textContent = 'Connessione al Network Galattico...';
+                    text.textContent = 'Connessione al Server Galattico...';
                     break;
             }
         }
@@ -760,6 +742,11 @@
             playerName = document.getElementById('player-name').value.trim();
             if (!playerName) {
                 showNotification('Inserisci il tuo nome da Comandante!', 'warning');
+                return;
+            }
+
+            if (connectionStatus !== 'online') {
+                showNotification('Connessione al server necessaria!', 'error');
                 return;
             }
 
@@ -796,17 +783,13 @@
                 gameHistory: []
             };
 
-            // Try to send to server, fallback to local storage
-            if (!sendToServer({
+            sendToServer({
                 type: 'createGame',
                 roomCode: roomCode,
                 playerId: playerId,
                 playerName: playerName,
                 gameState: gameState
-            })) {
-                // Local mode
-                localRooms.set(roomCode, gameState);
-            }
+            });
             
             showScreen('game');
             updateGameDisplay();
@@ -827,55 +810,17 @@
                 return;
             }
 
-            // Try to send to server first
-            if (!sendToServer({
+            if (connectionStatus !== 'online') {
+                showNotification('Connessione al server necessaria!', 'error');
+                return;
+            }
+
+            sendToServer({
                 type: 'joinGame',
                 roomCode: roomCode.toUpperCase(),
                 playerId: playerId,
                 playerName: playerName
-            })) {
-                // Local mode - check local storage
-                const existingGame = localRooms.get(roomCode.toUpperCase());
-                if (!existingGame) {
-                    showNotification('Stazione non trovata! Crea una nuova stazione.', 'error');
-                    return;
-                }
-
-                // Join existing local game
-                gameState = existingGame;
-                
-                // Check if player already exists
-                const existingPlayerIndex = gameState.players.findIndex(p => p.name === playerName);
-                if (existingPlayerIndex !== -1) {
-                    gameState.players[existingPlayerIndex].isOnline = true;
-                    gameState.players[existingPlayerIndex].lastSeen = Date.now();
-                    gameState.players[existingPlayerIndex].id = playerId;
-                } else {
-                    gameState.players.push({
-                        id: playerId,
-                        name: playerName,
-                        score: 0,
-                        isHost: false,
-                        isOnline: true,
-                        lastSeen: Date.now()
-                    });
-                }
-
-                gameState.chat.push({
-                    id: 'join_' + Date.now(),
-                    playerId: 'system',
-                    playerName: 'Sistema Galattico',
-                    message: `🚪 ${playerName} è entrato nella stazione!`,
-                    timestamp: Date.now(),
-                    isSystem: true
-                });
-
-                localRooms.set(roomCode.toUpperCase(), gameState);
-            }
-
-            showScreen('game');
-            updateGameDisplay();
-            showNotification('🚪 Entrato nella stazione con successo!', 'success');
+            });
         }
 
         function startGame() {
@@ -891,15 +836,12 @@
                 isSystem: true
             });
 
-            // Send to server or save locally
-            if (!sendToServer({
+            sendToServer({
                 type: 'startGame',
                 roomCode: gameState.roomCode,
                 playerId: playerId,
                 gameState: gameState
-            })) {
-                localRooms.set(gameState.roomCode, gameState);
-            }
+            });
 
             attempts = 0;
             updateGameDisplay();
@@ -972,17 +914,14 @@
                 showNotification(`💥 Attacchi esauriti! Il numero era ${gameState.currentNumber}`, 'error');
             }
 
-            // Send to server or save locally
-            if (!sendToServer({
+            sendToServer({
                 type: 'gameAction',
                 action: 'guess',
                 roomCode: gameState.roomCode,
                 playerId: playerId,
                 data: { guess, result, levelWon },
                 gameState: gameState
-            })) {
-                localRooms.set(gameState.roomCode, gameState);
-            }
+            });
 
             document.getElementById('user-guess').value = '';
             updateGameDisplay();
@@ -1015,15 +954,12 @@
                 isSystem: true
             });
 
-            // Send to server or save locally
-            if (!sendToServer({
+            sendToServer({
                 type: 'nextLevel',
                 roomCode: gameState.roomCode,
                 playerId: playerId,
                 gameState: gameState
-            })) {
-                localRooms.set(gameState.roomCode, gameState);
-            }
+            });
 
             attempts = 0;
             updateGameDisplay();
@@ -1048,15 +984,12 @@
 
             gameState.chat.push(chatMessage);
 
-            // Send to server or save locally
-            if (!sendToServer({
+            sendToServer({
                 type: 'chatMessage',
                 roomCode: gameState.roomCode,
                 playerId: playerId,
                 message: chatMessage
-            })) {
-                localRooms.set(gameState.roomCode, gameState);
-            }
+            });
 
             input.value = '';
             updateGameDisplay();
@@ -1069,15 +1002,12 @@
                     player.isOnline = false;
                 }
 
-                // Send to server or save locally
-                if (!sendToServer({
+                sendToServer({
                     type: 'leaveGame',
                     roomCode: gameState.roomCode,
                     playerId: playerId,
                     playerName: playerName
-                })) {
-                    localRooms.set(gameState.roomCode, gameState);
-                }
+                });
             }
 
             gameState = null;
@@ -1296,7 +1226,7 @@
 
         // Cleanup on page unload
         window.addEventListener('beforeunload', () => {
-            if (gameState && !isLocalMode) {
+            if (gameState) {
                 sendToServer({
                     type: 'leaveGame',
                     roomCode: gameState.roomCode,
