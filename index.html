@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Battaglia Galattica - SEMPLICE</title>
+    <title>🌌 Battaglia Galattica - Arena</title>
     <style>
         * {
             margin: 0;
@@ -12,46 +12,130 @@
         }
 
         body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #1e293b, #7c3aed, #1e293b);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(45deg, #0f0f23, #1a1a3e, #2d1b69, #4c1d95);
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
             color: white;
             min-height: 100vh;
-            padding: 1rem;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
+            padding: 1rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 1rem 2rem;
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(0, 245, 255, 0.3);
+        }
+
+        .home-button {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .home-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(255, 107, 107, 0.4);
+        }
+
+        .title {
+            font-size: 2.5rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, #00f5ff, #ff6b6b, #4ecdc4);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: rainbowText 3s ease-in-out infinite;
+            text-align: center;
+        }
+
+        @keyframes rainbowText {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
         }
 
         .card {
             background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(34, 211, 238, 0.3);
-            border-radius: 0.5rem;
+            border: 2px solid rgba(34, 211, 238, 0.3);
+            border-radius: 20px;
             padding: 1.5rem;
             margin-bottom: 1.5rem;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(15px);
+            transition: all 0.3s ease;
         }
 
-        .title {
-            text-align: center;
-            font-size: 3rem;
-            font-weight: bold;
-            background: linear-gradient(45deg, #22d3ee, #fbbf24, #a855f7);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 2rem;
+        .card:hover {
+            border-color: #00f5ff;
+            box-shadow: 0 10px 30px rgba(0, 245, 255, 0.2);
         }
 
         .input {
             width: 100%;
-            padding: 0.75rem;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(34, 211, 238, 0.5);
-            border-radius: 0.375rem;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid rgba(34, 211, 238, 0.5);
+            border-radius: 15px;
             color: white;
             margin-bottom: 1rem;
             font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .input:focus {
+            outline: none;
+            border-color: #00f5ff;
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
         }
 
         .input::placeholder {
@@ -59,19 +143,36 @@
         }
 
         .button {
-            padding: 0.75rem 1.5rem;
+            padding: 1rem 2rem;
             border: none;
-            border-radius: 0.375rem;
+            border-radius: 25px;
             font-weight: bold;
             cursor: pointer;
             font-size: 1rem;
             width: 100%;
             margin-bottom: 0.5rem;
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .button:hover::before {
+            left: 100%;
         }
 
         .button:hover:not(:disabled) {
-            transform: translateY(-2px);
+            transform: translateY(-3px);
         }
 
         .button:disabled {
@@ -81,24 +182,24 @@
         }
 
         .button-primary {
-            background: linear-gradient(45deg, #06b6d4, #3b82f6);
-            color: black;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
         }
 
         .button-secondary {
-            background: linear-gradient(45deg, #ef4444, #ec4899);
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
             color: white;
         }
 
         .button-success {
-            background: linear-gradient(45deg, #10b981, #059669);
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
             color: white;
         }
 
         .grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 1rem;
+            gap: 2rem;
         }
 
         .hidden {
@@ -108,93 +209,249 @@
         .status {
             text-align: center;
             padding: 1rem;
-            border-radius: 0.5rem;
+            border-radius: 15px;
             margin-bottom: 1rem;
+            font-weight: bold;
         }
 
         .status-online {
             background: rgba(16, 185, 129, 0.2);
-            border: 1px solid #10b981;
+            border: 2px solid #10b981;
             color: #10b981;
         }
 
         .status-offline {
             background: rgba(239, 68, 68, 0.2);
-            border: 1px solid #ef4444;
+            border: 2px solid #ef4444;
             color: #ef4444;
         }
 
         .status-connecting {
             background: rgba(251, 191, 36, 0.2);
-            border: 1px solid #fbbf24;
+            border: 2px solid #fbbf24;
             color: #fbbf24;
         }
 
-        .chat {
-            height: 200px;
-            overflow-y: auto;
-            background: rgba(0, 0, 0, 0.3);
+        .level-progress {
+            background: rgba(0, 0, 0, 0.6);
             padding: 1rem;
-            border-radius: 0.5rem;
+            border-radius: 15px;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .level-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 0.5rem 0;
+        }
+
+        .level-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+
+        .level-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .difficulty-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
             margin-bottom: 1rem;
         }
 
+        .easy { background: linear-gradient(45deg, #4ecdc4, #44a08d); }
+        .normal { background: linear-gradient(45deg, #667eea, #764ba2); }
+        .hard { background: linear-gradient(45deg, #ff6b6b, #ee5a24); }
+        .expert { background: linear-gradient(45deg, #a55eea, #26de81); }
+
+        .turn-indicator {
+            text-align: center;
+            padding: 1.5rem;
+            border-radius: 20px;
+            margin-bottom: 1rem;
+            font-weight: bold;
+            font-size: 1.2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .turn-active {
+            background: rgba(16, 185, 129, 0.3);
+            border: 3px solid #10b981;
+            color: #10b981;
+            animation: pulse 2s infinite;
+        }
+
+        .turn-waiting {
+            background: rgba(251, 191, 36, 0.2);
+            border: 2px solid #fbbf24;
+            color: #fbbf24;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        .chat {
+            height: 250px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 1rem;
+            border-radius: 15px;
+            margin-bottom: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
         .chat-message {
-            margin-bottom: 0.5rem;
-            padding: 0.5rem;
-            border-radius: 0.25rem;
+            margin-bottom: 0.8rem;
+            padding: 0.8rem;
+            border-radius: 10px;
             background: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .chat-message:hover {
+            background: rgba(255, 255, 255, 0.15);
         }
 
         .chat-message.system {
             background: rgba(34, 211, 238, 0.2);
-            border-left: 3px solid #22d3ee;
+            border-left: 4px solid #22d3ee;
         }
 
         .leaderboard {
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(0, 0, 0, 0.6);
             padding: 1rem;
-            border-radius: 0.5rem;
+            border-radius: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
         }
 
         .player {
             display: flex;
             justify-content: space-between;
-            padding: 0.5rem;
-            margin-bottom: 0.5rem;
+            align-items: center;
+            padding: 1rem;
+            margin-bottom: 0.8rem;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 0.25rem;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .player::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+
+        .player:hover::before {
+            transform: translateX(100%);
+        }
+
+        .player:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.15);
         }
 
         .player.current-turn {
             background: rgba(16, 185, 129, 0.3);
             border: 2px solid #10b981;
+            transform: scale(1.02);
         }
 
         .notification {
             position: fixed;
-            top: 1rem;
-            right: 1rem;
-            padding: 1rem;
-            border-radius: 0.5rem;
+            top: 2rem;
+            right: 2rem;
+            padding: 1.5rem;
+            border-radius: 15px;
             font-weight: bold;
             z-index: 1000;
-            max-width: 300px;
+            max-width: 350px;
+            backdrop-filter: blur(15px);
+            border: 2px solid;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
 
         .notification-success {
-            background: #10b981;
+            background: rgba(16, 185, 129, 0.9);
+            border-color: #10b981;
             color: white;
         }
 
         .notification-error {
-            background: #ef4444;
+            background: rgba(239, 68, 68, 0.9);
+            border-color: #ef4444;
             color: white;
         }
 
         .notification-info {
-            background: #3b82f6;
+            background: rgba(59, 130, 246, 0.9);
+            border-color: #3b82f6;
             color: white;
+        }
+
+        .game-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-card {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 1rem;
+            border-radius: 15px;
+            text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00f5ff;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
         }
 
         @media (max-width: 768px) {
@@ -205,18 +462,37 @@
             .title {
                 font-size: 2rem;
             }
+            
+            .container {
+                padding: 0.5rem;
+            }
+            
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Stelle animate -->
+    <div class="stars" id="stars"></div>
+
     <div class="container">
+        <!-- Header con pulsante Home -->
+        <div class="header">
+            <a href="cristo.html" class="home-button">
+                🏠 Torna alla Home
+            </a>
+            <h1 class="title">🌌 ARENA GALATTICA</h1>
+            <div style="width: 150px;"></div> <!-- Spacer per centrare il titolo -->
+        </div>
+
         <!-- Notification -->
         <div id="notification" class="notification hidden"></div>
 
         <!-- Lobby Screen -->
         <div id="lobby-screen">
-            <h1 class="title">🌌 BATTAGLIA GALATTICA</h1>
-            
             <!-- Connection Status -->
             <div id="connection-status" class="status status-connecting">
                 🟡 Connessione al server...
@@ -224,41 +500,75 @@
 
             <!-- Game Form -->
             <div class="card">
-                <h3 style="margin-bottom: 1rem;">🚀 Entra in Battaglia</h3>
+                <h3 style="margin-bottom: 1rem; text-align: center; font-size: 1.5rem;">🚀 Entra in Battaglia</h3>
                 
-                <input type="text" id="player-name" class="input" placeholder="Il tuo nome" maxlength="20">
+                <div id="difficulty-display" class="difficulty-badge normal" style="display: block; text-align: center; margin-bottom: 1rem;">
+                    🎯 Modalità Guerriero
+                </div>
+                
+                <input type="text" id="player-name" class="input" placeholder="Il tuo nome da comandante" maxlength="20">
                 
                 <button id="create-room" class="button button-primary">
-                    🏠 Crea Stanza
+                    🏠 Crea Nuova Stazione
                 </button>
 
-                <input type="text" id="room-code" class="input" placeholder="Codice stanza" maxlength="12">
+                <input type="text" id="room-code" class="input" placeholder="Codice stazione (es: ROOM123)" maxlength="12">
                 
                 <button id="join-room" class="button button-secondary">
-                    🚪 Unisciti
+                    🚪 Unisciti alla Battaglia
                 </button>
             </div>
         </div>
 
         <!-- Game Screen -->
         <div id="game-screen" class="hidden">
-            <!-- Header -->
+            <!-- Game Header -->
             <div class="card">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <h2>🚀 Stanza: <span id="room-display"></span></h2>
-                    <button id="leave-room" class="button button-secondary" style="width: auto; padding: 0.5rem 1rem;">
-                        🚪 Esci
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    <div>
+                        <h2>🚀 Stazione: <span id="room-display"></span></h2>
+                        <div id="difficulty-info" class="difficulty-badge normal">Modalità Guerriero</div>
+                    </div>
+                    <button id="leave-room" class="button button-secondary" style="width: auto; padding: 0.8rem 1.5rem;">
+                        🚪 Abbandona Battaglia
                     </button>
                 </div>
             </div>
 
-            <!-- Game Status -->
-            <div class="card">
-                <div id="game-status">
-                    <p><strong>Stato:</strong> <span id="status-text">In attesa...</span></p>
-                    <p><strong>Giocatori:</strong> <span id="player-count">0</span></p>
-                    <p><strong>Round:</strong> <span id="round-number">0</span></p>
-                    <div id="turn-info" style="margin-top: 1rem; padding: 1rem; background: rgba(0,0,0,0.3); border-radius: 0.5rem;"></div>
+            <!-- Level Progress -->
+            <div class="level-progress">
+                <h3>📊 Progresso Livelli</h3>
+                <div style="display: flex; justify-content: space-between; margin: 0.5rem 0;">
+                    <span>Livello <span id="current-level">1</span>/10</span>
+                    <span id="level-winner"></span>
+                </div>
+                <div class="level-bar">
+                    <div class="level-fill" id="level-fill" style="width: 10%;"></div>
+                </div>
+            </div>
+
+            <!-- Turn Indicator -->
+            <div id="turn-indicator" class="turn-indicator hidden">
+                <div id="turn-text">In attesa...</div>
+            </div>
+
+            <!-- Game Stats -->
+            <div class="game-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="players-count">0</div>
+                    <div class="stat-label">Giocatori</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="current-round">0</div>
+                    <div class="stat-label">Round</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="attempts-left">0</div>
+                    <div class="stat-label">Tentativi</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="time-left">30</div>
+                    <div class="stat-label">Secondi</div>
                 </div>
             </div>
 
@@ -267,33 +577,37 @@
                 <div>
                     <!-- Controls -->
                     <div class="card">
-                        <h3 style="margin-bottom: 1rem;">🎮 Controlli</h3>
+                        <h3 style="margin-bottom: 1rem; text-align: center;">🎮 Controlli di Battaglia</h3>
                         
                         <div id="start-controls">
-                            <button id="start-game" class="button button-success">🎯 Inizia Battaglia</button>
+                            <button id="start-game" class="button button-success">🎯 Inizia Battaglia Epica</button>
+                            <p style="text-align: center; margin-top: 0.5rem; opacity: 0.8;">
+                                Servono almeno 2 comandanti per iniziare
+                            </p>
                         </div>
 
                         <div id="game-controls" class="hidden">
-                            <input type="number" id="guess-input" class="input" placeholder="Numero (1-100)" min="1" max="100">
-                            <button id="submit-guess" class="button button-success">🚀 Indovina!</button>
+                            <input type="number" id="guess-input" class="input" placeholder="Il tuo numero strategico" min="1" max="100">
+                            <button id="submit-guess" class="button button-success">🚀 Lancia Attacco!</button>
+                            <div id="attempts-info" style="text-align: center; margin-top: 0.5rem; opacity: 0.8; font-weight: bold;"></div>
                         </div>
                     </div>
 
                     <!-- Chat -->
                     <div class="card">
-                        <h3 style="margin-bottom: 1rem;">💬 Chat</h3>
+                        <h3 style="margin-bottom: 1rem;">💬 Comunicazioni Galattiche</h3>
                         <div id="chat-messages" class="chat"></div>
                         <div style="display: flex; gap: 0.5rem;">
-                            <input type="text" id="chat-input" class="input" placeholder="Messaggio..." style="margin-bottom: 0;">
-                            <button id="send-chat" class="button button-success" style="width: auto; padding: 0.75rem;">📤</button>
+                            <input type="text" id="chat-input" class="input" placeholder="Invia messaggio ai comandanti..." style="margin-bottom: 0;">
+                            <button id="send-chat" class="button button-success" style="width: auto; padding: 1rem;">📤</button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Players -->
+                <!-- Players & Leaderboard -->
                 <div>
                     <div class="card">
-                        <h3 style="margin-bottom: 1rem;">👥 Giocatori</h3>
+                        <h3 style="margin-bottom: 1rem; text-align: center;">🏆 Classifica Comandanti</h3>
                         <div id="leaderboard" class="leaderboard"></div>
                     </div>
                 </div>
@@ -308,14 +622,67 @@
         let playerId = 'player_' + Math.random().toString(36).substr(2, 9);
         let playerName = '';
         let connectionStatus = 'connecting';
+        let selectedDifficulty = 'normal';
 
         console.log(`🆔 Player ID: ${playerId}`);
 
+        // Crea stelle animate
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const numStars = 150;
+
+            for (let i = 0; i < numStars; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.width = Math.random() * 3 + 1 + 'px';
+                star.style.height = star.style.width;
+                star.style.animationDelay = Math.random() * 3 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
+            createStars();
+            
+            // Carica difficoltà selezionata
+            selectedDifficulty = localStorage.getItem('selectedDifficulty') || 'normal';
+            updateDifficultyDisplay();
+            
             setupEventListeners();
             connectToServer();
         });
+
+        function updateDifficultyDisplay() {
+            const difficultyNames = {
+                easy: '🌟 Modalità Principiante',
+                normal: '⚡ Modalità Guerriero', 
+                hard: '🔥 Modalità Comandante',
+                expert: '💀 Modalità Leggenda'
+            };
+            
+            const difficultyClasses = {
+                easy: 'easy',
+                normal: 'normal',
+                hard: 'hard', 
+                expert: 'expert'
+            };
+            
+            const displayEl = document.getElementById('difficulty-display');
+            const infoEl = document.getElementById('difficulty-info');
+            
+            if (displayEl) {
+                displayEl.textContent = difficultyNames[selectedDifficulty];
+                displayEl.className = `difficulty-badge ${difficultyClasses[selectedDifficulty]}`;
+            }
+            
+            if (infoEl) {
+                infoEl.textContent = difficultyNames[selectedDifficulty];
+                infoEl.className = `difficulty-badge ${difficultyClasses[selectedDifficulty]}`;
+            }
+        }
 
         function setupEventListeners() {
             document.getElementById('create-room').addEventListener('click', createRoom);
@@ -326,7 +693,7 @@
             document.getElementById('leave-room').addEventListener('click', leaveRoom);
             
             document.getElementById('guess-input').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') submitGuess();
+                if (e.key === 'Enter' && !this.disabled) submitGuess();
             });
             
             document.getElementById('chat-input').addEventListener('keypress', function(e) {
@@ -347,7 +714,7 @@
                     console.log('✅ Connected!');
                     connectionStatus = 'online';
                     updateConnectionStatus();
-                    showNotification('🌐 Connesso!', 'success');
+                    showNotification('🌐 Connesso al server galattico!', 'success');
                 };
                 
                 ws.onmessage = function(event) {
@@ -364,7 +731,7 @@
                     console.log('🔌 Connection closed');
                     connectionStatus = 'offline';
                     updateConnectionStatus();
-                    showNotification('🔴 Disconnesso', 'error');
+                    showNotification('🔴 Connessione persa', 'error');
                     
                     setTimeout(connectToServer, 3000);
                 };
@@ -392,14 +759,14 @@
                     console.log('🏠 Room created:', data.gameData.roomCode);
                     gameData = data.gameData;
                     showGameScreen();
-                    showNotification('🚀 Stanza creata!', 'success');
+                    showNotification('🚀 Stazione galattica creata!', 'success');
                     break;
                     
                 case 'roomJoined':
                     console.log('🚪 Joined room:', data.gameData.roomCode);
                     gameData = data.gameData;
                     showGameScreen();
-                    showNotification('🚪 Entrato nella stanza!', 'success');
+                    showNotification('🚪 Entrato nella battaglia!', 'success');
                     break;
                     
                 case 'gameUpdate':
@@ -433,7 +800,7 @@
                 return true;
             } else {
                 console.log('❌ WebSocket not connected');
-                showNotification('❌ Non connesso', 'error');
+                showNotification('❌ Non connesso al server', 'error');
                 return false;
             }
         }
@@ -444,15 +811,15 @@
             switch (connectionStatus) {
                 case 'online':
                     statusEl.className = 'status status-online';
-                    statusEl.textContent = '🟢 Connesso';
+                    statusEl.textContent = '🟢 Connesso alla rete galattica';
                     break;
                 case 'offline':
                     statusEl.className = 'status status-offline';
-                    statusEl.textContent = '🔴 Disconnesso';
+                    statusEl.textContent = '🔴 Disconnesso - Riconnessione...';
                     break;
                 case 'connecting':
                     statusEl.className = 'status status-connecting';
-                    statusEl.textContent = '🟡 Connessione...';
+                    statusEl.textContent = '🟡 Connessione alla rete galattica...';
                     break;
             }
         }
@@ -460,15 +827,16 @@
         function createRoom() {
             playerName = document.getElementById('player-name').value.trim();
             if (!playerName) {
-                showNotification('Inserisci il nome!', 'error');
+                showNotification('Inserisci il nome del comandante!', 'error');
                 return;
             }
 
-            console.log(`🏠 Creating room for: ${playerName}`);
+            console.log(`🏠 Creating room for: ${playerName} with difficulty: ${selectedDifficulty}`);
             sendMessage({
                 type: 'createRoom',
                 playerId: playerId,
-                playerName: playerName
+                playerName: playerName,
+                difficulty: selectedDifficulty
             });
         }
 
@@ -477,7 +845,7 @@
             const roomCode = document.getElementById('room-code').value.trim().toUpperCase();
             
             if (!playerName || !roomCode) {
-                showNotification('Inserisci nome e codice!', 'error');
+                showNotification('Inserisci nome comandante e codice stazione!', 'error');
                 return;
             }
 
@@ -492,14 +860,11 @@
 
         function startGame() {
             if (!gameData) {
-                showNotification('Errore: nessun dato gioco', 'error');
+                showNotification('Errore: nessun dato battaglia', 'error');
                 return;
             }
             
-            console.log(`🎮 Starting game for room: ${gameData.roomCode}`);
-            console.log(`👤 Player ID: ${playerId}`);
-            console.log(`🏠 Is host: ${gameData.players.find(p => p.id === playerId)?.isHost}`);
-            console.log(`👥 Players: ${gameData.players.length}`);
+            console.log(`🎮 Starting epic battle for room: ${gameData.roomCode}`);
             
             sendMessage({
                 type: 'startGame',
@@ -511,8 +876,9 @@
         function submitGuess() {
             const guess = parseInt(document.getElementById('guess-input').value);
             
-            if (isNaN(guess) || guess < 1 || guess > 100) {
-                showNotification('Numero tra 1 e 100!', 'error');
+            if (isNaN(guess) || guess < 1 || guess > (gameData?.config?.maxNumber || 100)) {
+                const maxNum = gameData?.config?.maxNumber || 100;
+                showNotification(`Numero tra 1 e ${maxNum}!`, 'error');
                 return;
             }
 
@@ -545,7 +911,7 @@
         function leaveRoom() {
             showLobbyScreen();
             gameData = null;
-            showNotification('🚪 Uscito dalla stanza', 'info');
+            showNotification('🚪 Hai abbandonato la battaglia', 'info');
         }
 
         function showLobbyScreen() {
@@ -567,61 +933,101 @@
             // Update room code
             document.getElementById('room-display').textContent = gameData.roomCode;
 
-            // Update status
-            document.getElementById('status-text').textContent = gameData.gameStarted ? 'In corso' : 'In attesa';
-            document.getElementById('player-count').textContent = gameData.players.length;
-            document.getElementById('round-number').textContent = gameData.currentRound || 0;
-
-            // Update turn info
-            const turnInfo = document.getElementById('turn-info');
-            if (gameData.gameStarted) {
-                const currentPlayer = gameData.players[gameData.currentPlayerIndex];
-                const isMyTurn = currentPlayer && currentPlayer.id === playerId;
-                
-                if (isMyTurn) {
-                    turnInfo.innerHTML = `🎯 <strong>È il tuo turno!</strong><br>Tentativi: ${gameData.currentAttempts}/${gameData.maxAttempts}`;
-                    turnInfo.style.background = 'rgba(16, 185, 129, 0.3)';
-                } else {
-                    turnInfo.innerHTML = `⏳ Turno di: <strong>${currentPlayer ? currentPlayer.name : 'Sconosciuto'}</strong>`;
-                    turnInfo.style.background = 'rgba(251, 191, 36, 0.2)';
-                }
-            } else {
-                turnInfo.innerHTML = '⏸️ Gioco non iniziato';
-                turnInfo.style.background = 'rgba(0, 0, 0, 0.3)';
+            // Update difficulty info
+            if (gameData.config) {
+                const difficultyInfo = document.getElementById('difficulty-info');
+                const difficultyNames = {
+                    easy: '🌟 Modalità Principiante',
+                    normal: '⚡ Modalità Guerriero',
+                    hard: '🔥 Modalità Comandante', 
+                    expert: '💀 Modalità Leggenda'
+                };
+                difficultyInfo.textContent = difficultyNames[gameData.difficulty] || '⚡ Modalità Guerriero';
             }
+
+            // Update level progress
+            const currentLevel = gameData.currentLevel || 1;
+            const levelProgress = (currentLevel / 10) * 100;
+            document.getElementById('current-level').textContent = currentLevel;
+            document.getElementById('level-fill').style.width = levelProgress + '%';
+
+            // Update game stats
+            document.getElementById('players-count').textContent = gameData.players.length;
+            document.getElementById('current-round').textContent = gameData.currentRound || 0;
 
             // Update controls
             const isHost = gameData.players.find(p => p.id === playerId)?.isHost;
             const currentPlayer = gameData.players[gameData.currentPlayerIndex];
             const isMyTurn = currentPlayer && currentPlayer.id === playerId;
 
-            if (gameData.gameStarted) {
+            if (gameData.gameStarted && !gameData.gameEnded) {
                 document.getElementById('start-controls').classList.add('hidden');
                 document.getElementById('game-controls').classList.remove('hidden');
+                document.getElementById('turn-indicator').classList.remove('hidden');
                 
                 document.getElementById('guess-input').disabled = !isMyTurn;
                 document.getElementById('submit-guess').disabled = !isMyTurn;
+                
+                // Update attempts info
+                const attemptsInfo = document.getElementById('attempts-info');
+                const attemptsLeft = document.getElementById('attempts-left');
+                if (isMyTurn) {
+                    const remaining = (gameData.config?.maxAttempts || 3) - gameData.currentAttempts;
+                    attemptsInfo.textContent = `Tentativi rimasti: ${remaining}/${gameData.config?.maxAttempts || 3}`;
+                    attemptsLeft.textContent = remaining;
+                } else {
+                    attemptsInfo.textContent = '';
+                    attemptsLeft.textContent = '0';
+                }
+                
+                updateTurnIndicator();
+            } else if (gameData.gameEnded) {
+                document.getElementById('game-controls').classList.add('hidden');
+                document.getElementById('turn-indicator').classList.add('hidden');
+                
+                // Show victory screen
+                if (gameData.winner) {
+                    showNotification(`🏆 ${gameData.winner.name} è il COMANDANTE SUPREMO!`, 'success');
+                }
             } else {
                 document.getElementById('game-controls').classList.add('hidden');
+                document.getElementById('turn-indicator').classList.add('hidden');
                 
                 if (isHost && gameData.players.length >= 2) {
                     document.getElementById('start-controls').classList.remove('hidden');
                     document.getElementById('start-game').disabled = false;
-                    document.getElementById('start-game').textContent = '🎯 Inizia Battaglia';
+                    document.getElementById('start-game').textContent = '🎯 Inizia Battaglia Epica';
                 } else if (isHost) {
                     document.getElementById('start-controls').classList.remove('hidden');
                     document.getElementById('start-game').disabled = true;
-                    document.getElementById('start-game').textContent = '⏳ Aspetta altri giocatori';
+                    document.getElementById('start-game').textContent = '⏳ Aspetta altri comandanti';
                 } else {
                     document.getElementById('start-controls').classList.add('hidden');
                 }
             }
 
-            // Update players
+            // Update leaderboard
             updateLeaderboard();
 
             // Update chat
             updateChat();
+        }
+
+        function updateTurnIndicator() {
+            if (!gameData || !gameData.gameStarted) return;
+            
+            const turnIndicator = document.getElementById('turn-indicator');
+            const turnText = document.getElementById('turn-text');
+            const currentPlayer = gameData.players[gameData.currentPlayerIndex];
+            const isMyTurn = currentPlayer && currentPlayer.id === playerId;
+            
+            if (isMyTurn) {
+                turnIndicator.className = 'turn-indicator turn-active';
+                turnText.textContent = `🎯 È il tuo turno, Comandante! (${gameData.config?.maxAttempts || 3} tentativi)`;
+            } else {
+                turnIndicator.className = 'turn-indicator turn-waiting';
+                turnText.textContent = `⏳ Turno del Comandante ${currentPlayer ? currentPlayer.name : 'Sconosciuto'}`;
+            }
         }
 
         function updateLeaderboard() {
@@ -629,7 +1035,7 @@
             leaderboard.innerHTML = '';
 
             if (!gameData.players.length) {
-                leaderboard.innerHTML = '<p style="text-align: center; opacity: 0.6;">Nessun giocatore</p>';
+                leaderboard.innerHTML = '<p style="text-align: center; opacity: 0.6;">Nessun comandante</p>';
                 return;
             }
 
@@ -652,7 +1058,7 @@
                     
                     playerEl.innerHTML = `
                         <span>${icon} ${player.name}${hostIcon}${isCurrentPlayer}${turnIcon}</span>
-                        <span style="color: #fbbf24; font-weight: bold;">${player.score || 0}</span>
+                        <span style="color: #00f5ff; font-weight: bold; font-size: 1.2rem;">${player.score || 0}</span>
                     `;
                     
                     leaderboard.appendChild(playerEl);
@@ -702,10 +1108,10 @@
             
             setTimeout(() => {
                 notification.classList.add('hidden');
-            }, 3000);
+            }, 4000);
         }
 
-        console.log('🎮 Game loaded!');
+        console.log('🎮 Battaglia Galattica Arena loaded!');
     </script>
 </body>
 </html>
