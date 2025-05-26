@@ -62,21 +62,17 @@ function createRoom(playerId, playerName) {
   }
 
   rooms.set(roomCode, room)
-  console.log(`✅ Stanza creata: ${roomCode}, giocatori: ${room.players.length}`)
+  console.log(`✅ Stanza creata: ${roomCode}`)
   return room
 }
 
 function addPlayerToRoom(roomCode, playerId, playerName) {
   const room = rooms.get(roomCode)
-  if (!room) {
-    console.log(`❌ Stanza ${roomCode} non trovata`)
-    return null
-  }
+  if (!room) return null
 
   // Controlla se il giocatore è già nella stanza
   const existingPlayer = room.players.find((p) => p.id === playerId)
   if (existingPlayer) {
-    console.log(`⚠️ Giocatore ${playerName} già nella stanza ${roomCode}`)
     return room
   }
 
@@ -88,8 +84,6 @@ function addPlayerToRoom(roomCode, playerId, playerName) {
     isHost: false,
   })
 
-  console.log(`✅ ${playerName} aggiunto alla stanza ${roomCode}, totale giocatori: ${room.players.length}`)
-
   // Aggiungi messaggio di benvenuto alla chat
   room.chat.push({
     playerName: "Sistema",
@@ -97,14 +91,13 @@ function addPlayerToRoom(roomCode, playerId, playerName) {
     timestamp: Date.now(),
   })
 
+  console.log(`✅ ${playerName} aggiunto alla stanza ${roomCode}`)
   return room
 }
 
 function broadcastToRoom(roomCode, message, excludePlayerId = null) {
   const room = rooms.get(roomCode)
   if (!room) return
-
-  console.log(`📡 Broadcasting a stanza ${roomCode}, giocatori: ${room.players.length}`)
 
   room.players.forEach((player) => {
     if (player.id !== excludePlayerId) {
@@ -120,16 +113,57 @@ function broadcastToRoom(roomCode, message, excludePlayerId = null) {
   })
 }
 
-function startGame(roomCode) {
-  console.log(`🎮 Tentativo di avvio gioco per stanza: ${roomCode}`)
-
+function nextTurn(roomCode) {
   const room = rooms.get(roomCode)
-  if (!room) {
-    console.log(`❌ Stanza ${roomCode} non trovata per startGame`)
-    return { error: "Stanza non trovata" }
+  if (!room || !room.gameStarted || room.players.length === 0) return
+
+  // Cancella il timer precedente
+  if (room.turnTimer) {
+    clearTimeout(room.turnTimer)
+    room.turnTimer = null
   }
 
-  console.log(`📊 Stanza ${roomCode} - Giocatori: ${room.players.length}, Già iniziato: ${room.gameStarted}`)
+  // Passa al prossimo giocatore
+  room.currentPlayerIndex = (room.currentPlayerIndex + 1) % room.players.length
+  room.currentAttempts = 0
+  room.turnStartTime = Date.now()
+
+  const currentPlayer = room.players[room.currentPlayerIndex]
+
+  room.chat.push({
+    playerName: "Sistema",
+    message: `🎯 È il turno di ${currentPlayer.name}! (${room.turnTimeLimit}s, max ${room.maxAttempts} tentativi)`,
+    timestamp: Date.now(),
+  })
+
+  // Imposta timer per il turno
+  room.turnTimer = setTimeout(() => {
+    const currentRoom = rooms.get(roomCode)
+    if (currentRoom && currentRoom.gameStarted) {
+      currentRoom.chat.push({
+        playerName: "Sistema",
+        message: `⏰ Tempo scaduto per ${currentPlayer.name}!`,
+        timestamp: Date.now(),
+      })
+
+      nextTurn(roomCode)
+
+      broadcastToRoom(roomCode, {
+        type: "gameUpdate",
+        gameData: currentRoom,
+      })
+    }
+  }, room.turnTimeLimit * 1000)
+
+  return currentPlayer
+}
+
+function startGame(roomCode) {
+  const room = rooms.get(roomCode)
+  if (!room) {
+    console.log(`❌ Stanza ${roomCode} non trovata`)
+    return { error: "Stanza non trovata" }
+  }
 
   if (room.players.length < 2) {
     console.log(`❌ Non abbastanza giocatori: ${room.players.length}`)
@@ -137,50 +171,200 @@ function startGame(roomCode) {
   }
 
   if (room.gameStarted) {
-    console.log(`⚠️ Gioco già iniziato per stanza ${roomCode}`)
+    console.log(`⚠️ Gioco già iniziato`)
     return { error: "Il gioco è già iniziato!" }
   }
 
-  try {
-    console.log(`🚀 Avvio gioco per stanza ${roomCode}`)
+  console.log(`🚀 Avvio gioco per stanza ${roomCode}`)
 
-    room.gameStarted = true
-    room.secretNumber = generateSecretNumber()
-    room.currentRound = 1
-    room.currentPlayerIndex = 0
-    room.currentAttempts = 0
-    room.turnStartTime = Date.now()
+  // Inizializza il gioco
+  room.gameStarted = true
+  room.secretNumber = generateSecretNumber()
+  room.currentRound = 1
+  room.currentPlayerIndex = 0
+  room.currentAttempts = 0
+  room.turnStartTime = Date.now()
 
-    console.log(`🎯 Numero segreto generato: ${room.secretNumber}`)
-    console.log(`👤 Primo giocatore: ${room.players[0].name}`)
+  const currentPlayer = room.players[room.currentPlayerIndex]
 
-    const currentPlayer = room.players[room.currentPlayerIndex]
+  room.chat.push({
+    playerName: "Sistema",
+    message: `🎯 Battaglia iniziata! Numero segreto generato (1-100)`,
+    timestamp: Date.now(),
+  })
 
-    room.chat.push({
-      playerName: "Sistema",
-      message: `🎯 Battaglia iniziata! Numero segreto generato (1-100)`,
-      timestamp: Date.now(),
-    })
+  room.chat.push({
+    playerName: "Sistema",
+    message: `🎮 È il turno di ${currentPlayer.name}! (${room.turnTimeLimit}s, max ${room.maxAttempts} tentativi)`,
+    timestamp: Date.now(),
+  })
 
-    room.chat.push({
-      playerName: "Sistema",
-      message: `🎮 È il turno di ${currentPlayer.name}! (${room.turnTimeLimit}s, max ${room.maxAttempts} tentativi)`,
-      timestamp: Date.now(),
-    })
+  // Imposta timer per il primo turno
+  room.turnTimer = setTimeout(() => {
+    const currentRoom = rooms.get(roomCode)
+    if (currentRoom && currentRoom.gameStarted) {
+      currentRoom.chat.push({
+        playerName: "Sistema",
+        message: `⏰ Tempo scaduto per ${currentPlayer.name}!`,
+        timestamp: Date.now(),
+      })
 
-    console.log(`✅ Gioco avviato con successo per stanza ${roomCode}`)
-    return { success: true }
-  } catch (error) {
-    console.error(`❌ Errore in startGame per stanza ${roomCode}:`, error)
-    return { error: "Errore interno del server: " + error.message }
+      nextTurn(roomCode)
+
+      broadcastToRoom(roomCode, {
+        type: "gameUpdate",
+        gameData: currentRoom,
+      })
+    }
+  }, room.turnTimeLimit * 1000)
+
+  console.log(`✅ Gioco avviato con successo`)
+  return { success: true }
+}
+
+function handleGuess(roomCode, playerId, playerName, guess) {
+  const room = rooms.get(roomCode)
+  if (!room || !room.gameStarted) return null
+
+  // Verifica se è il turno del giocatore
+  const currentPlayer = room.players[room.currentPlayerIndex]
+  if (!currentPlayer || currentPlayer.id !== playerId) {
+    return {
+      error: true,
+      message: `❌ Non è il tuo turno! È il turno di ${currentPlayer ? currentPlayer.name : "qualcuno"}`,
+    }
   }
+
+  // Verifica se ha ancora tentativi
+  if (room.currentAttempts >= room.maxAttempts) {
+    return {
+      error: true,
+      message: `❌ Hai esaurito i tuoi ${room.maxAttempts} tentativi per questo turno!`,
+    }
+  }
+
+  room.currentAttempts++
+
+  const result = {
+    playerId,
+    playerName,
+    guess,
+    correct: false,
+    hint: "",
+    attemptsLeft: room.maxAttempts - room.currentAttempts,
+  }
+
+  if (guess === room.secretNumber) {
+    result.correct = true
+    result.hint = "🎉 CORRETTO!"
+
+    // Cancella il timer del turno
+    if (room.turnTimer) {
+      clearTimeout(room.turnTimer)
+      room.turnTimer = null
+    }
+
+    // Aggiungi punti al giocatore
+    const bonusPoints = (room.maxAttempts - room.currentAttempts + 1) * 5
+    const player = room.players.find((p) => p.id === playerId)
+    if (player) {
+      player.score += 10 + bonusPoints
+    }
+
+    room.chat.push({
+      playerName: "Sistema",
+      message: `🏆 ${playerName} ha indovinato il numero ${guess}! +${10 + bonusPoints} punti`,
+      timestamp: Date.now(),
+    })
+
+    // Inizia nuovo round dopo 3 secondi
+    setTimeout(() => {
+      const currentRoom = rooms.get(roomCode)
+      if (currentRoom) {
+        currentRoom.secretNumber = generateSecretNumber()
+        currentRoom.currentRound++
+        currentRoom.currentPlayerIndex = 0
+        currentRoom.currentAttempts = 0
+        currentRoom.turnStartTime = Date.now()
+
+        currentRoom.chat.push({
+          playerName: "Sistema",
+          message: `🔄 Round ${currentRoom.currentRound}! Nuovo numero segreto generato`,
+          timestamp: Date.now(),
+        })
+
+        const newCurrentPlayer = currentRoom.players[0]
+        currentRoom.chat.push({
+          playerName: "Sistema",
+          message: `🎮 È il turno di ${newCurrentPlayer.name}!`,
+          timestamp: Date.now(),
+        })
+
+        // Nuovo timer
+        currentRoom.turnTimer = setTimeout(() => {
+          const roomForTimer = rooms.get(roomCode)
+          if (roomForTimer && roomForTimer.gameStarted) {
+            roomForTimer.chat.push({
+              playerName: "Sistema",
+              message: `⏰ Tempo scaduto per ${newCurrentPlayer.name}!`,
+              timestamp: Date.now(),
+            })
+
+            nextTurn(roomCode)
+
+            broadcastToRoom(roomCode, {
+              type: "gameUpdate",
+              gameData: roomForTimer,
+            })
+          }
+        }, currentRoom.turnTimeLimit * 1000)
+
+        broadcastToRoom(roomCode, {
+          type: "gameUpdate",
+          gameData: currentRoom,
+        })
+      }
+    }, 3000)
+  } else if (guess < room.secretNumber) {
+    result.hint = "📈 Troppo basso!"
+    room.chat.push({
+      playerName: "Sistema",
+      message: `${playerName}: ${guess} - Troppo basso! 📈 (${result.attemptsLeft} tentativi rimasti)`,
+      timestamp: Date.now(),
+    })
+  } else {
+    result.hint = "📉 Troppo alto!"
+    room.chat.push({
+      playerName: "Sistema",
+      message: `${playerName}: ${guess} - Troppo alto! 📉 (${result.attemptsLeft} tentativi rimasti)`,
+      timestamp: Date.now(),
+    })
+  }
+
+  // Se ha esaurito i tentativi, passa al prossimo giocatore
+  if (room.currentAttempts >= room.maxAttempts && !result.correct) {
+    room.chat.push({
+      playerName: "Sistema",
+      message: `❌ ${playerName} ha esaurito i tentativi!`,
+      timestamp: Date.now(),
+    })
+
+    setTimeout(() => {
+      nextTurn(roomCode)
+      broadcastToRoom(roomCode, {
+        type: "gameUpdate",
+        gameData: rooms.get(roomCode),
+      })
+    }, 1500)
+  }
+
+  return result
 }
 
 // WebSocket connection handler
 wss.on("connection", (ws) => {
   console.log("🔗 Nuova connessione WebSocket")
 
-  // Invia conferma di connessione
   ws.send(
     JSON.stringify({
       type: "connected",
@@ -191,12 +375,11 @@ wss.on("connection", (ws) => {
   ws.on("message", (data) => {
     try {
       const message = JSON.parse(data)
-      console.log(`📨 Messaggio ricevuto: ${message.type}`, message)
+      console.log(`📨 Messaggio: ${message.type}`)
 
       switch (message.type) {
         case "createRoom":
           {
-            console.log(`🏠 Creazione stanza per ${message.playerName}`)
             const { playerId, playerName } = message
             players.set(playerId, ws)
 
@@ -208,23 +391,17 @@ wss.on("connection", (ws) => {
                 gameData: room,
               }),
             )
-
-            console.log(`✅ Stanza ${room.roomCode} creata e inviata al client`)
           }
           break
 
         case "joinRoom":
           {
-            console.log(`🚪 ${message.playerName} tenta di unirsi a ${message.roomCode}`)
             const { playerId, playerName, roomCode } = message
             players.set(playerId, ws)
 
             const room = addPlayerToRoom(roomCode, playerId, playerName)
 
             if (room) {
-              console.log(`✅ ${playerName} unito a ${roomCode}`)
-
-              // Invia aggiornamento al giocatore che si è unito
               ws.send(
                 JSON.stringify({
                   type: "roomJoined",
@@ -232,15 +409,11 @@ wss.on("connection", (ws) => {
                 }),
               )
 
-              // Invia aggiornamento a tutti i giocatori nella stanza
               broadcastToRoom(roomCode, {
                 type: "gameUpdate",
                 gameData: room,
               })
-
-              console.log(`📡 Aggiornamenti inviati per stanza ${roomCode}`)
             } else {
-              console.log(`❌ Impossibile unire ${playerName} a ${roomCode}`)
               ws.send(
                 JSON.stringify({
                   type: "error",
@@ -253,13 +426,10 @@ wss.on("connection", (ws) => {
 
         case "startGame":
           {
-            console.log(`🎮 Richiesta avvio gioco da ${message.playerId} per stanza ${message.roomCode}`)
-
             const { roomCode, playerId } = message
             const room = rooms.get(roomCode)
 
             if (!room) {
-              console.log(`❌ Stanza ${roomCode} non trovata per startGame`)
               ws.send(
                 JSON.stringify({
                   type: "error",
@@ -269,24 +439,8 @@ wss.on("connection", (ws) => {
               break
             }
 
-            console.log(`📊 Stanza trovata: ${roomCode}, giocatori: ${room.players.length}`)
-
             const player = room.players.find((p) => p.id === playerId)
-            if (!player) {
-              console.log(`❌ Giocatore ${playerId} non trovato nella stanza`)
-              ws.send(
-                JSON.stringify({
-                  type: "error",
-                  message: "❌ Giocatore non trovato nella stanza!",
-                }),
-              )
-              break
-            }
-
-            console.log(`👤 Giocatore trovato: ${player.name}, è host: ${player.isHost}`)
-
-            if (!player.isHost) {
-              console.log(`❌ ${player.name} non è l'host`)
+            if (!player || !player.isHost) {
               ws.send(
                 JSON.stringify({
                   type: "error",
@@ -297,23 +451,18 @@ wss.on("connection", (ws) => {
             }
 
             const result = startGame(roomCode)
-            console.log(`🎮 Risultato startGame:`, result)
 
-            if (result && result.success) {
-              console.log(`✅ Gioco avviato, invio aggiornamenti...`)
-
+            if (result.success) {
               broadcastToRoom(roomCode, {
                 type: "gameUpdate",
                 gameData: room,
               })
-
-              console.log(`📡 Aggiornamenti inviati per avvio gioco`)
+              console.log(`✅ Gioco avviato per ${roomCode}`)
             } else {
-              console.log(`❌ Errore avvio gioco:`, result?.error)
               ws.send(
                 JSON.stringify({
                   type: "error",
-                  message: result?.error || "❌ Errore nell'avvio del gioco",
+                  message: result.error,
                 }),
               )
             }
@@ -322,14 +471,37 @@ wss.on("connection", (ws) => {
 
         case "guess":
           {
-            console.log(`🎯 Tentativo di ${message.playerName}: ${message.guess}`)
-            // Implementazione guess...
+            const { roomCode, playerId, playerName, guess } = message
+            const result = handleGuess(roomCode, playerId, playerName, guess)
+
+            if (result) {
+              if (result.error) {
+                ws.send(
+                  JSON.stringify({
+                    type: "error",
+                    message: result.message,
+                  }),
+                )
+              } else {
+                ws.send(
+                  JSON.stringify({
+                    type: "guessResult",
+                    result: result,
+                  }),
+                )
+
+                broadcastToRoom(roomCode, {
+                  type: "gameUpdate",
+                  gameData: rooms.get(roomCode),
+                })
+              }
+            }
           }
           break
 
         case "chat":
           {
-            const { roomCode, playerId, playerName, message: chatMessage } = message
+            const { roomCode, playerName, message: chatMessage } = message
             const room = rooms.get(roomCode)
 
             if (room) {
@@ -339,7 +511,6 @@ wss.on("connection", (ws) => {
                 timestamp: Date.now(),
               })
 
-              // Mantieni solo gli ultimi 50 messaggi
               if (room.chat.length > 50) {
                 room.chat = room.chat.slice(-50)
               }
@@ -348,8 +519,6 @@ wss.on("connection", (ws) => {
                 type: "gameUpdate",
                 gameData: room,
               })
-
-              console.log(`💬 ${playerName}: ${chatMessage}`)
             }
           }
           break
@@ -357,24 +526,59 @@ wss.on("connection", (ws) => {
         case "ping":
           ws.send(JSON.stringify({ type: "pong" }))
           break
-
-        default:
-          console.log("❓ Tipo messaggio sconosciuto:", message.type)
       }
     } catch (error) {
-      console.error("❌ Errore parsing messaggio:", error)
+      console.error("❌ Errore:", error)
       ws.send(
         JSON.stringify({
           type: "error",
-          message: "Errore del server: " + error.message,
+          message: "Errore del server",
         }),
       )
     }
   })
 
   ws.on("close", () => {
-    console.log("🔌 Connessione WebSocket chiusa")
-    // Cleanup logic...
+    console.log("🔌 Connessione chiusa")
+
+    // Cleanup
+    for (const [playerId, playerWs] of players.entries()) {
+      if (playerWs === ws) {
+        players.delete(playerId)
+
+        for (const [roomCode, room] of rooms.entries()) {
+          const playerIndex = room.players.findIndex((p) => p.id === playerId)
+          if (playerIndex !== -1) {
+            const player = room.players[playerIndex]
+            room.players.splice(playerIndex, 1)
+
+            if (room.turnTimer) {
+              clearTimeout(room.turnTimer)
+              room.turnTimer = null
+            }
+
+            if (room.players.length === 0) {
+              rooms.delete(roomCode)
+            } else {
+              if (player.isHost && room.players.length > 0) {
+                room.players[0].isHost = true
+              }
+
+              if (room.gameStarted && room.players.length === 1) {
+                room.gameStarted = false
+              }
+
+              broadcastToRoom(roomCode, {
+                type: "gameUpdate",
+                gameData: room,
+              })
+            }
+            break
+          }
+        }
+        break
+      }
+    }
   })
 
   ws.on("error", (error) => {
@@ -387,5 +591,4 @@ const HOST = process.env.HOST || "0.0.0.0"
 
 server.listen(PORT, HOST, () => {
   console.log(`🚀 Server avviato su ${HOST}:${PORT}`)
-  console.log(`🌐 Apri http://localhost:${PORT} per giocare`)
 })
