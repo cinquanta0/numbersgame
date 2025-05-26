@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "build": "echo 'Build completato - nessuna build necessaria per file statici'",
+    "build": "echo 'Build completato - tutti i file nella root'",
     "test": "echo 'Test non configurati'"
   },
   "dependencies": {
