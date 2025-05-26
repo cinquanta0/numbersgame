@@ -7,8 +7,8 @@ const app = express()
 const server = http.createServer(app)
 const wss = new WebSocket.Server({ server })
 
-// Middleware per servire file statici
-app.use(express.static("public"))
+// Middleware per servire file statici dalla root
+app.use(express.static(__dirname))
 app.use(express.json())
 
 // Storage in memoria per le stanze di gioco
@@ -340,19 +340,19 @@ app.get("/api/stats", (req, res) => {
   res.json(stats)
 })
 
-// Route principale
+// Route principale - serve index.html per il multiplayer
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"))
+  res.sendFile(path.join(__dirname, "index.html"))
 })
 
-// Route per cristo.html
+// Route per cristo.html - single player
 app.get("/cristo", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "cristo.html"))
+  res.sendFile(path.join(__dirname, "cristo.html"))
 })
 
-// Gestione errori 404
+// Gestione errori 404 - serve index.html come fallback
 app.use((req, res) => {
-  res.status(404).sendFile(path.join(__dirname, "public", "index.html"))
+  res.status(404).sendFile(path.join(__dirname, "index.html"))
 })
 
 // Pulizia automatica stanze inattive ogni 30 minuti
@@ -381,6 +381,7 @@ server.listen(PORT, () => {
   console.log(`🚀 Battaglia Galattica Server avviato sulla porta ${PORT}`)
   console.log(`🌐 WebSocket server pronto per battaglie multiplayer!`)
   console.log(`📊 Health check: http://localhost:${PORT}/api/health`)
+  console.log(`📁 Servendo file da: ${__dirname}`)
 })
 
 // Gestione graceful shutdown
