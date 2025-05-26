@@ -1,417 +1,422 @@
-const WebSocket = require("ws")
+const express = require("express")
 const http = require("http")
-const fs = require("fs")
+const WebSocket = require("ws")
 const path = require("path")
 
-// Crea server HTTP
-const server = http.createServer((req, res) => {
-  if (req.url === "/" || req.url === "/index.html") {
-    fs.readFile(path.join(__dirname, "index.html"), (err, data) => {
-      if (err) {
-        res.writeHead(404)
-        res.end("File not found")
-        return
-      }
-      res.writeHead(200, { "Content-Type": "text/html" })
-      res.end(data)
-    })
-  } else {
-    res.writeHead(404)
-    res.end("Not found")
-  }
-})
-
-// Crea WebSocket server
+const app = express()
+const server = http.createServer(app)
 const wss = new WebSocket.Server({ server })
 
-// Game state - SEMPLIFICATO
-const rooms = new Map()
-const players = new Map()
+const PORT = process.env.PORT || 3000
 
-function generateRoomCode() {
-  return "ROOM" + Math.random().toString(36).substr(2, 4).toUpperCase()
+// Serve static files
+app.use(express.static(path.join(__dirname)))
+
+// Routes
+app.get("/", (req, res) => {
+  console.log("📱 Serving home page (cristo.html)")
+  res.sendFile(path.join(__dirname, "cristo.html"))
+})
+
+app.get("/multiplayer", (req, res) => {
+  console.log("🎮 Serving multiplayer arena (index.html)")
+  res.sendFile(path.join(__dirname, "index.html"))
+})
+
+// Fallback per altre route
+app.get("*", (req, res) => {
+  console.log(`❓ Unknown route: ${req.path}, redirecting to home`)
+  res.redirect("/")
+})
+
+// Game state
+const rooms = new Map()
+
+// Difficulty configurations
+const difficultyConfigs = {
+  easy: {
+    name: "🌟 Modalità Principiante",
+    maxNumber: 50,
+    maxAttempts: 5,
+    timeLimit: 45,
+    levelMultiplier: 25,
+  },
+  normal: {
+    name: "⚡ Modalità Guerriero",
+    maxNumber: 100,
+    maxAttempts: 3,
+    timeLimit: 30,
+    levelMultiplier: 50,
+  },
+  hard: {
+    name: "🔥 Modalità Comandante",
+    maxNumber: 200,
+    maxAttempts: 2,
+    timeLimit: 20,
+    levelMultiplier: 75,
+  },
+  expert: {
+    name: "💀 Modalità Leggenda",
+    maxNumber: 500,
+    maxAttempts: 1,
+    timeLimit: 15,
+    levelMultiplier: 100,
+  },
 }
 
-function generateSecretNumber() {
-  return Math.floor(Math.random() * 100) + 1
+function generateRoomCode() {
+  return "ROOM" + Math.random().toString(36).substr(2, 6).toUpperCase()
+}
+
+function generateTargetNumber(config, level) {
+  const maxNum = config.maxNumber + (level - 1) * config.levelMultiplier
+  return Math.floor(Math.random() * maxNum) + 1
+}
+
+function calculateScore(attempts, timeLeft, level, config) {
+  const baseScore = 100
+  const attemptsBonus = (config.maxAttempts - attempts) * 20
+  const timeBonus = Math.floor(timeLeft * 2)
+  const levelBonus = level * 50
+
+  return Math.max(0, baseScore + attemptsBonus + timeBonus + levelBonus)
 }
 
 function broadcastToRoom(roomCode, message) {
   const room = rooms.get(roomCode)
   if (!room) return
 
-  console.log(`📡 Broadcasting to room ${roomCode}:`, message.type)
-
   room.players.forEach((player) => {
-    const ws = players.get(player.id)
-    if (ws && ws.readyState === WebSocket.OPEN) {
+    if (player.ws && player.ws.readyState === WebSocket.OPEN) {
       try {
-        ws.send(JSON.stringify(message))
-        console.log(`✅ Sent to ${player.name}`)
+        player.ws.send(JSON.stringify(message))
       } catch (error) {
-        console.error(`❌ Error sending to ${player.name}:`, error)
+        console.error(`❌ Error sending to player ${player.id}:`, error)
       }
-    } else {
-      console.log(`⚠️ Player ${player.name} not connected`)
     }
   })
 }
 
-// WebSocket connection handler
+function addChatMessage(roomCode, playerName, message) {
+  const room = rooms.get(roomCode)
+  if (!room) return
+
+  room.chat.push({
+    playerName,
+    message,
+    timestamp: Date.now(),
+  })
+
+  // Keep only last 50 messages
+  if (room.chat.length > 50) {
+    room.chat = room.chat.slice(-50)
+  }
+}
+
+function nextLevel(roomCode) {
+  const room = rooms.get(roomCode)
+  if (!room) return
+
+  room.currentLevel++
+  room.currentRound++
+  room.currentPlayerIndex = 0
+  room.currentAttempts = 0
+  room.targetNumber = generateTargetNumber(room.config, room.currentLevel)
+
+  addChatMessage(
+    roomCode,
+    "Sistema",
+    `🎉 Livello ${room.currentLevel} iniziato! Range: 1-${room.config.maxNumber + (room.currentLevel - 1) * room.config.levelMultiplier}`,
+  )
+
+  if (room.currentLevel > 10) {
+    endGame(roomCode)
+    return
+  }
+
+  broadcastToRoom(roomCode, {
+    type: "gameUpdate",
+    gameData: room,
+  })
+}
+
+function nextPlayer(roomCode) {
+  const room = rooms.get(roomCode)
+  if (!room) return
+
+  room.currentPlayerIndex = (room.currentPlayerIndex + 1) % room.players.length
+  room.currentAttempts = 0
+
+  broadcastToRoom(roomCode, {
+    type: "gameUpdate",
+    gameData: room,
+  })
+}
+
+function endGame(roomCode) {
+  const room = rooms.get(roomCode)
+  if (!room) return
+
+  room.gameEnded = true
+
+  // Find winner (highest score)
+  const winner = room.players.reduce((prev, current) => (prev.score > current.score ? prev : current))
+
+  room.winner = winner
+
+  addChatMessage(
+    roomCode,
+    "Sistema",
+    `🏆 BATTAGLIA COMPLETATA! Il vincitore è ${winner.name} con ${winner.score} punti!`,
+  )
+
+  broadcastToRoom(roomCode, {
+    type: "gameUpdate",
+    gameData: room,
+  })
+}
+
+// WebSocket connection handling
 wss.on("connection", (ws) => {
   console.log("🔗 New WebSocket connection")
 
-  ws.send(
-    JSON.stringify({
-      type: "connected",
-      message: "Connected to server!",
-    }),
-  )
+  ws.send(JSON.stringify({ type: "connected" }))
 
-  ws.on("message", (data) => {
+  ws.on("message", (message) => {
     try {
-      const message = JSON.parse(data)
-      console.log(`📨 Received: ${message.type}`, message)
+      const data = JSON.parse(message)
+      console.log(`📨 Received: ${data.type} from ${data.playerId || "unknown"}`)
 
-      switch (message.type) {
+      switch (data.type) {
         case "createRoom":
-          {
-            console.log(`🏠 Creating room for ${message.playerName}`)
+          const roomCode = generateRoomCode()
+          const difficulty = data.difficulty || "normal"
+          const config = difficultyConfigs[difficulty]
 
-            const roomCode = generateRoomCode()
-            const room = {
-              roomCode,
-              players: [
-                {
-                  id: message.playerId,
-                  name: message.playerName,
-                  score: 0,
-                  isHost: true,
-                },
-              ],
-              gameStarted: false,
-              secretNumber: null,
-              chat: [
-                {
-                  playerName: "Sistema",
-                  message: `🚀 Stanza ${roomCode} creata!`,
-                  timestamp: Date.now(),
-                },
-              ],
-              currentRound: 0,
-              currentPlayerIndex: 0,
-              maxAttempts: 3,
-              currentAttempts: 0,
-              turnTimeLimit: 30,
-            }
-
-            rooms.set(roomCode, room)
-            players.set(message.playerId, ws)
-
-            console.log(`✅ Room ${roomCode} created`)
-
-            ws.send(
-              JSON.stringify({
-                type: "roomCreated",
-                gameData: room,
-              }),
-            )
+          const room = {
+            roomCode,
+            config,
+            players: [
+              {
+                id: data.playerId,
+                name: data.playerName,
+                ws: ws,
+                score: 0,
+                isHost: true,
+              },
+            ],
+            gameStarted: false,
+            gameEnded: false,
+            currentLevel: 1,
+            currentRound: 0,
+            currentPlayerIndex: 0,
+            currentAttempts: 0,
+            targetNumber: generateTargetNumber(config, 1),
+            chat: [],
+            winner: null,
           }
+
+          rooms.set(roomCode, room)
+
+          addChatMessage(roomCode, "Sistema", `🚀 Stazione ${roomCode} creata! Modalità: ${config.name}`)
+
+          ws.send(
+            JSON.stringify({
+              type: "roomCreated",
+              gameData: room,
+            }),
+          )
+
+          console.log(`🏠 Room ${roomCode} created by ${data.playerName}`)
           break
 
         case "joinRoom":
-          {
-            console.log(`🚪 ${message.playerName} joining ${message.roomCode}`)
-
-            const room = rooms.get(message.roomCode)
-            if (!room) {
-              console.log(`❌ Room ${message.roomCode} not found`)
-              ws.send(
-                JSON.stringify({
-                  type: "error",
-                  message: "❌ Stanza non trovata!",
-                }),
-              )
-              break
-            }
-
-            // Check if player already exists
-            const existingPlayer = room.players.find((p) => p.id === message.playerId)
-            if (!existingPlayer) {
-              room.players.push({
-                id: message.playerId,
-                name: message.playerName,
-                score: 0,
-                isHost: false,
-              })
-
-              room.chat.push({
-                playerName: "Sistema",
-                message: `🚀 ${message.playerName} si è unito!`,
-                timestamp: Date.now(),
-              })
-            }
-
-            players.set(message.playerId, ws)
-
-            console.log(`✅ ${message.playerName} joined room ${message.roomCode}`)
-
-            // Send to joiner
+          const targetRoom = rooms.get(data.roomCode)
+          if (!targetRoom) {
             ws.send(
               JSON.stringify({
-                type: "roomJoined",
-                gameData: room,
+                type: "error",
+                message: "Stazione galattica non trovata!",
               }),
             )
-
-            // Broadcast to all
-            broadcastToRoom(message.roomCode, {
-              type: "gameUpdate",
-              gameData: room,
-            })
+            break
           }
+
+          if (targetRoom.players.length >= 6) {
+            ws.send(
+              JSON.stringify({
+                type: "error",
+                message: "Stazione galattica piena! (max 6 comandanti)",
+              }),
+            )
+            break
+          }
+
+          if (targetRoom.gameStarted) {
+            ws.send(
+              JSON.stringify({
+                type: "error",
+                message: "Battaglia già in corso!",
+              }),
+            )
+            break
+          }
+
+          targetRoom.players.push({
+            id: data.playerId,
+            name: data.playerName,
+            ws: ws,
+            score: 0,
+            isHost: false,
+          })
+
+          addChatMessage(data.roomCode, "Sistema", `👋 ${data.playerName} si è unito alla battaglia!`)
+
+          ws.send(
+            JSON.stringify({
+              type: "roomJoined",
+              gameData: targetRoom,
+            }),
+          )
+
+          broadcastToRoom(data.roomCode, {
+            type: "gameUpdate",
+            gameData: targetRoom,
+          })
+
+          console.log(`🚪 ${data.playerName} joined room ${data.roomCode}`)
           break
 
         case "startGame":
-          {
-            console.log(`🎮 Start game request for room ${message.roomCode}`)
-
-            const room = rooms.get(message.roomCode)
-            if (!room) {
-              console.log(`❌ Room not found: ${message.roomCode}`)
-              ws.send(
-                JSON.stringify({
-                  type: "error",
-                  message: "❌ Stanza non trovata!",
-                }),
-              )
-              break
-            }
-
-            console.log(`📊 Room state: players=${room.players.length}, started=${room.gameStarted}`)
-
-            const player = room.players.find((p) => p.id === message.playerId)
-            if (!player) {
-              console.log(`❌ Player not found: ${message.playerId}`)
-              ws.send(
-                JSON.stringify({
-                  type: "error",
-                  message: "❌ Giocatore non trovato!",
-                }),
-              )
-              break
-            }
-
-            if (!player.isHost) {
-              console.log(`❌ Player ${player.name} is not host`)
-              ws.send(
-                JSON.stringify({
-                  type: "error",
-                  message: "❌ Solo l'host può iniziare!",
-                }),
-              )
-              break
-            }
-
-            if (room.players.length < 2) {
-              console.log(`❌ Not enough players: ${room.players.length}`)
-              ws.send(
-                JSON.stringify({
-                  type: "error",
-                  message: "❌ Servono almeno 2 giocatori!",
-                }),
-              )
-              break
-            }
-
-            if (room.gameStarted) {
-              console.log(`⚠️ Game already started`)
-              ws.send(
-                JSON.stringify({
-                  type: "error",
-                  message: "❌ Gioco già iniziato!",
-                }),
-              )
-              break
-            }
-
-            // START THE GAME!
-            console.log(`🚀 Starting game for room ${message.roomCode}`)
-
-            room.gameStarted = true
-            room.secretNumber = generateSecretNumber()
-            room.currentRound = 1
-            room.currentPlayerIndex = 0
-            room.currentAttempts = 0
-
-            room.chat.push({
-              playerName: "Sistema",
-              message: `🎯 Battaglia iniziata! Indovinate il numero (1-100)`,
-              timestamp: Date.now(),
-            })
-
-            room.chat.push({
-              playerName: "Sistema",
-              message: `🎮 È il turno di ${room.players[0].name}!`,
-              timestamp: Date.now(),
-            })
-
-            console.log(`✅ Game started! Secret number: ${room.secretNumber}`)
-
-            // Broadcast to all players
-            broadcastToRoom(message.roomCode, {
-              type: "gameUpdate",
-              gameData: room,
-            })
-
-            console.log(`📡 Game start broadcasted to all players`)
+          const gameRoom = rooms.get(data.roomCode)
+          if (!gameRoom) {
+            ws.send(
+              JSON.stringify({
+                type: "error",
+                message: "Stazione non trovata!",
+              }),
+            )
+            break
           }
+
+          const player = gameRoom.players.find((p) => p.id === data.playerId)
+          if (!player || !player.isHost) {
+            ws.send(
+              JSON.stringify({
+                type: "error",
+                message: "Solo il comandante principale può iniziare!",
+              }),
+            )
+            break
+          }
+
+          if (gameRoom.players.length < 2) {
+            ws.send(
+              JSON.stringify({
+                type: "error",
+                message: "Servono almeno 2 comandanti per iniziare!",
+              }),
+            )
+            break
+          }
+
+          gameRoom.gameStarted = true
+          gameRoom.currentRound = 1
+
+          addChatMessage(data.roomCode, "Sistema", "🎯 BATTAGLIA GALATTICA INIZIATA! Che la forza sia con voi!")
+
+          broadcastToRoom(data.roomCode, {
+            type: "gameUpdate",
+            gameData: gameRoom,
+          })
+
+          console.log(`🎮 Game started in room ${data.roomCode}`)
           break
 
         case "guess":
-          {
-            console.log(`🎯 Guess from ${message.playerName}: ${message.guess}`)
+          const guessRoom = rooms.get(data.roomCode)
+          if (!guessRoom || !guessRoom.gameStarted || guessRoom.gameEnded) {
+            break
+          }
 
-            const room = rooms.get(message.roomCode)
-            if (!room || !room.gameStarted) {
-              ws.send(
-                JSON.stringify({
-                  type: "error",
-                  message: "❌ Gioco non attivo!",
-                }),
-              )
-              break
-            }
-
-            const currentPlayer = room.players[room.currentPlayerIndex]
-            if (!currentPlayer || currentPlayer.id !== message.playerId) {
-              ws.send(
-                JSON.stringify({
-                  type: "error",
-                  message: `❌ Non è il tuo turno! È il turno di ${currentPlayer?.name || "qualcuno"}`,
-                }),
-              )
-              break
-            }
-
-            if (room.currentAttempts >= room.maxAttempts) {
-              ws.send(
-                JSON.stringify({
-                  type: "error",
-                  message: "❌ Hai esaurito i tentativi!",
-                }),
-              )
-              break
-            }
-
-            room.currentAttempts++
-            const guess = Number.parseInt(message.guess)
-            let hint = ""
-            let correct = false
-
-            if (guess === room.secretNumber) {
-              correct = true
-              hint = "🎉 CORRETTO!"
-
-              // Add points
-              currentPlayer.score += 10
-
-              room.chat.push({
-                playerName: "Sistema",
-                message: `🏆 ${message.playerName} ha indovinato ${guess}! +10 punti`,
-                timestamp: Date.now(),
-              })
-
-              // New round
-              setTimeout(() => {
-                room.secretNumber = generateSecretNumber()
-                room.currentRound++
-                room.currentPlayerIndex = 0
-                room.currentAttempts = 0
-
-                room.chat.push({
-                  playerName: "Sistema",
-                  message: `🔄 Round ${room.currentRound}! Nuovo numero generato`,
-                  timestamp: Date.now(),
-                })
-
-                broadcastToRoom(message.roomCode, {
-                  type: "gameUpdate",
-                  gameData: room,
-                })
-              }, 2000)
-            } else if (guess < room.secretNumber) {
-              hint = "📈 Troppo basso!"
-              room.chat.push({
-                playerName: "Sistema",
-                message: `${message.playerName}: ${guess} - Troppo basso!`,
-                timestamp: Date.now(),
-              })
-            } else {
-              hint = "📉 Troppo alto!"
-              room.chat.push({
-                playerName: "Sistema",
-                message: `${message.playerName}: ${guess} - Troppo alto!`,
-                timestamp: Date.now(),
-              })
-            }
-
-            // Send result to guesser
+          const currentPlayer = guessRoom.players[guessRoom.currentPlayerIndex]
+          if (!currentPlayer || currentPlayer.id !== data.playerId) {
             ws.send(
               JSON.stringify({
-                type: "guessResult",
-                result: { hint, correct, attemptsLeft: room.maxAttempts - room.currentAttempts },
+                type: "error",
+                message: "Non è il tuo turno!",
               }),
             )
-
-            // Next turn if attempts exhausted and not correct
-            if (room.currentAttempts >= room.maxAttempts && !correct) {
-              room.chat.push({
-                playerName: "Sistema",
-                message: `❌ ${message.playerName} ha esaurito i tentativi!`,
-                timestamp: Date.now(),
-              })
-
-              setTimeout(() => {
-                room.currentPlayerIndex = (room.currentPlayerIndex + 1) % room.players.length
-                room.currentAttempts = 0
-
-                room.chat.push({
-                  playerName: "Sistema",
-                  message: `🎯 È il turno di ${room.players[room.currentPlayerIndex].name}!`,
-                  timestamp: Date.now(),
-                })
-
-                broadcastToRoom(message.roomCode, {
-                  type: "gameUpdate",
-                  gameData: room,
-                })
-              }, 1500)
-            }
-
-            // Broadcast update
-            broadcastToRoom(message.roomCode, {
-              type: "gameUpdate",
-              gameData: room,
-            })
+            break
           }
+
+          guessRoom.currentAttempts++
+          const guess = Number.parseInt(data.guess)
+          const target = guessRoom.targetNumber
+
+          const result = {
+            correct: false,
+            hint: "",
+            guess: guess,
+            target: target,
+          }
+
+          if (guess === target) {
+            result.correct = true
+            result.hint = "🎉 NUMERO CORRETTO! Avanzamento al livello successivo!"
+
+            const timeLeft = guessRoom.config.timeLimit - 5 // Simulated time
+            const score = calculateScore(guessRoom.currentAttempts, timeLeft, guessRoom.currentLevel, guessRoom.config)
+            currentPlayer.score += score
+
+            addChatMessage(data.roomCode, "Sistema", `🎯 ${data.playerName} ha indovinato ${target}! +${score} punti!`)
+
+            setTimeout(() => {
+              nextLevel(data.roomCode)
+            }, 2000)
+          } else if (guessRoom.currentAttempts >= guessRoom.config.maxAttempts) {
+            result.hint = `❌ Tentativi esauriti! Il numero era ${target}. Turno successivo!`
+            addChatMessage(
+              data.roomCode,
+              "Sistema",
+              `💥 ${data.playerName} ha esaurito i tentativi! Il numero era ${target}`,
+            )
+
+            setTimeout(() => {
+              nextPlayer(data.roomCode)
+            }, 2000)
+          } else {
+            if (guess < target) {
+              result.hint = `⬆️ Troppo basso! Tentativi rimasti: ${guessRoom.config.maxAttempts - guessRoom.currentAttempts}`
+            } else {
+              result.hint = `⬇️ Troppo alto! Tentativi rimasti: ${guessRoom.config.maxAttempts - guessRoom.currentAttempts}`
+            }
+            addChatMessage(data.roomCode, data.playerName, `Tentativo: ${guess} ${result.hint}`)
+          }
+
+          ws.send(
+            JSON.stringify({
+              type: "guessResult",
+              result: result,
+            }),
+          )
+
+          broadcastToRoom(data.roomCode, {
+            type: "gameUpdate",
+            gameData: guessRoom,
+          })
+
           break
 
         case "chat":
-          {
-            const room = rooms.get(message.roomCode)
-            if (room) {
-              room.chat.push({
-                playerName: message.playerName,
-                message: message.message,
-                timestamp: Date.now(),
-              })
+          const chatRoom = rooms.get(data.roomCode)
+          if (chatRoom) {
+            addChatMessage(data.roomCode, data.playerName, data.message)
 
-              broadcastToRoom(message.roomCode, {
-                type: "gameUpdate",
-                gameData: room,
-              })
-            }
+            broadcastToRoom(data.roomCode, {
+              type: "gameUpdate",
+              gameData: chatRoom,
+            })
           }
           break
 
@@ -420,53 +425,54 @@ wss.on("connection", (ws) => {
           break
 
         default:
-          console.log(`❓ Unknown message type: ${message.type}`)
+          console.log(`❓ Unknown message type: ${data.type}`)
       }
     } catch (error) {
       console.error("❌ Error processing message:", error)
       ws.send(
         JSON.stringify({
           type: "error",
-          message: "Server error: " + error.message,
+          message: "Errore del server",
         }),
       )
     }
   })
 
   ws.on("close", () => {
-    console.log("🔌 Connection closed")
+    console.log("🔌 WebSocket connection closed")
 
-    // Cleanup
-    for (const [playerId, playerWs] of players.entries()) {
-      if (playerWs === ws) {
-        players.delete(playerId)
+    // Remove player from all rooms
+    rooms.forEach((room, roomCode) => {
+      const playerIndex = room.players.findIndex((p) => p.ws === ws)
+      if (playerIndex > -1) {
+        const player = room.players[playerIndex]
+        room.players.splice(playerIndex, 1)
 
-        // Remove from rooms
-        for (const [roomCode, room] of rooms.entries()) {
-          const playerIndex = room.players.findIndex((p) => p.id === playerId)
-          if (playerIndex !== -1) {
-            const player = room.players[playerIndex]
-            room.players.splice(playerIndex, 1)
+        addChatMessage(roomCode, "Sistema", `👋 ${player.name} ha abbandonato la battaglia`)
 
-            if (room.players.length === 0) {
-              rooms.delete(roomCode)
-              console.log(`🗑️ Room ${roomCode} deleted (empty)`)
-            } else {
-              if (player.isHost && room.players.length > 0) {
-                room.players[0].isHost = true
-              }
-
-              broadcastToRoom(roomCode, {
-                type: "gameUpdate",
-                gameData: room,
-              })
-            }
-            break
+        // If room is empty, delete it
+        if (room.players.length === 0) {
+          rooms.delete(roomCode)
+          console.log(`🗑️ Room ${roomCode} deleted (empty)`)
+        } else {
+          // If host left, make first player the new host
+          if (player.isHost && room.players.length > 0) {
+            room.players[0].isHost = true
+            addChatMessage(roomCode, "Sistema", `👑 ${room.players[0].name} è ora il comandante principale`)
           }
+
+          // Adjust current player index if needed
+          if (room.currentPlayerIndex >= room.players.length) {
+            room.currentPlayerIndex = 0
+          }
+
+          broadcastToRoom(roomCode, {
+            type: "gameUpdate",
+            gameData: room,
+          })
         }
-        break
       }
-    }
+    })
   })
 
   ws.on("error", (error) => {
@@ -474,10 +480,28 @@ wss.on("connection", (ws) => {
   })
 })
 
-const PORT = process.env.PORT || 3000
-const HOST = process.env.HOST || "0.0.0.0"
+// Cleanup empty rooms periodically
+setInterval(() => {
+  rooms.forEach((room, roomCode) => {
+    if (room.players.length === 0) {
+      rooms.delete(roomCode)
+      console.log(`🧹 Cleaned up empty room: ${roomCode}`)
+    }
+  })
+}, 300000) // Every 5 minutes
 
-server.listen(PORT, HOST, () => {
-  console.log(`🚀 Server running on ${HOST}:${PORT}`)
-  console.log(`🌐 Open http://localhost:${PORT} to play`)
+server.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`)
+  console.log(`🏠 Home: http://localhost:${PORT}/`)
+  console.log(`🎮 Multiplayer: http://localhost:${PORT}/multiplayer`)
+  console.log(`📊 Active rooms: ${rooms.size}`)
+})
+
+// Graceful shutdown
+process.on("SIGTERM", () => {
+  console.log("🛑 SIGTERM received, shutting down gracefully")
+  server.close(() => {
+    console.log("✅ Server closed")
+    process.exit(0)
+  })
 })
