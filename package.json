@@ -1,19 +1,35 @@
 {
-  "name": "battaglia-galattica",
-  "version": "1.0.0",
-  "description": "Gioco multiplayer di indovinare numeri",
+  "name": "numero-quest-galattico",
+  "version": "2.0.0",
+  "description": "Gioco multiplayer Number Quest con home spettacolare e arena galattica",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "build": "echo 'No build step required'",
+    "test": "echo 'No tests specified'"
   },
   "dependencies": {
+    "express": "^4.18.2",
     "ws": "^8.14.2"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
   },
-  "keywords": ["game", "multiplayer", "websocket"],
-  "author": "Your Name",
-  "license": "MIT"
+  "keywords": [
+    "game", 
+    "multiplayer", 
+    "websocket", 
+    "math", 
+    "number-quest",
+    "galattico"
+  ],
+  "author": "v0 AI Assistant",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/numero-quest-galattico.git"
+  },
+  "homepage": "https://numero-quest-galattico.onrender.com"
 }
