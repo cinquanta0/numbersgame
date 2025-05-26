@@ -527,6 +527,13 @@
                 </div>
             </div>
 
+            <!-- Turn Indicator -->
+            <div class="card bg-purple">
+                <div id="turn-indicator" class="text-center">
+                    ⏳ In attesa di iniziare...
+                </div>
+            </div>
+
             <div class="grid grid-2">
                 <div class="space-y-6">
                     <!-- Level Info -->
@@ -540,7 +547,8 @@
                     <div id="game-controls" class="card bg-green">
                         <div class="text-center" style="margin-bottom: 1rem;">
                             <p id="game-message" style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;">🎯 Indovina il numero segreto!</p>
-                            <p id="attempts-display" style="font-size: 0.875rem; opacity: 0.8;">Attacchi lanciati: 0/10</p>
+                            <p id="attempts-display" style="font-size: 0.875rem; opacity: 0.8;">Tuoi tentativi: 0/10</p>
+                            <p id="turn-info" style="font-size: 0.875rem; opacity: 0.8; margin-top: 0.5rem;">Sistema a turni attivo</p>
                         </div>
                         <div class="flex">
                             <input type="number" id="user-guess" class="input" placeholder="🎯 Inserisci coordinate numeriche" style="text-align: center; font-size: 1.125rem; margin-bottom: 0;">
@@ -655,6 +663,8 @@
         let playerName = '';
         let connectionStatus = 'connecting';
         let attempts = 0;
+        let playerAttempts = new Map(); // Track attempts per player
+        let eliminatedPlayers = new Set(); // Track eliminated players
         let websocket = null;
         let reconnectInterval = null;
         let heartbeatInterval = null;
@@ -968,12 +978,16 @@
                     score: 0,
                     isHost: true,
                     isOnline: true,
-                    lastSeen: Date.now()
+                    lastSeen: Date.now(),
+                    attempts: 0,
+                    isEliminated: false
                 }],
                 gameStarted: false,
                 gameCompleted: false,
                 levelCompleted: false,
                 winner: null,
+                currentPlayerTurn: playerId, // Add this line
+                turnOrder: [playerId], // Add this line
                 chat: [{
                     id: 'welcome_' + Date.now(),
                     playerId: 'system',
@@ -1066,195 +1080,157 @@
         }
 
         function submitGuess() {
-            if (!gameState || !gameState.gameStarted) {
-                showNotification('La battaglia non è ancora iniziata!', 'warning');
-                return;
-            }
+    if (!gameState || !gameState.gameStarted) {
+        showNotification('La battaglia non è ancora iniziata!', 'warning');
+        return;
+    }
 
-            const guess = parseInt(document.getElementById('user-guess').value);
-            const currentRange = getCurrentRange();
+    // Check if it's player's turn
+    if (gameState.currentPlayerTurn !== playerId) {
+        showNotification('Non è il tuo turno!', 'warning');
+        return;
+    }
 
-            if (isNaN(guess) || guess < 1 || guess > currentRange) {
-                showNotification(`Inserisci un numero tra 1 e ${currentRange}!`, 'warning');
-                return;
-            }
+    // Check if player is eliminated
+    if (eliminatedPlayers.has(playerId)) {
+        showNotification('Sei stato eliminato!', 'error');
+        return;
+    }
 
-            const newAttempts = attempts + 1;
-            let result = '';
-            let levelWon = false;
-            let gameOver = false;
+    const guess = parseInt(document.getElementById('user-guess').value);
+    const currentRange = getCurrentRange();
 
-            if (guess === gameState.currentNumber) {
-                result = '🎯 BERSAGLIO CENTRATO!';
-                levelWon = true;
-            } else if (guess < gameState.currentNumber) {
-                result = '📈 Troppo basso! Punta più in alto!';
-            } else {
-                result = '📉 Troppo alto! Abbassa la mira!';
-            }
+    if (isNaN(guess) || guess < 1 || guess > currentRange) {
+        showNotification(`Inserisci un numero tra 1 e ${currentRange}!`, 'warning');
+        return;
+    }
 
-            if (newAttempts >= gameState.maxAttempts && !levelWon) {
-                gameOver = true;
-                result = `💥 Attacchi esauriti! Il numero era ${gameState.currentNumber}`;
-            }
+    // Get current player attempts
+    const currentPlayer = gameState.players.find(p => p.id === playerId);
+    if (!currentPlayer) return;
 
-            const historyEntry = {
-                playerId: playerId,
-                playerName: playerName,
-                guess: guess,
-                result: result,
-                timestamp: Date.now()
-            };
+    const newAttempts = currentPlayer.attempts + 1;
+    let result = '';
+    let levelWon = false;
+    let playerEliminated = false;
 
-            const updatedGameState = {
-                ...gameState,
-                gameHistory: [...gameState.gameHistory, historyEntry],
-                chat: [
-                    ...gameState.chat,
-                    {
-                        id: 'guess_' + Date.now(),
-                        playerId: 'system',
-                        playerName: 'Sistema Galattico',
-                        message: `${playerName}: ${guess} → ${result}`,
-                        timestamp: Date.now(),
-                        isSystem: true
-                    }
-                ]
-            };
+    if (guess === gameState.currentNumber) {
+        result = '🎯 BERSAGLIO CENTRATO!';
+        levelWon = true;
+    } else if (guess < gameState.currentNumber) {
+        result = '📈 Troppo basso! Punta più in alto!';
+    } else {
+        result = '📉 Troppo alto! Abbassa la mira!';
+    }
 
-            if (levelWon) {
-                const currentPlayer = updatedGameState.players.find(p => p.id === playerId);
-                if (currentPlayer) {
-                    currentPlayer.score += Math.max(100 - (newAttempts - 1) * 10, 10);
-                }
+    // Check if player is eliminated
+    if (newAttempts >= gameState.maxAttempts && !levelWon) {
+        playerEliminated = true;
+        eliminatedPlayers.add(playerId);
+        result = `💥 ${currentPlayer.name} eliminato! Il numero era ${gameState.currentNumber}`;
+    }
 
-                if (gameState.level >= 10) {
-                    updatedGameState.gameCompleted = true;
-                    updatedGameState.winner = playerName;
-                } else {
-                    updatedGameState.levelCompleted = true;
-                    updatedGameState.winner = playerName;
-                }
+    const historyEntry = {
+        playerId: playerId,
+        playerName: currentPlayer.name,
+        guess: guess,
+        result: result,
+        timestamp: Date.now(),
+        isCurrentTurn: true
+    };
 
-                triggerConfetti();
-            }
+    // Update player attempts
+    currentPlayer.attempts = newAttempts;
+    if (playerEliminated) {
+        currentPlayer.isEliminated = true;
+    }
 
-            sendToServer({
-                type: 'gameAction',
-                roomCode: gameState.roomCode,
-                playerId: playerId,
-                gameState: updatedGameState
-            });
-
-            attempts = newAttempts;
-            document.getElementById('user-guess').value = '';
-
-            if (levelWon) {
-                showNotification('🎉 SETTORE CONQUISTATO!', 'success');
-            } else if (gameOver) {
-                showNotification(`💥 Attacchi esauriti! Il numero era ${gameState.currentNumber}`, 'error');
-            }
-        }
-
-        function nextLevel() {
-            if (!gameState || !isHost()) return;
-
-            if (gameState.level >= 10) {
-                gameState.gameCompleted = true;
-                showScreen('leaderboard');
-                updateLeaderboard();
-                return;
-            }
-
-            const newLevel = gameState.level + 1;
-            const newRange = DIFFICULTIES[gameState.difficulty].baseRange * newLevel;
-            const newNumber = Math.floor(Math.random() * newRange) + 1;
-
-            const updatedGameState = {
-                ...gameState,
-                level: newLevel,
-                currentNumber: newNumber,
-                levelCompleted: false,
-                winner: null,
-                chat: [
-                    ...gameState.chat,
-                    {
-                        id: 'nextlevel_' + Date.now(),
-                        playerId: 'system',
-                        playerName: 'Sistema Galattico',
-                        message: `🎯 SETTORE ${newLevel}/10 - Range: 1-${newRange}`,
-                        timestamp: Date.now(),
-                        isSystem: true
-                    }
-                ]
-            };
-
-            sendToServer({
-                type: 'nextLevel',
-                roomCode: gameState.roomCode,
-                playerId: playerId,
-                gameState: updatedGameState
-            });
-
-            attempts = 0;
-            showNotification(`🚀 Settore ${newLevel} sbloccato!`, 'success');
-        }
-
-        function sendChatMessage() {
-            if (!gameState) return;
-
-            const input = document.getElementById('chat-input');
-            const message = input.value.trim();
-            if (!message) return;
-
-            const chatMessage = {
-                id: 'chat_' + Date.now(),
-                playerId: playerId,
-                playerName: playerName,
-                message: message,
+    const updatedGameState = {
+        ...gameState,
+        players: gameState.players.map(p => 
+            p.id === playerId ? currentPlayer : p
+        ),
+        gameHistory: [...gameState.gameHistory, historyEntry],
+        chat: [
+            ...gameState.chat,
+            {
+                id: 'guess_' + Date.now(),
+                playerId: 'system',
+                playerName: 'Sistema Galattico',
+                message: `🎯 ${currentPlayer.name}: ${guess} → ${result}`,
                 timestamp: Date.now(),
-                isSystem: false
-            };
-
-            sendToServer({
-                type: 'chatMessage',
-                roomCode: gameState.roomCode,
-                playerId: playerId,
-                message: chatMessage
-            });
-
-            input.value = '';
-        }
-
-        function leaveRoom() {
-            if (gameState) {
-                sendToServer({
-                    type: 'leaveGame',
-                    roomCode: gameState.roomCode,
-                    playerId: playerId,
-                    playerName: playerName
-                });
+                isSystem: true
             }
+        ]
+    };
 
-            gameState = null;
-            attempts = 0;
-            showScreen('lobby');
-            showNotification('🚪 Hai abbandonato la stazione', 'info');
+    if (levelWon) {
+        // Player won the level
+        currentPlayer.score += Math.max(100 - (newAttempts - 1) * 10, 10);
+        
+        if (gameState.level >= 10) {
+            updatedGameState.gameCompleted = true;
+            updatedGameState.winner = currentPlayer.name;
+        } else {
+            updatedGameState.levelCompleted = true;
+            updatedGameState.winner = currentPlayer.name;
         }
 
-        function backToLobby() {
-            leaveRoom();
-        }
+        // Reset all players for next level
+        updatedGameState.players.forEach(p => {
+            p.attempts = 0;
+            p.isEliminated = false;
+        });
+        eliminatedPlayers.clear();
 
-        function newBattle() {
-            gameState = null;
-            attempts = 0;
-            showScreen('lobby');
-        }
+        triggerConfetti();
+    } else {
+        // Pass turn to next player
+        updatedGameState.currentPlayerTurn = getNextPlayerTurn(updatedGameState);
+    }
 
-        function returnHome() {
-            newBattle();
-        }
+    sendToServer({
+        type: 'gameAction',
+        roomCode: gameState.roomCode,
+        playerId: playerId,
+        gameState: updatedGameState
+    });
+
+    document.getElementById('user-guess').value = '';
+
+    if (levelWon) {
+        showNotification('🎉 SETTORE CONQUISTATO!', 'success');
+    } else if (playerEliminated) {
+        showNotification('💥 Sei stato eliminato da questo livello!', 'error');
+    } else {
+        showNotification('Turno passato al prossimo giocatore', 'info');
+    }
+}
+
+function getNextPlayerTurn(gameState) {
+    const activePlayers = gameState.players.filter(p => 
+        p.isOnline && !p.isEliminated
+    );
+    
+    if (activePlayers.length === 0) {
+        return null;
+    }
+    
+    const currentIndex = activePlayers.findIndex(p => p.id === gameState.currentPlayerTurn);
+    const nextIndex = (currentIndex + 1) % activePlayers.length;
+    
+    return activePlayers[nextIndex].id;
+}
+
+function getCurrentPlayerName() {
+    if (!gameState || !gameState.currentPlayerTurn) return '';
+    const currentPlayer = gameState.players.find(p => p.id === gameState.currentPlayerTurn);
+    return currentPlayer ? currentPlayer.name : '';
+}
+
+function isMyTurn() {
+    return gameState && gameState.currentPlayerTurn === playerId;
+}
 
         function updateGameDisplay() {
             if (!gameState) return;
@@ -1267,49 +1243,88 @@
             const player = gameState.players.find(p => p.id === playerId);
             document.getElementById('score-display').textContent = player ? player.score : 0;
 
+            // Update turn indicator
+const currentPlayerName = getCurrentPlayerName();
+const turnIndicator = document.getElementById('turn-indicator');
+if (turnIndicator) {
+    if (isMyTurn()) {
+        turnIndicator.innerHTML = '🎯 <span class="text-green">È IL TUO TURNO!</span>';
+        turnIndicator.className = 'text-center pulse';
+    } else {
+        turnIndicator.innerHTML = `⏳ Turno di: <span class="text-yellow">${currentPlayerName}</span>`;
+        turnIndicator.className = 'text-center';
+    }
+}
+
+// Update player attempts
+const currentPlayer = gameState.players.find(p => p.id === playerId);
+if (currentPlayer) {
+    document.getElementById('attempts-display').textContent = 
+        `Tuoi tentativi: ${currentPlayer.attempts}/${gameState.maxAttempts}`;
+}
+
             // Update range and attempts
             const currentRange = getCurrentRange();
             document.getElementById('range-display').textContent = `Range: 1 - ${currentRange}`;
             document.getElementById('attempts-info').textContent = `Tentativi disponibili: ${gameState.maxAttempts}`;
-            document.getElementById('attempts-display').textContent = `Attacchi lanciati: ${attempts}/${gameState.maxAttempts}`;
+            
 
             // Update leaderboard
             updateLeaderboardDisplay();
 
             // Update game controls visibility
-            const gameControls = document.getElementById('game-controls');
-            const levelCompleted = document.getElementById('level-completed');
-            const startGameContainer = document.getElementById('start-game-container');
+const gameControls = document.getElementById('game-controls');
+const levelCompleted = document.getElementById('level-completed');
+const startGameContainer = document.getElementById('start-game-container');
 
-            if (gameState.gameStarted && !gameState.levelCompleted) {
-                gameControls.classList.remove('hidden');
-                levelCompleted.classList.add('hidden');
-                startGameContainer.classList.add('hidden');
-            } else if (gameState.levelCompleted) {
-                gameControls.classList.add('hidden');
-                levelCompleted.classList.remove('hidden');
-                startGameContainer.classList.add('hidden');
-                document.getElementById('winner-display').textContent = `Vincitore: ${gameState.winner}`;
-                
-                // Show next level button only for host
-                const nextButton = document.getElementById('next-level');
-                if (isHost()) {
-                    nextButton.classList.remove('hidden');
-                } else {
-                    nextButton.classList.add('hidden');
-                }
-            } else {
-                gameControls.classList.add('hidden');
-                levelCompleted.classList.add('hidden');
-                
-                // Show start button only for host when game not started
-                if (isHost() && !gameState.gameStarted) {
-                    startGameContainer.classList.remove('hidden');
-                    document.getElementById('start-game').classList.remove('hidden');
-                } else {
-                    startGameContainer.classList.add('hidden');
-                }
-            }
+if (gameState.gameStarted && !gameState.levelCompleted) {
+    gameControls.classList.remove('hidden');
+    levelCompleted.classList.add('hidden');
+    startGameContainer.classList.add('hidden');
+    
+    // Enable/disable controls based on turn
+    const guessInput = document.getElementById('user-guess');
+    const submitButton = document.getElementById('submit-guess');
+    const isEliminated = eliminatedPlayers.has(playerId);
+    
+    if (!isMyTurn() || isEliminated) {
+        guessInput.disabled = true;
+        submitButton.disabled = true;
+        if (isEliminated) {
+            document.getElementById('game-message').textContent = '💀 Sei stato eliminato da questo livello!';
+        } else {
+            document.getElementById('game-message').textContent = `⏳ Aspetta il tuo turno...`;
+        }
+    } else {
+        guessInput.disabled = false;
+        submitButton.disabled = false;
+        document.getElementById('game-message').textContent = '🎯 È il tuo turno! Indovina il numero!';
+    }
+} else if (gameState.levelCompleted) {
+    gameControls.classList.add('hidden');
+    levelCompleted.classList.remove('hidden');
+    startGameContainer.classList.add('hidden');
+    document.getElementById('winner-display').textContent = `Vincitore: ${gameState.winner}`;
+    
+    // Show next level button only for host
+    const nextButton = document.getElementById('next-level');
+    if (isHost()) {
+        nextButton.classList.remove('hidden');
+    } else {
+        nextButton.classList.add('hidden');
+    }
+} else {
+    gameControls.classList.add('hidden');
+    levelCompleted.classList.add('hidden');
+    
+    // Show start button only for host when game not started
+    if (isHost() && !gameState.gameStarted) {
+        startGameContainer.classList.remove('hidden');
+        document.getElementById('start-game').classList.remove('hidden');
+    } else {
+        startGameContainer.classList.add('hidden');
+    }
+}
 
             // Show leaderboard button if game completed
             const viewLeaderboardBtn = document.getElementById('view-leaderboard');
