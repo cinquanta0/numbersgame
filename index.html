@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌌 Battaglia Galattica - Arena</title>
+    <title>🌌 Battaglia Galattica - Arena Multiplayer</title>
     <style>
         * {
             margin: 0;
@@ -82,6 +82,7 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            font-size: 0.9rem;
         }
 
         .home-button:hover {
@@ -234,26 +235,37 @@
 
         .level-progress {
             background: rgba(0, 0, 0, 0.6);
-            padding: 1rem;
-            border-radius: 15px;
-            margin-bottom: 1rem;
+            padding: 1.5rem;
+            border-radius: 20px;
+            margin-bottom: 1.5rem;
             text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .level-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .level-bar {
             width: 100%;
-            height: 20px;
+            height: 25px;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
+            border-radius: 15px;
             overflow: hidden;
-            margin: 0.5rem 0;
+            margin: 1rem 0;
+            position: relative;
         }
 
         .level-fill {
             height: 100%;
-            background: linear-gradient(45deg, #4ecdc4, #44a08d);
-            border-radius: 10px;
-            transition: width 0.5s ease;
+            background: linear-gradient(45deg, #4ecdc4, #44a08d, #00f5ff);
+            border-radius: 15px;
+            transition: width 0.8s ease;
             position: relative;
         }
 
@@ -264,7 +276,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
             animation: shimmer 2s infinite;
         }
 
@@ -317,14 +329,61 @@
             100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
 
+        .game-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 1rem;
+            border-radius: 15px;
+            text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            border-color: #00f5ff;
+            transform: translateY(-2px);
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #00f5ff;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 0.5rem;
+        }
+
         .chat {
-            height: 250px;
+            height: 280px;
             overflow-y: auto;
             background: rgba(0, 0, 0, 0.6);
             padding: 1rem;
             border-radius: 15px;
             margin-bottom: 1rem;
             border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .chat::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .chat::-webkit-scrollbar-thumb {
+            background: rgba(0, 212, 255, 0.5);
+            border-radius: 10px;
         }
 
         .chat-message {
@@ -428,30 +487,40 @@
             color: white;
         }
 
-        .game-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1rem;
+        .victory-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
         }
 
-        .stat-card {
-            background: rgba(0, 0, 0, 0.6);
-            padding: 1rem;
-            border-radius: 15px;
+        .victory-content {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            padding: 3rem;
+            border-radius: 30px;
             text-align: center;
-            border: 2px solid rgba(255, 255, 255, 0.1);
+            border: 3px solid #00f5ff;
+            box-shadow: 0 20px 40px rgba(0, 245, 255, 0.3);
         }
 
-        .stat-value {
-            font-size: 1.5rem;
+        .victory-title {
+            font-size: 3rem;
             font-weight: bold;
-            color: #00f5ff;
+            margin-bottom: 1rem;
+            animation: bounce 1s infinite;
         }
 
-        .stat-label {
-            font-size: 0.9rem;
-            opacity: 0.8;
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
         }
 
         @media (max-width: 768px) {
@@ -470,6 +539,10 @@
             .header {
                 flex-direction: column;
                 gap: 1rem;
+            }
+
+            .game-stats {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
     </style>
@@ -491,25 +564,36 @@
         <!-- Notification -->
         <div id="notification" class="notification hidden"></div>
 
+        <!-- Victory Screen -->
+        <div id="victory-screen" class="victory-screen hidden">
+            <div class="victory-content">
+                <div class="victory-title">🏆 VITTORIA EPICA!</div>
+                <div id="victory-text"></div>
+                <button class="button button-success" onclick="hideVictoryScreen()" style="margin-top: 2rem; width: auto; padding: 1rem 2rem;">
+                    🎮 Continua
+                </button>
+            </div>
+        </div>
+
         <!-- Lobby Screen -->
         <div id="lobby-screen">
             <!-- Connection Status -->
             <div id="connection-status" class="status status-connecting">
-                🟡 Connessione al server...
+                🟡 Connessione alla rete galattica...
             </div>
 
             <!-- Game Form -->
             <div class="card">
-                <h3 style="margin-bottom: 1rem; text-align: center; font-size: 1.5rem;">🚀 Entra in Battaglia</h3>
+                <h3 style="margin-bottom: 1rem; text-align: center; font-size: 1.5rem;">🚀 Entra in Battaglia Multiplayer</h3>
                 
                 <div id="difficulty-display" class="difficulty-badge normal" style="display: block; text-align: center; margin-bottom: 1rem;">
-                    🎯 Modalità Guerriero
+                    ⚡ Modalità Guerriero
                 </div>
                 
-                <input type="text" id="player-name" class="input" placeholder="Il tuo nome da comandante" maxlength="20">
+                <input type="text" id="player-name" class="input" placeholder="Il tuo nome da comandante galattico" maxlength="20">
                 
                 <button id="create-room" class="button button-primary">
-                    🏠 Crea Nuova Stazione
+                    🏠 Crea Nuova Stazione Galattica
                 </button>
 
                 <input type="text" id="room-code" class="input" placeholder="Codice stazione (es: ROOM123)" maxlength="12">
@@ -517,6 +601,18 @@
                 <button id="join-room" class="button button-secondary">
                     🚪 Unisciti alla Battaglia
                 </button>
+            </div>
+
+            <!-- Info Section -->
+            <div class="card">
+                <h3 style="margin-bottom: 1rem; color: #00f5ff;">ℹ️ Regole di Battaglia Epica</h3>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.1);">🎯 <strong>Obiettivo:</strong> Completa 10 livelli epici prima degli altri</li>
+                    <li style="padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.1);">⚡ <strong>Livelli:</strong> Ogni livello aumenta la difficoltà del numero</li>
+                    <li style="padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.1);">🏆 <strong>Punteggio:</strong> Più veloce indovini, più punti ottieni</li>
+                    <li style="padding: 0.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.1);">👥 <strong>Requisiti:</strong> Servono almeno 2 comandanti</li>
+                    <li style="padding: 0.5rem 0;">🌟 <strong>Vittoria:</strong> Chi ha più punti dopo 10 livelli vince!</li>
+                </ul>
             </div>
         </div>
 
@@ -527,7 +623,7 @@
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
                     <div>
                         <h2>🚀 Stazione: <span id="room-display"></span></h2>
-                        <div id="difficulty-info" class="difficulty-badge normal">Modalità Guerriero</div>
+                        <div id="difficulty-info" class="difficulty-badge normal">⚡ Modalità Guerriero</div>
                     </div>
                     <button id="leave-room" class="button button-secondary" style="width: auto; padding: 0.8rem 1.5rem;">
                         🚪 Abbandona Battaglia
@@ -537,26 +633,27 @@
 
             <!-- Level Progress -->
             <div class="level-progress">
-                <h3>📊 Progresso Livelli</h3>
+                <div class="level-title">📊 Progresso Livelli Galattici</div>
                 <div style="display: flex; justify-content: space-between; margin: 0.5rem 0;">
                     <span>Livello <span id="current-level">1</span>/10</span>
-                    <span id="level-winner"></span>
+                    <span id="level-info">Range: 1-100</span>
                 </div>
                 <div class="level-bar">
                     <div class="level-fill" id="level-fill" style="width: 10%;"></div>
                 </div>
+                <div id="level-winner" style="margin-top: 0.5rem; font-weight: bold; color: #4ecdc4;"></div>
             </div>
 
             <!-- Turn Indicator -->
             <div id="turn-indicator" class="turn-indicator hidden">
-                <div id="turn-text">In attesa...</div>
+                <div id="turn-text">In attesa di comandanti...</div>
             </div>
 
             <!-- Game Stats -->
             <div class="game-stats">
                 <div class="stat-card">
                     <div class="stat-value" id="players-count">0</div>
-                    <div class="stat-label">Giocatori</div>
+                    <div class="stat-label">Comandanti</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-value" id="current-round">0</div>
@@ -577,18 +674,18 @@
                 <div>
                     <!-- Controls -->
                     <div class="card">
-                        <h3 style="margin-bottom: 1rem; text-align: center;">🎮 Controlli di Battaglia</h3>
+                        <h3 style="margin-bottom: 1rem; text-align: center;">🎮 Centro Comando Galattico</h3>
                         
                         <div id="start-controls">
                             <button id="start-game" class="button button-success">🎯 Inizia Battaglia Epica</button>
                             <p style="text-align: center; margin-top: 0.5rem; opacity: 0.8;">
-                                Servono almeno 2 comandanti per iniziare
+                                Solo il comandante principale può iniziare
                             </p>
                         </div>
 
                         <div id="game-controls" class="hidden">
                             <input type="number" id="guess-input" class="input" placeholder="Il tuo numero strategico" min="1" max="100">
-                            <button id="submit-guess" class="button button-success">🚀 Lancia Attacco!</button>
+                            <button id="submit-guess" class="button button-success">🚀 Lancia Attacco Galattico!</button>
                             <div id="attempts-info" style="text-align: center; margin-top: 0.5rem; opacity: 0.8; font-weight: bold;"></div>
                         </div>
                     </div>
@@ -607,7 +704,7 @@
                 <!-- Players & Leaderboard -->
                 <div>
                     <div class="card">
-                        <h3 style="margin-bottom: 1rem; text-align: center;">🏆 Classifica Comandanti</h3>
+                        <h3 style="margin-bottom: 1rem; text-align: center;">🏆 Classifica Comandanti Galattici</h3>
                         <div id="leaderboard" class="leaderboard"></div>
                     </div>
                 </div>
@@ -714,7 +811,7 @@
                     console.log('✅ Connected!');
                     connectionStatus = 'online';
                     updateConnectionStatus();
-                    showNotification('🌐 Connesso al server galattico!', 'success');
+                    showNotification('🌐 Connesso alla rete galattica!', 'success');
                 };
                 
                 ws.onmessage = function(event) {
@@ -773,6 +870,11 @@
                     console.log('🔄 Game update received');
                     gameData = data.gameData;
                     updateGameDisplay();
+                    
+                    // Controlla vittoria
+                    if (gameData.gameEnded && gameData.winner) {
+                        showVictoryScreen();
+                    }
                     break;
                     
                 case 'guessResult':
@@ -875,10 +977,10 @@
 
         function submitGuess() {
             const guess = parseInt(document.getElementById('guess-input').value);
+            const maxNumber = getCurrentMaxNumber();
             
-            if (isNaN(guess) || guess < 1 || guess > (gameData?.config?.maxNumber || 100)) {
-                const maxNum = gameData?.config?.maxNumber || 100;
-                showNotification(`Numero tra 1 e ${maxNum}!`, 'error');
+            if (isNaN(guess) || guess < 1 || guess > maxNumber) {
+                showNotification(`Numero tra 1 e ${maxNumber}!`, 'error');
                 return;
             }
 
@@ -891,6 +993,11 @@
             });
 
             document.getElementById('guess-input').value = '';
+        }
+
+        function getCurrentMaxNumber() {
+            if (!gameData || !gameData.config) return 100;
+            return gameData.config.maxNumber + (gameData.currentLevel - 1) * gameData.config.levelMultiplier;
         }
 
         function sendChat() {
@@ -925,6 +1032,35 @@
             updateGameDisplay();
         }
 
+        function showVictoryScreen() {
+            if (!gameData || !gameData.winner) return;
+            
+            const victoryScreen = document.getElementById('victory-screen');
+            const victoryText = document.getElementById('victory-text');
+            
+            const isWinner = gameData.winner.id === playerId;
+            
+            if (isWinner) {
+                victoryText.innerHTML = `
+                    <div style="font-size: 2rem; margin-bottom: 1rem;">🎉 HAI VINTO! 🎉</div>
+                    <div style="font-size: 1.2rem;">Sei il COMANDANTE SUPREMO GALATTICO!</div>
+                    <div style="margin-top: 1rem; font-size: 1.5rem; color: #feca57;">Punteggio finale: ${gameData.winner.score} punti</div>
+                `;
+            } else {
+                victoryText.innerHTML = `
+                    <div style="font-size: 1.8rem; margin-bottom: 1rem;">🏆 Battaglia Completata!</div>
+                    <div style="font-size: 1.2rem;">Il vincitore è: <strong>${gameData.winner.name}</strong></div>
+                    <div style="margin-top: 1rem; font-size: 1.5rem; color: #feca57;">Punteggio finale: ${gameData.winner.score} punti</div>
+                `;
+            }
+            
+            victoryScreen.classList.remove('hidden');
+        }
+
+        function hideVictoryScreen() {
+            document.getElementById('victory-screen').classList.add('hidden');
+        }
+
         function updateGameDisplay() {
             if (!gameData) return;
 
@@ -936,13 +1072,7 @@
             // Update difficulty info
             if (gameData.config) {
                 const difficultyInfo = document.getElementById('difficulty-info');
-                const difficultyNames = {
-                    easy: '🌟 Modalità Principiante',
-                    normal: '⚡ Modalità Guerriero',
-                    hard: '🔥 Modalità Comandante', 
-                    expert: '💀 Modalità Leggenda'
-                };
-                difficultyInfo.textContent = difficultyNames[gameData.difficulty] || '⚡ Modalità Guerriero';
+                difficultyInfo.textContent = gameData.config.name;
             }
 
             // Update level progress
@@ -950,6 +1080,10 @@
             const levelProgress = (currentLevel / 10) * 100;
             document.getElementById('current-level').textContent = currentLevel;
             document.getElementById('level-fill').style.width = levelProgress + '%';
+            
+            // Update level info
+            const maxNumber = getCurrentMaxNumber();
+            document.getElementById('level-info').textContent = `Range: 1-${maxNumber}`;
 
             // Update game stats
             document.getElementById('players-count').textContent = gameData.players.length;
@@ -968,6 +1102,11 @@
                 document.getElementById('guess-input').disabled = !isMyTurn;
                 document.getElementById('submit-guess').disabled = !isMyTurn;
                 
+                // Update input placeholder
+                const guessInput = document.getElementById('guess-input');
+                guessInput.placeholder = `Il tuo numero strategico (1-${maxNumber})`;
+                guessInput.max = maxNumber;
+                
                 // Update attempts info
                 const attemptsInfo = document.getElementById('attempts-info');
                 const attemptsLeft = document.getElementById('attempts-left');
@@ -984,11 +1123,6 @@
             } else if (gameData.gameEnded) {
                 document.getElementById('game-controls').classList.add('hidden');
                 document.getElementById('turn-indicator').classList.add('hidden');
-                
-                // Show victory screen
-                if (gameData.winner) {
-                    showNotification(`🏆 ${gameData.winner.name} è il COMANDANTE SUPREMO!`, 'success');
-                }
             } else {
                 document.getElementById('game-controls').classList.add('hidden');
                 document.getElementById('turn-indicator').classList.add('hidden');
@@ -1111,7 +1245,14 @@
             }, 4000);
         }
 
-        console.log('🎮 Battaglia Galattica Arena loaded!');
+        // Heartbeat
+        setInterval(() => {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                sendMessage({ type: 'ping' });
+            }
+        }, 30000);
+
+        console.log('🎮 Battaglia Galattica Arena Multiplayer loaded!');
     </script>
 </body>
 </html>
