@@ -17,6 +17,7 @@
             color: white;
             min-height: 100vh;
             padding: 1rem;
+            overflow-x: hidden;
         }
 
         .container {
@@ -31,6 +32,12 @@
             padding: 1.5rem;
             margin-bottom: 1.5rem;
             backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: rgba(34, 211, 238, 0.5);
+            transform: translateY(-2px);
         }
 
         .logo {
@@ -49,6 +56,7 @@
             justify-content: center;
             font-size: 4rem;
             animation: spin-slow 3s linear infinite;
+            box-shadow: 0 0 30px rgba(34, 211, 238, 0.3);
         }
 
         .title {
@@ -59,12 +67,14 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
             margin-bottom: 1rem;
+            text-shadow: 0 0 20px rgba(34, 211, 238, 0.3);
         }
 
         .subtitle {
             font-size: 1.25rem;
             color: #22d3ee;
             font-family: monospace;
+            text-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
         }
 
         .input {
@@ -76,6 +86,13 @@
             color: white;
             margin-bottom: 1rem;
             font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .input:focus {
+            outline: none;
+            border-color: #22d3ee;
+            box-shadow: 0 0 10px rgba(34, 211, 238, 0.3);
         }
 
         .input::placeholder {
@@ -89,14 +106,22 @@
             font-weight: bold;
             cursor: pointer;
             font-size: 1rem;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
             width: 100%;
             margin-bottom: 0.5rem;
+            position: relative;
+            overflow: hidden;
         }
 
         .button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
 
         .button-primary {
@@ -104,19 +129,9 @@
             color: black;
         }
 
-        .button-primary:hover:not(:disabled) {
-            background: linear-gradient(45deg, #0891b2, #2563eb);
-            transform: translateY(-2px);
-        }
-
         .button-secondary {
             background: linear-gradient(45deg, #ef4444, #ec4899);
             color: white;
-        }
-
-        .button-secondary:hover:not(:disabled) {
-            background: linear-gradient(45deg, #dc2626, #db2777);
-            transform: translateY(-2px);
         }
 
         .button-success {
@@ -124,9 +139,9 @@
             color: white;
         }
 
-        .button-success:hover:not(:disabled) {
-            background: linear-gradient(45deg, #059669, #047857);
-            transform: translateY(-2px);
+        .button-warning {
+            background: linear-gradient(45deg, #f59e0b, #f97316);
+            color: white;
         }
 
         .select {
@@ -138,6 +153,12 @@
             color: white;
             margin-bottom: 1rem;
             font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .select option {
+            background: #1e293b;
+            color: white;
         }
 
         .grid {
@@ -146,11 +167,11 @@
         }
 
         .grid-2 {
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
         }
 
         .grid-3 {
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         }
 
         .flex {
@@ -163,31 +184,20 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
 
         .text-center {
             text-align: center;
         }
 
-        .text-cyan {
-            color: #22d3ee;
-        }
-
-        .text-yellow {
-            color: #fbbf24;
-        }
-
-        .text-green {
-            color: #10b981;
-        }
-
-        .text-red {
-            color: #ef4444;
-        }
-
-        .text-purple {
-            color: #a855f7;
-        }
+        .text-cyan { color: #22d3ee; }
+        .text-yellow { color: #fbbf24; }
+        .text-green { color: #10b981; }
+        .text-red { color: #ef4444; }
+        .text-purple { color: #a855f7; }
+        .text-orange { color: #f97316; }
 
         .bg-yellow {
             background: rgba(251, 191, 36, 0.2);
@@ -209,6 +219,11 @@
             border-color: rgba(34, 211, 238, 0.5);
         }
 
+        .bg-purple {
+            background: rgba(168, 85, 247, 0.2);
+            border-color: rgba(168, 85, 247, 0.5);
+        }
+
         .leaderboard-item {
             display: flex;
             justify-content: space-between;
@@ -217,11 +232,18 @@
             border-radius: 0.5rem;
             margin-bottom: 0.5rem;
             background: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .leaderboard-item:hover {
+            transform: translateX(5px);
+            background: rgba(255, 255, 255, 0.15);
         }
 
         .leaderboard-1 {
             background: rgba(251, 191, 36, 0.2);
             border: 1px solid rgba(251, 191, 36, 0.5);
+            box-shadow: 0 0 15px rgba(251, 191, 36, 0.3);
         }
 
         .leaderboard-2 {
@@ -235,15 +257,32 @@
         }
 
         .chat-container {
-            max-height: 10rem;
+            max-height: 12rem;
             overflow-y: auto;
             margin-bottom: 1rem;
+            scrollbar-width: thin;
+            scrollbar-color: #22d3ee rgba(0, 0, 0, 0.3);
+        }
+
+        .chat-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-container::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 3px;
+        }
+
+        .chat-container::-webkit-scrollbar-thumb {
+            background: #22d3ee;
+            border-radius: 3px;
         }
 
         .chat-message {
             padding: 0.5rem;
             border-radius: 0.375rem;
             margin-bottom: 0.5rem;
+            animation: slideIn 0.3s ease;
         }
 
         .chat-system {
@@ -270,43 +309,24 @@
             border-radius: 0.5rem;
             font-weight: bold;
             z-index: 1000;
-            max-width: 300px;
+            max-width: 350px;
+            animation: slideInRight 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
 
-        .notification-success {
-            background: #10b981;
-            color: white;
-        }
+        .notification-success { background: #10b981; color: white; }
+        .notification-error { background: #ef4444; color: white; }
+        .notification-warning { background: #f59e0b; color: white; }
+        .notification-info { background: #3b82f6; color: white; }
 
-        .notification-error {
-            background: #ef4444;
-            color: white;
-        }
+        .hidden { display: none; }
 
-        .notification-warning {
-            background: #f59e0b;
-            color: white;
-        }
+        .status-online { color: #10b981; }
+        .status-offline { color: #ef4444; }
+        .status-connecting { color: #f59e0b; }
 
-        .notification-info {
-            background: #3b82f6;
-            color: white;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .status-online {
-            color: #10b981;
-        }
-
-        .status-offline {
-            color: #ef4444;
-        }
-
-        .status-connecting {
-            color: #f59e0b;
+        .pulse {
+            animation: pulse 2s infinite;
         }
 
         @keyframes spin-slow {
@@ -314,8 +334,23 @@
             to { transform: rotate(360deg); }
         }
 
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(100%); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
         @keyframes confetti {
-            0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            0% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0deg); }
             100% { opacity: 0; transform: translate(-50%, -50%) scale(2) rotate(360deg); }
         }
 
@@ -330,13 +365,58 @@
             pointer-events: none;
         }
 
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #22d3ee;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         @media (max-width: 768px) {
             .title {
                 font-size: 2rem;
             }
             
-            .grid-2, .grid-3 {
-                grid-template-columns: 1fr;
+            .container {
+                padding: 0.5rem;
+            }
+            
+            .card {
+                padding: 1rem;
+            }
+            
+            .flex {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .flex-between {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .logo-icon {
+                width: 6rem;
+                height: 6rem;
+                font-size: 3rem;
+            }
+            
+            .title {
+                font-size: 1.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
             }
         }
     </style>
@@ -357,8 +437,9 @@
             <!-- Connection Status -->
             <div class="card">
                 <div class="text-center">
-                    <span id="connection-icon" class="status-connecting">🟡</span>
+                    <span id="connection-icon" class="status-connecting pulse">🟡</span>
                     <span id="connection-text">Connessione al Network Galattico...</span>
+                    <div id="connection-loading" class="loading hidden" style="margin: 0 auto; margin-top: 0.5rem;"></div>
                 </div>
             </div>
 
@@ -377,10 +458,10 @@
                 </div>
                 <div class="bg-yellow" style="padding: 1rem; border-radius: 0.5rem;">
                     <strong class="text-yellow">📊 PROGRESSIONE DIFFICOLTÀ:</strong><br><br>
-                    <div style="font-size: 0.875rem;">
+                    <div style="font-size: 0.875rem; line-height: 1.5;">
                         <div>🧩 <strong class="text-green">FACILE:</strong> 1-30 → 1-60 → 1-90 → ... → 1-300</div>
                         <div>⚔️ <strong class="text-cyan">MEDIO:</strong> 1-60 → 1-120 → 1-180 → ... → 1-600</div>
-                        <div>🔥 <strong style="color: #f97316;">DIFFICILE:</strong> 1-150 → 1-300 → 1-450 → ... → 1-1500</div>
+                        <div>🔥 <strong class="text-orange">DIFFICILE:</strong> 1-150 → 1-300 → 1-450 → ... → 1-1500</div>
                         <div>💀 <strong class="text-red">HARDCORE:</strong> 1-300 → 1-600 → 1-900 → ... → 1-3000</div>
                     </div>
                 </div>
@@ -397,17 +478,24 @@
                     <option value="hardcore">💀 HARDCORE - Leggenda Universale (5 tentativi)</option>
                 </select>
 
-                <button id="create-game" class="button button-primary">🏠 CREA STAZIONE SPAZIALE</button>
+                <button id="create-game" class="button button-primary">
+                    <span id="create-game-text">🏠 CREA STAZIONE SPAZIALE</span>
+                    <div id="create-game-loading" class="loading hidden"></div>
+                </button>
 
                 <input type="text" id="room-code" class="input" placeholder="🔑 Codice Stazione (es: GALAXY123)" maxlength="12" style="text-transform: uppercase;">
-                <button id="join-game" class="button button-secondary">🚪 ENTRA NELLA STAZIONE</button>
+                
+                <button id="join-game" class="button button-secondary">
+                    <span id="join-game-text">🚪 ENTRA NELLA STAZIONE</span>
+                    <div id="join-game-loading" class="loading hidden"></div>
+                </button>
             </div>
 
             <!-- Navigation -->
             <div class="card">
                 <div class="text-center">
                     <h3 class="text-purple" style="margin-bottom: 1rem;">🎮 ALTRE MODALITÀ</h3>
-                    <button class="button" style="background: linear-gradient(45deg, #f59e0b, #f97316); color: white;" onclick="window.location.href='/cristo'">
+                    <button class="button button-warning" onclick="window.location.href='/cristo'">
                         👤 MODALITÀ SINGLE PLAYER
                     </button>
                 </div>
@@ -418,7 +506,12 @@
         <div id="game-screen" class="hidden">
             <!-- Header -->
             <div class="card">
-                <h2 class="text-center">🚀 STAZIONE: <span id="room-display" class="text-cyan"></span></h2>
+                <div class="flex-between">
+                    <h2>🚀 STAZIONE: <span id="room-display" class="text-cyan"></span></h2>
+                    <div class="text-center">
+                        <span id="connection-status-game" class="status-online">🟢 ONLINE</span>
+                    </div>
+                </div>
             </div>
 
             <!-- Level and Score -->
@@ -434,61 +527,75 @@
                 </div>
             </div>
 
-            <!-- Level Info -->
-            <div class="card bg-yellow">
-                <h4 class="text-yellow" style="margin-bottom: 0.5rem;">🎯 OBIETTIVO SETTORE GALATTICO</h4>
-                <p id="range-display" class="text-yellow" style="font-size: 1.25rem; font-weight: bold;">Range: 1 - 30</p>
-                <p id="attempts-info" style="font-size: 0.875rem; opacity: 0.8; margin-top: 0.5rem;">Tentativi disponibili: 10</p>
-            </div>
+            <div class="grid grid-2">
+                <div class="space-y-6">
+                    <!-- Level Info -->
+                    <div class="card bg-yellow">
+                        <h4 class="text-yellow" style="margin-bottom: 0.5rem;">🎯 OBIETTIVO SETTORE GALATTICO</h4>
+                        <p id="range-display" class="text-yellow" style="font-size: 1.25rem; font-weight: bold;">Range: 1 - 30</p>
+                        <p id="attempts-info" style="font-size: 0.875rem; opacity: 0.8; margin-top: 0.5rem;">Tentativi disponibili: 10</p>
+                    </div>
 
-            <!-- Leaderboard -->
-            <div class="card bg-yellow">
-                <h4 class="text-yellow" style="margin-bottom: 1rem;">🏆 CLASSIFICA GALATTICA LIVE</h4>
-                <div id="leaderboard"></div>
-            </div>
+                    <!-- Game Controls -->
+                    <div id="game-controls" class="card bg-green">
+                        <div class="text-center" style="margin-bottom: 1rem;">
+                            <p id="game-message" style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;">🎯 Indovina il numero segreto!</p>
+                            <p id="attempts-display" style="font-size: 0.875rem; opacity: 0.8;">Attacchi lanciati: 0/10</p>
+                        </div>
+                        <div class="flex">
+                            <input type="number" id="user-guess" class="input" placeholder="🎯 Inserisci coordinate numeriche" style="text-align: center; font-size: 1.125rem; margin-bottom: 0;">
+                            <button id="submit-guess" class="button button-success" style="margin-bottom: 0; width: auto; padding: 0.75rem 1.5rem;">🚀 ATTACCO</button>
+                        </div>
+                    </div>
 
-            <!-- Game Controls -->
-            <div id="game-controls" class="card bg-green">
-                <div class="text-center" style="margin-bottom: 1rem;">
-                    <p id="game-message" style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem;">🎯 Indovina il numero segreto!</p>
-                    <p id="attempts-display" style="font-size: 0.875rem; opacity: 0.8;">Attacchi lanciati: 0/10</p>
+                    <!-- Level Completed -->
+                    <div id="level-completed" class="card bg-green hidden">
+                        <div class="text-center">
+                            <h4 class="text-green" style="font-size: 1.5rem; font-weight: bold; margin-bottom: 0.5rem;">🎉 SETTORE CONQUISTATO!</h4>
+                            <p id="winner-display" style="font-size: 1.125rem; font-weight: 600; margin-bottom: 1rem;">Vincitore: </p>
+                            <button id="next-level" class="button button-success">➡️ SETTORE SUCCESSIVO</button>
+                        </div>
+                    </div>
+
+                    <!-- Start Game Button -->
+                    <div id="start-game-container" class="card bg-green hidden">
+                        <div class="text-center">
+                            <p style="margin-bottom: 1rem;">Aspettando che l'host inizi la battaglia...</p>
+                            <button id="start-game" class="button button-success">🚀 INIZIA BATTAGLIA</button>
+                        </div>
+                    </div>
+
+                    <!-- Game History -->
+                    <div class="card bg-purple">
+                        <h4 class="text-purple" style="margin-bottom: 1rem;">📊 CRONOLOGIA BATTAGLIA</h4>
+                        <div id="game-history" class="chat-container"></div>
+                    </div>
                 </div>
-                <div class="flex">
-                    <input type="number" id="user-guess" class="input" placeholder="🎯 Inserisci coordinate numeriche" style="text-align: center; font-size: 1.125rem; margin-bottom: 0;">
-                    <button id="submit-guess" class="button button-success" style="margin-bottom: 0; width: auto; padding: 0.75rem 1.5rem;">🚀 ATTACCO</button>
-                </div>
-            </div>
 
-            <!-- Level Completed -->
-            <div id="level-completed" class="card bg-green hidden">
-                <div class="text-center">
-                    <h4 class="text-green" style="font-size: 1.5rem; font-weight: bold; margin-bottom: 0.5rem;">🎉 SETTORE CONQUISTATO!</h4>
-                    <p id="winner-display" style="font-size: 1.125rem; font-weight: 600; margin-bottom: 1rem;">Vincitore: </p>
-                    <button id="next-level" class="button button-success">➡️ SETTORE SUCCESSIVO</button>
-                </div>
-            </div>
+                <div class="space-y-6">
+                    <!-- Leaderboard -->
+                    <div class="card bg-yellow">
+                        <h4 class="text-yellow" style="margin-bottom: 1rem;">🏆 CLASSIFICA GALATTICA LIVE</h4>
+                        <div id="leaderboard"></div>
+                    </div>
 
-            <!-- Game History -->
-            <div class="card" style="border-color: rgba(168, 85, 247, 0.3);">
-                <h4 class="text-purple" style="margin-bottom: 1rem;">📊 CRONOLOGIA BATTAGLIA</h4>
-                <div id="game-history" class="chat-container"></div>
-            </div>
-
-            <!-- Chat -->
-            <div class="card bg-green">
-                <h4 class="text-green" style="margin-bottom: 1rem;">💬 CHAT GALATTICO</h4>
-                <div id="chat-messages" class="chat-container"></div>
-                <div class="flex">
-                    <input type="text" id="chat-input" class="input" placeholder="💬 Messaggio per la flotta..." style="margin-bottom: 0;">
-                    <button id="send-chat" class="button button-success" style="margin-bottom: 0; width: auto; padding: 0.75rem 1rem;">📤</button>
+                    <!-- Chat -->
+                    <div class="card bg-green">
+                        <h4 class="text-green" style="margin-bottom: 1rem;">💬 CHAT GALATTICO</h4>
+                        <div id="chat-messages" class="chat-container"></div>
+                        <div class="flex">
+                            <input type="text" id="chat-input" class="input" placeholder="💬 Messaggio per la flotta..." style="margin-bottom: 0;" maxlength="200">
+                            <button id="send-chat" class="button button-success" style="margin-bottom: 0; width: auto; padding: 0.75rem 1rem;">📤</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <!-- Controls -->
-            <div class="grid grid-3">
+            <div class="grid grid-3" style="margin-top: 1.5rem;">
                 <button id="leave-room" class="button button-secondary">🚪 ABBANDONA STAZIONE</button>
-                <button id="start-game" class="button button-success hidden">🚀 INIZIA BATTAGLIA</button>
-                <button id="view-leaderboard" class="button" style="background: linear-gradient(45deg, #f59e0b, #f97316); color: white;">🏆 CLASSIFICA FINALE</button>
+                <button id="view-leaderboard" class="button button-warning hidden">🏆 CLASSIFICA FINALE</button>
+                <button id="back-to-lobby" class="button button-warning">🏠 TORNA ALLA LOBBY</button>
             </div>
         </div>
 
@@ -535,7 +642,7 @@
             <!-- Controls -->
             <div class="grid grid-2">
                 <button id="new-battle" class="button button-success">🔄 NUOVA BATTAGLIA</button>
-                <button id="return-home" class="button" style="background: linear-gradient(45deg, #f59e0b, #f97316); color: white;">🏠 RITORNA ALLA BASE</button>
+                <button id="return-home" class="button button-warning">🏠 RITORNA ALLA BASE</button>
             </div>
         </div>
     </div>
@@ -550,6 +657,8 @@
         let attempts = 0;
         let websocket = null;
         let reconnectInterval = null;
+        let heartbeatInterval = null;
+        let lastHeartbeat = Date.now();
 
         // Game Configuration
         const DIFFICULTIES = {
@@ -569,6 +678,12 @@
         function initializeGame() {
             updateConnectionStatus();
             showScreen('lobby');
+            
+            // Load saved player name
+            const savedName = localStorage.getItem('playerName');
+            if (savedName) {
+                document.getElementById('player-name').value = savedName;
+            }
         }
 
         function setupEventListeners() {
@@ -588,6 +703,7 @@
             document.getElementById('start-game').addEventListener('click', startGame);
             document.getElementById('next-level').addEventListener('click', nextLevel);
             document.getElementById('leave-room').addEventListener('click', leaveRoom);
+            document.getElementById('back-to-lobby').addEventListener('click', backToLobby);
             document.getElementById('view-leaderboard').addEventListener('click', () => showScreen('leaderboard'));
             
             // Leaderboard events
@@ -598,6 +714,11 @@
             document.getElementById('room-code').addEventListener('input', function(e) {
                 e.target.value = e.target.value.toUpperCase();
             });
+
+            // Save player name
+            document.getElementById('player-name').addEventListener('input', function(e) {
+                localStorage.setItem('playerName', e.target.value);
+            });
         }
 
         function connectToServer() {
@@ -605,7 +726,6 @@
             updateConnectionStatus();
             
             try {
-                // Use wss:// for HTTPS sites, ws:// for HTTP
                 const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
                 const wsUrl = `${protocol}//${window.location.host}`;
                 
@@ -616,10 +736,14 @@
                     updateConnectionStatus();
                     showNotification('🌐 Connesso al server multiplayer!', 'success');
                     
+                    // Clear reconnect interval
                     if (reconnectInterval) {
                         clearInterval(reconnectInterval);
                         reconnectInterval = null;
                     }
+
+                    // Start heartbeat
+                    startHeartbeat();
                 };
                 
                 websocket.onmessage = function(event) {
@@ -636,17 +760,21 @@
                     updateConnectionStatus();
                     showNotification('🔴 Connessione persa. Tentativo di riconnessione...', 'warning');
                     
+                    // Stop heartbeat
+                    stopHeartbeat();
+                    
                     // Auto-reconnect
                     if (!reconnectInterval) {
                         reconnectInterval = setInterval(() => {
                             if (websocket.readyState === WebSocket.CLOSED) {
                                 connectToServer();
                             }
-                        }, 5000);
+                        }, 3000);
                     }
                 };
                 
-                websocket.onerror = function() {
+                websocket.onerror = function(error) {
+                    console.error('WebSocket error:', error);
                     connectionStatus = 'offline';
                     updateConnectionStatus();
                     showNotification('❌ Errore di connessione al server', 'error');
@@ -659,57 +787,104 @@
             }
         }
 
+        function startHeartbeat() {
+            heartbeatInterval = setInterval(() => {
+                if (websocket && websocket.readyState === WebSocket.OPEN) {
+                    websocket.send(JSON.stringify({ type: 'ping' }));
+                    lastHeartbeat = Date.now();
+                }
+            }, 30000); // Every 30 seconds
+        }
+
+        function stopHeartbeat() {
+            if (heartbeatInterval) {
+                clearInterval(heartbeatInterval);
+                heartbeatInterval = null;
+            }
+        }
+
         function sendToServer(data) {
             if (websocket && websocket.readyState === WebSocket.OPEN) {
                 websocket.send(JSON.stringify(data));
                 return true;
+            } else {
+                showNotification('❌ Connessione non disponibile', 'error');
+                return false;
             }
-            return false;
         }
 
         function handleServerMessage(data) {
             switch (data.type) {
                 case 'gameStateUpdate':
-                    if (data.roomCode === gameState?.roomCode) {
+                    if (!gameState || data.roomCode === gameState.roomCode) {
                         gameState = data.gameState;
                         updateGameDisplay();
+                        
+                        // Auto-switch to game screen if joined successfully
+                        if (currentScreen === 'lobby' && gameState) {
+                            showScreen('game');
+                            showNotification('🚪 Entrato nella stazione con successo!', 'success');
+                        }
                     }
                     break;
                 case 'playerJoined':
-                    if (data.roomCode === gameState?.roomCode) {
+                    if (gameState && data.roomCode === gameState.roomCode) {
                         showNotification(`🚪 ${data.playerName} è entrato nella stazione!`, 'info');
                     }
                     break;
                 case 'playerLeft':
-                    if (data.roomCode === gameState?.roomCode) {
+                    if (gameState && data.roomCode === gameState.roomCode) {
                         showNotification(`🚪 ${data.playerName} ha abbandonato la stazione`, 'info');
                     }
                     break;
                 case 'error':
                     showNotification(data.message, 'error');
+                    hideLoadingButtons();
                     break;
+                case 'pong':
+                    // Heartbeat response
+                    break;
+                default:
+                    console.log('Unknown message type:', data.type);
             }
         }
 
         function updateConnectionStatus() {
             const icon = document.getElementById('connection-icon');
             const text = document.getElementById('connection-text');
+            const loading = document.getElementById('connection-loading');
+            const gameStatus = document.getElementById('connection-status-game');
             
             switch(connectionStatus) {
                 case 'online':
                     icon.textContent = '🟢';
                     icon.className = 'status-online';
                     text.textContent = 'Connesso al Server Galattico';
+                    loading.classList.add('hidden');
+                    if (gameStatus) {
+                        gameStatus.textContent = '🟢 ONLINE';
+                        gameStatus.className = 'status-online';
+                    }
                     break;
                 case 'offline':
                     icon.textContent = '🔴';
                     icon.className = 'status-offline';
                     text.textContent = 'Server Offline - Riconnessione...';
+                    loading.classList.remove('hidden');
+                    if (gameStatus) {
+                        gameStatus.textContent = '🔴 OFFLINE';
+                        gameStatus.className = 'status-offline';
+                    }
                     break;
                 case 'connecting':
                     icon.textContent = '🟡';
-                    icon.className = 'status-connecting';
+                    icon.className = 'status-connecting pulse';
                     text.textContent = 'Connessione al Server Galattico...';
+                    loading.classList.remove('hidden');
+                    if (gameStatus) {
+                        gameStatus.textContent = '🟡 CONNESSIONE...';
+                        gameStatus.className = 'status-connecting';
+                    }
                     break;
             }
         }
@@ -731,7 +906,33 @@
             
             setTimeout(() => {
                 notification.classList.add('hidden');
-            }, 4000);
+            }, 5000);
+        }
+
+        function showLoadingButton(buttonId) {
+            const button = document.getElementById(buttonId);
+            const text = document.getElementById(buttonId + '-text');
+            const loading = document.getElementById(buttonId + '-loading');
+            
+            if (text && loading) {
+                text.classList.add('hidden');
+                loading.classList.remove('hidden');
+                button.disabled = true;
+            }
+        }
+
+        function hideLoadingButtons() {
+            ['create-game', 'join-game'].forEach(buttonId => {
+                const button = document.getElementById(buttonId);
+                const text = document.getElementById(buttonId + '-text');
+                const loading = document.getElementById(buttonId + '-loading');
+                
+                if (text && loading) {
+                    text.classList.remove('hidden');
+                    loading.classList.add('hidden');
+                    button.disabled = false;
+                }
+            });
         }
 
         function generateRoomCode() {
@@ -750,10 +951,12 @@
                 return;
             }
 
+            showLoadingButton('create-game');
+
             const difficulty = document.getElementById('difficulty').value;
             const roomCode = generateRoomCode();
             
-            gameState = {
+            const newGameState = {
                 roomCode: roomCode,
                 level: 1,
                 currentNumber: Math.floor(Math.random() * DIFFICULTIES[difficulty].baseRange) + 1,
@@ -769,31 +972,34 @@
                 }],
                 gameStarted: false,
                 gameCompleted: false,
-                currentPlayerTurn: playerId,
                 levelCompleted: false,
                 winner: null,
                 chat: [{
-                    id: 'welcome',
+                    id: 'welcome_' + Date.now(),
                     playerId: 'system',
                     playerName: 'Sistema Galattico',
-                    message: `🚀 Stazione ${roomCode} creata! Benvenuto Comandante ${playerName}!`,
+                    message: `🚀 Stazione ${roomCode} creata da ${playerName}!`,
                     timestamp: Date.now(),
                     isSystem: true
                 }],
-                gameHistory: []
+                gameHistory: [],
+                lastActivity: Date.now()
             };
 
-            sendToServer({
+            if (sendToServer({
                 type: 'createGame',
                 roomCode: roomCode,
                 playerId: playerId,
                 playerName: playerName,
-                gameState: gameState
-            });
-            
-            showScreen('game');
-            updateGameDisplay();
-            showNotification('🚀 Stazione Spaziale creata con successo!', 'success');
+                gameState: newGameState
+            })) {
+                gameState = newGameState;
+                showScreen('game');
+                attempts = 0;
+                showNotification('🚀 Stazione Spaziale creata con successo!', 'success');
+            }
+
+            hideLoadingButtons();
         }
 
         function joinGame() {
@@ -815,41 +1021,55 @@
                 return;
             }
 
+            showLoadingButton('join-game');
+
             sendToServer({
                 type: 'joinGame',
                 roomCode: roomCode.toUpperCase(),
                 playerId: playerId,
                 playerName: playerName
             });
+
+            // Hide loading after timeout
+            setTimeout(() => {
+                hideLoadingButtons();
+            }, 5000);
         }
 
         function startGame() {
             if (!gameState || !isHost()) return;
 
-            gameState.gameStarted = true;
-            gameState.chat.push({
-                id: 'start_' + Date.now(),
-                playerId: 'system',
-                playerName: 'Sistema Galattico',
-                message: '🚀 BATTAGLIA GALATTICA INIZIATA! Che la forza sia con voi!',
-                timestamp: Date.now(),
-                isSystem: true
-            });
+            const updatedGameState = {
+                ...gameState,
+                gameStarted: true,
+                chat: [
+                    ...gameState.chat,
+                    {
+                        id: 'start_' + Date.now(),
+                        playerId: 'system',
+                        playerName: 'Sistema Galattico',
+                        message: '🚀 BATTAGLIA INIZIATA! Che la forza sia con voi!',
+                        timestamp: Date.now(),
+                        isSystem: true
+                    }
+                ]
+            };
 
             sendToServer({
                 type: 'startGame',
                 roomCode: gameState.roomCode,
                 playerId: playerId,
-                gameState: gameState
+                gameState: updatedGameState
             });
 
-            attempts = 0;
-            updateGameDisplay();
             showNotification('🚀 Battaglia iniziata!', 'success');
         }
 
         function submitGuess() {
-            if (!gameState || !gameState.gameStarted) return;
+            if (!gameState || !gameState.gameStarted) {
+                showNotification('La battaglia non è ancora iniziata!', 'warning');
+                return;
+            }
 
             const guess = parseInt(document.getElementById('user-guess').value);
             const currentRange = getCurrentRange();
@@ -859,9 +1079,10 @@
                 return;
             }
 
-            attempts++;
+            const newAttempts = attempts + 1;
             let result = '';
             let levelWon = false;
+            let gameOver = false;
 
             if (guess === gameState.currentNumber) {
                 result = '🎯 BERSAGLIO CENTRATO!';
@@ -872,59 +1093,67 @@
                 result = '📉 Troppo alto! Abbassa la mira!';
             }
 
-            // Add to history
-            gameState.gameHistory.push({
+            if (newAttempts >= gameState.maxAttempts && !levelWon) {
+                gameOver = true;
+                result = `💥 Attacchi esauriti! Il numero era ${gameState.currentNumber}`;
+            }
+
+            const historyEntry = {
                 playerId: playerId,
                 playerName: playerName,
                 guess: guess,
                 result: result,
                 timestamp: Date.now()
-            });
+            };
+
+            const updatedGameState = {
+                ...gameState,
+                gameHistory: [...gameState.gameHistory, historyEntry],
+                chat: [
+                    ...gameState.chat,
+                    {
+                        id: 'guess_' + Date.now(),
+                        playerId: 'system',
+                        playerName: 'Sistema Galattico',
+                        message: `${playerName}: ${guess} → ${result}`,
+                        timestamp: Date.now(),
+                        isSystem: true
+                    }
+                ]
+            };
 
             if (levelWon) {
-                // Player won the level
-                const player = gameState.players.find(p => p.id === playerId);
-                if (player) {
-                    player.score += Math.max(100 - (attempts - 1) * 10, 10);
+                const currentPlayer = updatedGameState.players.find(p => p.id === playerId);
+                if (currentPlayer) {
+                    currentPlayer.score += Math.max(100 - (newAttempts - 1) * 10, 10);
                 }
 
-                gameState.levelCompleted = true;
-                gameState.winner = playerName;
-
-                gameState.chat.push({
-                    id: 'win_' + Date.now(),
-                    playerId: 'system',
-                    playerName: 'Sistema Galattico',
-                    message: `🎉 ${playerName} ha conquistato il Settore ${gameState.level}!`,
-                    timestamp: Date.now(),
-                    isSystem: true
-                });
+                if (gameState.level >= 10) {
+                    updatedGameState.gameCompleted = true;
+                    updatedGameState.winner = playerName;
+                } else {
+                    updatedGameState.levelCompleted = true;
+                    updatedGameState.winner = playerName;
+                }
 
                 triggerConfetti();
-                showNotification('🎉 SETTORE CONQUISTATO!', 'success');
-            } else if (attempts >= gameState.maxAttempts) {
-                gameState.chat.push({
-                    id: 'fail_' + Date.now(),
-                    playerId: 'system',
-                    playerName: 'Sistema Galattico',
-                    message: `💥 ${playerName} ha esaurito gli attacchi! Il numero era ${gameState.currentNumber}`,
-                    timestamp: Date.now(),
-                    isSystem: true
-                });
-                showNotification(`💥 Attacchi esauriti! Il numero era ${gameState.currentNumber}`, 'error');
             }
 
             sendToServer({
                 type: 'gameAction',
-                action: 'guess',
                 roomCode: gameState.roomCode,
                 playerId: playerId,
-                data: { guess, result, levelWon },
-                gameState: gameState
+                gameState: updatedGameState
             });
 
+            attempts = newAttempts;
             document.getElementById('user-guess').value = '';
-            updateGameDisplay();
+
+            if (levelWon) {
+                showNotification('🎉 SETTORE CONQUISTATO!', 'success');
+            } else if (gameOver) {
+                showNotification(`💥 Attacchi esauriti! Il numero era ${gameState.currentNumber}`, 'error');
+            }
         }
 
         function nextLevel() {
@@ -939,30 +1168,35 @@
 
             const newLevel = gameState.level + 1;
             const newRange = DIFFICULTIES[gameState.difficulty].baseRange * newLevel;
+            const newNumber = Math.floor(Math.random() * newRange) + 1;
 
-            gameState.level = newLevel;
-            gameState.currentNumber = Math.floor(Math.random() * newRange) + 1;
-            gameState.levelCompleted = false;
-            gameState.winner = null;
-
-            gameState.chat.push({
-                id: 'nextlevel_' + Date.now(),
-                playerId: 'system',
-                playerName: 'Sistema Galattico',
-                message: `🚀 Settore ${newLevel} sbloccato! Range: 1-${newRange}`,
-                timestamp: Date.now(),
-                isSystem: true
-            });
+            const updatedGameState = {
+                ...gameState,
+                level: newLevel,
+                currentNumber: newNumber,
+                levelCompleted: false,
+                winner: null,
+                chat: [
+                    ...gameState.chat,
+                    {
+                        id: 'nextlevel_' + Date.now(),
+                        playerId: 'system',
+                        playerName: 'Sistema Galattico',
+                        message: `🎯 SETTORE ${newLevel}/10 - Range: 1-${newRange}`,
+                        timestamp: Date.now(),
+                        isSystem: true
+                    }
+                ]
+            };
 
             sendToServer({
                 type: 'nextLevel',
                 roomCode: gameState.roomCode,
                 playerId: playerId,
-                gameState: gameState
+                gameState: updatedGameState
             });
 
             attempts = 0;
-            updateGameDisplay();
             showNotification(`🚀 Settore ${newLevel} sbloccato!`, 'success');
         }
 
@@ -974,15 +1208,13 @@
             if (!message) return;
 
             const chatMessage = {
-                id: 'msg_' + Date.now(),
+                id: 'chat_' + Date.now(),
                 playerId: playerId,
                 playerName: playerName,
                 message: message,
                 timestamp: Date.now(),
                 isSystem: false
             };
-
-            gameState.chat.push(chatMessage);
 
             sendToServer({
                 type: 'chatMessage',
@@ -992,16 +1224,10 @@
             });
 
             input.value = '';
-            updateGameDisplay();
         }
 
         function leaveRoom() {
             if (gameState) {
-                const player = gameState.players.find(p => p.id === playerId);
-                if (player) {
-                    player.isOnline = false;
-                }
-
                 sendToServer({
                     type: 'leaveGame',
                     roomCode: gameState.roomCode,
@@ -1014,6 +1240,10 @@
             attempts = 0;
             showScreen('lobby');
             showNotification('🚪 Hai abbandonato la stazione', 'info');
+        }
+
+        function backToLobby() {
+            leaveRoom();
         }
 
         function newBattle() {
@@ -1049,14 +1279,16 @@
             // Update game controls visibility
             const gameControls = document.getElementById('game-controls');
             const levelCompleted = document.getElementById('level-completed');
-            const startButton = document.getElementById('start-game');
+            const startGameContainer = document.getElementById('start-game-container');
 
             if (gameState.gameStarted && !gameState.levelCompleted) {
                 gameControls.classList.remove('hidden');
                 levelCompleted.classList.add('hidden');
+                startGameContainer.classList.add('hidden');
             } else if (gameState.levelCompleted) {
                 gameControls.classList.add('hidden');
                 levelCompleted.classList.remove('hidden');
+                startGameContainer.classList.add('hidden');
                 document.getElementById('winner-display').textContent = `Vincitore: ${gameState.winner}`;
                 
                 // Show next level button only for host
@@ -1069,13 +1301,22 @@
             } else {
                 gameControls.classList.add('hidden');
                 levelCompleted.classList.add('hidden');
+                
+                // Show start button only for host when game not started
+                if (isHost() && !gameState.gameStarted) {
+                    startGameContainer.classList.remove('hidden');
+                    document.getElementById('start-game').classList.remove('hidden');
+                } else {
+                    startGameContainer.classList.add('hidden');
+                }
             }
 
-            // Show start button only for host when game not started
-            if (isHost() && !gameState.gameStarted) {
-                startButton.classList.remove('hidden');
+            // Show leaderboard button if game completed
+            const viewLeaderboardBtn = document.getElementById('view-leaderboard');
+            if (gameState.gameCompleted) {
+                viewLeaderboardBtn.classList.remove('hidden');
             } else {
-                startButton.classList.add('hidden');
+                viewLeaderboardBtn.classList.add('hidden');
             }
 
             // Update chat
@@ -1087,7 +1328,7 @@
             // Disable guess input if max attempts reached
             const guessInput = document.getElementById('user-guess');
             const submitButton = document.getElementById('submit-guess');
-            if (attempts >= gameState.maxAttempts) {
+            if (attempts >= gameState.maxAttempts && !gameState.levelCompleted) {
                 guessInput.disabled = true;
                 submitButton.disabled = true;
             } else {
@@ -1100,6 +1341,8 @@
             const leaderboard = document.getElementById('leaderboard');
             leaderboard.innerHTML = '';
 
+            if (!gameState || !gameState.players) return;
+
             gameState.players
                 .sort((a, b) => b.score - a.score)
                 .forEach((player, index) => {
@@ -1108,11 +1351,11 @@
                     
                     const icon = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '👤';
                     const hostIcon = player.isHost ? ' 👑' : '';
-                    const offlineText = !player.isOnline ? ' (offline)' : '';
+                    const offlineText = !player.isOnline ? ' <span class="text-red">(offline)</span>' : '';
                     
                     item.innerHTML = `
                         <div class="flex">
-                            <span style="font-size: 1.25rem;">${icon}</span>
+                            <span style="font-size: 1.25rem; margin-right: 0.5rem;">${icon}</span>
                             <span style="font-weight: 600;">${player.name}${hostIcon}${offlineText}</span>
                         </div>
                         <span class="text-yellow" style="font-weight: bold;">${player.score}</span>
@@ -1126,13 +1369,23 @@
             const chatContainer = document.getElementById('chat-messages');
             chatContainer.innerHTML = '';
 
-            gameState.chat.slice(-10).forEach(msg => {
+            if (!gameState || !gameState.chat) return;
+
+            gameState.chat.slice(-15).forEach(msg => {
                 const messageDiv = document.createElement('div');
                 messageDiv.className = `chat-message ${msg.isSystem ? 'chat-system' : msg.playerId === playerId ? 'chat-own' : 'chat-other'}`;
                 
+                const time = new Date(msg.timestamp).toLocaleTimeString('it-IT', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                
                 messageDiv.innerHTML = `
-                    <div style="font-weight: 600; font-size: 0.875rem;">${msg.playerName}</div>
-                    <div>${msg.message}</div>
+                    <div style="font-weight: 600; font-size: 0.875rem; display: flex; justify-content: space-between;">
+                        <span>${msg.playerName}</span>
+                        <span style="opacity: 0.6; font-size: 0.75rem;">${time}</span>
+                    </div>
+                    <div style="margin-top: 0.25rem;">${msg.message}</div>
                 `;
                 
                 chatContainer.appendChild(messageDiv);
@@ -1145,17 +1398,27 @@
             const historyContainer = document.getElementById('game-history');
             historyContainer.innerHTML = '';
 
-            gameState.gameHistory.slice(-10).reverse().forEach(entry => {
+            if (!gameState || !gameState.gameHistory) return;
+
+            gameState.gameHistory.slice(-15).reverse().forEach(entry => {
                 const historyDiv = document.createElement('div');
                 historyDiv.className = 'chat-message chat-other';
                 historyDiv.style.display = 'flex';
                 historyDiv.style.justifyContent = 'space-between';
                 historyDiv.style.alignItems = 'center';
+                historyDiv.style.flexWrap = 'wrap';
+                historyDiv.style.gap = '0.5rem';
+                
+                const time = new Date(entry.timestamp).toLocaleTimeString('it-IT', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
                 
                 historyDiv.innerHTML = `
                     <span style="font-weight: 600;">${entry.playerName}</span>
                     <span>Tentativo: ${entry.guess}</span>
                     <span style="font-size: 0.875rem; opacity: 0.8;">${entry.result}</span>
+                    <span style="font-size: 0.75rem; opacity: 0.6;">${time}</span>
                 `;
                 
                 historyContainer.appendChild(historyDiv);
@@ -1216,7 +1479,7 @@
         function triggerConfetti() {
             const confetti = document.createElement('div');
             confetti.className = 'confetti';
-            confetti.textContent = '🎉🎊✨🌟💫';
+            confetti.textContent = '🎉🎊✨🌟💫🚀';
             document.body.appendChild(confetti);
             
             setTimeout(() => {
@@ -1236,6 +1499,18 @@
             }
             if (websocket) {
                 websocket.close();
+            }
+        });
+
+        // Handle visibility change (tab switching)
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && gameState) {
+                // Refresh game state when tab becomes visible
+                sendToServer({
+                    type: 'refreshState',
+                    roomCode: gameState.roomCode,
+                    playerId: playerId
+                });
             }
         });
     </script>
