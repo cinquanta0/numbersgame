@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Battaglia Galattica - Multiplayer</title>
+    <title>Battaglia Galattica - Multiplayer a Turni</title>
     <style>
         * {
             margin: 0;
@@ -58,6 +58,11 @@
             color: rgba(156, 163, 175, 1);
         }
 
+        .input:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         .button {
             padding: 0.75rem 1.5rem;
             border: none;
@@ -70,7 +75,7 @@
             transition: all 0.3s ease;
         }
 
-        .button:hover {
+        .button:hover:not(:disabled) {
             transform: translateY(-2px);
         }
 
@@ -130,6 +135,50 @@
             color: #fbbf24;
         }
 
+        .turn-indicator {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .turn-active {
+            background: rgba(16, 185, 129, 0.3);
+            border: 2px solid #10b981;
+            color: #10b981;
+            animation: pulse 2s infinite;
+        }
+
+        .turn-waiting {
+            background: rgba(251, 191, 36, 0.2);
+            border: 1px solid #fbbf24;
+            color: #fbbf24;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        .timer {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #fbbf24;
+        }
+
+        .timer.warning {
+            color: #ef4444;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
         .chat {
             height: 200px;
             overflow-y: auto;
@@ -146,6 +195,11 @@
             background: rgba(255, 255, 255, 0.1);
         }
 
+        .chat-message.system {
+            background: rgba(34, 211, 238, 0.2);
+            border-left: 3px solid #22d3ee;
+        }
+
         .leaderboard {
             background: rgba(0, 0, 0, 0.3);
             padding: 1rem;
@@ -159,6 +213,13 @@
             margin-bottom: 0.5rem;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 0.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .player.current-turn {
+            background: rgba(16, 185, 129, 0.3);
+            border: 2px solid #10b981;
+            transform: scale(1.02);
         }
 
         .notification {
@@ -206,6 +267,9 @@
         <!-- Lobby Screen -->
         <div id="lobby-screen">
             <h1 class="title">🌌 BATTAGLIA GALATTICA</h1>
+            <p style="text-align: center; margin-bottom: 2rem; font-size: 1.1rem; opacity: 0.8;">
+                🎯 Gioco a turni - Indovina il numero segreto prima degli altri!
+            </p>
             
             <!-- Connection Status -->
             <div id="connection-status" class="status status-connecting">
@@ -233,10 +297,11 @@
             <div class="card">
                 <h3 style="margin-bottom: 1rem;">ℹ️ Come Giocare</h3>
                 <ul style="line-height: 1.6;">
-                    <li>🎯 Indovina il numero segreto (1-100)</li>
-                    <li>💬 Chatta con altri giocatori</li>
-                    <li>🏆 Guadagna punti per ogni vittoria</li>
-                    <li>👑 Diventa il campione galattico!</li>
+                    <li>🎯 <strong>Obiettivo:</strong> Indovina il numero segreto (1-100)</li>
+                    <li>⏰ <strong>Turni:</strong> 30 secondi e 3 tentativi per turno</li>
+                    <li>🏆 <strong>Punteggio:</strong> Più veloce indovini, più punti ottieni</li>
+                    <li>👥 <strong>Multiplayer:</strong> Servono almeno 2 giocatori</li>
+                    <li>💬 <strong>Chat:</strong> Comunica con gli altri comandanti</li>
                 </ul>
             </div>
         </div>
@@ -253,6 +318,12 @@
                 </div>
             </div>
 
+            <!-- Turn Indicator -->
+            <div id="turn-indicator" class="turn-indicator hidden">
+                <div id="turn-text">In attesa...</div>
+                <div id="turn-timer" class="timer"></div>
+            </div>
+
             <div class="grid">
                 <!-- Game Area -->
                 <div>
@@ -262,12 +333,16 @@
                         <p style="margin-bottom: 1rem;">Indovina il numero segreto tra 1 e 100!</p>
                         
                         <div id="game-controls">
-                            <input type="number" id="guess-input" class="input" placeholder="Il tuo numero" min="1" max="100">
-                            <button id="submit-guess" class="button button-success">🚀 Attacca!</button>
+                            <input type="number" id="guess-input" class="input" placeholder="Il tuo numero" min="1" max="100" disabled>
+                            <button id="submit-guess" class="button button-success" disabled>🚀 Attacca!</button>
+                            <div id="attempts-info" style="text-align: center; margin-top: 0.5rem; opacity: 0.8;"></div>
                         </div>
                         
                         <div id="start-controls" class="hidden">
                             <button id="start-game" class="button button-success">🎮 Inizia Battaglia</button>
+                            <p style="text-align: center; margin-top: 0.5rem; opacity: 0.8; font-size: 0.9rem;">
+                                Servono almeno 2 giocatori per iniziare
+                            </p>
                         </div>
                     </div>
 
@@ -300,6 +375,7 @@
         let playerId = 'player_' + Math.random().toString(36).substr(2, 9);
         let playerName = '';
         let connectionStatus = 'connecting';
+        let timerInterval = null;
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
@@ -317,7 +393,7 @@
             
             // Enter key handlers
             document.getElementById('guess-input').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') submitGuess();
+                if (e.key === 'Enter' && !this.disabled) submitGuess();
             });
             
             document.getElementById('chat-input').addEventListener('keypress', function(e) {
@@ -542,6 +618,11 @@
         }
 
         function leaveRoom() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            
             showLobbyScreen();
             gameData = null;
             showNotification('🚪 Hai lasciato la stazione', 'info');
@@ -565,17 +646,46 @@
             document.getElementById('room-display').textContent = gameData.roomCode;
 
             // Update game controls
+            const currentPlayer = gameData.players[gameData.currentPlayerIndex];
             const isHost = gameData.players.find(p => p.id === playerId)?.isHost;
+            const isMyTurn = currentPlayer && currentPlayer.id === playerId;
             
             if (gameData.gameStarted) {
                 document.getElementById('game-controls').classList.remove('hidden');
                 document.getElementById('start-controls').classList.add('hidden');
+                document.getElementById('turn-indicator').classList.remove('hidden');
+                
+                // Update turn controls
+                const guessInput = document.getElementById('guess-input');
+                const submitButton = document.getElementById('submit-guess');
+                
+                guessInput.disabled = !isMyTurn;
+                submitButton.disabled = !isMyTurn;
+                
+                // Update attempts info
+                const attemptsInfo = document.getElementById('attempts-info');
+                if (isMyTurn) {
+                    const attemptsLeft = gameData.maxAttempts - gameData.currentAttempts;
+                    attemptsInfo.textContent = `Tentativi rimasti: ${attemptsLeft}/${gameData.maxAttempts}`;
+                } else {
+                    attemptsInfo.textContent = '';
+                }
+                
+                updateTurnIndicator();
+                startTimer();
             } else {
                 document.getElementById('game-controls').classList.add('hidden');
-                if (isHost) {
+                document.getElementById('turn-indicator').classList.add('hidden');
+                
+                if (isHost && gameData.players.length >= 2) {
                     document.getElementById('start-controls').classList.remove('hidden');
                 } else {
                     document.getElementById('start-controls').classList.add('hidden');
+                }
+                
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
                 }
             }
 
@@ -584,6 +694,50 @@
 
             // Update chat
             updateChat();
+        }
+
+        function updateTurnIndicator() {
+            if (!gameData || !gameData.gameStarted) return;
+            
+            const turnIndicator = document.getElementById('turn-indicator');
+            const turnText = document.getElementById('turn-text');
+            const currentPlayer = gameData.players[gameData.currentPlayerIndex];
+            const isMyTurn = currentPlayer && currentPlayer.id === playerId;
+            
+            if (isMyTurn) {
+                turnIndicator.className = 'turn-indicator turn-active';
+                turnText.textContent = `🎯 È il tuo turno! (${gameData.maxAttempts} tentativi)`;
+            } else {
+                turnIndicator.className = 'turn-indicator turn-waiting';
+                turnText.textContent = `⏳ Turno di ${currentPlayer ? currentPlayer.name : 'Sconosciuto'}`;
+            }
+        }
+
+        function startTimer() {
+            if (!gameData || !gameData.gameStarted || !gameData.turnStartTime) return;
+            
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+            
+            timerInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - gameData.turnStartTime) / 1000);
+                const remaining = Math.max(0, gameData.turnTimeLimit - elapsed);
+                
+                const timerEl = document.getElementById('turn-timer');
+                timerEl.textContent = `⏰ ${remaining}s`;
+                
+                if (remaining <= 10) {
+                    timerEl.className = 'timer warning';
+                } else {
+                    timerEl.className = 'timer';
+                }
+                
+                if (remaining <= 0) {
+                    clearInterval(timerInterval);
+                    timerInterval = null;
+                }
+            }, 1000);
         }
 
         function updateLeaderboard() {
@@ -595,18 +749,26 @@
                 return;
             }
 
+            const currentPlayer = gameData.gameStarted ? gameData.players[gameData.currentPlayerIndex] : null;
+
             gameData.players
                 .sort((a, b) => b.score - a.score)
                 .forEach((player, index) => {
                     const playerEl = document.createElement('div');
                     playerEl.className = 'player';
                     
+                    // Evidenzia il giocatore del turno corrente
+                    if (currentPlayer && player.id === currentPlayer.id) {
+                        playerEl.classList.add('current-turn');
+                    }
+                    
                     const icon = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '👤';
                     const hostIcon = player.isHost ? ' 👑' : '';
                     const isCurrentPlayer = player.id === playerId ? ' (Tu)' : '';
+                    const turnIcon = currentPlayer && player.id === currentPlayer.id ? ' 🎯' : '';
                     
                     playerEl.innerHTML = `
-                        <span>${icon} ${player.name}${hostIcon}${isCurrentPlayer}</span>
+                        <span>${icon} ${player.name}${hostIcon}${isCurrentPlayer}${turnIcon}</span>
                         <span style="color: #fbbf24; font-weight: bold;">${player.score}</span>
                     `;
                     
@@ -626,6 +788,11 @@
             gameData.chat.slice(-20).forEach(msg => {
                 const msgEl = document.createElement('div');
                 msgEl.className = 'chat-message';
+                
+                // Evidenzia i messaggi di sistema
+                if (msg.playerName === 'Sistema') {
+                    msgEl.classList.add('system');
+                }
                 
                 const time = new Date(msg.timestamp || Date.now()).toLocaleTimeString('it-IT', { 
                     hour: '2-digit', 
@@ -663,7 +830,7 @@
             }
         }, 30000);
 
-        console.log('🎮 Battaglia Galattica caricata!');
+        console.log('🎮 Battaglia Galattica a Turni caricata!');
     </script>
 </body>
 </html>
