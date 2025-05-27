@@ -1,1 +1,754 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 Numero Quest - Gioco Principale</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Orbitron:wght@400;700&family=Roboto:wght@400;700&family=Press+Start+2P&family=Fredoka+One&family=Righteous&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --primary-neon: #00fff2;
+            --secondary-neon: #ff6b6b;
+            --accent-gold: #ffd93d;
+            --dark-bg: #0a0a0a;
+            --card-bg: rgba(255,255,255,0.1);
+            --text-color: white;
+            --gradient-bg: linear-gradient(45deg, #0a0a0a, #1a1a2e, #16213e);
+        }
+        
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: var(--gradient-bg);
+            color: var(--text-color);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* STELLE ANIMATE */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .star {
+            position: absolute;
+            background: var(--primary-neon);
+            border-radius: 50%;
+            animation: twinkle 2s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        /* HEADER */
+        .header {
+            text-align: center;
+            padding: 2rem 0;
+            background: linear-gradient(90deg, transparent, var(--card-bg), transparent);
+            border-bottom: 3px solid var(--primary-neon);
+            margin-bottom: 2rem;
+        }
+
+        .main-title {
+            font-family: 'Bangers', cursive;
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            background: linear-gradient(45deg, var(--primary-neon), var(--accent-gold), var(--secondary-neon));
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 3s ease-in-out infinite;
+            margin-bottom: 0.5rem;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .subtitle {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            color: var(--accent-gold);
+            opacity: 0.9;
+        }
+
+        /* NAVIGATION */
+        .nav-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-btn {
+            background: var(--card-bg);
+            border: 2px solid var(--primary-neon);
+            border-radius: 50px;
+            padding: 12px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            font-size: 1rem;
+            color: var(--primary-neon);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .nav-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px var(--primary-neon);
+            background: var(--primary-neon);
+            color: var(--dark-bg);
+        }
+
+        /* CONTAINER */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        /* CARD */
+        .card {
+            background: var(--card-bg);
+            border: 3px solid rgba(0, 245, 255, 0.3);
+            border-radius: 25px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(15px);
+            transition: all 0.4s ease;
+        }
+
+        .card:hover {
+            border-color: var(--primary-neon);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 245, 255, 0.2);
+        }
+
+        /* GAME AREA */
+        .game-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        /* GAME STATS */
+        .game-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 1.5rem;
+            border-radius: 20px;
+            text-align: center;
+            border: 2px solid var(--primary-neon);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 245, 255, 0.3);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--accent-gold);
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 0.5rem;
+        }
+
+        /* INPUT E BUTTON */
+        .input {
+            width: 100%;
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.6);
+            border: 3px solid var(--primary-neon);
+            border-radius: 20px;
+            color: var(--text-color);
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .input:focus {
+            outline: none;
+            box-shadow: 0 0 30px var(--primary-neon);
+            border-color: var(--accent-gold);
+        }
+
+        .button {
+            padding: 1.5rem 2.5rem;
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1.1rem;
+            width: 100%;
+            margin-bottom: 1rem;
+            transition: all 0.4s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-family: 'Fredoka One', cursive;
+        }
+
+        .button:hover:not(:disabled) {
+            transform: translateY(-5px) scale(1.05);
+        }
+
+        .button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .button-primary {
+            background: linear-gradient(45deg, var(--primary-neon), #00d4ff);
+            color: var(--dark-bg);
+            box-shadow: 0 10px 25px rgba(0, 245, 255, 0.3);
+        }
+
+        .button-secondary {
+            background: linear-gradient(45deg, var(--secondary-neon), #ff5252);
+            color: white;
+            box-shadow: 0 10px 25px rgba(255, 107, 107, 0.3);
+        }
+
+        .button-success {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            color: white;
+            box-shadow: 0 10px 25px rgba(78, 205, 196, 0.3);
+        }
+
+        /* DIFFICULTY SELECTOR */
+        .difficulty-selector {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .difficulty-badge {
+            padding: 1rem 1.5rem;
+            border-radius: 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .difficulty-badge:hover,
+        .difficulty-badge.active {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .easy { 
+            background: linear-gradient(45deg, #4ecdc4, #44a08d); 
+            border-color: #4ecdc4;
+        }
+        .normal { 
+            background: linear-gradient(45deg, #667eea, #764ba2); 
+            border-color: #667eea;
+        }
+        .hard { 
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24); 
+            border-color: #ff6b6b;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .game-area {
+                grid-template-columns: 1fr;
+            }
+            
+            .game-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* HIDDEN */
+        .hidden {
+            display: none !important;
+        }
+
+        /* MENU PRINCIPALE */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .menu-card {
+            background: var(--card-bg);
+            border: 3px solid rgba(0, 245, 255, 0.3);
+            border-radius: 25px;
+            padding: 2rem;
+            text-align: center;
+            backdrop-filter: blur(15px);
+            transition: all 0.4s ease;
+            cursor: pointer;
+        }
+
+        .menu-card:hover {
+            border-color: var(--primary-neon);
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(0, 245, 255, 0.3);
+        }
+
+        .menu-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .menu-title {
+            font-family: 'Bangers', cursive;
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: var(--accent-gold);
+        }
+
+        .menu-description {
+            opacity: 0.8;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <!-- STELLE ANIMATE -->
+    <div class="stars" id="stars"></div>
+
+    <!-- NAVIGATION -->
+    <div class="nav-controls">
+        <a href="index.html" class="nav-btn">
+            🌌 Multiplayer
+        </a>
+    </div>
+
+    <div class="container">
+        <!-- HEADER -->
+        <header class="header">
+            <h1 class="main-title">🎯 NUMERO QUEST</h1>
+            <p class="subtitle">Il Gioco di Indovinare i Numeri più Epico della Galassia</p>
+        </header>
+
+        <!-- MENU PRINCIPALE -->
+        <div id="main-menu">
+            <div class="menu-grid">
+                <div class="menu-card" onclick="showSinglePlayer()">
+                    <div class="menu-icon">🎯</div>
+                    <div class="menu-title">Giocatore Singolo</div>
+                    <div class="menu-description">
+                        Sfida te stesso in modalità classica. Indovina il numero segreto e batti i tuoi record!
+                    </div>
+                </div>
+
+                <div class="menu-card" onclick="window.location.href='index.html'">
+                    <div class="menu-icon">🌌</div>
+                    <div class="menu-title">Arena Galattica</div>
+                    <div class="menu-description">
+                        Battaglia multiplayer epica! Sfida altri giocatori in tempo reale attraverso 10 livelli galattici.
+                    </div>
+                </div>
+
+                <div class="menu-card" onclick="showSettings()">
+                    <div class="menu-icon">⚙️</div>
+                    <div class="menu-title">Impostazioni</div>
+                    <div class="menu-description">
+                        Personalizza la tua esperienza di gioco. Difficoltà, suoni e molto altro.
+                    </div>
+                </div>
+
+                <div class="menu-card" onclick="showStats()">
+                    <div class="menu-icon">📊</div>
+                    <div class="menu-title">Statistiche</div>
+                    <div class="menu-description">
+                        Visualizza i tuoi progressi, record personali e achievement conquistati.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GIOCO SINGOLO -->
+        <div id="single-player" class="hidden">
+            <!-- Selezione Difficoltà -->
+            <div class="card">
+                <h3 style="text-align: center; font-size: 2rem; font-family: 'Bangers', cursive; color: var(--accent-gold); margin-bottom: 2rem;">
+                    🎮 Seleziona Difficoltà
+                </h3>
+                
+                <div class="difficulty-selector">
+                    <div class="difficulty-badge easy active" data-difficulty="easy" onclick="selectDifficulty('easy')">
+                        🌟 FACILE<br>
+                        <small>1-50 | 10 tentativi</small>
+                    </div>
+                    <div class="difficulty-badge normal" data-difficulty="normal" onclick="selectDifficulty('normal')">
+                        ⚡ NORMALE<br>
+                        <small>1-100 | 7 tentativi</small>
+                    </div>
+                    <div class="difficulty-badge hard" data-difficulty="hard" onclick="selectDifficulty('hard')">
+                        🔥 DIFFICILE<br>
+                        <small>1-200 | 5 tentativi</small>
+                    </div>
+                </div>
+
+                <button class="button button-primary" onclick="startGame()">
+                    🚀 Inizia Partita
+                </button>
+
+                <button class="button button-secondary" onclick="showMainMenu()">
+                    🏠 Torna al Menu
+                </button>
+            </div>
+
+            <!-- Area di Gioco -->
+            <div id="game-area" class="hidden">
+                <!-- Statistiche -->
+                <div class="game-stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="current-number">?</div>
+                        <div class="stat-label">Numero Segreto</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="attempts-left">10</div>
+                        <div class="stat-label">Tentativi</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="current-score">0</div>
+                        <div class="stat-label">Punteggio</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="best-score">0</div>
+                        <div class="stat-label">Record</div>
+                    </div>
+                </div>
+
+                <div class="game-area">
+                    <!-- Controlli -->
+                    <div class="card">
+                        <h3 style="text-align: center; font-family: 'Bangers', cursive; font-size: 1.8rem; color: var(--accent-gold); margin-bottom: 2rem;">
+                            🎯 Centro Comando
+                        </h3>
+                        
+                        <input type="number" id="guess-input" class="input" placeholder="Inserisci il tuo numero" min="1">
+                        <button id="submit-guess" class="button button-success" onclick="makeGuess()">
+                            🚀 Indovina!
+                        </button>
+                        
+                        <div id="hint" style="text-align: center; margin-top: 1rem; font-size: 1.2rem; font-weight: bold; color: var(--primary-neon);"></div>
+                    </div>
+
+                    <!-- Cronologia -->
+                    <div class="card">
+                        <h3 style="text-align: center; font-family: 'Bangers', cursive; font-size: 1.8rem; color: var(--accent-gold); margin-bottom: 2rem;">
+                            📜 Cronologia Tentativi
+                        </h3>
+                        <div id="history" style="max-height: 300px; overflow-y: auto;"></div>
+                    </div>
+                </div>
+
+                <div style="text-align: center;">
+                    <button class="button button-secondary" onclick="resetGame()">
+                        🔄 Nuova Partita
+                    </button>
+                    <button class="button button-secondary" onclick="showMainMenu()">
+                        🏠 Menu Principale
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game State
+        let gameState = {
+            secretNumber: 0,
+            attemptsLeft: 10,
+            maxAttempts: 10,
+            score: 0,
+            difficulty: 'easy',
+            gameStarted: false,
+            history: []
+        };
+
+        // Difficulty Settings
+        const difficulties = {
+            easy: { min: 1, max: 50, attempts: 10, name: '🌟 FACILE' },
+            normal: { min: 1, max: 100, attempts: 7, name: '⚡ NORMALE' },
+            hard: { min: 1, max: 200, attempts: 5, name: '🔥 DIFFICILE' }
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            createStars();
+            loadBestScore();
+            
+            // Event listeners
+            document.getElementById('guess-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') makeGuess();
+            });
+        });
+
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const numStars = 150;
+
+            for (let i = 0; i < numStars; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.width = Math.random() * 3 + 1 + 'px';
+                star.style.height = star.style.width;
+                star.style.animationDelay = Math.random() * 3 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+
+        function showMainMenu() {
+            document.getElementById('main-menu').classList.remove('hidden');
+            document.getElementById('single-player').classList.add('hidden');
+            document.getElementById('game-area').classList.add('hidden');
+        }
+
+        function showSinglePlayer() {
+            document.getElementById('main-menu').classList.add('hidden');
+            document.getElementById('single-player').classList.remove('hidden');
+            document.getElementById('game-area').classList.add('hidden');
+        }
+
+        function showSettings() {
+            alert('🚧 Impostazioni in arrivo nella prossima versione!');
+        }
+
+        function showStats() {
+            const bestScore = localStorage.getItem('numberquest-best-score') || 0;
+            alert(`📊 Statistiche:\n\n🏆 Miglior Punteggio: ${bestScore}\n🎯 Partite Giocate: ${localStorage.getItem('numberquest-games-played') || 0}\n⚡ Vittorie: ${localStorage.getItem('numberquest-wins') || 0}`);
+        }
+
+        function selectDifficulty(difficulty) {
+            gameState.difficulty = difficulty;
+            
+            // Update UI
+            document.querySelectorAll('.difficulty-badge').forEach(badge => {
+                badge.classList.remove('active');
+            });
+            document.querySelector(`[data-difficulty="${difficulty}"]`).classList.add('active');
+            
+            // Update input max
+            const config = difficulties[difficulty];
+            document.getElementById('guess-input').max = config.max;
+            document.getElementById('guess-input').placeholder = `Inserisci numero (${config.min}-${config.max})`;
+        }
+
+        function startGame() {
+            const config = difficulties[gameState.difficulty];
+            
+            gameState.secretNumber = Math.floor(Math.random() * (config.max - config.min + 1)) + config.min;
+            gameState.attemptsLeft = config.attempts;
+            gameState.maxAttempts = config.attempts;
+            gameState.score = 0;
+            gameState.gameStarted = true;
+            gameState.history = [];
+            
+            updateDisplay();
+            document.getElementById('game-area').classList.remove('hidden');
+            document.getElementById('guess-input').focus();
+            
+            console.log('🎯 Numero segreto:', gameState.secretNumber); // Per debug
+        }
+
+        function makeGuess() {
+            if (!gameState.gameStarted) return;
+            
+            const guess = parseInt(document.getElementById('guess-input').value);
+            const config = difficulties[gameState.difficulty];
+            
+            if (isNaN(guess) || guess < config.min || guess > config.max) {
+                showHint(`❌ Inserisci un numero tra ${config.min} e ${config.max}!`);
+                return;
+            }
+            
+            gameState.attemptsLeft--;
+            
+            let hint = '';
+            let isCorrect = false;
+            
+            if (guess === gameState.secretNumber) {
+                hint = '🎉 PERFETTO! Hai indovinato!';
+                isCorrect = true;
+                
+                // Calcola punteggio
+                const baseScore = config.max;
+                const attemptsBonus = gameState.attemptsLeft * 10;
+                gameState.score = baseScore + attemptsBonus;
+                
+                // Effetto confetti
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+                
+                endGame(true);
+                
+            } else if (guess < gameState.secretNumber) {
+                const diff = gameState.secretNumber - guess;
+                if (diff <= 5) {
+                    hint = '🔥 Molto vicino! Prova un numero più ALTO!';
+                } else if (diff <= 15) {
+                    hint = '📈 Più ALTO!';
+                } else {
+                    hint = '⬆️ Molto più ALTO!';
+                }
+            } else {
+                const diff = guess - gameState.secretNumber;
+                if (diff <= 5) {
+                    hint = '🔥 Molto vicino! Prova un numero più BASSO!';
+                } else if (diff <= 15) {
+                    hint = '📉 Più BASSO!';
+                } else {
+                    hint = '⬇️ Molto più BASSO!';
+                }
+            }
+            
+            // Aggiungi alla cronologia
+            gameState.history.unshift({
+                guess: guess,
+                hint: hint,
+                attemptsLeft: gameState.attemptsLeft
+            });
+            
+            showHint(hint);
+            updateDisplay();
+            updateHistory();
+            
+            // Controlla game over
+            if (gameState.attemptsLeft <= 0 && !isCorrect) {
+                endGame(false);
+            }
+            
+            document.getElementById('guess-input').value = '';
+            document.getElementById('guess-input').focus();
+        }
+
+        function endGame(won) {
+            gameState.gameStarted = false;
+            
+            if (won) {
+                // Salva statistiche
+                const gamesPlayed = parseInt(localStorage.getItem('numberquest-games-played') || 0) + 1;
+                const wins = parseInt(localStorage.getItem('numberquest-wins') || 0) + 1;
+                const bestScore = parseInt(localStorage.getItem('numberquest-best-score') || 0);
+                
+                localStorage.setItem('numberquest-games-played', gamesPlayed);
+                localStorage.setItem('numberquest-wins', wins);
+                
+                if (gameState.score > bestScore) {
+                    localStorage.setItem('numberquest-best-score', gameState.score);
+                    showHint('🏆 NUOVO RECORD! Punteggio: ' + gameState.score);
+                } else {
+                    showHint('🎉 Vittoria! Punteggio: ' + gameState.score);
+                }
+                
+            } else {
+                showHint(`💀 Game Over! Il numero era: ${gameState.secretNumber}`);
+                
+                const gamesPlayed = parseInt(localStorage.getItem('numberquest-games-played') || 0) + 1;
+                localStorage.setItem('numberquest-games-played', gamesPlayed);
+            }
+            
+            document.getElementById('submit-guess').disabled = true;
+            document.getElementById('guess-input').disabled = true;
+            
+            loadBestScore();
+        }
+
+        function resetGame() {
+            document.getElementById('submit-guess').disabled = false;
+            document.getElementById('guess-input').disabled = false;
+            document.getElementById('hint').textContent = '';
+            document.getElementById('history').innerHTML = '';
+            startGame();
+        }
+
+        function showHint(message) {
+            document.getElementById('hint').textContent = message;
+        }
+
+        function updateDisplay() {
+            document.getElementById('attempts-left').textContent = gameState.attemptsLeft;
+            document.getElementById('current-score').textContent = gameState.score;
+            
+            // Mostra numero segreto solo se gioco finito
+            if (!gameState.gameStarted && gameState.secretNumber > 0) {
+                document.getElementById('current-number').textContent = gameState.secretNumber;
+            } else {
+                document.getElementById('current-number').textContent = '?';
+            }
+        }
+
+        function updateHistory() {
+            const historyEl = document.getElementById('history');
+            historyEl.innerHTML = '';
+            
+            gameState.history.forEach((entry, index) => {
+                const entryEl = document.createElement('div');
+                entryEl.style.cssText = `
+                    padding: 1rem;
+                    margin-bottom: 0.5rem;
+                    background: rgba(255,255,255,0.1);
+                    border-radius: 10px;
+                    border-left: 4px solid var(--primary-neon);
+                `;
+                
+                entryEl.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: bold; color: var(--accent-gold);">Tentativo ${gameState.maxAttempts - entry.attemptsLeft}</span>
+                        <span style="font-size: 1.2rem; font-weight: bold;">${entry.guess}</span>
+                    </div>
+                    <div style="margin-top: 0.5rem; opacity: 0.9;">${entry.hint}</div>
+                `;
+                
+                historyEl.appendChild(entryEl);
+            });
+        }
+
+        function loadBestScore() {
+            const bestScore = localStorage.getItem('numberquest-best-score') || 0;
+            document.getElementById('best-score').textContent = bestScore;
+        }
+
+        console.log('🎯 Numero Quest caricato!');
+    </script>
+</body>
+</html>
 
