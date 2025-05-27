@@ -138,6 +138,57 @@
             color: var(--dark-bg);
         }
 
+        /* CONTROLLI MUSICA */
+        .music-controls {
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 1000;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--card-bg);
+            padding: 8px 12px;
+            border-radius: 25px;
+            border: 2px solid var(--primary-neon);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .volume-slider {
+            width: 80px;
+            height: 4px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 4px;
+            outline: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            background: var(--primary-neon);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .volume-slider::-moz-range-thumb {
+            width: 12px;
+            height: 12px;
+            background: var(--primary-neon);
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+
         /* MENU TEMI */
         .theme-menu {
             position: fixed;
@@ -296,6 +347,16 @@
             box-shadow: 0 15px 30px rgba(0,0,0,0.3), 0 0 20px var(--primary-neon);
         }
 
+        .mode-card.multiplayer {
+            border: 3px solid var(--accent-gold);
+            background: linear-gradient(135deg, var(--card-bg), rgba(255, 215, 0, 0.1));
+        }
+
+        .mode-card.multiplayer:hover {
+            border-color: var(--accent-gold);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.3), 0 0 25px var(--accent-gold);
+        }
+
         .mode-icon {
             font-size: 3rem;
             margin-bottom: 1rem;
@@ -371,6 +432,19 @@
         .btn-back {
             background: linear-gradient(45deg, #666, #888);
             color: white;
+        }
+
+        .btn-multiplayer {
+            background: linear-gradient(45deg, var(--accent-gold), #ffb300);
+            color: var(--dark-bg);
+            font-size: 1.1rem;
+            padding: 1.2rem 2.5rem;
+            animation: multiplayerPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes multiplayerPulse {
+            0%, 100% { box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+            50% { box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4), 0 0 20px var(--accent-gold); }
         }
 
         /* SEZIONI SPECIALI */
@@ -522,10 +596,24 @@
                 gap: 5px;
             }
 
+            .music-controls {
+                top: 10px;
+                left: 10px;
+                gap: 5px;
+            }
+
             .control-btn {
                 width: 45px;
                 height: 45px;
                 font-size: 1rem;
+            }
+
+            .volume-control {
+                padding: 6px 10px;
+            }
+
+            .volume-slider {
+                width: 60px;
             }
 
             .theme-menu {
@@ -729,6 +817,15 @@
         <div class="loading-spinner"></div>
     </div>
 
+    <!-- CONTROLLI MUSICA -->
+    <div class="music-controls">
+        <div class="control-btn" id="musicBtn" title="Musica">🎵</div>
+        <div class="volume-control" id="volumeControl">
+            <span style="font-size: 0.9rem;">🔊</span>
+            <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="50">
+        </div>
+    </div>
+
     <!-- CONTROLLI SUPERIORI -->
     <div class="top-controls">
         <div class="control-btn" id="themeBtn" title="Temi">🎨</div>
@@ -772,6 +869,12 @@
     <div class="stars" id="stars"></div>
     <div class="confetti-container" id="confettiContainer"></div>
 
+    <!-- AUDIO ELEMENT -->
+    <audio id="backgroundMusic" loop preload="auto">
+        <source src="musica.mp3" type="audio/mpeg">
+        Il tuo browser non supporta l'audio HTML5.
+    </audio>
+
     <!-- HEADER EPICO -->
     <header class="epic-header">
         <h1 class="main-title">🎮 NUMERO QUEST</h1>
@@ -781,8 +884,32 @@
     <!-- SCHERMATA PRINCIPALE -->
     <div id="mainScreen" class="screen active">
         <div class="main-container">
+            <!-- SEZIONE MULTIPLAYER SPECIALE -->
+            <section class="special-section" style="border-color: var(--accent-gold); background: linear-gradient(135deg, var(--card-bg), rgba(255, 215, 0, 0.1));">
+                <h2 class="section-title" style="color: var(--accent-gold);">🌟 MODALITÀ MULTIPLAYER ONLINE</h2>
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <div class="mode-card multiplayer" onclick="goToMultiplayer()" style="max-width: 500px; margin: 0 auto;">
+                        <div class="mode-icon">👥</div>
+                        <div class="mode-title" style="color: var(--accent-gold);">Arena Galattica Multiplayer</div>
+                        <div class="mode-description">
+                            Sfida giocatori da tutto il mondo in epiche battaglie numeriche! Chat in tempo reale, tornei e classifiche globali ti aspettano!
+                        </div>
+                        <ul class="mode-features">
+                            <li>Fino a 6 giocatori per stanza</li>
+                            <li>10 livelli progressivi</li>
+                            <li>Chat in tempo reale</li>
+                            <li>Sistema auto-start intelligente</li>
+                            <li>Classifiche globali</li>
+                        </ul>
+                    </div>
+                    <button class="btn btn-multiplayer" onclick="goToMultiplayer()" style="margin-top: 1rem;">
+                        🚀 ENTRA NELL'ARENA GALATTICA
+                    </button>
+                </div>
+            </section>
+
             <section class="special-section">
-                <h2 class="section-title">🎯 Scegli la Tua Avventura</h2>
+                <h2 class="section-title">🎯 Modalità Single Player</h2>
                 <div class="game-modes-grid">
                     <div class="mode-card" onclick="startMode('classic')">
                         <div class="mode-icon">🎲</div>
@@ -1061,9 +1188,11 @@
 
         // SETUP EVENT LISTENERS
         function setupEventListeners() {
+            document.getElementById('musicBtn').addEventListener('click', toggleMusic);
             document.getElementById('themeBtn').addEventListener('click', toggleThemeMenu);
             document.getElementById('homeBtn').addEventListener('click', goToMain);
             document.getElementById('settingsBtn').addEventListener('click', showSettings);
+            document.getElementById('volumeSlider').addEventListener('input', adjustVolume);
 
             document.querySelectorAll('.theme-option').forEach(option => {
                 option.addEventListener('click', () => changeTheme(option.dataset.theme));
@@ -1084,6 +1213,32 @@
                     }
                 });
             }
+        }
+
+        // SISTEMA MUSICA
+        function toggleMusic() {
+            const musicBtn = document.getElementById('musicBtn');
+            const music = document.getElementById('backgroundMusic');
+
+            if (music.paused) {
+                music.play().then(() => {
+                    musicBtn.classList.add('active');
+                    showNotification('🎵 Musica attivata!', 2000, 'success');
+                }).catch(error => {
+                    console.error('Errore riproduzione audio:', error);
+                    showNotification('❌ Errore riproduzione audio', 2000, 'error');
+                });
+            } else {
+                music.pause();
+                musicBtn.classList.remove('active');
+                showNotification('🔇 Musica disattivata', 2000);
+            }
+        }
+
+        function adjustVolume() {
+            const volume = document.getElementById('volumeSlider').value / 100;
+            document.getElementById('backgroundMusic').volume = volume;
+            localStorage.setItem('numeroquest_volume', volume);
         }
 
         // SISTEMA TEMI
@@ -1138,6 +1293,13 @@
         function goToClassic() {
             gameState.currentMode = 'classic';
             showScreen('classicScreen');
+        }
+
+        function goToMultiplayer() {
+            showNotification('🚀 Reindirizzamento all\'Arena Galattica...', 2000, 'success');
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1000);
         }
 
         function startMode(mode) {
@@ -1411,6 +1573,8 @@
 
         function makeBattleGuess(target, attemptsLeft, type, choice) {
             const guess = parseInt(document.getElementById('battleInput').value);
+              {
+            const guess = parseInt(document.getElementById('battleInput').value);
             
             if (isNaN(guess)) {
                 showNotification('⚠️ Inserisci un numero valido!', 2000, 'warning');
@@ -1633,9 +1797,15 @@
         // SALVATAGGIO IMPOSTAZIONI
         function loadSavedSettings() {
             const savedTheme = localStorage.getItem('numeroquest_theme');
+            const savedVolume = localStorage.getItem('numeroquest_volume');
             
             if (savedTheme) {
                 changeTheme(savedTheme);
+            }
+            
+            if (savedVolume) {
+                document.getElementById('volumeSlider').value = savedVolume * 100;
+                document.getElementById('backgroundMusic').volume = savedVolume;
             }
         }
 
@@ -1646,21 +1816,29 @@
 🎮 Controlli:
 - Enter: Conferma risposta
 - Click: Interagisci con elementi
-- Temi: 7 temi unici disponibili
+- 🎵: Attiva/disattiva musica
+- 🎨: Cambia tema
 
 🎯 Modalità Disponibili:
 ✅ Modalità Classica (Completa)
 ✅ Chronicles of Arithmos (Completa)
 ✅ Time Rift Chronicles (Completa)
 ✅ Galactic Math Empire (Completa)
+✅ Multiplayer Online (index.html)
 🔄 Battle Royale (In sviluppo)
 🔄 Puzzle Mode (In sviluppo)
 
+🎵 Audio:
+- Musica di sottofondo: musica.mp3
+- Controllo volume integrato
+- Salvataggio automatico impostazioni
+
 🌐 Caratteristiche:
-- Salvataggio automatico progressi
-- Responsive design per mobile
+- 7 temi unici
+- Design responsive per mobile
 - Effetti visivi ottimizzati
 - Sistema di punteggi avanzato
+- Salvataggio automatico progressi
 
 💾 I tuoi progressi vengono salvati automaticamente!
             `;
@@ -1715,8 +1893,10 @@
         }, false);
 
         console.log("🎮 Number Quest - Versione Completa Caricata!");
+        console.log("🎵 Sistema audio integrato con musica.mp3!");
         console.log("🌟 Tutte le modalità implementate e ottimizzate!");
         console.log("📱 Design responsive e mobile-friendly attivo!");
+        console.log("🚀 Collegamento multiplayer a index.html configurato!");
     </script>
 </body>
 </html>
