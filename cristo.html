@@ -91,237 +91,6 @@
             50% { opacity: 1; transform: scale(1.2); }
         }
 
-        /* LOGIN SCREEN STYLES */
-        .login-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--gradient-bg);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            transition: all 0.5s ease;
-        }
-
-        .login-container {
-            background: var(--card-bg);
-            border: 3px solid var(--primary-neon);
-            border-radius: 25px;
-            padding: 3rem;
-            backdrop-filter: blur(15px);
-            text-align: center;
-            max-width: 500px;
-            width: 90%;
-            position: relative;
-            overflow: hidden;
-            animation: loginPulse 3s ease-in-out infinite;
-        }
-
-        @keyframes loginPulse {
-            0%, 100% { box-shadow: 0 0 30px rgba(0, 245, 255, 0.3); }
-            50% { box-shadow: 0 0 50px rgba(0, 245, 255, 0.6); }
-        }
-
-        .login-container::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: conic-gradient(var(--primary-neon), transparent, var(--accent-gold), transparent, var(--secondary-neon), transparent);
-            opacity: 0.1;
-            animation: loginRotate 10s linear infinite;
-            z-index: -1;
-        }
-
-        @keyframes loginRotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        .login-title {
-            font-family: 'Bangers', cursive;
-            font-size: 3rem;
-            background: linear-gradient(45deg, var(--primary-neon), var(--accent-gold), var(--secondary-neon));
-            background-size: 400% 400%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: gradientShift 3s ease-in-out infinite;
-            margin-bottom: 1rem;
-        }
-
-        @keyframes gradientShift {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
-
-        .login-subtitle {
-            font-family: 'Orbitron', sans-serif;
-            color: var(--accent-gold);
-            margin-bottom: 2rem;
-            opacity: 0.9;
-        }
-
-        .login-methods {
-            display: grid;
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .login-btn {
-            padding: 1rem 2rem;
-            border: 2px solid var(--primary-neon);
-            border-radius: 15px;
-            background: rgba(0, 0, 0, 0.6);
-            color: var(--text-color);
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 1rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .login-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .login-btn:hover::before {
-            left: 100%;
-        }
-
-        .login-btn:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 10px 25px rgba(0, 245, 255, 0.3);
-            border-color: var(--accent-gold);
-        }
-
-        .login-btn.google {
-            border-color: #db4437;
-            background: linear-gradient(45deg, rgba(219, 68, 55, 0.2), rgba(0, 0, 0, 0.6));
-        }
-
-        .login-btn.github {
-            border-color: #333;
-            background: linear-gradient(45deg, rgba(51, 51, 51, 0.2), rgba(0, 0, 0, 0.6));
-        }
-
-        .login-btn.facebook {
-            border-color: #4267B2;
-            background: linear-gradient(45deg, rgba(66, 103, 178, 0.2), rgba(0, 0, 0, 0.6));
-        }
-
-        .login-btn.discord {
-            border-color: #7289da;
-            background: linear-gradient(45deg, rgba(114, 137, 218, 0.2), rgba(0, 0, 0, 0.6));
-        }
-
-        .login-btn.email {
-            border-color: var(--accent-gold);
-            background: linear-gradient(45deg, rgba(255, 217, 61, 0.2), rgba(0, 0, 0, 0.6));
-        }
-
-        .login-btn.guest {
-            border-color: var(--secondary-neon);
-            background: linear-gradient(45deg, rgba(255, 107, 107, 0.2), rgba(0, 0, 0, 0.6));
-        }
-
-        .email-form {
-            display: none;
-            margin-top: 1rem;
-        }
-
-        .email-form.active {
-            display: block;
-            animation: slideDown 0.3s ease;
-        }
-
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .login-input {
-            width: 100%;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            background: rgba(0, 0, 0, 0.6);
-            border: 2px solid var(--primary-neon);
-            border-radius: 10px;
-            color: var(--text-color);
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .login-input:focus {
-            outline: none;
-            box-shadow: 0 0 20px var(--primary-neon);
-            border-color: var(--accent-gold);
-        }
-
-        .user-info {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 1000;
-            background: var(--card-bg);
-            border: 2px solid var(--primary-neon);
-            border-radius: 15px;
-            padding: 1rem;
-            backdrop-filter: blur(10px);
-            display: none;
-        }
-
-        .user-info.active {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            animation: slideIn 0.5s ease;
-        }
-
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-100%); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: 2px solid var(--accent-gold);
-        }
-
-        .logout-btn {
-            background: var(--secondary-neon);
-            border: none;
-            border-radius: 8px;
-            padding: 0.5rem 1rem;
-            color: white;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-
-        .logout-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
-        }
-
         /* HEADER */
         .header {
             text-align: center;
@@ -358,6 +127,11 @@
             -webkit-text-fill-color: transparent;
             animation: gradientShift 3s ease-in-out infinite;
             margin-bottom: 0.5rem;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
         }
 
         .subtitle {
@@ -797,14 +571,6 @@
                 flex-direction: column;
                 align-items: center;
             }
-
-            .login-container {
-                padding: 2rem;
-            }
-
-            .login-title {
-                font-size: 2rem;
-            }
         }
 
         /* HIDDEN */
@@ -1049,69 +815,6 @@
 
     <!-- STELLE ANIMATE -->
     <div class="stars" id="stars"></div>
-
-    <!-- LOGIN SCREEN -->
-    <div id="login-screen" class="login-screen">
-        <div class="login-container">
-            <h1 class="login-title">🎯 NUMERO QUEST</h1>
-            <p class="login-subtitle">Accedi per iniziare la tua avventura epica!</p>
-            
-            <div class="login-methods">
-                <button class="login-btn google" onclick="loginWith('google')">
-                    <span>🔴</span>
-                    <span>Accedi con Google</span>
-                </button>
-                
-                <button class="login-btn github" onclick="loginWith('github')">
-                    <span>⚫</span>
-                    <span>Accedi con GitHub</span>
-                </button>
-                
-                <button class="login-btn facebook" onclick="loginWith('facebook')">
-                    <span>🔵</span>
-                    <span>Accedi con Facebook</span>
-                </button>
-                
-                <button class="login-btn discord" onclick="loginWith('discord')">
-                    <span>🟣</span>
-                    <span>Accedi con Discord</span>
-                </button>
-                
-                <button class="login-btn email" onclick="toggleEmailForm()">
-                    <span>📧</span>
-                    <span>Accedi con Email</span>
-                </button>
-                
-                <div id="email-form" class="email-form">
-                    <input type="email" class="login-input" placeholder="La tua email" id="email-input">
-                    <input type="password" class="login-input" placeholder="Password" id="password-input">
-                    <button class="login-btn email" onclick="loginWithEmail()">
-                        <span>✅</span>
-                        <span>Conferma Login</span>
-                    </button>
-                </div>
-                
-                <button class="login-btn guest" onclick="loginAsGuest()">
-                    <span>👤</span>
-                    <span>Continua come Ospite</span>
-                </button>
-            </div>
-            
-            <p style="font-size: 0.9rem; opacity: 0.7; margin-top: 1rem;">
-                Scegli il tuo metodo di accesso preferito per salvare i progressi e competere con altri giocatori!
-            </p>
-        </div>
-    </div>
-
-    <!-- USER INFO -->
-    <div id="user-info" class="user-info">
-        <img id="user-avatar" class="user-avatar" src="/placeholder.svg?height=40&width=40" alt="Avatar">
-        <div>
-            <div id="user-name" style="font-weight: bold; color: var(--accent-gold);">Nome Utente</div>
-            <div id="user-email" style="font-size: 0.8rem; opacity: 0.8;">email@example.com</div>
-        </div>
-        <button class="logout-btn" onclick="logout()">Esci</button>
-    </div>
 
     <!-- NAVIGATION -->
     <div class="nav-controls">
@@ -1628,10 +1331,6 @@
     </div>
 
     <script>
-        // User Authentication State
-        let currentUser = null;
-        let isLoggedIn = false;
-
         // Game State
         let gameState = {
             currentGame: null,
@@ -1738,7 +1437,8 @@
         document.addEventListener('DOMContentLoaded', function() {
             createStars();
             loadSettings();
-            checkLoginStatus();
+            loadStats();
+            initializeAudio();
             
             // Event listeners
             document.getElementById('guess-input').addEventListener('keypress', function(e) {
@@ -1749,140 +1449,6 @@
                 if (e.key === 'Enter') submitMathAnswer();
             });
         });
-
-        // LOGIN FUNCTIONS
-        function checkLoginStatus() {
-            const savedUser = localStorage.getItem('numeroquest-user');
-            if (savedUser) {
-                currentUser = JSON.parse(savedUser);
-                isLoggedIn = true;
-                showGameHub();
-            } else {
-                showLoginScreen();
-            }
-        }
-
-        function showLoginScreen() {
-            document.getElementById('login-screen').style.display = 'flex';
-            document.getElementById('user-info').classList.remove('active');
-            createStars();
-        }
-
-        function showGameHub() {
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('user-info').classList.add('active');
-            updateUserInfo();
-            loadStats();
-            initializeAudio();
-        }
-
-        function loginWith(provider) {
-            // Simulazione login con provider OAuth
-            const mockUsers = {
-                google: {
-                    name: 'Mario Rossi',
-                    email: 'mario.rossi@gmail.com',
-                    avatar: '/placeholder.svg?height=40&width=40',
-                    provider: 'Google'
-                },
-                github: {
-                    name: 'DevGamer',
-                    email: 'dev@github.com',
-                    avatar: '/placeholder.svg?height=40&width=40',
-                    provider: 'GitHub'
-                },
-                facebook: {
-                    name: 'Luca Bianchi',
-                    email: 'luca@facebook.com',
-                    avatar: '/placeholder.svg?height=40&width=40',
-                    provider: 'Facebook'
-                },
-                discord: {
-                    name: 'GamerPro',
-                    email: 'gamer@discord.com',
-                    avatar: '/placeholder.svg?height=40&width=40',
-                    provider: 'Discord'
-                }
-            };
-
-            currentUser = mockUsers[provider];
-            isLoggedIn = true;
-            localStorage.setItem('numeroquest-user', JSON.stringify(currentUser));
-            
-            // Effetto di login
-            confetti({
-                particleCount: 100,
-                spread: 70,
-                origin: { y: 0.6 }
-            });
-
-            setTimeout(() => {
-                showGameHub();
-            }, 1000);
-        }
-
-        function toggleEmailForm() {
-            const form = document.getElementById('email-form');
-            form.classList.toggle('active');
-        }
-
-        function loginWithEmail() {
-            const email = document.getElementById('email-input').value;
-            const password = document.getElementById('password-input').value;
-
-            if (!email || !password) {
-                alert('Inserisci email e password!');
-                return;
-            }
-
-            currentUser = {
-                name: email.split('@')[0],
-                email: email,
-                avatar: '/placeholder.svg?height=40&width=40',
-                provider: 'Email'
-            };
-
-            isLoggedIn = true;
-            localStorage.setItem('numeroquest-user', JSON.stringify(currentUser));
-            
-            confetti({
-                particleCount: 100,
-                spread: 70,
-                origin: { y: 0.6 }
-            });
-
-            setTimeout(() => {
-                showGameHub();
-            }, 1000);
-        }
-
-        function loginAsGuest() {
-            currentUser = {
-                name: 'Ospite',
-                email: 'guest@numeroquest.com',
-                avatar: '/placeholder.svg?height=40&width=40',
-                provider: 'Guest'
-            };
-
-            isLoggedIn = true;
-            localStorage.setItem('numeroquest-user', JSON.stringify(currentUser));
-            showGameHub();
-        }
-
-        function logout() {
-            currentUser = null;
-            isLoggedIn = false;
-            localStorage.removeItem('numeroquest-user');
-            showLoginScreen();
-        }
-
-        function updateUserInfo() {
-            if (currentUser) {
-                document.getElementById('user-name').textContent = currentUser.name;
-                document.getElementById('user-email').textContent = currentUser.email;
-                document.getElementById('user-avatar').src = currentUser.avatar;
-            }
-        }
 
         function createStars() {
             const starsContainer = document.getElementById('stars');
@@ -1930,31 +1496,25 @@
             document.body.className = `theme-${settings.theme}`;
             
             // Aggiorna UI impostazioni
-            if (document.getElementById('music-volume')) {
-                document.getElementById('music-volume').value = settings.musicVolume;
-                document.getElementById('volume-display').textContent = settings.musicVolume + '%';
-                document.getElementById('reduce-animations').checked = settings.reduceAnimations;
-                document.getElementById('reduce-particles').checked = settings.reduceParticles;
-                
-                // Aggiorna tema attivo
-                document.querySelectorAll('.theme-option').forEach(option => {
-                    option.classList.remove('active');
-                });
-                const activeTheme = document.querySelector(`[data-theme="${settings.theme}"]`);
-                if (activeTheme) activeTheme.classList.add('active');
-            }
+            document.getElementById('music-volume').value = settings.musicVolume;
+            document.getElementById('volume-display').textContent = settings.musicVolume + '%';
+            document.getElementById('reduce-animations').checked = settings.reduceAnimations;
+            document.getElementById('reduce-particles').checked = settings.reduceParticles;
+            
+            // Aggiorna tema attivo
+            document.querySelectorAll('.theme-option').forEach(option => {
+                option.classList.remove('active');
+            });
+            document.querySelector(`[data-theme="${settings.theme}"]`).classList.add('active');
             
             // Aggiorna status musica
             updateMusicStatus();
         }
 
         function loadStats() {
-            if (!isLoggedIn) return;
-            
-            const userKey = currentUser.email;
-            const totalGames = localStorage.getItem(`numberquest-total-games-${userKey}`) || 0;
-            const totalWins = localStorage.getItem(`numberquest-total-wins-${userKey}`) || 0;
-            const bestScore = localStorage.getItem(`numberquest-best-score-${userKey}`) || 0;
+            const totalGames = localStorage.getItem('numberquest-total-games') || 0;
+            const totalWins = localStorage.getItem('numberquest-total-wins') || 0;
+            const bestScore = localStorage.getItem('numberquest-best-score') || 0;
             
             document.getElementById('total-games').textContent = totalGames;
             document.getElementById('total-wins').textContent = totalWins;
@@ -1962,21 +1522,6 @@
             
             const winRate = totalGames > 0 ? Math.round((totalWins / totalGames) * 100) : 0;
             document.getElementById('win-rate').textContent = winRate + '%';
-        }
-
-        function saveStats(gameWon = false, score = 0) {
-            if (!isLoggedIn) return;
-            
-            const userKey = currentUser.email;
-            const totalGames = parseInt(localStorage.getItem(`numberquest-total-games-${userKey}`) || 0) + 1;
-            const totalWins = parseInt(localStorage.getItem(`numberquest-total-wins-${userKey}`) || 0) + (gameWon ? 1 : 0);
-            const bestScore = Math.max(parseInt(localStorage.getItem(`numberquest-best-score-${userKey}`) || 0), score);
-            
-            localStorage.setItem(`numberquest-total-games-${userKey}`, totalGames);
-            localStorage.setItem(`numberquest-total-wins-${userKey}`, totalWins);
-            localStorage.setItem(`numberquest-best-score-${userKey}`, bestScore);
-            
-            loadStats();
         }
 
         function showMainMenu() {
@@ -2161,7 +1706,19 @@
                 } else {
                     // Gioco completato!
                     showHint(`🏆 TUTTI I LIVELLI COMPLETATI! Punteggio finale: ${gameState.numberQuest.score}`);
-                    saveStats(true, gameState.numberQuest.score);
+                    
+                    // Salva statistiche
+                    const totalGames = parseInt(localStorage.getItem('numberquest-total-games') || 0) + 1;
+                    const totalWins = parseInt(localStorage.getItem('numberquest-total-wins') || 0) + 1;
+                    const bestScore = parseInt(localStorage.getItem('numberquest-best-score') || 0);
+                    
+                    localStorage.setItem('numberquest-total-games', totalGames);
+                    localStorage.setItem('numberquest-total-wins', totalWins);
+                    
+                    if (gameState.numberQuest.score > bestScore) {
+                        localStorage.setItem('numberquest-best-score', gameState.numberQuest.score);
+                        showHint('🏆 NUOVO RECORD ASSOLUTO! Punteggio: ' + gameState.numberQuest.score);
+                    }
                     
                     // Reset per nuova partita
                     setTimeout(() => {
@@ -2170,7 +1727,9 @@
                 }
             } else {
                 showHint(`💀 Livello fallito! Il numero era: ${gameState.numberQuest.secretNumber}`);
-                saveStats(false, gameState.numberQuest.score);
+                
+                const totalGames = parseInt(localStorage.getItem('numberquest-total-games') || 0) + 1;
+                localStorage.setItem('numberquest-total-games', totalGames);
                 
                 setTimeout(() => {
                     resetNumberQuest();
@@ -2771,8 +2330,7 @@
             document.querySelectorAll('.theme-option').forEach(option => {
                 option.classList.remove('active');
             });
-            const activeTheme = document.querySelector(`[data-theme="${theme}"]`);
-            if (activeTheme) activeTheme.classList.add('active');
+            document.querySelector(`[data-theme="${theme}"]`).classList.add('active');
             
             saveSettings();
         }
@@ -2790,29 +2348,21 @@
 
         function resetAllStats() {
             if (confirm('Sei sicuro di voler cancellare tutte le statistiche?')) {
-                if (isLoggedIn) {
-                    const userKey = currentUser.email;
-                    localStorage.removeItem(`numberquest-total-games-${userKey}`);
-                    localStorage.removeItem(`numberquest-total-wins-${userKey}`);
-                    localStorage.removeItem(`numberquest-best-score-${userKey}`);
-                }
+                localStorage.removeItem('numberquest-total-games');
+                localStorage.removeItem('numberquest-total-wins');
+                localStorage.removeItem('numberquest-best-score');
+                localStorage.removeItem('numberquest-games-played');
+                localStorage.removeItem('numberquest-wins');
                 loadStats();
                 alert('✅ Statistiche cancellate!');
             }
         }
 
         function exportStats() {
-            if (!isLoggedIn) {
-                alert('Devi essere loggato per esportare le statistiche!');
-                return;
-            }
-            
-            const userKey = currentUser.email;
             const stats = {
-                user: currentUser,
-                totalGames: localStorage.getItem(`numberquest-total-games-${userKey}`) || 0,
-                totalWins: localStorage.getItem(`numberquest-total-wins-${userKey}`) || 0,
-                bestScore: localStorage.getItem(`numberquest-best-score-${userKey}`) || 0,
+                totalGames: localStorage.getItem('numberquest-total-games') || 0,
+                totalWins: localStorage.getItem('numberquest-total-wins') || 0,
+                bestScore: localStorage.getItem('numberquest-best-score') || 0,
                 settings: settings
             };
             
@@ -2822,7 +2372,7 @@
             
             const link = document.createElement('a');
             link.href = url;
-            link.download = `numero-quest-stats-${currentUser.name}.json`;
+            link.download = 'numero-quest-stats.json';
             link.click();
             
             URL.revokeObjectURL(url);
@@ -2830,12 +2380,6 @@
 
         function showCredits() {
             alert(`🎯 NUMERO QUEST - Gaming Hub Epico
-
-🔐 Sistema di Autenticazione:
-• Login con Google, GitHub, Facebook, Discord
-• Login con Email/Password
-• Modalità Ospite
-• Statistiche personalizzate per utente
 
 🎮 Modalità di Gioco:
 • Numero Quest - Indovina il numero segreto
@@ -2849,11 +2393,10 @@
 • 5 Temi personalizzabili
 • Musica di sottofondo
 • Sistema di livelli progressivi
-• Statistiche dettagliate per utente
+• Statistiche dettagliate
 • Effetti visivi epici
-• Sistema di login completo
 
-Versione 3.0 - Gaming Hub con Autenticazione
+Versione 2.0 - Gaming Hub Completo
 Creato con ❤️ per sfidare la tua mente!`);
         }
 
@@ -2861,8 +2404,7 @@ Creato con ❤️ per sfidare la tua mente!`);
             document.getElementById('hint').textContent = message;
         }
 
-        console.log('🎯 Numero Quest Gaming Hub con Autenticazione caricato!');
-        console.log('🔐 Sistema di login attivo!');
+        console.log('🎯 Numero Quest Gaming Hub caricato!');
         console.log('🌟 6 modalità di gioco disponibili!');
     </script>
 </body>
