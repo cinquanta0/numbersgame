@@ -3,153 +3,211 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎯 Numero Quest - Gaming Hub Epico</title>
-    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Orbitron:wght@400;700&family=Roboto:wght@400;700&family=Press+Start+2P&family=Fredoka+One&family=Righteous&display=swap" rel="stylesheet">
+    <title>🎯 NUMERO QUEST - Ultimate Gaming Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&family=Exo+2:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
         :root {
-            --primary-neon: #00fff2;
-            --secondary-neon: #ff6b6b;
-            --accent-gold: #ffd93d;
-            --dark-bg: #0a0a0a;
-            --card-bg: rgba(255,255,255,0.1);
-            --text-color: white;
-            --gradient-bg: linear-gradient(45deg, #0a0a0a, #1a1a2e, #16213e);
+            --primary: #00ffff;
+            --secondary: #ff0080;
+            --accent: #ffff00;
+            --success: #00ff80;
+            --danger: #ff4040;
+            --dark: #0a0a0f;
+            --darker: #050508;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text: #ffffff;
+            --text-dim: rgba(255, 255, 255, 0.7);
+            --shadow-glow: 0 0 30px;
+            --shadow-intense: 0 0 60px;
         }
 
-        /* TEMI PERSONALIZZABILI */
-        .theme-space {
-            --gradient-bg: linear-gradient(45deg, #0a0a0a, #1a1a2e, #16213e);
-            --primary-neon: #00fff2;
-            --secondary-neon: #ff6b6b;
-            --accent-gold: #ffd93d;
-        }
-
-        .theme-ocean {
-            --gradient-bg: linear-gradient(45deg, #0f3460, #16537e, #1e6091);
-            --primary-neon: #00d4ff;
-            --secondary-neon: #4ecdc4;
-            --accent-gold: #f39c12;
-        }
-
-        .theme-forest {
-            --gradient-bg: linear-gradient(45deg, #1e3c2a, #2d5a3d, #3c7850);
-            --primary-neon: #2ecc71;
-            --secondary-neon: #e74c3c;
-            --accent-gold: #f1c40f;
-        }
-
-        .theme-sunset {
-            --gradient-bg: linear-gradient(45deg, #2c1810, #4a2c17, #68401f);
-            --primary-neon: #ff6b35;
-            --secondary-neon: #f7931e;
-            --accent-gold: #ffd93d;
+        /* THEMES */
+        .theme-cyber {
+            --primary: #00ffff;
+            --secondary: #ff0080;
+            --accent: #ffff00;
+            --bg-gradient: radial-gradient(circle at 20% 80%, #001122 0%, #000511 50%, #000000 100%);
         }
 
         .theme-neon {
-            --gradient-bg: linear-gradient(45deg, #0d0d0d, #1a0d1a, #2d0a2d);
-            --primary-neon: #ff00ff;
-            --secondary-neon: #00ff00;
-            --accent-gold: #ffff00;
+            --primary: #ff00ff;
+            --secondary: #00ff00;
+            --accent: #ffff00;
+            --bg-gradient: radial-gradient(circle at 80% 20%, #220011 0%, #110022 50%, #000000 100%);
         }
-        
-        * { 
-            box-sizing: border-box; 
-            margin: 0; 
-            padding: 0; 
+
+        .theme-matrix {
+            --primary: #00ff41;
+            --secondary: #41ff00;
+            --accent: #80ff00;
+            --bg-gradient: radial-gradient(circle at 50% 50%, #001100 0%, #000800 50%, #000000 100%);
         }
-        
+
+        .theme-fire {
+            --primary: #ff4000;
+            --secondary: #ff8000;
+            --accent: #ffff00;
+            --bg-gradient: radial-gradient(circle at 30% 70%, #220800 0%, #110400 50%, #000000 100%);
+        }
+
+        .theme-ice {
+            --primary: #40c0ff;
+            --secondary: #80e0ff;
+            --accent: #c0f0ff;
+            --bg-gradient: radial-gradient(circle at 70% 30%, #002244 0%, #001122 50%, #000000 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Roboto', sans-serif;
-            background: var(--gradient-bg);
-            color: var(--text-color);
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--bg-gradient, radial-gradient(circle at 20% 80%, #001122 0%, #000511 50%, #000000 100%));
+            color: var(--text);
             min-height: 100vh;
             overflow-x: hidden;
             position: relative;
-            transition: all 0.5s ease;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* STELLE ANIMATE */
-        .stars {
+        /* ANIMATED BACKGROUND */
+        .bg-animation {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: -1;
+            z-index: -2;
+            opacity: 0.3;
         }
 
-        .star {
+        .particle {
             position: absolute;
-            background: var(--primary-neon);
+            background: var(--primary);
             border-radius: 50%;
-            animation: twinkle 2s infinite;
+            pointer-events: none;
+            animation: float 6s ease-in-out infinite;
         }
 
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.3; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.2); }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
+            50% { transform: translateY(-20px) rotate(180deg); opacity: 0.8; }
         }
 
-        /* LOGIN SCREEN STYLES */
+        .grid-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        /* GLASSMORPHISM COMPONENTS */
+        .glass {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.8s ease;
+        }
+
+        .glass:hover::before {
+            left: 100%;
+        }
+
+        /* NEON EFFECTS */
+        .neon {
+            text-shadow: 
+                0 0 5px currentColor,
+                0 0 10px currentColor,
+                0 0 20px currentColor,
+                0 0 40px currentColor;
+            animation: neonPulse 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes neonPulse {
+            from { filter: brightness(1); }
+            to { filter: brightness(1.2); }
+        }
+
+        .neon-border {
+            border: 2px solid var(--primary);
+            box-shadow: 
+                inset 0 0 20px rgba(0, 255, 255, 0.1),
+                0 0 20px rgba(0, 255, 255, 0.3);
+            animation: borderGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes borderGlow {
+            from { box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.1), 0 0 20px rgba(0, 255, 255, 0.3); }
+            to { box-shadow: inset 0 0 30px rgba(0, 255, 255, 0.2), 0 0 40px rgba(0, 255, 255, 0.5); }
+        }
+
+        /* LOGIN SCREEN */
         .login-screen {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: var(--gradient-bg);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 9999;
-            transition: all 0.5s ease;
+            background: var(--bg-gradient);
         }
 
         .login-container {
-            background: var(--card-bg);
-            border: 3px solid var(--primary-neon);
-            border-radius: 25px;
-            padding: 3rem;
-            backdrop-filter: blur(15px);
-            text-align: center;
-            max-width: 500px;
+            max-width: 450px;
             width: 90%;
+            padding: 3rem;
+            text-align: center;
             position: relative;
-            overflow: hidden;
-            animation: loginPulse 3s ease-in-out infinite;
+            animation: loginFloat 6s ease-in-out infinite;
         }
 
-        @keyframes loginPulse {
-            0%, 100% { box-shadow: 0 0 30px rgba(0, 245, 255, 0.3); }
-            50% { box-shadow: 0 0 50px rgba(0, 245, 255, 0.6); }
-        }
-
-        .login-container::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: conic-gradient(var(--primary-neon), transparent, var(--accent-gold), transparent, var(--secondary-neon), transparent);
-            opacity: 0.1;
-            animation: loginRotate 10s linear infinite;
-            z-index: -1;
-        }
-
-        @keyframes loginRotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+        @keyframes loginFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
         }
 
         .login-title {
-            font-family: 'Bangers', cursive;
+            font-family: 'Orbitron', monospace;
             font-size: 3rem;
-            background: linear-gradient(45deg, var(--primary-neon), var(--accent-gold), var(--secondary-neon));
-            background-size: 400% 400%;
+            font-weight: 900;
+            background: linear-gradient(45deg, var(--primary), var(--accent), var(--secondary));
+            background-size: 200% 200%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            background-clip: text;
             animation: gradientShift 3s ease-in-out infinite;
             margin-bottom: 1rem;
         }
@@ -160,148 +218,210 @@
         }
 
         .login-subtitle {
-            font-family: 'Orbitron', sans-serif;
-            color: var(--accent-gold);
+            font-size: 1.2rem;
+            color: var(--text-dim);
             margin-bottom: 2rem;
-            opacity: 0.9;
+            font-weight: 300;
         }
 
-        .auth-form {
-            margin-bottom: 2rem;
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
         }
 
-        .auth-form.hidden {
-            display: none;
-        }
-
-        .login-input {
+        .form-input {
             width: 100%;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            background: rgba(0, 0, 0, 0.6);
-            border: 2px solid var(--primary-neon);
-            border-radius: 10px;
-            color: var(--text-color);
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .login-input:focus {
-            outline: none;
-            box-shadow: 0 0 20px var(--primary-neon);
-            border-color: var(--accent-gold);
-        }
-
-        .login-input::placeholder {
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .login-btn {
-            width: 100%;
-            padding: 1rem 2rem;
-            border: 2px solid var(--primary-neon);
+            padding: 1rem 1.5rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid transparent;
             border-radius: 15px;
-            background: linear-gradient(45deg, var(--primary-neon), var(--accent-gold));
-            color: var(--dark-bg);
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
+            color: var(--text);
+            font-size: 1rem;
+            font-family: inherit;
             transition: all 0.3s ease;
-            margin-bottom: 1rem;
+            outline: none;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            transform: scale(1.02);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-dim);
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 15px;
+            font-family: inherit;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .login-btn::before {
+        .btn::before {
             content: '';
             position: absolute;
             top: 0;
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
             transition: left 0.5s ease;
         }
 
-        .login-btn:hover::before {
+        .btn:hover::before {
             left: 100%;
         }
 
-        .login-btn:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 10px 25px rgba(0, 245, 255, 0.3);
+        .btn-primary {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: var(--dark);
+            box-shadow: var(--shadow-glow) rgba(0, 255, 255, 0.3);
         }
 
-        .login-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: var(--shadow-intense) rgba(0, 255, 255, 0.5);
         }
 
-        .login-btn.secondary {
-            background: linear-gradient(45deg, var(--secondary-neon), #ff5252);
-            color: white;
-            border-color: var(--secondary-neon);
+        .btn-secondary {
+            background: linear-gradient(45deg, var(--secondary), var(--danger));
+            color: var(--text);
+            box-shadow: var(--shadow-glow) rgba(255, 0, 128, 0.3);
         }
 
-        .login-btn.secondary:hover {
-            box-shadow: 0 10px 25px rgba(255, 107, 107, 0.3);
+        .btn-secondary:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: var(--shadow-intense) rgba(255, 0, 128, 0.5);
+        }
+
+        .btn-full {
+            width: 100%;
+            margin-bottom: 1rem;
         }
 
         .auth-toggle {
-            margin-top: 1rem;
-            color: var(--accent-gold);
-            font-size: 0.9rem;
+            color: var(--accent);
             cursor: pointer;
             text-decoration: underline;
             transition: all 0.3s ease;
+            margin-top: 1rem;
         }
 
         .auth-toggle:hover {
-            color: var(--primary-neon);
+            color: var(--primary);
             transform: scale(1.05);
         }
 
-        .auth-error {
-            color: var(--secondary-neon);
-            margin-top: 1rem;
-            font-size: 0.9rem;
-            font-weight: bold;
-            padding: 0.5rem;
-            background: rgba(255, 107, 107, 0.1);
+        .error-message, .success-message {
+            padding: 1rem;
             border-radius: 10px;
-            border: 1px solid var(--secondary-neon);
+            margin-top: 1rem;
+            font-weight: 600;
         }
 
-        .auth-success {
-            color: #4ecdc4;
-            margin-top: 1rem;
-            font-size: 0.9rem;
-            font-weight: bold;
-            padding: 0.5rem;
-            background: rgba(78, 205, 196, 0.1);
-            border-radius: 10px;
-            border: 1px solid #4ecdc4;
+        .error-message {
+            background: rgba(255, 64, 64, 0.1);
+            border: 1px solid var(--danger);
+            color: var(--danger);
         }
 
-        .user-info {
+        .success-message {
+            background: rgba(0, 255, 128, 0.1);
+            border: 1px solid var(--success);
+            color: var(--success);
+        }
+
+        /* MAIN INTERFACE */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .main-title {
+            font-family: 'Orbitron', monospace;
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 900;
+            background: linear-gradient(45deg, var(--primary), var(--accent), var(--secondary));
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 3s ease-in-out infinite;
+            margin-bottom: 1rem;
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            color: var(--text-dim);
+            font-weight: 300;
+        }
+
+        /* NAVIGATION */
+        .nav-bar {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-btn {
+            padding: 0.8rem 1.5rem;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 25px;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .nav-btn:hover {
+            background: var(--primary);
+            color: var(--dark);
+            transform: scale(1.05);
+            box-shadow: var(--shadow-glow) rgba(0, 255, 255, 0.5);
+        }
+
+        /* USER INFO */
+        .user-panel {
             position: fixed;
             top: 20px;
             left: 20px;
             z-index: 1000;
-            background: var(--card-bg);
-            border: 2px solid var(--primary-neon);
-            border-radius: 15px;
             padding: 1rem;
-            backdrop-filter: blur(10px);
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
             display: none;
-        }
-
-        .user-info.active {
-            display: flex;
             align-items: center;
             gap: 1rem;
             animation: slideIn 0.5s ease;
+        }
+
+        .user-panel.active {
+            display: flex;
         }
 
         @keyframes slideIn {
@@ -310,196 +430,94 @@
         }
 
         .user-avatar {
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
-            border: 2px solid var(--accent-gold);
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
+            font-weight: 700;
             font-size: 1.2rem;
-            background: var(--primary-neon);
-            color: var(--dark-bg);
+            color: var(--dark);
         }
 
-        .logout-btn {
-            background: var(--secondary-neon);
-            border: none;
-            border-radius: 8px;
-            padding: 0.5rem 1rem;
-            color: white;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-
-        .logout-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
-        }
-
-        /* LOADING SPINNER */
-        .loading-spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-            margin-right: 10px;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* HEADER */
-        .header {
-            text-align: center;
-            padding: 2rem 0;
-            background: linear-gradient(90deg, transparent, var(--card-bg), transparent);
-            border-bottom: 3px solid var(--primary-neon);
-            margin-bottom: 2rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-            animation: headerSweep 4s infinite;
-        }
-
-        @keyframes headerSweep {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
-
-        .main-title {
-            font-family: 'Bangers', cursive;
-            font-size: clamp(2.5rem, 8vw, 4rem);
-            background: linear-gradient(45deg, var(--primary-neon), var(--accent-gold), var(--secondary-neon));
-            background-size: 400% 400%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: gradientShift 3s ease-in-out infinite;
-            margin-bottom: 0.5rem;
-        }
-
-        .subtitle {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.2rem;
-            color: var(--accent-gold);
-            opacity: 0.9;
-            animation: subtitleGlow 2s ease-in-out infinite alternate;
-        }
-
-        @keyframes subtitleGlow {
-            0% { text-shadow: 0 0 10px var(--accent-gold); }
-            100% { text-shadow: 0 0 20px var(--accent-gold); }
-        }
-
-        /* NAVIGATION */
-        .nav-controls {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-            display: flex;
-            gap: 15px;
-        }
-
-        .nav-btn {
-            background: var(--card-bg);
-            border: 2px solid var(--primary-neon);
-            border-radius: 50px;
-            padding: 12px 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-            font-size: 1rem;
-            color: var(--primary-neon);
-            text-decoration: none;
-            font-weight: bold;
-        }
-
-        .nav-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 25px var(--primary-neon);
-            background: var(--primary-neon);
-            color: var(--dark-bg);
-        }
-
-        /* CONTAINER */
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 1rem;
-        }
-
-        /* CARD */
-        .card {
-            background: var(--card-bg);
-            border: 3px solid rgba(0, 245, 255, 0.3);
-            border-radius: 25px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            backdrop-filter: blur(15px);
-            transition: all 0.4s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-            transition: left 0.6s ease;
-        }
-
-        .card:hover::before {
-            left: 100%;
-        }
-
-        .card:hover {
-            border-color: var(--primary-neon);
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0, 245, 255, 0.2);
-        }
-
-        /* GAME AREA */
-        .game-area {
+        /* GAME GRID */
+        .games-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
             gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .game-card {
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .game-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: var(--shadow-intense) rgba(0, 255, 255, 0.3);
+        }
+
+        .game-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: iconFloat 4s ease-in-out infinite;
+        }
+
+        @keyframes iconFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(5deg); }
+        }
+
+        .game-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+
+        .game-description {
+            color: var(--text-dim);
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+
+        /* STATS PANEL */
+        .stats-panel {
+            padding: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .stats-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 2rem;
+            text-align: center;
+            color: var(--accent);
             margin-bottom: 2rem;
         }
 
-        /* GAME STATS */
-        .game-stats {
+        .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
         }
 
         .stat-card {
-            background: rgba(0, 0, 0, 0.6);
-            padding: 1.5rem;
-            border-radius: 20px;
+            padding: 2rem;
             text-align: center;
-            border: 2px solid var(--primary-neon);
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            border: 1px solid var(--glass-border);
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
@@ -512,10 +530,10 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: conic-gradient(var(--primary-neon), transparent, var(--primary-neon));
+            background: conic-gradient(var(--primary), transparent, var(--primary));
             opacity: 0;
             transition: opacity 0.3s ease;
-            animation: statRotate 4s linear infinite;
+            animation: rotate 4s linear infinite;
             z-index: -1;
         }
 
@@ -523,141 +541,45 @@
             opacity: 0.1;
         }
 
-        .stat-card:hover {
-            transform: translateY(-5px) scale(1.02);
-            box-shadow: 0 15px 30px rgba(0, 245, 255, 0.3);
-        }
-
-        @keyframes statRotate {
+        @keyframes rotate {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
 
         .stat-value {
-            font-size: 2rem;
-            font-weight: bold;
-            color: var(--accent-gold);
-            font-family: 'Orbitron', sans-serif;
-            text-shadow: 0 0 15px var(--accent-gold);
-            animation: statGlow 2s ease-in-out infinite alternate;
-        }
-
-        @keyframes statGlow {
-            0% { text-shadow: 0 0 15px var(--accent-gold); }
-            100% { text-shadow: 0 0 25px var(--accent-gold); }
+            font-family: 'Orbitron', monospace;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 20px currentColor;
         }
 
         .stat-label {
-            font-size: 0.9rem;
-            opacity: 0.8;
-            margin-top: 0.5rem;
-            font-weight: bold;
-        }
-
-        /* INPUT E BUTTON */
-        .input {
-            width: 100%;
-            padding: 1.5rem;
-            background: rgba(0, 0, 0, 0.6);
-            border: 3px solid var(--primary-neon);
-            border-radius: 20px;
-            color: var(--text-color);
-            font-size: 1.2rem;
-            margin-bottom: 1.5rem;
-            font-family: 'Orbitron', sans-serif;
-            transition: all 0.3s ease;
-        }
-
-        .input:focus {
-            outline: none;
-            box-shadow: 0 0 30px var(--primary-neon);
-            transform: scale(1.02);
-            border-color: var(--accent-gold);
-        }
-
-        .button {
-            padding: 1.5rem 2.5rem;
-            border: none;
-            border-radius: 25px;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 1.1rem;
-            width: 100%;
-            margin-bottom: 1rem;
-            transition: all 0.4s ease;
+            color: var(--text-dim);
+            font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            font-family: 'Fredoka One', cursive;
-            position: relative;
-            overflow: hidden;
+            letter-spacing: 1px;
         }
 
-        .button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-            transition: left 0.6s ease;
+        /* GAME INTERFACE */
+        .game-interface {
+            padding: 2rem;
+            margin-bottom: 2rem;
         }
 
-        .button:hover::before {
-            left: 100%;
+        .game-header {
+            text-align: center;
+            margin-bottom: 2rem;
         }
 
-        .button:hover:not(:disabled) {
-            transform: translateY(-5px) scale(1.05);
+        .game-title-main {
+            font-family: 'Orbitron', monospace;
+            font-size: 2.5rem;
+            color: var(--accent);
+            margin-bottom: 1rem;
         }
 
-        .button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .button-primary {
-            background: linear-gradient(45deg, var(--primary-neon), #00d4ff);
-            color: var(--dark-bg);
-            box-shadow: 0 10px 25px rgba(0, 245, 255, 0.3);
-        }
-
-        .button-primary:hover {
-            box-shadow: 0 15px 35px rgba(0, 245, 255, 0.5);
-        }
-
-        .button-secondary {
-            background: linear-gradient(45deg, var(--secondary-neon), #ff5252);
-            color: white;
-            box-shadow: 0 10px 25px rgba(255, 107, 107, 0.3);
-        }
-
-        .button-secondary:hover {
-            box-shadow: 0 15px 35px rgba(255, 107, 107, 0.5);
-        }
-
-        .button-success {
-            background: linear-gradient(45deg, #4ecdc4, #44a08d);
-            color: white;
-            box-shadow: 0 10px 25px rgba(78, 205, 196, 0.3);
-        }
-
-        .button-success:hover {
-            box-shadow: 0 15px 35px rgba(78, 205, 196, 0.5);
-        }
-
-        .button-gold {
-            background: linear-gradient(45deg, var(--accent-gold), #ffb300);
-            color: var(--dark-bg);
-            box-shadow: 0 10px 25px rgba(255, 217, 61, 0.3);
-        }
-
-        .button-gold:hover {
-            box-shadow: 0 15px 35px rgba(255, 217, 61, 0.5);
-        }
-
-        /* DIFFICULTY SELECTOR */
         .difficulty-selector {
             display: flex;
             justify-content: center;
@@ -666,134 +588,131 @@
             flex-wrap: wrap;
         }
 
-        .difficulty-badge {
-            padding: 1rem 1.5rem;
-            border-radius: 20px;
-            font-size: 1rem;
-            font-weight: bold;
+        .difficulty-btn {
+            padding: 1rem 2rem;
+            border: 2px solid transparent;
+            border-radius: 15px;
+            background: var(--glass);
+            color: var(--text);
             cursor: pointer;
             transition: all 0.3s ease;
-            border: 2px solid transparent;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .difficulty-badge::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .difficulty-badge:hover::before,
-        .difficulty-badge.active::before {
-            left: 100%;
-        }
-
-        .difficulty-badge:hover,
-        .difficulty-badge.active {
-            transform: scale(1.05);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-        }
-
-        .easy { 
-            background: linear-gradient(45deg, #4ecdc4, #44a08d); 
-            border-color: #4ecdc4;
-        }
-        .normal { 
-            background: linear-gradient(45deg, #667eea, #764ba2); 
-            border-color: #667eea;
-        }
-        .hard { 
-            background: linear-gradient(45deg, #ff6b6b, #ee5a24); 
-            border-color: #ff6b6b;
-        }
-
-        /* LEVEL PROGRESS */
-        .level-progress {
-            background: rgba(0, 0, 0, 0.6);
-            padding: 2rem;
-            border-radius: 25px;
-            margin-bottom: 2rem;
+            font-weight: 600;
             text-align: center;
-            border: 3px solid var(--accent-gold);
-            position: relative;
-            overflow: hidden;
+            min-width: 150px;
         }
 
-        .level-progress::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, var(--accent-gold) 0%, transparent 70%);
-            opacity: 0.1;
-            animation: levelGlow 4s ease-in-out infinite;
-            z-index: -1;
+        .difficulty-btn.active,
+        .difficulty-btn:hover {
+            border-color: var(--primary);
+            background: rgba(0, 255, 255, 0.1);
+            transform: scale(1.05);
+            box-shadow: var(--shadow-glow) rgba(0, 255, 255, 0.3);
         }
 
-        @keyframes levelGlow {
-            0%, 100% { transform: scale(1) rotate(0deg); }
-            50% { transform: scale(1.1) rotate(180deg); }
+        .difficulty-easy { border-color: var(--success); }
+        .difficulty-normal { border-color: var(--accent); }
+        .difficulty-hard { border-color: var(--danger); }
+
+        /* GAME AREA */
+        .game-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
         }
 
-        .level-title {
-            font-family: 'Bangers', cursive;
-            font-size: 2rem;
-            font-weight: bold;
-            margin-bottom: 1.5rem;
-            background: linear-gradient(45deg, var(--accent-gold), #ffb300);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: levelTitlePulse 3s ease-in-out infinite;
+        .control-panel {
+            padding: 2rem;
         }
 
-        @keyframes levelTitlePulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
-        .level-bar {
+        .game-input {
             width: 100%;
-            height: 30px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            overflow: hidden;
-            margin: 1.5rem 0;
-            position: relative;
-            border: 2px solid var(--primary-neon);
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid var(--glass-border);
+            border-radius: 15px;
+            color: var(--text);
+            font-size: 1.2rem;
+            font-family: 'Orbitron', monospace;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
         }
 
-        .level-fill {
+        .game-input:focus {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-glow) rgba(0, 255, 255, 0.3);
+            outline: none;
+        }
+
+        .hint-display {
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-top: 1rem;
+            min-height: 2rem;
+        }
+
+        .history-panel {
+            padding: 2rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border-left: 4px solid var(--primary);
+            animation: slideInRight 0.5s ease;
+        }
+
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* PROGRESS BAR */
+        .progress-container {
+            margin: 2rem 0;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 1rem 0;
+            position: relative;
+        }
+
+        .progress-fill {
             height: 100%;
-            background: linear-gradient(45deg, var(--primary-neon), var(--accent-gold), var(--secondary-neon));
-            background-size: 200% 100%;
-            border-radius: 20px;
+            background: linear-gradient(45deg, var(--primary), var(--accent));
+            border-radius: 10px;
             transition: width 1s ease;
             position: relative;
-            animation: levelShimmer 2s linear infinite;
+            animation: progressShimmer 2s linear infinite;
         }
 
-        @keyframes levelShimmer {
+        @keyframes progressShimmer {
             0% { background-position: -200% 0; }
             100% { background-position: 200% 0; }
         }
 
         /* TIMER */
-        .timer {
+        .timer-display {
+            font-family: 'Orbitron', monospace;
             font-size: 3rem;
-            font-weight: bold;
-            color: var(--secondary-neon);
+            font-weight: 700;
+            color: var(--secondary);
             text-align: center;
             margin: 1rem 0;
-            font-family: 'Orbitron', sans-serif;
-            text-shadow: 0 0 20px var(--secondary-neon);
+            text-shadow: 0 0 30px currentColor;
             animation: timerPulse 1s ease-in-out infinite;
         }
 
@@ -802,8 +721,8 @@
             50% { transform: scale(1.1); }
         }
 
-        .timer.warning {
-            color: #ff6b6b;
+        .timer-warning {
+            color: var(--danger) !important;
             animation: timerWarning 0.5s ease-in-out infinite;
         }
 
@@ -812,18 +731,94 @@
             50% { transform: scale(1.2); }
         }
 
+        /* SETTINGS */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .setting-group {
+            padding: 2rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .setting-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.5rem;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+        }
+
+        .theme-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .theme-option {
+            aspect-ratio: 1;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .theme-option:hover,
+        .theme-option.active {
+            border-color: var(--accent);
+            transform: scale(1.1);
+            box-shadow: var(--shadow-glow) rgba(255, 255, 0, 0.5);
+        }
+
+        .theme-cyber { background: radial-gradient(circle, #001122, #000511); }
+        .theme-neon { background: radial-gradient(circle, #220011, #110022); }
+        .theme-matrix { background: radial-gradient(circle, #001100, #000800); }
+        .theme-fire { background: radial-gradient(circle, #220800, #110400); }
+        .theme-ice { background: radial-gradient(circle, #002244, #001122); }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            outline: none;
+            margin: 1rem 0;
+            cursor: pointer;
+        }
+
+        .slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+
         /* RESPONSIVE */
         @media (max-width: 768px) {
+            .main-container {
+                padding: 1rem;
+            }
+
+            .games-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
             .game-area {
                 grid-template-columns: 1fr;
             }
-            
-            .game-stats {
-                grid-template-columns: repeat(2, 1fr);
-            }
 
-            .menu-grid {
-                grid-template-columns: 1fr;
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
 
             .difficulty-selector {
@@ -831,97 +826,59 @@
                 align-items: center;
             }
 
-            .login-container {
-                padding: 2rem;
+            .nav-bar {
+                position: relative;
+                top: auto;
+                right: auto;
+                justify-content: center;
+                margin-bottom: 2rem;
             }
 
-            .login-title {
-                font-size: 2rem;
+            .user-panel {
+                position: relative;
+                top: auto;
+                left: auto;
+                margin-bottom: 2rem;
             }
         }
 
-        /* HIDDEN */
-        .hidden {
-            display: none !important;
+        /* UTILITY CLASSES */
+        .hidden { display: none !important; }
+        .text-center { text-align: center; }
+        .mb-2 { margin-bottom: 2rem; }
+        .mt-2 { margin-top: 2rem; }
+
+        /* LOADING SPINNER */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
         }
 
-        /* MENU PRINCIPALE */
-        .menu-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-top: 2rem;
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
-        .menu-card {
-            background: var(--card-bg);
-            border: 3px solid rgba(0, 245, 255, 0.3);
-            border-radius: 25px;
-            padding: 2rem;
-            text-align: center;
-            backdrop-filter: blur(15px);
-            transition: all 0.4s ease;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .menu-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-            transition: left 0.6s ease;
-        }
-
-        .menu-card:hover::before {
-            left: 100%;
-        }
-
-        .menu-card:hover {
-            border-color: var(--primary-neon);
-            transform: translateY(-10px);
-            box-shadow: 0 20px 50px rgba(0, 245, 255, 0.3);
-        }
-
-        .menu-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            animation: iconFloat 3s ease-in-out infinite;
-        }
-
-        @keyframes iconFloat {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-        }
-
-        .menu-title {
-            font-family: 'Bangers', cursive;
-            font-size: 1.8rem;
-            margin-bottom: 1rem;
-            color: var(--accent-gold);
-        }
-
-        .menu-description {
-            opacity: 0.8;
-            line-height: 1.5;
-        }
-
-        /* GAME MODES SPECIFICI */
+        /* MEMORY GAME */
         .memory-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 1rem;
             margin: 2rem 0;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .memory-card {
             aspect-ratio: 1;
-            background: var(--card-bg);
-            border: 2px solid var(--primary-neon);
+            background: var(--glass);
+            border: 2px solid var(--glass-border);
             border-radius: 15px;
             display: flex;
             align-items: center;
@@ -935,35 +892,46 @@
 
         .memory-card:hover {
             transform: scale(1.05);
-            box-shadow: 0 10px 25px rgba(0, 245, 255, 0.3);
+            box-shadow: var(--shadow-glow) rgba(0, 255, 255, 0.3);
         }
 
         .memory-card.flipped {
-            background: var(--accent-gold);
-            color: var(--dark-bg);
+            background: linear-gradient(45deg, var(--accent), var(--primary));
+            color: var(--dark);
+            transform: rotateY(180deg);
         }
 
         .memory-card.matched {
-            background: var(--secondary-neon);
-            color: white;
-            animation: matchedPulse 0.5s ease;
+            background: linear-gradient(45deg, var(--success), var(--primary));
+            animation: matchPulse 0.6s ease;
         }
 
-        @keyframes matchedPulse {
+        @keyframes matchPulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.2); }
             100% { transform: scale(1); }
         }
 
+        /* REACTION GAME */
+        .reaction-area {
+            position: relative;
+            height: 400px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 2px solid var(--glass-border);
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 2rem 0;
+        }
+
         .reaction-target {
-            width: 100px;
-            height: 100px;
-            background: var(--secondary-neon);
-            border-radius: 50%;
             position: absolute;
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle, var(--secondary), var(--danger));
+            border-radius: 50%;
             cursor: pointer;
-            transition: all 0.3s ease;
             animation: targetPulse 1s ease-in-out infinite;
+            box-shadow: var(--shadow-glow) rgba(255, 0, 128, 0.5);
         }
 
         @keyframes targetPulse {
@@ -971,688 +939,635 @@
             50% { transform: scale(1.1); }
         }
 
-        .reaction-area {
-            position: relative;
-            height: 400px;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 20px;
-            border: 2px solid var(--primary-neon);
-            overflow: hidden;
-        }
-
+        /* COLOR GAME */
         .color-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 1rem;
             margin: 2rem 0;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .color-button {
             aspect-ratio: 1;
-            border: 3px solid var(--primary-neon);
+            border: 3px solid var(--glass-border);
             border-radius: 20px;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-size: 1.5rem;
-            font-weight: bold;
+            font-size: 1.2rem;
+            font-weight: 700;
             display: flex;
             align-items: center;
             justify-content: center;
+            color: var(--text);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
         }
 
         .color-button:hover {
             transform: scale(1.05);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            box-shadow: var(--shadow-glow) rgba(255, 255, 255, 0.3);
         }
 
-        /* SETTINGS PANEL */
-        .settings-grid {
+        /* PATTERN GAME */
+        .pattern-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin: 2rem 0;
-        }
-
-        .setting-group {
-            background: rgba(0, 0, 0, 0.4);
-            padding: 2rem;
-            border-radius: 20px;
-            border: 2px solid var(--primary-neon);
-        }
-
-        .setting-title {
-            font-family: 'Bangers', cursive;
-            font-size: 1.5rem;
-            color: var(--accent-gold);
-            margin-bottom: 1rem;
-        }
-
-        .theme-selector {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 1rem;
-            margin: 1rem 0;
+            margin: 2rem 0;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
-        .theme-option {
+        .pattern-button {
             aspect-ratio: 1;
-            border-radius: 15px;
+            border: 3px solid var(--glass-border);
+            border-radius: 20px;
             cursor: pointer;
-            border: 3px solid transparent;
             transition: all 0.3s ease;
-            position: relative;
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text);
+            background: var(--glass);
         }
 
-        .theme-option:hover,
-        .theme-option.active {
-            border-color: var(--accent-gold);
-            transform: scale(1.1);
+        .pattern-button:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-glow) rgba(255, 255, 255, 0.3);
         }
 
-        .theme-space-preview { background: linear-gradient(45deg, #0a0a0a, #1a1a2e, #16213e); }
-        .theme-ocean-preview { background: linear-gradient(45deg, #0f3460, #16537e, #1e6091); }
-        .theme-forest-preview { background: linear-gradient(45deg, #1e3c2a, #2d5a3d, #3c7850); }
-        .theme-sunset-preview { background: linear-gradient(45deg, #2c1810, #4a2c17, #68401f); }
-        .theme-neon-preview { background: linear-gradient(45deg, #0d0d0d, #1a0d1a, #2d0a2d); }
-
-        .volume-slider {
-            width: 100%;
-            height: 10px;
-            border-radius: 5px;
-            background: rgba(255, 255, 255, 0.2);
-            outline: none;
-            margin: 1rem 0;
-        }
-
-        .volume-slider::-webkit-slider-thumb {
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: var(--primary-neon);
-            cursor: pointer;
+        .pattern-button.active {
+            background: var(--primary);
+            color: var(--dark);
+            box-shadow: var(--shadow-intense) rgba(0, 255, 255, 0.8);
         }
     </style>
 </head>
-<body>
-    <!-- AUDIO -->
-    <audio id="background-music" loop>
-        <source src="musica.mp3" type="audio/mpeg">
-    </audio>
+<body class="theme-cyber">
+    <!-- Background Animation -->
+    <div class="bg-animation" id="bgAnimation"></div>
+    <div class="grid-overlay"></div>
 
-    <!-- STELLE ANIMATE -->
-    <div class="stars" id="stars"></div>
-
-    <!-- LOGIN SCREEN -->
-    <div id="login-screen" class="login-screen">
-        <div class="login-container">
-            <h1 class="login-title">🎯 NUMERO QUEST</h1>
-            <p class="login-subtitle">Benvenuto nel Gaming Hub più epico del web!</p>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-container glass neon-border">
+            <h1 class="login-title neon">🎯 NUMERO QUEST</h1>
+            <p class="login-subtitle">Ultimate Gaming Experience</p>
             
-            <!-- LOGIN FORM -->
-            <div id="login-form" class="auth-form">
-                <h3 style="color: var(--accent-gold); margin-bottom: 1.5rem; font-family: 'Bangers', cursive; font-size: 1.5rem;">🔐 ACCEDI</h3>
-                <input type="email" class="login-input" placeholder="📧 La tua email" id="login-email">
-                <input type="password" class="login-input" placeholder="🔒 Password" id="login-password">
-                <button class="login-btn" onclick="loginUser()">
-                    <span id="login-spinner" class="loading-spinner hidden"></span>
-                    <span>🚀 Accedi</span>
+            <!-- Login Form -->
+            <div id="loginForm" class="auth-form">
+                <h3 style="color: var(--accent); margin-bottom: 1.5rem; font-family: 'Orbitron', monospace;">🔐 ACCESS</h3>
+                <div class="form-group">
+                    <input type="email" class="form-input" placeholder="📧 Email Address" id="loginEmail">
+                </div>
+                <div class="form-group">
+                    <input type="password" class="form-input" placeholder="🔒 Password" id="loginPassword">
+                </div>
+                <button class="btn btn-primary btn-full" onclick="loginUser()">
+                    <span id="loginSpinner" class="spinner hidden"></span>
+                    <span>🚀 LOGIN</span>
                 </button>
-                <div id="login-error" class="auth-error hidden"></div>
+                <div id="loginError" class="error-message hidden"></div>
                 <div class="auth-toggle" onclick="showRegisterForm()">
-                    Non hai un account? Registrati qui! 📝
+                    Don't have an account? Register here! 📝
                 </div>
             </div>
 
-            <!-- REGISTER FORM -->
-            <div id="register-form" class="auth-form hidden">
-                <h3 style="color: var(--accent-gold); margin-bottom: 1.5rem; font-family: 'Bangers', cursive; font-size: 1.5rem;">📝 REGISTRATI</h3>
-                <input type="text" class="login-input" placeholder="👤 Il tuo nome" id="register-name">
-                <input type="email" class="login-input" placeholder="📧 La tua email" id="register-email">
-                <input type="password" class="login-input" placeholder="🔒 Password" id="register-password">
-                <input type="password" class="login-input" placeholder="🔒 Conferma password" id="register-confirm">
-                <button class="login-btn" onclick="registerUser()">
-                    <span id="register-spinner" class="loading-spinner hidden"></span>
-                    <span>✨ Registrati</span>
+            <!-- Register Form -->
+            <div id="registerForm" class="auth-form hidden">
+                <h3 style="color: var(--accent); margin-bottom: 1.5rem; font-family: 'Orbitron', monospace;">📝 REGISTER</h3>
+                <div class="form-group">
+                    <input type="text" class="form-input" placeholder="👤 Full Name" id="registerName">
+                </div>
+                <div class="form-group">
+                    <input type="email" class="form-input" placeholder="📧 Email Address" id="registerEmail">
+                </div>
+                <div class="form-group">
+                    <input type="password" class="form-input" placeholder="🔒 Password" id="registerPassword">
+                </div>
+                <div class="form-group">
+                    <input type="password" class="form-input" placeholder="🔒 Confirm Password" id="registerConfirm">
+                </div>
+                <button class="btn btn-primary btn-full" onclick="registerUser()">
+                    <span id="registerSpinner" class="spinner hidden"></span>
+                    <span>✨ REGISTER</span>
                 </button>
-                <div id="register-error" class="auth-error hidden"></div>
-                <div id="register-success" class="auth-success hidden"></div>
+                <div id="registerError" class="error-message hidden"></div>
+                <div id="registerSuccess" class="success-message hidden"></div>
                 <div class="auth-toggle" onclick="showLoginForm()">
-                    Hai già un account? Accedi qui! 🔑
+                    Already have an account? Login here! 🔑
                 </div>
             </div>
 
-            <!-- GUEST LOGIN -->
-            <div style="margin-top: 2rem; padding-top: 2rem; border-top: 2px solid var(--primary-neon);">
-                <button class="login-btn secondary" onclick="loginAsGuest()">
-                    <span>👤</span>
-                    <span>Continua come Ospite</span>
+            <!-- Guest Login -->
+            <div style="margin-top: 2rem; padding-top: 2rem; border-top: 2px solid var(--glass-border);">
+                <button class="btn btn-secondary btn-full" onclick="loginAsGuest()">
+                    <span>👤 CONTINUE AS GUEST</span>
                 </button>
-                <p style="font-size: 0.8rem; opacity: 0.7; margin-top: 1rem;">
-                    Come ospite non salverai i progressi permanentemente
+                <p style="font-size: 0.9rem; color: var(--text-dim); margin-top: 1rem; text-align: center;">
+                    Guest mode: Progress won't be saved permanently
                 </p>
             </div>
         </div>
     </div>
 
-    <!-- USER INFO -->
-    <div id="user-info" class="user-info">
-        <div id="user-avatar" class="user-avatar">U</div>
+    <!-- User Panel -->
+    <div id="userPanel" class="user-panel">
+        <div id="userAvatar" class="user-avatar">U</div>
         <div>
-            <div id="user-name" style="font-weight: bold; color: var(--accent-gold);">Nome Utente</div>
-            <div id="user-email" style="font-size: 0.8rem; opacity: 0.8;">email@example.com</div>
+            <div id="userName" style="font-weight: 700; color: var(--accent);">User Name</div>
+            <div id="userEmail" style="font-size: 0.9rem; color: var(--text-dim);">user@example.com</div>
         </div>
-        <button class="logout-btn" onclick="logout()">Esci</button>
+        <button class="btn btn-secondary" onclick="logout()" style="padding: 0.5rem 1rem;">Logout</button>
     </div>
 
-    <!-- NAVIGATION -->
-    <div class="nav-controls">
-        <a href="index.html" class="nav-btn">
-            🌌 Multiplayer
-        </a>
+    <!-- Navigation -->
+    <div class="nav-bar">
         <div class="nav-btn" onclick="toggleMusic()">
-            🎵 <span id="music-status">ON</span>
+            🎵 <span id="musicStatus">ON</span>
+        </div>
+        <div class="nav-btn" onclick="showSettings()">
+            ⚙️ Settings
         </div>
     </div>
 
-    <div class="container">
-        <!-- HEADER -->
+    <div class="main-container">
+        <!-- Header -->
         <header class="header">
-            <h1 class="main-title">🎯 NUMERO QUEST</h1>
-            <p class="subtitle">Gaming Hub Epico - Sfida la Tua Mente!</p>
+            <h1 class="main-title neon">🎯 NUMERO QUEST</h1>
+            <p class="subtitle">Ultimate Gaming Hub - Challenge Your Mind!</p>
         </header>
 
-        <!-- MENU PRINCIPALE -->
-        <div id="main-menu">
-            <div class="menu-grid">
-                <div class="menu-card" onclick="showGameMode('number-quest')">
-                    <div class="menu-icon">🎯</div>
-                    <div class="menu-title">Numero Quest</div>
-                    <div class="menu-description">
-                        Il classico gioco di indovinare numeri con 10 livelli progressivi per ogni difficoltà!
+        <!-- Main Menu -->
+        <div id="mainMenu">
+            <div class="games-grid">
+                <div class="game-card glass neon-border" onclick="showGameMode('numberQuest')">
+                    <div class="game-icon">🎯</div>
+                    <div class="game-title">Number Quest</div>
+                    <div class="game-description">
+                        Classic number guessing game with 10 progressive levels for each difficulty!
                     </div>
                 </div>
 
-                <div class="menu-card" onclick="showGameMode('memory-challenge')">
-                    <div class="menu-icon">🧠</div>
-                    <div class="menu-title">Memory Challenge</div>
-                    <div class="menu-description">
-                        Metti alla prova la tua memoria! Trova le coppie di carte identiche nel minor tempo possibile.
+                <div class="game-card glass neon-border" onclick="showGameMode('memoryChallenge')">
+                    <div class="game-icon">🧠</div>
+                    <div class="game-title">Memory Challenge</div>
+                    <div class="game-description">
+                        Test your memory! Find matching pairs of cards in the shortest time possible.
                     </div>
                 </div>
 
-                <div class="menu-card" onclick="showGameMode('reaction-time')">
-                    <div class="menu-icon">⚡</div>
-                    <div class="menu-title">Reaction Time</div>
-                    <div class="menu-description">
-                        Testa i tuoi riflessi! Clicca sui bersagli che appaiono il più velocemente possibile.
+                <div class="game-card glass neon-border" onclick="showGameMode('reactionTime')">
+                    <div class="game-icon">⚡</div>
+                    <div class="game-title">Reaction Time</div>
+                    <div class="game-description">
+                        Test your reflexes! Click on targets that appear as fast as possible.
                     </div>
                 </div>
 
-                <div class="menu-card" onclick="showGameMode('pattern-master')">
-                    <div class="menu-icon">🔄</div>
-                    <div class="menu-title">Pattern Master</div>
-                    <div class="menu-description">
-                        Memorizza e ripeti sequenze sempre più complesse. Quanto lontano puoi arrivare?
+                <div class="game-card glass neon-border" onclick="showGameMode('patternMaster')">
+                    <div class="game-icon">🔄</div>
+                    <div class="game-title">Pattern Master</div>
+                    <div class="game-description">
+                        Memorize and repeat increasingly complex sequences. How far can you go?
                     </div>
                 </div>
 
-                <div class="menu-card" onclick="showGameMode('color-match')">
-                    <div class="menu-icon">🌈</div>
-                    <div class="menu-title">Color Match</div>
-                    <div class="menu-description">
-                        Abbina i colori giusti sotto pressione temporale. Precisione e velocità sono fondamentali!
+                <div class="game-card glass neon-border" onclick="showGameMode('colorMatch')">
+                    <div class="game-icon">🌈</div>
+                    <div class="game-title">Color Match</div>
+                    <div class="game-description">
+                        Match the right colors under time pressure. Precision and speed are key!
                     </div>
                 </div>
 
-                <div class="menu-card" onclick="showGameMode('quick-math')">
-                    <div class="menu-icon">🧮</div>
-                    <div class="menu-title">Quick Math</div>
-                    <div class="menu-description">
-                        Risolvi operazioni matematiche il più velocemente possibile. Allena il tuo cervello!
-                    </div>
-                </div>
-
-                <div class="menu-card" onclick="window.location.href='index.html'">
-                    <div class="menu-icon">🌌</div>
-                    <div class="menu-title">Arena Galattica</div>
-                    <div class="menu-description">
-                        Battaglia multiplayer epica! Sfida altri giocatori in tempo reale attraverso 10 livelli galattici.
-                    </div>
-                </div>
-
-                <div class="menu-card" onclick="showSettings()">
-                    <div class="menu-icon">⚙️</div>
-                    <div class="menu-title">Impostazioni</div>
-                    <div class="menu-description">
-                        Personalizza la tua esperienza di gioco. Temi, musica, difficoltà e molto altro.
+                <div class="game-card glass neon-border" onclick="showGameMode('quickMath')">
+                    <div class="game-icon">🧮</div>
+                    <div class="game-title">Quick Math</div>
+                    <div class="game-description">
+                        Solve math operations as fast as possible. Train your brain!
                     </div>
                 </div>
             </div>
 
-            <!-- STATISTICHE RAPIDE -->
-            <div class="card" style="margin-top: 2rem;">
-                <h3 style="text-align: center; font-family: 'Bangers', cursive; font-size: 2rem; color: var(--accent-gold); margin-bottom: 2rem;">
-                    📊 Le Tue Statistiche Epiche
-                </h3>
-                <div class="game-stats">
+            <!-- Stats Panel -->
+            <div class="stats-panel glass neon-border">
+                <h3 class="stats-title neon">📊 Your Epic Statistics</h3>
+                <div class="stats-grid">
                     <div class="stat-card">
-                        <div class="stat-value" id="total-games">0</div>
-                        <div class="stat-label">Partite Totali</div>
+                        <div class="stat-value neon" id="totalGames">0</div>
+                        <div class="stat-label">Total Games</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" id="total-wins">0</div>
-                        <div class="stat-label">Vittorie</div>
+                        <div class="stat-value neon" id="totalWins">0</div>
+                        <div class="stat-label">Victories</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" id="best-score">0</div>
-                        <div class="stat-label">Miglior Punteggio</div>
+                        <div class="stat-value neon" id="bestScore">0</div>
+                        <div class="stat-label">Best Score</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" id="win-rate">0%</div>
-                        <div class="stat-label">Percentuale Vittorie</div>
+                        <div class="stat-value neon" id="winRate">0%</div>
+                        <div class="stat-label">Win Rate</div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- NUMERO QUEST -->
-        <div id="number-quest" class="hidden">
-            <!-- Selezione Difficoltà -->
-            <div class="card">
-                <h3 style="text-align: center; font-size: 2rem; font-family: 'Bangers', cursive; color: var(--accent-gold); margin-bottom: 2rem;">
-                    🎮 Seleziona Difficoltà - 10 Livelli Epici
-                </h3>
+        <!-- Number Quest Game -->
+        <div id="numberQuest" class="hidden">
+            <div class="game-interface glass neon-border">
+                <div class="game-header">
+                    <h2 class="game-title-main neon">🎯 Number Quest</h2>
+                    <p>Select Difficulty - 10 Epic Levels</p>
+                </div>
                 
                 <div class="difficulty-selector">
-                    <div class="difficulty-badge easy active" data-difficulty="easy" onclick="selectDifficulty('easy')">
-                        🌟 FACILE<br>
-                        <small>Livelli: 0-30 → 0-300<br>10 tentativi per livello</small>
+                    <div class="difficulty-btn difficulty-easy active" data-difficulty="easy" onclick="selectDifficulty('easy')">
+                        🌟 EASY<br>
+                        <small>Levels: 0-30 → 0-300<br>10 attempts per level</small>
                     </div>
-                    <div class="difficulty-badge normal" data-difficulty="normal" onclick="selectDifficulty('normal')">
-                        ⚡ MEDIO<br>
-                        <small>Livelli: 0-80 → 0-800<br>7 tentativi per livello</small>
+                    <div class="difficulty-btn difficulty-normal" data-difficulty="normal" onclick="selectDifficulty('normal')">
+                        ⚡ MEDIUM<br>
+                        <small>Levels: 0-80 → 0-800<br>7 attempts per level</small>
                     </div>
-                    <div class="difficulty-badge hard" data-difficulty="hard" onclick="selectDifficulty('hard')">
-                        🔥 DIFFICILE<br>
-                        <small>Livelli: 0-150 → 0-1500<br>5 tentativi + Timer 40s</small>
+                    <div class="difficulty-btn difficulty-hard" data-difficulty="hard" onclick="selectDifficulty('hard')">
+                        🔥 HARD<br>
+                        <small>Levels: 0-150 → 0-1500<br>5 attempts + 40s timer</small>
                     </div>
                 </div>
 
-                <button class="button button-primary" onclick="startNumberQuest()">
-                    🚀 Inizia Avventura
-                </button>
-
-                <button class="button button-secondary" onclick="showMainMenu()">
-                    🏠 Torna al Menu
-                </button>
+                <div class="text-center">
+                    <button class="btn btn-primary" onclick="startNumberQuest()">
+                        🚀 Start Adventure
+                    </button>
+                    <button class="btn btn-secondary" onclick="showMainMenu()">
+                        🏠 Back to Menu
+                    </button>
+                </div>
             </div>
 
-            <!-- Progresso Livelli -->
-            <div id="level-progress" class="level-progress hidden">
-                <div class="level-title">📊 Progresso Livelli Epici</div>
-                <div style="display: flex; justify-content: space-between; margin: 1rem 0; font-size: 1.1rem; font-weight: bold;">
-                    <span>Livello <span id="current-level" style="color: var(--accent-gold);">1</span>/10</span>
-                    <span id="level-range" style="color: var(--primary-neon);">Range: 0-30</span>
+            <!-- Level Progress -->
+            <div id="levelProgress" class="progress-container glass neon-border hidden">
+                <h3 class="neon">📊 Epic Level Progress</h3>
+                <div style="display: flex; justify-content: space-between; margin: 1rem 0; font-weight: 600;">
+                    <span>Level <span id="currentLevel" style="color: var(--accent);">1</span>/10</span>
+                    <span id="levelRange" style="color: var(--primary);">Range: 0-30</span>
                 </div>
-                <div class="level-bar">
-                    <div class="level-fill" id="level-fill" style="width: 10%;"></div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="levelFill" style="width: 10%;"></div>
                 </div>
-                <div id="timer-display" class="timer hidden">40</div>
+                <div id="timerDisplay" class="timer-display hidden">40</div>
             </div>
 
-            <!-- Area di Gioco -->
-            <div id="number-game-area" class="hidden">
-                <!-- Statistiche -->
-                <div class="game-stats">
+            <!-- Game Area -->
+            <div id="numberGameArea" class="hidden">
+                <div class="stats-grid mb-2">
                     <div class="stat-card">
-                        <div class="stat-value" id="current-number">?</div>
-                        <div class="stat-label">Numero Segreto</div>
+                        <div class="stat-value neon" id="currentNumber">?</div>
+                        <div class="stat-label">Secret Number</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" id="attempts-left">10</div>
-                        <div class="stat-label">Tentativi</div>
+                        <div class="stat-value neon" id="attemptsLeft">10</div>
+                        <div class="stat-label">Attempts</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" id="current-score">0</div>
-                        <div class="stat-label">Punteggio</div>
+                        <div class="stat-value neon" id="currentScore">0</div>
+                        <div class="stat-label">Score</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" id="level-score">0</div>
-                        <div class="stat-label">Punteggio Livello</div>
+                        <div class="stat-value neon" id="levelScore">0</div>
+                        <div class="stat-label">Level Score</div>
                     </div>
                 </div>
 
                 <div class="game-area">
-                    <!-- Controlli -->
-                    <div class="card">
-                        <h3 style="text-align: center; font-family: 'Bangers', cursive; font-size: 1.8rem; color: var(--accent-gold); margin-bottom: 2rem;">
-                            🎯 Centro Comando
-                        </h3>
-                        
-                        <input type="number" id="guess-input" class="input" placeholder="Inserisci il tuo numero" min="0">
-                        <button id="submit-guess" class="button button-success" onclick="makeGuess()">
-                            🚀 Indovina!
+                    <div class="control-panel glass neon-border">
+                        <h3 class="text-center neon" style="margin-bottom: 2rem;">🎯 Command Center</h3>
+                        <input type="number" id="guessInput" class="game-input" placeholder="Enter your number" min="0">
+                        <button id="submitGuess" class="btn btn-primary btn-full" onclick="makeGuess()">
+                            🚀 GUESS!
                         </button>
-                        
-                        <div id="hint" style="text-align: center; margin-top: 1rem; font-size: 1.2rem; font-weight: bold; color: var(--primary-neon);"></div>
+                        <div id="hint" class="hint-display"></div>
                     </div>
 
-                    <!-- Cronologia -->
-                    <div class="card">
-                        <h3 style="text-align: center; font-family: 'Bangers', cursive; font-size: 1.8rem; color: var(--accent-gold); margin-bottom: 2rem;">
-                            📜 Cronologia Tentativi
-                        </h3>
+                    <div class="history-panel glass neon-border">
+                        <h3 class="text-center neon" style="margin-bottom: 2rem;">📜 Attempt History</h3>
                         <div id="history" style="max-height: 300px; overflow-y: auto;"></div>
                     </div>
                 </div>
 
-                <div style="text-align: center;">
-                    <button class="button button-secondary" onclick="resetNumberQuest()">
-                        🔄 Ricomincia Livello
+                <div class="text-center">
+                    <button class="btn btn-secondary" onclick="resetNumberQuest()">
+                        🔄 Restart Level
                     </button>
-                    <button class="button button-secondary" onclick="showMainMenu()">
-                        🏠 Menu Principale
+                    <button class="btn btn-secondary" onclick="showMainMenu()">
+                        🏠 Main Menu
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- MEMORY CHALLENGE -->
-        <div id="memory-challenge" class="hidden">
-            <div class="card">
-                <h3 style="text-align: center; font-family: 'Bangers', cursive; font-size: 2rem; color: var(--accent-gold); margin-bottom: 2rem;">
-                    🧠 Memory Challenge
-                </h3>
+        <!-- Memory Challenge -->
+        <div id="memoryChallenge" class="hidden">
+            <div class="game-interface glass neon-border">
+                <div class="game-header">
+                    <h2 class="game-title-main neon">🧠 Memory Challenge</h2>
+                </div>
                 
-                <div class="game-stats">
+                <div class="stats-grid mb-2">
                     <div class="stat-card">
-                        <div class="stat-value" id="memory-level">1</div>
-                        <div class="stat-label">Livello</div>
+                        <div class="stat-value neon" id="memoryLevel">1</div>
+                        <div class="stat-label">Level</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" id="memory-pairs">0</div>
-                        <div class="stat-label">Coppie Trovate</div>
+                        <div class="stat-value neon" id="memoryPairs">0</div>
+                        <div class="stat-label">Pairs Found</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" id="memory-moves">0</div>
-                        <div class="stat-label">Mosse</div>
+                        <div class="stat-value neon" id="memoryMoves">0</div>
+                        <div class="stat-label">Moves</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" id="memory-time">0</div>
-                        <div class="stat-label">Tempo</div>
+                        <div class="stat-value neon" id="memoryTime">0</div>
+                        <div class="stat-label">Time</div>
                     </div>
                 </div>
 
-                <div class="memory-grid" id="memory-grid"></div>
+                <div class="memory-grid" id="memoryGrid"></div>
 
-                <div style="text-align: center;">
-                    <button class="button button-primary" onclick="startMemoryGame()">
-                        🧠 Inizia Memory
+                <div class="text-center">
+                    <button class="btn btn-primary" onclick="startMemoryGame()">
+                        🧠 Start Memory
                     </button>
-                    <button class="button button-secondary" onclick="showMainMenu()">
-                        🏠 Menu Principale
+                    <button class="btn btn-secondary" onclick="showMainMenu()">
+                        🏠 Main Menu
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- REACTION TIME -->
-        <div id="reaction-time" class="hidden">
-            <div class="card">
-                <h3 style="text-align: center; font-family: 'Bangers', cursive; font-size: 2rem; color: var(--accent-gold); margin-bottom: 2rem;">
-                    ⚡ Reaction Time Challenge
-                </h3>
+        <!-- Reaction Time -->
+        <div id="reactionTime" class="hidden">
+            <div class="game-interface glass neon-border">
+                <div class="game-header">
+                    <h2 class="game-title-main neon">⚡ Reaction Time Challenge</h2>
+                </div>
                 
-                <div class="game-stats">
+                <div class="stats-grid mb-2">
                     <div class="stat-card">
-                        <div class="stat-value" id="reaction-score">0</div>
-                        <div class="stat-label">Punteggio</div>
+                        <div class="stat-value neon" id="reactionScore">0</div>
+                        <div class="stat-label">Score</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" id="reaction-hits">0</div>
-                        <div class="stat-label">Colpi</div>
+                        <div class="stat-value neon" id="reactionHits">0</div>
+                        <div class="stat-label">Hits</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" id="reaction-misses">0</div>
-                        <div class="stat-label">Mancati</div>
+                        <div class="stat-value neon" id="reactionMisses">0</div>
+                        <div class="stat-label">Misses</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" id="reaction-time-left">30</div>
-                        <div class="stat-label">Tempo</div>
+                        <div class="stat-value neon" id="reactionTimeLeft">30</div>
+                        <div class="stat-label">Time</div>
                     </div>
                 </div>
 
-                <div class="reaction-area" id="reaction-area"></div>
+                <div class="reaction-area" id="reactionArea"></div>
 
-                <div style="text-align: center; margin-top: 2rem;">
-                    <button class="button button-primary" onclick="startReactionGame()">
-                        ⚡ Inizia Test Riflessi
+                <div class="text-center">
+                    <button class="btn btn-primary" onclick="startReactionGame()">
+                        ⚡ Start Reflex Test
                     </button>
-                    <button class="button button-secondary" onclick="showMainMenu()">
-                        🏠 Menu Principale
+                    <button class="btn btn-secondary" onclick="showMainMenu()">
+                        🏠 Main Menu
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- PATTERN MASTER -->
-        <div id="pattern-master" class="hidden">
-            <div class="card">
-                <h3 style="text-align: center; font-family: 'Bangers', cursive; font-size: 2rem; color: var(--accent-gold); margin-bottom: 2rem;">
-                    🔄 Pattern Master
-                </h3>
+        <!-- Pattern Master -->
+        <div id="patternMaster" class="hidden">
+            <div class="game-interface glass neon-border">
+                <div class="game-header">
+                    <h2 class="game-title-main neon">🔄 Pattern Master</h2>
+                </div>
                 
-                <div class="game-stats">
+                <div class="stats-grid mb-2">
                     <div class="stat-card">
-                        <div class="stat-value" id="pattern-level">1</div>
-                        <div class="stat-label">Livello</div>
+                        <div class="stat-value neon" id="patternLevel">1</div>
+                        <div class="stat-label">Level</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" id="pattern-sequence">3</div>
-                        <div class="stat-label">Sequenza</div>
+                        <div class="stat-value neon" id="patternSequence">3</div>
+                        <div class="stat-label">Sequence</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" id="pattern-score">0</div>
-                        <div class="stat-label">Punteggio</div>
+                        <div class="stat-value neon" id="patternScore">0</div>
+                        <div class="stat-label">Score</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" id="pattern-lives">3</div>
-                        <div class="stat-label">Vite</div>
+                        <div class="stat-value neon" id="patternLives">3</div>
+                        <div class="stat-label">Lives</div>
                     </div>
                 </div>
 
-                <div class="color-grid" id="pattern-grid">
-                    <div class="color-button" style="background: #ff6b6b;" onclick="patternClick(0)">1</div>
-                    <div class="color-button" style="background: #4ecdc4;" onclick="patternClick(1)">2</div>
-                    <div class="color-button" style="background: #45b7d1;" onclick="patternClick(2)">3</div>
-                    <div class="color-button" style="background: #f9ca24;" onclick="patternClick(3)">4</div>
-                    <div class="color-button" style="background: #6c5ce7;" onclick="patternClick(4)">5</div>
-                    <div class="color-button" style="background: #a55eea;" onclick="patternClick(5)">6</div>
-                    <div class="color-button" style="background: #26de81;" onclick="patternClick(6)">7</div>
-                    <div class="color-button" style="background: #fd79a8;" onclick="patternClick(7)">8</div>
-                    <div class="color-button" style="background: #fdcb6e;" onclick="patternClick(8)">9</div>
+                <div class="pattern-grid" id="patternGrid">
+                    <div class="pattern-button" style="background: #ff6b6b;" onclick="patternClick(0)">1</div>
+                    <div class="pattern-button" style="background: #4ecdc4;" onclick="patternClick(1)">2</div>
+                    <div class="pattern-button" style="background: #45b7d1;" onclick="patternClick(2)">3</div>
+                    <div class="pattern-button" style="background: #f9ca24;" onclick="patternClick(3)">4</div>
+                    <div class="pattern-button" style="background: #6c5ce7;" onclick="patternClick(4)">5</div>
+                    <div class="pattern-button" style="background: #a55eea;" onclick="patternClick(5)">6</div>
+                    <div class="pattern-button" style="background: #26de81;" onclick="patternClick(6)">7</div>
+                    <div class="pattern-button" style="background: #fd79a8;" onclick="patternClick(7)">8</div>
+                    <div class="pattern-button" style="background: #fdcb6e;" onclick="patternClick(8)">9</div>
                 </div>
 
-                <div style="text-align: center;">
-                    <button class="button button-primary" onclick="startPatternGame()">
-                        🔄 Inizia Pattern
+                <div class="text-center">
+                    <button class="btn btn-primary" onclick="startPatternGame()">
+                        🔄 Start Pattern
                     </button>
-                    <button class="button button-secondary" onclick="showMainMenu()">
-                        🏠 Menu Principale
+                    <button class="btn btn-secondary" onclick="showMainMenu()">
+                        🏠 Main Menu
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- COLOR MATCH -->
-        <div id="color-match" class="hidden">
-            <div class="card">
-                <h3 style="text-align: center; font-family: 'Bangers', cursive; font-size: 2rem; color: var(--accent-gold); margin-bottom: 2rem;">
-                    🌈 Color Match Challenge
-                </h3>
+        <!-- Color Match -->
+        <div id="colorMatch" class="hidden">
+            <div class="game-interface glass neon-border">
+                <div class="game-header">
+                    <h2 class="game-title-main neon">🌈 Color Match Challenge</h2>
+                </div>
                 
-                <div class="game-stats">
+                <div class="stats-grid mb-2">
                     <div class="stat-card">
-                        <div class="stat-value" id="color-score">0</div>
-                        <div class="stat-label">Punteggio</div>
+                        <div class="stat-value neon" id="colorScore">0</div>
+                        <div class="stat-label">Score</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" id="color-correct">0</div>
-                        <div class="stat-label">Corretti</div>
+                        <div class="stat-value neon" id="colorCorrect">0</div>
+                        <div class="stat-label">Correct</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" id="color-wrong">0</div>
-                        <div class="stat-label">Sbagliati</div>
+                        <div class="stat-value neon" id="colorWrong">0</div>
+                        <div class="stat-label">Wrong</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" id="color-time">30</div>
-                        <div class="stat-label">Tempo</div>
+                        <div class="stat-value neon" id="colorTime">30</div>
+                        <div class="stat-label">Time</div>
                     </div>
                 </div>
 
-                <div style="text-align: center; margin: 2rem 0;">
-                    <div style="font-size: 2rem; margin-bottom: 1rem;">Trova il colore:</div>
-                    <div id="target-color" style="font-size: 3rem; font-weight: bold; color: var(--accent-gold);">ROSSO</div>
+                <div class="text-center mb-2">
+                    <div style="font-size: 2rem; margin-bottom: 1rem;">Find the color:</div>
+                    <div id="targetColor" class="neon" style="font-size: 3rem; font-weight: 700;">RED</div>
                 </div>
 
-                <div class="color-grid" id="color-grid">
-                    <div class="color-button" style="background: #ff6b6b;" onclick="colorClick('red')">ROSSO</div>
-                    <div class="color-button" style="background: #4ecdc4;" onclick="colorClick('cyan')">CIANO</div>
-                    <div class="color-button" style="background: #45b7d1;" onclick="colorClick('blue')">BLU</div>
-                    <div class="color-button" style="background: #f9ca24;" onclick="colorClick('yellow')">GIALLO</div>
-                    <div class="color-button" style="background: #6c5ce7;" onclick="colorClick('purple')">VIOLA</div>
-                    <div class="color-button" style="background: #26de81;" onclick="colorClick('green')">VERDE</div>
-                    <div class="color-button" style="background: #fd79a8;" onclick="colorClick('pink')">ROSA</div>
-                    <div class="color-button" style="background: #fdcb6e;" onclick="colorClick('orange')">ARANCIONE</div>
-                    <div class="color-button" style="background: #2d3436;" onclick="colorClick('black')">NERO</div>
+                <div class="color-grid" id="colorGrid">
+                    <div class="color-button" style="background: #ff6b6b;" onclick="colorClick('red')">RED</div>
+                    <div class="color-button" style="background: #4ecdc4;" onclick="colorClick('cyan')">CYAN</div>
+                    <div class="color-button" style="background: #45b7d1;" onclick="colorClick('blue')">BLUE</div>
+                    <div class="color-button" style="background: #f9ca24;" onclick="colorClick('yellow')">YELLOW</div>
+                    <div class="color-button" style="background: #6c5ce7;" onclick="colorClick('purple')">PURPLE</div>
+                    <div class="color-button" style="background: #26de81;" onclick="colorClick('green')">GREEN</div>
+                    <div class="color-button" style="background: #fd79a8;" onclick="colorClick('pink')">PINK</div>
+                    <div class="color-button" style="background: #fdcb6e;" onclick="colorClick('orange')">ORANGE</div>
+                    <div class="color-button" style="background: #2d3436;" onclick="colorClick('black')">BLACK</div>
                 </div>
 
-                <div style="text-align: center;">
-                    <button class="button button-primary" onclick="startColorGame()">
-                        🌈 Inizia Color Match
+                <div class="text-center">
+                    <button class="btn btn-primary" onclick="startColorGame()">
+                        🌈 Start Color Match
                     </button>
-                    <button class="button button-secondary" onclick="showMainMenu()">
-                        🏠 Menu Principale
+                    <button class="btn btn-secondary" onclick="showMainMenu()">
+                        🏠 Main Menu
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- QUICK MATH -->
-        <div id="quick-math" class="hidden">
-            <div class="card">
-                <h3 style="text-align: center; font-family: 'Bangers', cursive; font-size: 2rem; color: var(--accent-gold); margin-bottom: 2rem;">
-                    🧮 Quick Math Challenge
-                </h3>
+        <!-- Quick Math -->
+        <div id="quickMath" class="hidden">
+            <div class="game-interface glass neon-border">
+                <div class="game-header">
+                    <h2 class="game-title-main neon">🧮 Quick Math Challenge</h2>
+                </div>
                 
-                <div class="game-stats">
+                <div class="stats-grid mb-2">
                     <div class="stat-card">
-                        <div class="stat-value" id="math-score">0</div>
-                        <div class="stat-label">Punteggio</div>
+                        <div class="stat-value neon" id="mathScore">0</div>
+                        <div class="stat-label">Score</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" id="math-correct">0</div>
-                        <div class="stat-label">Corretti</div>
+                        <div class="stat-value neon" id="mathCorrect">0</div>
+                        <div class="stat-label">Correct</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" id="math-wrong">0</div>
-                        <div class="stat-label">Sbagliati</div>
+                        <div class="stat-value neon" id="mathWrong">0</div>
+                        <div class="stat-label">Wrong</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-value" id="math-time">60</div>
-                        <div class="stat-label">Tempo</div>
+                        <div class="stat-value neon" id="mathTime">60</div>
+                        <div class="stat-label">Time</div>
                     </div>
                 </div>
 
-                <div style="text-align: center; margin: 2rem 0;">
-                    <div id="math-question" style="font-size: 3rem; font-weight: bold; color: var(--primary-neon); margin-bottom: 2rem;">5 + 3 = ?</div>
-                    <input type="number" id="math-input" class="input" placeholder="Inserisci la risposta" style="max-width: 300px; margin: 0 auto;">
-                    <button class="button button-success" onclick="submitMathAnswer()">
-                        ✅ Conferma
+                <div class="text-center mb-2">
+                    <div id="mathQuestion" class="neon" style="font-size: 3rem; font-weight: 700; margin-bottom: 2rem;">5 + 3 = ?</div>
+                    <input type="number" id="mathInput" class="game-input" placeholder="Enter answer" style="max-width: 300px; margin: 0 auto;">
+                    <button class="btn btn-primary" onclick="submitMathAnswer()">
+                        ✅ Submit
                     </button>
                 </div>
 
-                <div style="text-align: center;">
-                    <button class="button button-primary" onclick="startMathGame()">
-                        🧮 Inizia Quick Math
+                <div class="text-center">
+                    <button class="btn btn-primary" onclick="startMathGame()">
+                        🧮 Start Quick Math
                     </button>
-                    <button class="button button-secondary" onclick="showMainMenu()">
-                        🏠 Menu Principale
+                    <button class="btn btn-secondary" onclick="showMainMenu()">
+                        🏠 Main Menu
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- IMPOSTAZIONI -->
+        <!-- Settings -->
         <div id="settings" class="hidden">
-            <div class="card">
-                <h3 style="text-align: center; font-family: 'Bangers', cursive; font-size: 2rem; color: var(--accent-gold); margin-bottom: 2rem;">
-                    ⚙️ Impostazioni Epiche
-                </h3>
+            <div class="game-interface glass neon-border">
+                <div class="game-header">
+                    <h2 class="game-title-main neon">⚙️ Epic Settings</h2>
+                </div>
                 
                 <div class="settings-grid">
                     <!-- Audio Settings -->
                     <div class="setting-group">
-                        <div class="setting-title">🎵 Audio</div>
+                        <div class="setting-title neon">🎵 Audio</div>
                         <div style="margin: 1rem 0;">
-                            <label style="display: block; margin-bottom: 0.5rem;">Volume Musica:</label>
-                            <input type="range" class="volume-slider" id="music-volume" min="0" max="100" value="50" onchange="setMusicVolume(this.value)">
-                            <div style="text-align: center; margin-top: 0.5rem;">
-                                <span id="volume-display">50%</span>
+                            <label style="display: block; margin-bottom: 0.5rem;">Music Volume:</label>
+                            <input type="range" class="slider" id="musicVolume" min="0" max="100" value="50" onchange="setMusicVolume(this.value)">
+                            <div class="text-center" style="margin-top: 0.5rem;">
+                                <span id="volumeDisplay">50%</span>
                             </div>
                         </div>
-                        <button class="button button-primary" onclick="toggleMusic()" style="width: 100%;">
-                            <span id="music-toggle">🔊 Disattiva Musica</span>
+                        <button class="btn btn-primary btn-full" onclick="toggleMusic()">
+                            <span id="musicToggle">🔊 Disable Music</span>
                         </button>
                     </div>
 
                     <!-- Theme Settings -->
                     <div class="setting-group">
-                        <div class="setting-title">🎨 Temi</div>
-                        <div class="theme-selector">
-                            <div class="theme-option theme-space-preview active" onclick="setTheme('space')" data-theme="space"></div>
-                            <div class="theme-option theme-ocean-preview" onclick="setTheme('ocean')" data-theme="ocean"></div>
-                            <div class="theme-option theme-forest-preview" onclick="setTheme('forest')" data-theme="forest"></div>
-                            <div class="theme-option theme-sunset-preview" onclick="setTheme('sunset')" data-theme="sunset"></div>
-                            <div class="theme-option theme-neon-preview" onclick="setTheme('neon')" data-theme="neon"></div>
+                        <div class="setting-title neon">🎨 Themes</div>
+                        <div class="theme-grid">
+                            <div class="theme-option theme-cyber active" onclick="setTheme('cyber')" data-theme="cyber"></div>
+                            <div class="theme-option theme-neon" onclick="setTheme('neon')" data-theme="neon"></div>
+                            <div class="theme-option theme-matrix" onclick="setTheme('matrix')" data-theme="matrix"></div>
+                            <div class="theme-option theme-fire" onclick="setTheme('fire')" data-theme="fire"></div>
+                            <div class="theme-option theme-ice" onclick="setTheme('ice')" data-theme="ice"></div>
                         </div>
-                        <div style="text-align: center; margin-top: 1rem; font-size: 0.9rem; opacity: 0.8;">
-                            Spazio • Oceano • Foresta • Tramonto • Neon
+                        <div class="text-center" style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-dim);">
+                            Cyber • Neon • Matrix • Fire • Ice
                         </div>
                     </div>
 
                     <!-- Game Settings -->
                     <div class="setting-group">
-                        <div class="setting-title">🎮 Gioco</div>
-                        <button class="button button-secondary" onclick="resetAllStats()" style="width: 100%;">
-                            🗑️ Reset Statistiche
+                        <div class="setting-title neon">🎮 Game</div>
+                        <button class="btn btn-secondary btn-full" onclick="resetAllStats()">
+                            🗑️ Reset Statistics
                         </button>
-                        <button class="button button-secondary" onclick="exportStats()" style="width: 100%;">
-                            📤 Esporta Dati
+                        <button class="btn btn-secondary btn-full" onclick="exportStats()">
+                            📤 Export Data
                         </button>
-                        <button class="button button-secondary" onclick="showCredits()" style="width: 100%;">
-                            ℹ️ Crediti
+                        <button class="btn btn-secondary btn-full" onclick="showCredits()">
+                            ℹ️ Credits
                         </button>
                     </div>
 
                     <!-- Performance Settings -->
                     <div class="setting-group">
-                        <div class="setting-title">⚡ Performance</div>
+                        <div class="setting-title neon">⚡ Performance</div>
                         <label style="display: flex; align-items: center; margin: 1rem 0;">
-                            <input type="checkbox" id="reduce-animations" onchange="toggleAnimations(this.checked)" style="margin-right: 1rem;">
-                            Riduci Animazioni
+                            <input type="checkbox" id="reduceAnimations" onchange="toggleAnimations(this.checked)" style="margin-right: 1rem;">
+                            Reduce Animations
                         </label>
                         <label style="display: flex; align-items: center; margin: 1rem 0;">
-                            <input type="checkbox" id="reduce-particles" onchange="toggleParticles(this.checked)" style="margin-right: 1rem;">
-                            Riduci Particelle
+                            <input type="checkbox" id="reduceParticles" onchange="toggleParticles(this.checked)" style="margin-right: 1rem;">
+                            Reduce Particles
                         </label>
                     </div>
                 </div>
 
-                <div style="text-align: center; margin-top: 2rem;">
-                    <button class="button button-primary" onclick="showMainMenu()">
-                        🏠 Torna al Menu
+                <div class="text-center mt-2">
+                    <button class="btn btn-primary" onclick="showMainMenu()">
+                        🏠 Back to Menu
                     </button>
                 </div>
             </div>
@@ -1660,7 +1575,7 @@
     </div>
 
     <script>
-        // User Authentication State
+        // Game State Management
         let currentUser = null;
         let isLoggedIn = false;
 
@@ -1729,15 +1644,15 @@
         let settings = {
             musicEnabled: true,
             musicVolume: 50,
-            theme: 'space',
+            theme: 'cyber',
             reduceAnimations: false,
             reduceParticles: false
         };
 
-        // Difficulty Settings per Number Quest
+        // Difficulty configurations
         const numberQuestDifficulties = {
             easy: { 
-                name: '🌟 FACILE',
+                name: '🌟 EASY',
                 levels: [
                     { min: 0, max: 30 }, { min: 0, max: 60 }, { min: 0, max: 90 }, { min: 0, max: 120 }, { min: 0, max: 150 },
                     { min: 0, max: 180 }, { min: 0, max: 210 }, { min: 0, max: 240 }, { min: 0, max: 270 }, { min: 0, max: 300 }
@@ -1746,7 +1661,7 @@
                 hasTimer: false
             },
             normal: { 
-                name: '⚡ MEDIO',
+                name: '⚡ MEDIUM',
                 levels: [
                     { min: 0, max: 80 }, { min: 0, max: 160 }, { min: 0, max: 240 }, { min: 0, max: 320 }, { min: 0, max: 400 },
                     { min: 0, max: 480 }, { min: 0, max: 560 }, { min: 0, max: 640 }, { min: 0, max: 720 }, { min: 0, max: 800 }
@@ -1755,7 +1670,7 @@
                 hasTimer: false
             },
             hard: { 
-                name: '🔥 DIFFICILE',
+                name: '🔥 HARD',
                 levels: [
                     { min: 0, max: 150 }, { min: 0, max: 300 }, { min: 0, max: 450 }, { min: 0, max: 600 }, { min: 0, max: 750 },
                     { min: 0, max: 900 }, { min: 0, max: 1050 }, { min: 0, max: 1200 }, { min: 0, max: 1350 }, { min: 0, max: 1500 }
@@ -1766,36 +1681,75 @@
             }
         };
 
-        // Initialize
+        // Initialize application
         document.addEventListener('DOMContentLoaded', function() {
-            createStars();
+            createBackgroundAnimation();
             loadSettings();
             checkLoginStatus();
             
             // Event listeners
-            document.getElementById('guess-input').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') makeGuess();
-            });
-
-            document.getElementById('math-input').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') submitMathAnswer();
-            });
-
-            // Login form listeners
-            document.getElementById('login-email').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') loginUser();
-            });
-
-            document.getElementById('login-password').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') loginUser();
-            });
-
-            document.getElementById('register-confirm').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') registerUser();
-            });
+            setupEventListeners();
         });
 
-        // AUTHENTICATION FUNCTIONS
+        function setupEventListeners() {
+            // Game input listeners
+            const guessInput = document.getElementById('guessInput');
+            if (guessInput) {
+                guessInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') makeGuess();
+                });
+            }
+
+            const mathInput = document.getElementById('mathInput');
+            if (mathInput) {
+                mathInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') submitMathAnswer();
+                });
+            }
+
+            // Login form listeners
+            const loginEmail = document.getElementById('loginEmail');
+            if (loginEmail) {
+                loginEmail.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') loginUser();
+                });
+            }
+
+            const loginPassword = document.getElementById('loginPassword');
+            if (loginPassword) {
+                loginPassword.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') loginUser();
+                });
+            }
+
+            const registerConfirm = document.getElementById('registerConfirm');
+            if (registerConfirm) {
+                registerConfirm.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') registerUser();
+                });
+            }
+        }
+
+        // Background Animation
+        function createBackgroundAnimation() {
+            const bgAnimation = document.getElementById('bgAnimation');
+            const numParticles = settings.reduceParticles ? 20 : 50;
+
+            bgAnimation.innerHTML = '';
+            for (let i = 0; i < numParticles; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.width = Math.random() * 4 + 2 + 'px';
+                particle.style.height = particle.style.width;
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.animationDuration = (Math.random() * 4 + 4) + 's';
+                bgAnimation.appendChild(particle);
+            }
+        }
+
+        // Authentication Functions
         function checkLoginStatus() {
             const savedUser = localStorage.getItem('numeroquest-user');
             if (savedUser) {
@@ -1808,35 +1762,33 @@
         }
 
         function showLoginScreen() {
-            document.getElementById('login-screen').style.display = 'flex';
-            document.getElementById('user-info').classList.remove('active');
-            createStars();
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('userPanel').classList.remove('active');
         }
 
         function showGameHub() {
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('user-info').classList.add('active');
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('userPanel').classList.add('active');
             updateUserInfo();
             loadStats();
-            initializeAudio();
         }
 
         function showLoginForm() {
-            document.getElementById('login-form').classList.remove('hidden');
-            document.getElementById('register-form').classList.add('hidden');
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('registerForm').classList.add('hidden');
             clearErrors();
         }
 
         function showRegisterForm() {
-            document.getElementById('register-form').classList.remove('hidden');
-            document.getElementById('login-form').classList.add('hidden');
+            document.getElementById('registerForm').classList.remove('hidden');
+            document.getElementById('loginForm').classList.add('hidden');
             clearErrors();
         }
 
         function clearErrors() {
-            document.getElementById('login-error').classList.add('hidden');
-            document.getElementById('register-error').classList.add('hidden');
-            document.getElementById('register-success').classList.add('hidden');
+            document.getElementById('loginError').classList.add('hidden');
+            document.getElementById('registerError').classList.add('hidden');
+            document.getElementById('registerSuccess').classList.add('hidden');
         }
 
         function showError(elementId, message) {
@@ -1859,79 +1811,78 @@
         function registerUser() {
             clearErrors();
             
-            const name = document.getElementById('register-name').value.trim();
-            const email = document.getElementById('register-email').value.trim();
-            const password = document.getElementById('register-password').value;
-            const confirmPassword = document.getElementById('register-confirm').value;
+            const name = document.getElementById('registerName').value.trim();
+            const email = document.getElementById('registerEmail').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerConfirm').value;
 
-            // Validazioni
+            // Validations
             if (!name) {
-                showError('register-error', '❌ Inserisci il tuo nome!');
+                showError('registerError', '❌ Please enter your name!');
                 return;
             }
 
             if (!email) {
-                showError('register-error', '❌ Inserisci una email!');
+                showError('registerError', '❌ Please enter an email!');
                 return;
             }
 
             if (!validateEmail(email)) {
-                showError('register-error', '❌ Email non valida!');
+                showError('registerError', '❌ Invalid email format!');
                 return;
             }
 
             if (!password) {
-                showError('register-error', '❌ Inserisci una password!');
+                showError('registerError', '❌ Please enter a password!');
                 return;
             }
 
             if (password.length < 6) {
-                showError('register-error', '❌ Password troppo corta (minimo 6 caratteri)!');
+                showError('registerError', '❌ Password too short (minimum 6 characters)!');
                 return;
             }
 
             if (password !== confirmPassword) {
-                showError('register-error', '❌ Le password non coincidono!');
+                showError('registerError', '❌ Passwords do not match!');
                 return;
             }
 
-            // Controlla se utente già esiste
+            // Check if user already exists
             const existingUsers = JSON.parse(localStorage.getItem('numeroquest-users') || '{}');
             if (existingUsers[email]) {
-                showError('register-error', '❌ Email già registrata! Usa il login.');
+                showError('registerError', '❌ Email already registered! Please login.');
                 return;
             }
 
-            // Mostra spinner
-            document.getElementById('register-spinner').classList.remove('hidden');
+            // Show spinner
+            document.getElementById('registerSpinner').classList.remove('hidden');
 
-            // Simula registrazione
+            // Simulate registration
             setTimeout(() => {
-                // Salva utente
+                // Save user
                 const userData = {
                     name: name,
                     email: email,
-                    password: password, // In un'app reale, hashare la password!
+                    password: password,
                     registeredAt: new Date().toISOString()
                 };
 
                 existingUsers[email] = userData;
                 localStorage.setItem('numeroquest-users', JSON.stringify(existingUsers));
 
-                document.getElementById('register-spinner').classList.add('hidden');
-                showSuccess('register-success', '✅ Registrazione completata! Ora puoi accedere.');
+                document.getElementById('registerSpinner').classList.add('hidden');
+                showSuccess('registerSuccess', '✅ Registration completed! You can now login.');
 
-                // Pulisci form
-                document.getElementById('register-name').value = '';
-                document.getElementById('register-email').value = '';
-                document.getElementById('register-password').value = '';
-                document.getElementById('register-confirm').value = '';
+                // Clear form
+                document.getElementById('registerName').value = '';
+                document.getElementById('registerEmail').value = '';
+                document.getElementById('registerPassword').value = '';
+                document.getElementById('registerConfirm').value = '';
 
-                // Mostra form login dopo 2 secondi
+                // Show login form after 2 seconds
                 setTimeout(() => {
                     showLoginForm();
-                    // Pre-compila email
-                    document.getElementById('login-email').value = email;
+                    document.getElementById('loginEmail').value = email;
                 }, 2000);
 
             }, 1000);
@@ -1940,40 +1891,40 @@
         function loginUser() {
             clearErrors();
             
-            const email = document.getElementById('login-email').value.trim();
-            const password = document.getElementById('login-password').value;
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
 
             if (!email) {
-                showError('login-error', '❌ Inserisci la tua email!');
+                showError('loginError', '❌ Please enter your email!');
                 return;
             }
 
             if (!password) {
-                showError('login-error', '❌ Inserisci la password!');
+                showError('loginError', '❌ Please enter your password!');
                 return;
             }
 
-            // Mostra spinner
-            document.getElementById('login-spinner').classList.remove('hidden');
+            // Show spinner
+            document.getElementById('loginSpinner').classList.remove('hidden');
 
-            // Simula login
+            // Simulate login
             setTimeout(() => {
                 const existingUsers = JSON.parse(localStorage.getItem('numeroquest-users') || '{}');
                 const userData = existingUsers[email];
 
                 if (!userData) {
-                    document.getElementById('login-spinner').classList.add('hidden');
-                    showError('login-error', '❌ Email non trovata! Registrati prima.');
+                    document.getElementById('loginSpinner').classList.add('hidden');
+                    showError('loginError', '❌ Email not found! Please register first.');
                     return;
                 }
 
                 if (userData.password !== password) {
-                    document.getElementById('login-spinner').classList.add('hidden');
-                    showError('login-error', '❌ Password errata!');
+                    document.getElementById('loginSpinner').classList.add('hidden');
+                    showError('loginError', '❌ Incorrect password!');
                     return;
                 }
 
-                // Login riuscito
+                // Login successful
                 currentUser = {
                     name: userData.name,
                     email: userData.email,
@@ -1983,14 +1934,16 @@
                 isLoggedIn = true;
                 localStorage.setItem('numeroquest-user', JSON.stringify(currentUser));
 
-                document.getElementById('login-spinner').classList.add('hidden');
+                document.getElementById('loginSpinner').classList.add('hidden');
 
-                // Effetto confetti
-                confetti({
-                    particleCount: 100,
-                    spread: 70,
-                    origin: { y: 0.6 }
-                });
+                // Confetti effect
+                if (typeof confetti !== 'undefined') {
+                    confetti({
+                        particleCount: 100,
+                        spread: 70,
+                        origin: { y: 0.6 }
+                    });
+                }
 
                 setTimeout(() => {
                     showGameHub();
@@ -2001,7 +1954,7 @@
 
         function loginAsGuest() {
             currentUser = {
-                name: 'Ospite',
+                name: 'Guest',
                 email: 'guest@numeroquest.com',
                 provider: 'Guest'
             };
@@ -2012,7 +1965,7 @@
         }
 
         function logout() {
-            if (confirm('Sei sicuro di voler uscire?')) {
+            if (confirm('Are you sure you want to logout?')) {
                 currentUser = null;
                 isLoggedIn = false;
                 localStorage.removeItem('numeroquest-user');
@@ -2022,45 +1975,17 @@
 
         function updateUserInfo() {
             if (currentUser) {
-                document.getElementById('user-name').textContent = currentUser.name;
-                document.getElementById('user-email').textContent = currentUser.email;
+                document.getElementById('userName').textContent = currentUser.name;
+                document.getElementById('userEmail').textContent = currentUser.email;
                 
-                // Crea avatar con prima lettera del nome
-                const avatar = document.getElementById('user-avatar');
+                const avatar = document.getElementById('userAvatar');
                 avatar.textContent = currentUser.name.charAt(0).toUpperCase();
             }
         }
 
-        function createStars() {
-            const starsContainer = document.getElementById('stars');
-            const numStars = settings.reduceParticles ? 50 : 200;
-
-            starsContainer.innerHTML = '';
-            for (let i = 0; i < numStars; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                star.style.left = Math.random() * 100 + '%';
-                star.style.top = Math.random() * 100 + '%';
-                star.style.width = Math.random() * 3 + 1 + 'px';
-                star.style.height = star.style.width;
-                star.style.animationDelay = Math.random() * 3 + 's';
-                starsContainer.appendChild(star);
-            }
-        }
-
-        function initializeAudio() {
-            const music = document.getElementById('background-music');
-            music.volume = settings.musicVolume / 100;
-            
-            if (settings.musicEnabled) {
-                music.play().catch(() => {
-                    console.log('Autoplay bloccato dal browser');
-                });
-            }
-        }
-
+        // Settings Functions
         function loadSettings() {
-            const savedSettings = localStorage.getItem('numberquest-settings');
+            const savedSettings = localStorage.getItem('numeroquest-settings');
             if (savedSettings) {
                 settings = { ...settings, ...JSON.parse(savedSettings) };
             }
@@ -2069,21 +1994,25 @@
         }
 
         function saveSettings() {
-            localStorage.setItem('numberquest-settings', JSON.stringify(settings));
+            localStorage.setItem('numeroquest-settings', JSON.stringify(settings));
         }
 
         function applySettings() {
-            // Applica tema
+            // Apply theme
             document.body.className = `theme-${settings.theme}`;
             
-            // Aggiorna UI impostazioni
-            if (document.getElementById('music-volume')) {
-                document.getElementById('music-volume').value = settings.musicVolume;
-                document.getElementById('volume-display').textContent = settings.musicVolume + '%';
-                document.getElementById('reduce-animations').checked = settings.reduceAnimations;
-                document.getElementById('reduce-particles').checked = settings.reduceParticles;
+            // Update settings UI
+            const musicVolume = document.getElementById('musicVolume');
+            if (musicVolume) {
+                musicVolume.value = settings.musicVolume;
+                document.getElementById('volumeDisplay').textContent = settings.musicVolume + '%';
                 
-                // Aggiorna tema attivo
+                const reduceAnimations = document.getElementById('reduceAnimations');
+                const reduceParticles = document.getElementById('reduceParticles');
+                if (reduceAnimations) reduceAnimations.checked = settings.reduceAnimations;
+                if (reduceParticles) reduceParticles.checked = settings.reduceParticles;
+                
+                // Update active theme
                 document.querySelectorAll('.theme-option').forEach(option => {
                     option.classList.remove('active');
                 });
@@ -2091,44 +2020,164 @@
                 if (activeTheme) activeTheme.classList.add('active');
             }
             
-            // Aggiorna status musica
             updateMusicStatus();
         }
 
+        function setTheme(theme) {
+            settings.theme = theme;
+            document.body.className = `theme-${theme}`;
+            
+            document.querySelectorAll('.theme-option').forEach(option => {
+                option.classList.remove('active');
+            });
+            const activeTheme = document.querySelector(`[data-theme="${theme}"]`);
+            if (activeTheme) activeTheme.classList.add('active');
+            
+            saveSettings();
+        }
+
+        function toggleMusic() {
+            settings.musicEnabled = !settings.musicEnabled;
+            updateMusicStatus();
+            saveSettings();
+        }
+
+        function updateMusicStatus() {
+            const statusEl = document.getElementById('musicStatus');
+            const toggleEl = document.getElementById('musicToggle');
+            
+            if (settings.musicEnabled) {
+                if (statusEl) statusEl.textContent = 'ON';
+                if (toggleEl) toggleEl.textContent = '🔊 Disable Music';
+            } else {
+                if (statusEl) statusEl.textContent = 'OFF';
+                if (toggleEl) toggleEl.textContent = '🔇 Enable Music';
+            }
+        }
+
+        function setMusicVolume(volume) {
+            settings.musicVolume = volume;
+            document.getElementById('volumeDisplay').textContent = volume + '%';
+            saveSettings();
+        }
+
+        function toggleAnimations(reduce) {
+            settings.reduceAnimations = reduce;
+            saveSettings();
+        }
+
+        function toggleParticles(reduce) {
+            settings.reduceParticles = reduce;
+            createBackgroundAnimation();
+            saveSettings();
+        }
+
+        // Statistics Functions
         function loadStats() {
             if (!isLoggedIn) return;
             
             const userKey = currentUser.email;
-            const totalGames = localStorage.getItem(`numberquest-total-games-${userKey}`) || 0;
-            const totalWins = localStorage.getItem(`numberquest-total-wins-${userKey}`) || 0;
-            const bestScore = localStorage.getItem(`numberquest-best-score-${userKey}`) || 0;
+            const totalGames = localStorage.getItem(`numeroquest-total-games-${userKey}`) || 0;
+            const totalWins = localStorage.getItem(`numeroquest-total-wins-${userKey}`) || 0;
+            const bestScore = localStorage.getItem(`numeroquest-best-score-${userKey}`) || 0;
             
-            document.getElementById('total-games').textContent = totalGames;
-            document.getElementById('total-wins').textContent = totalWins;
-            document.getElementById('best-score').textContent = bestScore;
+            document.getElementById('totalGames').textContent = totalGames;
+            document.getElementById('totalWins').textContent = totalWins;
+            document.getElementById('bestScore').textContent = bestScore;
             
             const winRate = totalGames > 0 ? Math.round((totalWins / totalGames) * 100) : 0;
-            document.getElementById('win-rate').textContent = winRate + '%';
+            document.getElementById('winRate').textContent = winRate + '%';
         }
 
         function saveStats(gameWon = false, score = 0) {
             if (!isLoggedIn) return;
             
             const userKey = currentUser.email;
-            const totalGames = parseInt(localStorage.getItem(`numberquest-total-games-${userKey}`) || 0) + 1;
-            const totalWins = parseInt(localStorage.getItem(`numberquest-total-wins-${userKey}`) || 0) + (gameWon ? 1 : 0);
-            const bestScore = Math.max(parseInt(localStorage.getItem(`numberquest-best-score-${userKey}`) || 0), score);
+            const totalGames = parseInt(localStorage.getItem(`numeroquest-total-games-${userKey}`) || 0) + 1;
+            const totalWins = parseInt(localStorage.getItem(`numeroquest-total-wins-${userKey}`) || 0) + (gameWon ? 1 : 0);
+            const bestScore = Math.max(parseInt(localStorage.getItem(`numeroquest-best-score-${userKey}`) || 0), score);
             
-            localStorage.setItem(`numberquest-total-games-${userKey}`, totalGames);
-            localStorage.setItem(`numberquest-total-wins-${userKey}`, totalWins);
-            localStorage.setItem(`numberquest-best-score-${userKey}`, bestScore);
+            localStorage.setItem(`numeroquest-total-games-${userKey}`, totalGames);
+            localStorage.setItem(`numeroquest-total-wins-${userKey}`, totalWins);
+            localStorage.setItem(`numeroquest-best-score-${userKey}`, bestScore);
             
             loadStats();
         }
 
+        function resetAllStats() {
+            if (confirm('Are you sure you want to reset all statistics?')) {
+                if (isLoggedIn) {
+                    const userKey = currentUser.email;
+                    localStorage.removeItem(`numeroquest-total-games-${userKey}`);
+                    localStorage.removeItem(`numeroquest-total-wins-${userKey}`);
+                    localStorage.removeItem(`numeroquest-best-score-${userKey}`);
+                }
+                loadStats();
+                alert('✅ Statistics reset!');
+            }
+        }
+
+        function exportStats() {
+            if (!isLoggedIn) {
+                alert('You must be logged in to export statistics!');
+                return;
+            }
+            
+            const userKey = currentUser.email;
+            const stats = {
+                user: currentUser,
+                totalGames: localStorage.getItem(`numeroquest-total-games-${userKey}`) || 0,
+                totalWins: localStorage.getItem(`numeroquest-total-wins-${userKey}`) || 0,
+                bestScore: localStorage.getItem(`numeroquest-best-score-${userKey}`) || 0,
+                settings: settings
+            };
+            
+            const dataStr = JSON.stringify(stats, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `numero-quest-stats-${currentUser.name}.json`;
+            link.click();
+            
+            URL.revokeObjectURL(url);
+        }
+
+        function showCredits() {
+            alert(`🎯 NUMERO QUEST - Ultimate Gaming Hub
+
+🔐 Authentication System:
+• Complete registration with email and password
+• Secure login with validation
+• Guest mode available
+• Personalized user statistics
+• Local data storage
+
+🎮 Game Modes:
+• Number Quest - Guess the secret number
+• Memory Challenge - Find matching pairs
+• Reaction Time - Test your reflexes
+• Pattern Master - Memorize sequences
+• Color Match - Match colors quickly
+• Quick Math - Solve math problems
+
+🎨 Features:
+• 5 Customizable themes
+• Background music
+• Progressive level system
+• Detailed user statistics
+• Epic visual effects
+• Complete authentication system
+
+Version 5.0 - Ultimate Gaming Experience
+Created with ❤️ to challenge your mind!`);
+        }
+
+        // Navigation Functions
         function showMainMenu() {
             hideAllScreens();
-            document.getElementById('main-menu').classList.remove('hidden');
+            document.getElementById('mainMenu').classList.remove('hidden');
             loadStats();
         }
 
@@ -2144,18 +2193,19 @@
         }
 
         function hideAllScreens() {
-            const screens = ['main-menu', 'number-quest', 'memory-challenge', 'reaction-time', 'pattern-master', 'color-match', 'quick-math', 'settings'];
+            const screens = ['mainMenu', 'numberQuest', 'memoryChallenge', 'reactionTime', 'patternMaster', 'colorMatch', 'quickMath', 'settings'];
             screens.forEach(screen => {
-                document.getElementById(screen).classList.add('hidden');
+                const element = document.getElementById(screen);
+                if (element) element.classList.add('hidden');
             });
         }
 
-        // NUMERO QUEST FUNCTIONS
+        // Number Quest Game Functions
         function selectDifficulty(difficulty) {
             gameState.numberQuest.difficulty = difficulty;
             
-            document.querySelectorAll('.difficulty-badge').forEach(badge => {
-                badge.classList.remove('active');
+            document.querySelectorAll('.difficulty-btn').forEach(btn => {
+                btn.classList.remove('active');
             });
             document.querySelector(`[data-difficulty="${difficulty}"]`).classList.add('active');
         }
@@ -2174,33 +2224,34 @@
             if (config.hasTimer) {
                 gameState.numberQuest.timeLeft = config.timeLimit;
                 startNumberQuestTimer();
-                document.getElementById('timer-display').classList.remove('hidden');
+                document.getElementById('timerDisplay').classList.remove('hidden');
             } else {
-                document.getElementById('timer-display').classList.add('hidden');
+                document.getElementById('timerDisplay').classList.add('hidden');
             }
             
             updateNumberQuestDisplay();
-            document.getElementById('level-progress').classList.remove('hidden');
-            document.getElementById('number-game-area').classList.remove('hidden');
-            document.getElementById('guess-input').focus();
+            document.getElementById('levelProgress').classList.remove('hidden');
+            document.getElementById('numberGameArea').classList.remove('hidden');
+            document.getElementById('guessInput').focus();
             
-            console.log('🎯 Numero segreto:', gameState.numberQuest.secretNumber);
+            console.log('🎯 Secret number:', gameState.numberQuest.secretNumber);
         }
 
         function startNumberQuestTimer() {
-            const config = numberQuestDifficulties[gameState.numberQuest.difficulty];
-            
             gameState.numberQuest.timer = setInterval(() => {
                 gameState.numberQuest.timeLeft--;
-                document.getElementById('timer-display').textContent = gameState.numberQuest.timeLeft;
-                
-                if (gameState.numberQuest.timeLeft <= 10) {
-                    document.getElementById('timer-display').classList.add('warning');
-                }
-                
-                if (gameState.numberQuest.timeLeft <= 0) {
-                    clearInterval(gameState.numberQuest.timer);
-                    endNumberQuestLevel(false);
+                const timerDisplay = document.getElementById('timerDisplay');
+                if (timerDisplay) {
+                    timerDisplay.textContent = gameState.numberQuest.timeLeft;
+                    
+                    if (gameState.numberQuest.timeLeft <= 10) {
+                        timerDisplay.classList.add('timer-warning');
+                    }
+                    
+                    if (gameState.numberQuest.timeLeft <= 0) {
+                        clearInterval(gameState.numberQuest.timer);
+                        endNumberQuestLevel(false);
+                    }
                 }
             }, 1000);
         }
@@ -2208,12 +2259,12 @@
         function makeGuess() {
             if (!gameState.numberQuest.gameStarted) return;
             
-            const guess = parseInt(document.getElementById('guess-input').value);
+            const guess = parseInt(document.getElementById('guessInput').value);
             const config = numberQuestDifficulties[gameState.numberQuest.difficulty];
             const currentLevelConfig = config.levels[gameState.numberQuest.currentLevel - 1];
             
             if (isNaN(guess) || guess < currentLevelConfig.min || guess > currentLevelConfig.max) {
-                showHint(`❌ Inserisci un numero tra ${currentLevelConfig.min} e ${currentLevelConfig.max}!`);
+                showHint(`❌ Enter a number between ${currentLevelConfig.min} and ${currentLevelConfig.max}!`);
                 return;
             }
             
@@ -2223,18 +2274,18 @@
             let isCorrect = false;
             
             if (guess === gameState.numberQuest.secretNumber) {
-                hint = '🎉 PERFETTO! Livello completato!';
+                hint = '🎉 PERFECT! Level completed!';
                 isCorrect = true;
                 
-                // Calcola punteggio livello
+                // Calculate level score
                 const baseScore = currentLevelConfig.max;
                 const attemptsBonus = gameState.numberQuest.attemptsLeft * 20;
                 const timeBonus = config.hasTimer ? gameState.numberQuest.timeLeft * 5 : 0;
                 gameState.numberQuest.levelScore = baseScore + attemptsBonus + timeBonus;
                 gameState.numberQuest.score += gameState.numberQuest.levelScore;
                 
-                // Effetto confetti
-                if (!settings.reduceParticles) {
+                // Confetti effect
+                if (typeof confetti !== 'undefined' && !settings.reduceParticles) {
                     confetti({
                         particleCount: 100,
                         spread: 70,
@@ -2247,28 +2298,28 @@
             } else if (guess < gameState.numberQuest.secretNumber) {
                 const diff = gameState.numberQuest.secretNumber - guess;
                 if (diff <= 5) {
-                    hint = '🔥 Caldissimo! Prova un numero più ALTO!';
+                    hint = '🔥 Very hot! Try a HIGHER number!';
                 } else if (diff <= 15) {
-                    hint = '📈 Più ALTO!';
+                    hint = '📈 HIGHER!';
                 } else if (diff <= 50) {
-                    hint = '⬆️ Molto più ALTO!';
+                    hint = '⬆️ Much HIGHER!';
                 } else {
-                    hint = '🚀 ALTISSIMO!';
+                    hint = '🚀 WAY HIGHER!';
                 }
             } else {
                 const diff = guess - gameState.numberQuest.secretNumber;
                 if (diff <= 5) {
-                    hint = '🔥 Caldissimo! Prova un numero più BASSO!';
+                    hint = '🔥 Very hot! Try a LOWER number!';
                 } else if (diff <= 15) {
-                    hint = '📉 Più BASSO!';
+                    hint = '📉 LOWER!';
                 } else if (diff <= 50) {
-                    hint = '⬇️ Molto più BASSO!';
+                    hint = '⬇️ Much LOWER!';
                 } else {
-                    hint = '🕳️ BASSISSIMO!';
+                    hint = '🕳️ WAY LOWER!';
                 }
             }
             
-            // Aggiungi alla cronologia
+            // Add to history
             gameState.numberQuest.history.unshift({
                 guess: guess,
                 hint: hint,
@@ -2279,13 +2330,13 @@
             updateNumberQuestDisplay();
             updateNumberQuestHistory();
             
-            // Controlla game over
+            // Check game over
             if (gameState.numberQuest.attemptsLeft <= 0 && !isCorrect) {
                 endNumberQuestLevel(false);
             }
             
-            document.getElementById('guess-input').value = '';
-            document.getElementById('guess-input').focus();
+            document.getElementById('guessInput').value = '';
+            document.getElementById('guessInput').focus();
         }
 
         function endNumberQuestLevel(won) {
@@ -2297,26 +2348,26 @@
             
             if (won) {
                 if (gameState.numberQuest.currentLevel < 10) {
-                    // Prossimo livello
+                    // Next level
                     setTimeout(() => {
                         gameState.numberQuest.currentLevel++;
-                        showHint(`🎊 Livello ${gameState.numberQuest.currentLevel}/10 - Punteggio: +${gameState.numberQuest.levelScore}`);
+                        showHint(`🎊 Level ${gameState.numberQuest.currentLevel}/10 - Score: +${gameState.numberQuest.levelScore}`);
                         setTimeout(() => {
                             startNumberQuest();
                         }, 2000);
                     }, 1500);
                 } else {
-                    // Gioco completato!
-                    showHint(`🏆 TUTTI I LIVELLI COMPLETATI! Punteggio finale: ${gameState.numberQuest.score}`);
+                    // Game completed!
+                    showHint(`🏆 ALL LEVELS COMPLETED! Final score: ${gameState.numberQuest.score}`);
                     saveStats(true, gameState.numberQuest.score);
                     
-                    // Reset per nuova partita
+                    // Reset for new game
                     setTimeout(() => {
                         resetNumberQuest();
                     }, 3000);
                 }
             } else {
-                showHint(`💀 Livello fallito! Il numero era: ${gameState.numberQuest.secretNumber}`);
+                showHint(`💀 Level failed! The number was: ${gameState.numberQuest.secretNumber}`);
                 saveStats(false, gameState.numberQuest.score);
                 
                 setTimeout(() => {
@@ -2324,8 +2375,10 @@
                 }, 2000);
             }
             
-            document.getElementById('submit-guess').disabled = true;
-            document.getElementById('guess-input').disabled = true;
+            const submitGuess = document.getElementById('submitGuess');
+            const guessInput = document.getElementById('guessInput');
+            if (submitGuess) submitGuess.disabled = true;
+            if (guessInput) guessInput.disabled = true;
         }
 
         function resetNumberQuest() {
@@ -2343,13 +2396,21 @@
                 timeLeft: 40
             };
             
-            document.getElementById('submit-guess').disabled = false;
-            document.getElementById('guess-input').disabled = false;
-            document.getElementById('hint').textContent = '';
-            document.getElementById('history').innerHTML = '';
-            document.getElementById('timer-display').classList.remove('warning');
-            document.getElementById('level-progress').classList.add('hidden');
-            document.getElementById('number-game-area').classList.add('hidden');
+            const submitGuess = document.getElementById('submitGuess');
+            const guessInput = document.getElementById('guessInput');
+            const hint = document.getElementById('hint');
+            const history = document.getElementById('history');
+            const timerDisplay = document.getElementById('timerDisplay');
+            const levelProgress = document.getElementById('levelProgress');
+            const numberGameArea = document.getElementById('numberGameArea');
+            
+            if (submitGuess) submitGuess.disabled = false;
+            if (guessInput) guessInput.disabled = false;
+            if (hint) hint.textContent = '';
+            if (history) history.innerHTML = '';
+            if (timerDisplay) timerDisplay.classList.remove('timer-warning');
+            if (levelProgress) levelProgress.classList.add('hidden');
+            if (numberGameArea) numberGameArea.classList.add('hidden');
             
             updateNumberQuestDisplay();
         }
@@ -2358,58 +2419,72 @@
             const config = numberQuestDifficulties[gameState.numberQuest.difficulty];
             const currentLevelConfig = config.levels[gameState.numberQuest.currentLevel - 1];
             
-            document.getElementById('attempts-left').textContent = gameState.numberQuest.attemptsLeft;
-            document.getElementById('current-score').textContent = gameState.numberQuest.score;
-            document.getElementById('level-score').textContent = gameState.numberQuest.levelScore;
-            document.getElementById('current-level').textContent = gameState.numberQuest.currentLevel;
-            document.getElementById('level-range').textContent = `Range: ${currentLevelConfig.min}-${currentLevelConfig.max}`;
+            const elements = {
+                attemptsLeft: document.getElementById('attemptsLeft'),
+                currentScore: document.getElementById('currentScore'),
+                levelScore: document.getElementById('levelScore'),
+                currentLevel: document.getElementById('currentLevel'),
+                levelRange: document.getElementById('levelRange'),
+                levelFill: document.getElementById('levelFill'),
+                guessInput: document.getElementById('guessInput'),
+                currentNumber: document.getElementById('currentNumber')
+            };
             
-            // Aggiorna barra progresso
+            if (elements.attemptsLeft) elements.attemptsLeft.textContent = gameState.numberQuest.attemptsLeft;
+            if (elements.currentScore) elements.currentScore.textContent = gameState.numberQuest.score;
+            if (elements.levelScore) elements.levelScore.textContent = gameState.numberQuest.levelScore;
+            if (elements.currentLevel) elements.currentLevel.textContent = gameState.numberQuest.currentLevel;
+            if (elements.levelRange) elements.levelRange.textContent = `Range: ${currentLevelConfig.min}-${currentLevelConfig.max}`;
+            
+            // Update progress bar
             const progress = (gameState.numberQuest.currentLevel / 10) * 100;
-            document.getElementById('level-fill').style.width = progress + '%';
+            if (elements.levelFill) elements.levelFill.style.width = progress + '%';
             
-            // Aggiorna input
-            const guessInput = document.getElementById('guess-input');
-            guessInput.min = currentLevelConfig.min;
-            guessInput.max = currentLevelConfig.max;
-            guessInput.placeholder = `Numero (${currentLevelConfig.min}-${currentLevelConfig.max})`;
+            // Update input
+            if (elements.guessInput) {
+                elements.guessInput.min = currentLevelConfig.min;
+                elements.guessInput.max = currentLevelConfig.max;
+                elements.guessInput.placeholder = `Number (${currentLevelConfig.min}-${currentLevelConfig.max})`;
+            }
             
-            // Mostra numero segreto solo se gioco finito
-            if (!gameState.numberQuest.gameStarted && gameState.numberQuest.secretNumber > 0) {
-                document.getElementById('current-number').textContent = gameState.numberQuest.secretNumber;
-            } else {
-                document.getElementById('current-number').textContent = '?';
+            // Show secret number only if game finished
+            if (elements.currentNumber) {
+                if (!gameState.numberQuest.gameStarted && gameState.numberQuest.secretNumber > 0) {
+                    elements.currentNumber.textContent = gameState.numberQuest.secretNumber;
+                } else {
+                    elements.currentNumber.textContent = '?';
+                }
             }
         }
 
         function updateNumberQuestHistory() {
             const historyEl = document.getElementById('history');
+            if (!historyEl) return;
+            
             historyEl.innerHTML = '';
             
             gameState.numberQuest.history.forEach((entry, index) => {
                 const entryEl = document.createElement('div');
-                entryEl.style.cssText = `
-                    padding: 1rem;
-                    margin-bottom: 0.5rem;
-                    background: rgba(255,255,255,0.1);
-                    border-radius: 10px;
-                    border-left: 4px solid var(--primary-neon);
-                    animation: messageSlide 0.5s ease;
-                `;
+                entryEl.className = 'history-item';
                 
                 entryEl.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-weight: bold; color: var(--accent-gold);">Tentativo ${gameState.numberQuest.maxAttempts - entry.attemptsLeft}</span>
-                        <span style="font-size: 1.2rem; font-weight: bold;">${entry.guess}</span>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <span style="font-weight: 700; color: var(--accent);">Attempt ${gameState.numberQuest.maxAttempts - entry.attemptsLeft}</span>
+                        <span style="font-size: 1.2rem; font-weight: 700; color: var(--primary);">${entry.guess}</span>
                     </div>
-                    <div style="margin-top: 0.5rem; opacity: 0.9;">${entry.hint}</div>
+                    <div style="color: var(--text-dim);">${entry.hint}</div>
                 `;
                 
                 historyEl.appendChild(entryEl);
             });
         }
 
-        // MEMORY GAME FUNCTIONS
+        function showHint(message) {
+            const hint = document.getElementById('hint');
+            if (hint) hint.textContent = message;
+        }
+
+        // Memory Game Functions
         function startMemoryGame() {
             gameState.memoryGame = {
                 level: 1,
@@ -2426,7 +2501,8 @@
             
             gameState.memoryGame.timer = setInterval(() => {
                 gameState.memoryGame.time++;
-                document.getElementById('memory-time').textContent = gameState.memoryGame.time;
+                const memoryTime = document.getElementById('memoryTime');
+                if (memoryTime) memoryTime.textContent = gameState.memoryGame.time;
             }, 1000);
         }
 
@@ -2438,20 +2514,22 @@
             
             gameState.memoryGame.cards = [];
             
-            // Crea coppie
+            // Create pairs
             for (let i = 0; i < pairsNeeded; i++) {
                 const symbol = symbols[i % symbols.length];
                 gameState.memoryGame.cards.push(symbol, symbol);
             }
             
-            // Mescola
+            // Shuffle
             for (let i = gameState.memoryGame.cards.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [gameState.memoryGame.cards[i], gameState.memoryGame.cards[j]] = [gameState.memoryGame.cards[j], gameState.memoryGame.cards[i]];
             }
             
-            // Crea griglia
-            const grid = document.getElementById('memory-grid');
+            // Create grid
+            const grid = document.getElementById('memoryGrid');
+            if (!grid) return;
+            
             grid.innerHTML = '';
             
             gameState.memoryGame.cards.forEach((symbol, index) => {
@@ -2469,7 +2547,7 @@
             if (gameState.memoryGame.flippedCards.length >= 2) return;
             
             const card = document.querySelector(`[data-index="${index}"]`);
-            if (card.classList.contains('flipped') || card.classList.contains('matched')) return;
+            if (!card || card.classList.contains('flipped') || card.classList.contains('matched')) return;
             
             card.classList.add('flipped');
             card.textContent = card.dataset.symbol;
@@ -2490,17 +2568,17 @@
             const firstCard = document.querySelector(`[data-index="${first}"]`);
             const secondCard = document.querySelector(`[data-index="${second}"]`);
             
-            if (firstCard.dataset.symbol === secondCard.dataset.symbol) {
+            if (firstCard && secondCard && firstCard.dataset.symbol === secondCard.dataset.symbol) {
                 // Match!
                 firstCard.classList.add('matched');
                 secondCard.classList.add('matched');
                 gameState.memoryGame.pairs++;
                 
                 if (gameState.memoryGame.pairs === 8) {
-                    // Livello completato
+                    // Level completed
                     clearInterval(gameState.memoryGame.timer);
                     
-                    if (!settings.reduceParticles) {
+                    if (typeof confetti !== 'undefined' && !settings.reduceParticles) {
                         confetti({
                             particleCount: 100,
                             spread: 70,
@@ -2509,18 +2587,20 @@
                     }
                     
                     setTimeout(() => {
-                        alert(`🎉 Livello completato!
-Tempo: ${gameState.memoryGame.time}s
-Mosse: ${gameState.memoryGame.moves}`);
+                        alert(`🎉 Level completed!\nTime: ${gameState.memoryGame.time}s\nMoves: ${gameState.memoryGame.moves}`);
                         startMemoryGame();
                     }, 1000);
                 }
             } else {
                 // No match
-                firstCard.classList.remove('flipped');
-                secondCard.classList.remove('flipped');
-                firstCard.textContent = '?';
-                secondCard.textContent = '?';
+                if (firstCard) {
+                    firstCard.classList.remove('flipped');
+                    firstCard.textContent = '?';
+                }
+                if (secondCard) {
+                    secondCard.classList.remove('flipped');
+                    secondCard.textContent = '?';
+                }
             }
             
             gameState.memoryGame.flippedCards = [];
@@ -2528,12 +2608,18 @@ Mosse: ${gameState.memoryGame.moves}`);
         }
 
         function updateMemoryDisplay() {
-            document.getElementById('memory-level').textContent = gameState.memoryGame.level;
-            document.getElementById('memory-pairs').textContent = gameState.memoryGame.pairs;
-            document.getElementById('memory-moves').textContent = gameState.memoryGame.moves;
+            const elements = {
+                memoryLevel: document.getElementById('memoryLevel'),
+                memoryPairs: document.getElementById('memoryPairs'),
+                memoryMoves: document.getElementById('memoryMoves')
+            };
+            
+            if (elements.memoryLevel) elements.memoryLevel.textContent = gameState.memoryGame.level;
+            if (elements.memoryPairs) elements.memoryPairs.textContent = gameState.memoryGame.pairs;
+            if (elements.memoryMoves) elements.memoryMoves.textContent = gameState.memoryGame.moves;
         }
 
-        // REACTION TIME FUNCTIONS
+        // Reaction Time Functions
         function startReactionGame() {
             gameState.reactionGame = {
                 score: 0,
@@ -2548,7 +2634,8 @@ Mosse: ${gameState.memoryGame.moves}`);
             
             gameState.reactionGame.timer = setInterval(() => {
                 gameState.reactionGame.timeLeft--;
-                document.getElementById('reaction-time-left').textContent = gameState.reactionGame.timeLeft;
+                const reactionTimeLeft = document.getElementById('reactionTimeLeft');
+                if (reactionTimeLeft) reactionTimeLeft.textContent = gameState.reactionGame.timeLeft;
                 
                 if (gameState.reactionGame.timeLeft <= 0) {
                     endReactionGame();
@@ -2561,13 +2648,15 @@ Mosse: ${gameState.memoryGame.moves}`);
         function spawnReactionTarget() {
             if (!gameState.reactionGame.gameActive) return;
             
-            const area = document.getElementById('reaction-area');
+            const area = document.getElementById('reactionArea');
+            if (!area) return;
+            
             area.innerHTML = '';
             
             const target = document.createElement('div');
             target.className = 'reaction-target';
-            target.style.left = Math.random() * (area.offsetWidth - 100) + 'px';
-            target.style.top = Math.random() * (area.offsetHeight - 100) + 'px';
+            target.style.left = Math.random() * (area.offsetWidth - 80) + 'px';
+            target.style.top = Math.random() * (area.offsetHeight - 80) + 'px';
             
             target.onclick = () => {
                 gameState.reactionGame.hits++;
@@ -2582,7 +2671,7 @@ Mosse: ${gameState.memoryGame.moves}`);
             
             area.appendChild(target);
             
-            // Rimuovi target dopo 2 secondi
+            // Remove target after 2 seconds
             setTimeout(() => {
                 if (target.parentNode) {
                     gameState.reactionGame.misses++;
@@ -2599,24 +2688,30 @@ Mosse: ${gameState.memoryGame.moves}`);
         function endReactionGame() {
             gameState.reactionGame.gameActive = false;
             clearInterval(gameState.reactionGame.timer);
-            document.getElementById('reaction-area').innerHTML = '';
+            
+            const area = document.getElementById('reactionArea');
+            if (area) area.innerHTML = '';
             
             const accuracy = gameState.reactionGame.hits + gameState.reactionGame.misses > 0 
                 ? Math.round((gameState.reactionGame.hits / (gameState.reactionGame.hits + gameState.reactionGame.misses)) * 100) 
                 : 0;
             
-            alert(`🎯 Gioco terminato!
-Punteggio: ${gameState.reactionGame.score}
-Precisione: ${accuracy}%`);
+            alert(`🎯 Game finished!\nScore: ${gameState.reactionGame.score}\nAccuracy: ${accuracy}%`);
         }
 
         function updateReactionDisplay() {
-            document.getElementById('reaction-score').textContent = gameState.reactionGame.score;
-            document.getElementById('reaction-hits').textContent = gameState.reactionGame.hits;
-            document.getElementById('reaction-misses').textContent = gameState.reactionGame.misses;
+            const elements = {
+                reactionScore: document.getElementById('reactionScore'),
+                reactionHits: document.getElementById('reactionHits'),
+                reactionMisses: document.getElementById('reactionMisses')
+            };
+            
+            if (elements.reactionScore) elements.reactionScore.textContent = gameState.reactionGame.score;
+            if (elements.reactionHits) elements.reactionHits.textContent = gameState.reactionGame.hits;
+            if (elements.reactionMisses) elements.reactionMisses.textContent = gameState.reactionGame.misses;
         }
 
-        // PATTERN GAME FUNCTIONS
+        // Pattern Game Functions
         function startPatternGame() {
             gameState.patternGame = {
                 level: 1,
@@ -2650,23 +2745,26 @@ Precisione: ${accuracy}%`);
             const interval = setInterval(() => {
                 if (index > 0) {
                     // Reset previous
-                    const prevButton = document.querySelector(`#pattern-grid .color-button:nth-child(${gameState.patternGame.sequence[index - 1] + 1})`);
-                    prevButton.style.transform = 'scale(1)';
-                    prevButton.style.boxShadow = '';
+                    const prevButton = document.querySelector(`#patternGrid .pattern-button:nth-child(${gameState.patternGame.sequence[index - 1] + 1})`);
+                    if (prevButton) {
+                        prevButton.classList.remove('active');
+                    }
                 }
                 
                 if (index < gameState.patternGame.sequence.length) {
                     // Highlight current
-                    const button = document.querySelector(`#pattern-grid .color-button:nth-child(${gameState.patternGame.sequence[index] + 1})`);
-                    button.style.transform = 'scale(1.2)';
-                    button.style.boxShadow = '0 0 30px rgba(255, 255, 255, 0.8)';
+                    const button = document.querySelector(`#patternGrid .pattern-button:nth-child(${gameState.patternGame.sequence[index] + 1})`);
+                    if (button) {
+                        button.classList.add('active');
+                    }
                     index++;
                 } else {
                     // Reset last and end
                     if (index > 0) {
-                        const lastButton = document.querySelector(`#pattern-grid .color-button:nth-child(${gameState.patternGame.sequence[index - 1] + 1})`);
-                        lastButton.style.transform = 'scale(1)';
-                        lastButton.style.boxShadow = '';
+                        const lastButton = document.querySelector(`#patternGrid .pattern-button:nth-child(${gameState.patternGame.sequence[index - 1] + 1})`);
+                        if (lastButton) {
+                            lastButton.classList.remove('active');
+                        }
                     }
                     clearInterval(interval);
                     gameState.patternGame.showingPattern = false;
@@ -2682,29 +2780,27 @@ Precisione: ${accuracy}%`);
             const currentIndex = gameState.patternGame.userSequence.length - 1;
             
             if (gameState.patternGame.userSequence[currentIndex] !== gameState.patternGame.sequence[currentIndex]) {
-                // Errore
+                // Error
                 gameState.patternGame.lives--;
                 updatePatternDisplay();
                 
                 if (gameState.patternGame.lives <= 0) {
-                    alert(`💀 Game Over!
-Livello raggiunto: ${gameState.patternGame.level}
-Punteggio: ${gameState.patternGame.score}`);
+                    alert(`💀 Game Over!\nLevel reached: ${gameState.patternGame.level}\nScore: ${gameState.patternGame.score}`);
                     return;
                 }
                 
-                alert('❌ Sequenza sbagliata! Riprova.');
+                alert('❌ Wrong sequence! Try again.');
                 setTimeout(() => {
                     showPattern();
                 }, 1000);
                 
             } else if (gameState.patternGame.userSequence.length === gameState.patternGame.sequence.length) {
-                // Sequenza completata
+                // Sequence completed
                 gameState.patternGame.score += gameState.patternGame.level * 100;
                 gameState.patternGame.level++;
                 updatePatternDisplay();
                 
-                if (!settings.reduceParticles) {
+                if (typeof confetti !== 'undefined' && !settings.reduceParticles) {
                     confetti({
                         particleCount: 50,
                         spread: 50,
@@ -2719,13 +2815,20 @@ Punteggio: ${gameState.patternGame.score}`);
         }
 
         function updatePatternDisplay() {
-            document.getElementById('pattern-level').textContent = gameState.patternGame.level;
-            document.getElementById('pattern-sequence').textContent = gameState.patternGame.sequence.length;
-            document.getElementById('pattern-score').textContent = gameState.patternGame.score;
-            document.getElementById('pattern-lives').textContent = gameState.patternGame.lives;
+            const elements = {
+                patternLevel: document.getElementById('patternLevel'),
+                patternSequence: document.getElementById('patternSequence'),
+                patternScore: document.getElementById('patternScore'),
+                patternLives: document.getElementById('patternLives')
+            };
+            
+            if (elements.patternLevel) elements.patternLevel.textContent = gameState.patternGame.level;
+            if (elements.patternSequence) elements.patternSequence.textContent = gameState.patternGame.sequence.length;
+            if (elements.patternScore) elements.patternScore.textContent = gameState.patternGame.score;
+            if (elements.patternLives) elements.patternLives.textContent = gameState.patternGame.lives;
         }
 
-        // COLOR GAME FUNCTIONS
+        // Color Game Functions
         function startColorGame() {
             gameState.colorGame = {
                 score: 0,
@@ -2742,7 +2845,8 @@ Punteggio: ${gameState.patternGame.score}`);
             
             gameState.colorGame.timer = setInterval(() => {
                 gameState.colorGame.timeLeft--;
-                document.getElementById('color-time').textContent = gameState.colorGame.timeLeft;
+                const colorTime = document.getElementById('colorTime');
+                if (colorTime) colorTime.textContent = gameState.colorGame.timeLeft;
                 
                 if (gameState.colorGame.timeLeft <= 0) {
                     endColorGame();
@@ -2752,12 +2856,13 @@ Punteggio: ${gameState.patternGame.score}`);
 
         function generateColorChallenge() {
             const colors = ['red', 'cyan', 'blue', 'yellow', 'purple', 'green', 'pink', 'orange', 'black'];
-            const colorNames = ['ROSSO', 'CIANO', 'BLU', 'GIALLO', 'VIOLA', 'VERDE', 'ROSA', 'ARANCIONE', 'NERO'];
+            const colorNames = ['RED', 'CYAN', 'BLUE', 'YELLOW', 'PURPLE', 'GREEN', 'PINK', 'ORANGE', 'BLACK'];
             
             const randomIndex = Math.floor(Math.random() * colors.length);
             gameState.colorGame.targetColor = colors[randomIndex];
             
-            document.getElementById('target-color').textContent = colorNames[randomIndex];
+            const targetColor = document.getElementById('targetColor');
+            if (targetColor) targetColor.textContent = colorNames[randomIndex];
         }
 
         function colorClick(color) {
@@ -2783,18 +2888,22 @@ Punteggio: ${gameState.patternGame.score}`);
                 ? Math.round((gameState.colorGame.correct / (gameState.colorGame.correct + gameState.colorGame.wrong)) * 100) 
                 : 0;
             
-            alert(`🌈 Gioco terminato!
-Punteggio: ${gameState.colorGame.score}
-Precisione: ${accuracy}%`);
+            alert(`🌈 Game finished!\nScore: ${gameState.colorGame.score}\nAccuracy: ${accuracy}%`);
         }
 
         function updateColorDisplay() {
-            document.getElementById('color-score').textContent = gameState.colorGame.score;
-            document.getElementById('color-correct').textContent = gameState.colorGame.correct;
-            document.getElementById('color-wrong').textContent = gameState.colorGame.wrong;
+            const elements = {
+                colorScore: document.getElementById('colorScore'),
+                colorCorrect: document.getElementById('colorCorrect'),
+                colorWrong: document.getElementById('colorWrong')
+            };
+            
+            if (elements.colorScore) elements.colorScore.textContent = gameState.colorGame.score;
+            if (elements.colorCorrect) elements.colorCorrect.textContent = gameState.colorGame.correct;
+            if (elements.colorWrong) elements.colorWrong.textContent = gameState.colorGame.wrong;
         }
 
-        // MATH GAME FUNCTIONS
+        // Math Game Functions
         function startMathGame() {
             gameState.mathGame = {
                 score: 0,
@@ -2811,7 +2920,8 @@ Precisione: ${accuracy}%`);
             
             gameState.mathGame.timer = setInterval(() => {
                 gameState.mathGame.timeLeft--;
-                document.getElementById('math-time').textContent = gameState.mathGame.timeLeft;
+                const mathTime = document.getElementById('mathTime');
+                if (mathTime) mathTime.textContent = gameState.mathGame.timeLeft;
                 
                 if (gameState.mathGame.timeLeft <= 0) {
                     endMathGame();
@@ -2844,15 +2954,20 @@ Precisione: ${accuracy}%`);
             }
             
             gameState.mathGame.currentQuestion = { a, b, operation, answer };
-            document.getElementById('math-question').textContent = `${a} ${operation} ${b} = ?`;
-            document.getElementById('math-input').value = '';
-            document.getElementById('math-input').focus();
+            const mathQuestion = document.getElementById('mathQuestion');
+            if (mathQuestion) mathQuestion.textContent = `${a} ${operation} ${b} = ?`;
+            
+            const mathInput = document.getElementById('mathInput');
+            if (mathInput) {
+                mathInput.value = '';
+                mathInput.focus();
+            }
         }
 
         function submitMathAnswer() {
             if (!gameState.mathGame.gameActive) return;
             
-            const userAnswer = parseInt(document.getElementById('math-input').value);
+            const userAnswer = parseInt(document.getElementById('mathInput').value);
             
             if (userAnswer === gameState.mathGame.currentQuestion.answer) {
                 gameState.mathGame.correct++;
@@ -2873,155 +2988,24 @@ Precisione: ${accuracy}%`);
                 ? Math.round((gameState.mathGame.correct / (gameState.mathGame.correct + gameState.mathGame.wrong)) * 100) 
                 : 0;
             
-            alert(`🧮 Gioco terminato!
-Punteggio: ${gameState.mathGame.score}
-Precisione: ${accuracy}%`);
+            alert(`🧮 Game finished!\nScore: ${gameState.mathGame.score}\nAccuracy: ${accuracy}%`);
         }
 
         function updateMathDisplay() {
-            document.getElementById('math-score').textContent = gameState.mathGame.score;
-            document.getElementById('math-correct').textContent = gameState.mathGame.correct;
-            document.getElementById('math-wrong').textContent = gameState.mathGame.wrong;
-        }
-
-        // SETTINGS FUNCTIONS
-        function toggleMusic() {
-            settings.musicEnabled = !settings.musicEnabled;
-            const music = document.getElementById('background-music');
-            
-            if (settings.musicEnabled) {
-                music.play().catch(() => {
-                    console.log('Autoplay bloccato dal browser');
-                });
-            } else {
-                music.pause();
-            }
-            
-            updateMusicStatus();
-            saveSettings();
-        }
-
-        function updateMusicStatus() {
-            const statusEl = document.getElementById('music-status');
-            const toggleEl = document.getElementById('music-toggle');
-            
-            if (settings.musicEnabled) {
-                statusEl.textContent = 'ON';
-                if (toggleEl) toggleEl.textContent = '🔊 Disattiva Musica';
-            } else {
-                statusEl.textContent = 'OFF';
-                if (toggleEl) toggleEl.textContent = '🔇 Attiva Musica';
-            }
-        }
-
-        function setMusicVolume(volume) {
-            settings.musicVolume = volume;
-            document.getElementById('background-music').volume = volume / 100;
-            document.getElementById('volume-display').textContent = volume + '%';
-            saveSettings();
-        }
-
-        function setTheme(theme) {
-            settings.theme = theme;
-            document.body.className = `theme-${theme}`;
-            
-            document.querySelectorAll('.theme-option').forEach(option => {
-                option.classList.remove('active');
-            });
-            const activeTheme = document.querySelector(`[data-theme="${theme}"]`);
-            if (activeTheme) activeTheme.classList.add('active');
-            
-            saveSettings();
-        }
-
-        function toggleAnimations(reduce) {
-            settings.reduceAnimations = reduce;
-            saveSettings();
-        }
-
-        function toggleParticles(reduce) {
-            settings.reduceParticles = reduce;
-            createStars();
-            saveSettings();
-        }
-
-        function resetAllStats() {
-            if (confirm('Sei sicuro di voler cancellare tutte le statistiche?')) {
-                if (isLoggedIn) {
-                    const userKey = currentUser.email;
-                    localStorage.removeItem(`numberquest-total-games-${userKey}`);
-                    localStorage.removeItem(`numberquest-total-wins-${userKey}`);
-                    localStorage.removeItem(`numberquest-best-score-${userKey}`);
-                }
-                loadStats();
-                alert('✅ Statistiche cancellate!');
-            }
-        }
-
-        function exportStats() {
-            if (!isLoggedIn) {
-                alert('Devi essere loggato per esportare le statistiche!');
-                return;
-            }
-            
-            const userKey = currentUser.email;
-            const stats = {
-                user: currentUser,
-                totalGames: localStorage.getItem(`numberquest-total-games-${userKey}`) || 0,
-                totalWins: localStorage.getItem(`numberquest-total-wins-${userKey}`) || 0,
-                bestScore: localStorage.getItem(`numberquest-best-score-${userKey}`) || 0,
-                settings: settings
+            const elements = {
+                mathScore: document.getElementById('mathScore'),
+                mathCorrect: document.getElementById('mathCorrect'),
+                mathWrong: document.getElementById('mathWrong')
             };
             
-            const dataStr = JSON.stringify(stats, null, 2);
-            const dataBlob = new Blob([dataStr], {type: 'application/json'});
-            const url = URL.createObjectURL(dataBlob);
-            
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `numero-quest-stats-${currentUser.name}.json`;
-            link.click();
-            
-            URL.revokeObjectURL(url);
+            if (elements.mathScore) elements.mathScore.textContent = gameState.mathGame.score;
+            if (elements.mathCorrect) elements.mathCorrect.textContent = gameState.mathGame.correct;
+            if (elements.mathWrong) elements.mathWrong.textContent = gameState.mathGame.wrong;
         }
 
-        function showCredits() {
-            alert(`🎯 NUMERO QUEST - Gaming Hub Epico
-
-🔐 Sistema di Autenticazione:
-• Registrazione completa con email e password
-• Login sicuro con validazione
-• Modalità Ospite
-• Statistiche personalizzate per utente
-• Dati salvati localmente
-
-🎮 Modalità di Gioco:
-• Numero Quest - Indovina il numero segreto
-• Memory Challenge - Trova le coppie
-• Reaction Time - Testa i riflessi
-• Pattern Master - Memorizza sequenze
-• Color Match - Abbina i colori
-• Quick Math - Calcoli veloci
-
-🎨 Caratteristiche:
-• 5 Temi personalizzabili
-• Musica di sottofondo
-• Sistema di livelli progressivi
-• Statistiche dettagliate per utente
-• Effetti visivi epici
-• Sistema di autenticazione completo
-
-Versione 4.0 - Sistema di Registrazione Realistico
-Creato con ❤️ per sfidare la tua mente!`);
-        }
-
-        function showHint(message) {
-            document.getElementById('hint').textContent = message;
-        }
-
-        console.log('🎯 Numero Quest Gaming Hub con Sistema di Registrazione caricato!');
-        console.log('🔐 Sistema di registrazione e login attivo!');
-        console.log('🌟 6 modalità di gioco disponibili!');
+        console.log('🎯 NUMERO QUEST - Ultimate Gaming Hub Loaded!');
+        console.log('🔐 Complete authentication system active!');
+        console.log('🌟 6 game modes available with enhanced graphics!');
     </script>
 </body>
 </html>
