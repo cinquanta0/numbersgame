@@ -349,6 +349,7 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             will-change: transform;
+            background: transparent;
         }
 
         .btn::before {
@@ -1406,7 +1407,7 @@
                 <div class="form-group">
                     <input type="password" class="form-input" placeholder="🔒 Password" id="loginPassword">
                 </div>
-                <button class="btn btn-primary btn-full" onclick="loginUser()">
+                <button type="button" class="btn btn-primary btn-full" onclick="loginUser()">
                     <span id="loginSpinner" class="spinner hidden"></span>
                     <span>🚀 ENTER UNIVERSE</span>
                 </button>
@@ -1431,7 +1432,7 @@
                 <div class="form-group">
                     <input type="password" class="form-input" placeholder="🔒 Confirm Password" id="registerConfirm">
                 </div>
-                <button class="btn btn-primary btn-full" onclick="registerUser()">
+                <button type="button" class="btn btn-primary btn-full" onclick="registerUser()">
                     <span id="registerSpinner" class="spinner hidden"></span>
                     <span>✨ CREATE ACCOUNT</span>
                 </button>
@@ -1444,7 +1445,7 @@
 
             <!-- Guest Login -->
             <div style="margin-top: 2rem; padding-top: 2rem; border-top: 2px solid var(--glass-border);">
-                <button class="btn btn-secondary btn-full" onclick="loginAsGuest()">
+                <button type="button" class="btn btn-secondary btn-full" onclick="loginAsGuest()">
                     <span>👤 GUEST ACCESS</span>
                 </button>
                 <p style="font-size: 0.9rem; color: var(--text-dim); margin-top: 1rem; text-align: center;">
@@ -1463,7 +1464,7 @@
                 <div id="userName" style="font-weight: 700; color: var(--accent);">Commander</div>
                 <div id="userEmail" style="font-size: 0.9rem; color: var(--text-dim);">user@universe.com</div>
             </div>
-            <button class="btn btn-secondary" onclick="logout()" style="padding: 0.8rem 1.5rem;">Logout</button>
+            <button type="button" class="btn btn-secondary" onclick="logout()" style="padding: 0.8rem 1.5rem;">Logout</button>
         </div>
 
         <!-- Navigation -->
@@ -1594,10 +1595,10 @@
                     </div>
 
                     <div class="text-center">
-                        <button class="btn btn-primary" onclick="startNumberQuest()">
+                        <button type="button" class="btn btn-primary" onclick="startNumberQuest()">
                             🚀 Start Adventure
                         </button>
-                        <button class="btn btn-secondary" onclick="showMainMenu()">
+                        <button type="button" class="btn btn-secondary" onclick="showMainMenu()">
                             🏠 Back to Menu
                         </button>
                     </div>
@@ -1641,7 +1642,7 @@
                         <div class="control-panel glass neon-border">
                             <h3 class="text-center neon" style="margin-bottom: 2rem;">🎯 Command Center</h3>
                             <input type="number" id="guessInput" class="game-input" placeholder="Enter your number" min="0">
-                            <button id="submitGuess" class="btn btn-primary btn-full" onclick="makeGuess()">
+                            <button type="button" id="submitGuess" class="btn btn-primary btn-full" onclick="makeGuess()">
                                 🚀 GUESS!
                             </button>
                             <div id="hint" class="hint-display"></div>
@@ -1654,10 +1655,10 @@
                     </div>
 
                     <div class="text-center">
-                        <button class="btn btn-secondary" onclick="resetNumberQuest()">
+                        <button type="button" class="btn btn-secondary" onclick="resetNumberQuest()">
                             🔄 Restart Level
                         </button>
-                        <button class="btn btn-secondary" onclick="showMainMenu()">
+                        <button type="button" class="btn btn-secondary" onclick="showMainMenu()">
                             🏠 Main Menu
                         </button>
                     </div>
@@ -1693,10 +1694,10 @@
                     <div class="memory-grid" id="memoryGrid"></div>
 
                     <div class="text-center">
-                        <button class="btn btn-primary" onclick="startMemoryGame()">
+                        <button type="button" class="btn btn-primary" onclick="startMemoryGame()">
                             🧠 Start Memory
                         </button>
-                        <button class="btn btn-secondary" onclick="showMainMenu()">
+                        <button type="button" class="btn btn-secondary" onclick="showMainMenu()">
                             🏠 Main Menu
                         </button>
                     </div>
@@ -1732,10 +1733,10 @@
                     <div class="reaction-area" id="reactionArea"></div>
 
                     <div class="text-center">
-                        <button class="btn btn-primary" onclick="startReactionGame()">
+                        <button type="button" class="btn btn-primary" onclick="startReactionGame()">
                             ⚡ Start Reflex Test
                         </button>
-                        <button class="btn btn-secondary" onclick="showMainMenu()">
+                        <button type="button" class="btn btn-secondary" onclick="showMainMenu()">
                             🏠 Main Menu
                         </button>
                     </div>
@@ -1781,10 +1782,10 @@
                     </div>
 
                     <div class="text-center">
-                        <button class="btn btn-primary" onclick="startPatternGame()">
+                        <button type="button" class="btn btn-primary" onclick="startPatternGame()">
                             🔄 Start Pattern
                         </button>
-                        <button class="btn btn-secondary" onclick="showMainMenu()">
+                        <button type="button" class="btn btn-secondary" onclick="showMainMenu()">
                             🏠 Main Menu
                         </button>
                     </div>
@@ -1835,10 +1836,10 @@
                     </div>
 
                     <div class="text-center">
-                        <button class="btn btn-primary" onclick="startColorGame()">
+                        <button type="button" class="btn btn-primary" onclick="startColorGame()">
                             🌈 Start Color Match
                         </button>
-                        <button class="btn btn-secondary" onclick="showMainMenu()">
+                        <button type="button" class="btn btn-secondary" onclick="showMainMenu()">
                             🏠 Main Menu
                         </button>
                     </div>
@@ -1874,16 +1875,16 @@
                     <div class="text-center mb-2">
                         <div id="mathQuestion" class="neon" style="font-size: 3rem; font-weight: 700; margin-bottom: 2rem;">5 + 3 = ?</div>
                         <input type="number" id="mathInput" class="game-input" placeholder="Enter answer" style="max-width: 300px; margin: 0 auto;">
-                        <button class="btn btn-primary" onclick="submitMathAnswer()">
+                        <button type="button" class="btn btn-primary" onclick="submitMathAnswer()">
                             ✅ Submit
                         </button>
                     </div>
 
                     <div class="text-center">
-                        <button class="btn btn-primary" onclick="startMathGame()">
+                        <button type="button" class="btn btn-primary" onclick="startMathGame()">
                             🧮 Start Quick Math
                         </button>
-                        <button class="btn btn-secondary" onclick="showMainMenu()">
+                        <button type="button" class="btn btn-secondary" onclick="showMainMenu()">
                             🏠 Main Menu
                         </button>
                     </div>
@@ -1908,7 +1909,7 @@
                                     <span id="volumeDisplay">50%</span>
                                 </div>
                             </div>
-                            <button class="btn btn-primary btn-full" onclick="toggleMusic()">
+                            <button type="button" class="btn btn-primary btn-full" onclick="toggleMusic()">
                                 <span id="musicToggle">🔊 Enable Music</span>
                             </button>
                         </div>
@@ -1932,13 +1933,13 @@
                         <!-- Game Settings -->
                         <div class="setting-group">
                             <div class="setting-title neon">🎮 Game Control</div>
-                            <button class="btn btn-secondary btn-full" onclick="resetAllStats()">
+                            <button type="button" class="btn btn-secondary btn-full" onclick="resetAllStats()">
                                 🗑️ Reset Statistics
                             </button>
-                            <button class="btn btn-secondary btn-full" onclick="exportStats()">
+                            <button type="button" class="btn btn-secondary btn-full" onclick="exportStats()">
                                 📤 Export Data
                             </button>
-                            <button class="btn btn-secondary btn-full" onclick="showCredits()">
+                            <button type="button" class="btn btn-secondary btn-full" onclick="showCredits()">
                                 ℹ️ Credits
                             </button>
                         </div>
@@ -1958,7 +1959,7 @@
                     </div>
 
                     <div class="text-center mt-2">
-                        <button class="btn btn-primary" onclick="showMainMenu()">
+                        <button type="button" class="btn btn-primary" onclick="showMainMenu()">
                             🏠 Back to Universe
                         </button>
                     </div>
@@ -3271,14 +3272,4 @@ Created with ❤️ and cutting-edge technology!`;
         }
 
         function updateColorDisplay() {
-            document.getElementById('colorScore').textContent = gameState.colorGame.score;
-            document.getElementById('colorCorrect').textContent = gameState.colorGame.correct;
-            document.getElementById('colorWrong').textContent = gameState.colorGame.wrong;
-        }
-
-        // Math Game Functions
-        function startMathGame() {
-            gameState.mathGame = {
-                score: 0,
-                correct: 0,
-                wrong: 0
+            document.getElementById('colorScore').textContent = gameState.colorGame.
