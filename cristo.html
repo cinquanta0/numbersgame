@@ -80,12 +80,15 @@
             box-sizing: border-box;
         }
 
+        html, body {
+            height: 100%;
+            overflow-x: hidden;
+        }
+
         body {
             font-family: 'Rajdhani', sans-serif;
             background: var(--bg-gradient, radial-gradient(ellipse at center, #001122 0%, #000511 50%, #000000 100%));
             color: var(--text);
-            min-height: 100vh;
-            overflow-x: hidden;
             position: relative;
             transition: all 0.5s ease;
             perspective: 1000px;
@@ -232,28 +235,32 @@
             }
         }
 
-        /* LOGIN SCREEN 3D */
+        /* LOGIN SCREEN 3D - OTTIMIZZATO PER CENTRATURA IMMEDIATA */
         .login-screen {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 9999;
             background: var(--bg-gradient);
+            padding: 20px;
+            box-sizing: border-box;
         }
 
         .login-container {
             max-width: 500px;
-            width: 90%;
+            width: 100%;
+            max-height: 90vh;
             padding: 3rem;
             text-align: center;
             position: relative;
             animation: loginFloat 10s ease-in-out infinite;
             transform-style: preserve-3d;
+            overflow-y: auto;
         }
 
         @keyframes loginFloat {
@@ -424,6 +431,7 @@
             max-width: 1600px;
             margin: 0 auto;
             padding: 2rem;
+            min-height: 100vh;
         }
 
         .header {
@@ -1251,6 +1259,15 @@
 
         /* RESPONSIVE 3D */
         @media (max-width: 768px) {
+            .login-container {
+                padding: 2rem;
+                max-height: 95vh;
+            }
+
+            .login-title {
+                font-size: 2.5rem;
+            }
+
             .main-container {
                 padding: 1rem;
             }
@@ -3231,146 +3248,4 @@ Created with ❤️ and cutting-edge technology!`;
         }
 
         function generateColorChallenge() {
-            const colors = ['red', 'cyan', 'blue', 'yellow', 'purple', 'green', 'pink', 'orange', 'black'];
-            const colorNames = ['RED', 'CYAN', 'BLUE', 'YELLOW', 'PURPLE', 'GREEN', 'PINK', 'ORANGE', 'BLACK'];
-            
-            const randomIndex = Math.floor(Math.random() * colors.length);
-            gameState.colorGame.targetColor = colors[randomIndex];
-            
-            document.getElementById('targetColor').textContent = colorNames[randomIndex];
-        }
-
-        function colorClick(color) {
-            if (!gameState.colorGame.gameActive) return;
-            
-            if (color === gameState.colorGame.targetColor) {
-                gameState.colorGame.correct++;
-                gameState.colorGame.score += 10;
-            } else {
-                gameState.colorGame.wrong++;
-                gameState.colorGame.score = Math.max(0, gameState.colorGame.score - 5);
-            }
-            
-            updateColorDisplay();
-            generateColorChallenge();
-        }
-
-        function endColorGame() {
-            gameState.colorGame.gameActive = false;
-            clearInterval(gameState.colorGame.timer);
-            
-            const accuracy = gameState.colorGame.correct + gameState.colorGame.wrong > 0 
-                ? Math.round((gameState.colorGame.correct / (gameState.colorGame.correct + gameState.colorGame.wrong)) * 100) 
-                : 0;
-            
-            showNotification(`🌈 Game finished! Score: ${gameState.colorGame.score}, Accuracy: ${accuracy}%`, 'success');
-        }
-
-        function updateColorDisplay() {
-            document.getElementById('colorScore').textContent = gameState.colorGame.score;
-            document.getElementById('colorCorrect').textContent = gameState.colorGame.correct;
-            document.getElementById('colorWrong').textContent = gameState.colorGame.wrong;
-        }
-
-        // Math Game Functions
-        function startMathGame() {
-            gameState.mathGame = {
-                score: 0,
-                correct: 0,
-                wrong: 0,
-                timeLeft: 60,
-                timer: null,
-                currentQuestion: {},
-                gameActive: true
-            };
-            
-            updateMathDisplay();
-            generateMathQuestion();
-            
-            gameState.mathGame.timer = setInterval(() => {
-                gameState.mathGame.timeLeft--;
-                document.getElementById('mathTime').textContent = gameState.mathGame.timeLeft;
-                
-                if (gameState.mathGame.timeLeft <= 0) {
-                    endMathGame();
-                }
-            }, 1000);
-        }
-
-        function generateMathQuestion() {
-            const operations = ['+', '-', '*'];
-            const operation = operations[Math.floor(Math.random() * operations.length)];
-            
-            let num1, num2, answer;
-            
-            switch (operation) {
-                case '+':
-                    num1 = Math.floor(Math.random() * 50) + 1;
-                    num2 = Math.floor(Math.random() * 50) + 1;
-                    answer = num1 + num2;
-                    break;
-                case '-':
-                    num1 = Math.floor(Math.random() * 50) + 25;
-                    num2 = Math.floor(Math.random() * 25) + 1;
-                    answer = num1 - num2;
-                    break;
-                case '*':
-                    num1 = Math.floor(Math.random() * 12) + 1;
-                    num2 = Math.floor(Math.random() * 12) + 1;
-                    answer = num1 * num2;
-                    break;
-            }
-            
-            gameState.mathGame.currentQuestion = {
-                question: `${num1} ${operation} ${num2} = ?`,
-                answer: answer
-            };
-            
-            document.getElementById('mathQuestion').textContent = gameState.mathGame.currentQuestion.question;
-            document.getElementById('mathInput').value = '';
-            document.getElementById('mathInput').focus();
-        }
-
-        function submitMathAnswer() {
-            if (!gameState.mathGame.gameActive) return;
-            
-            const userAnswer = parseInt(document.getElementById('mathInput').value);
-            
-            if (isNaN(userAnswer)) return;
-            
-            if (userAnswer === gameState.mathGame.currentQuestion.answer) {
-                gameState.mathGame.correct++;
-                gameState.mathGame.score += 10;
-            } else {
-                gameState.mathGame.wrong++;
-                gameState.mathGame.score = Math.max(0, gameState.mathGame.score - 3);
-            }
-            
-            updateMathDisplay();
-            generateMathQuestion();
-        }
-
-        function endMathGame() {
-            gameState.mathGame.gameActive = false;
-            clearInterval(gameState.mathGame.timer);
-            
-            const accuracy = gameState.mathGame.correct + gameState.mathGame.wrong > 0 
-                ? Math.round((gameState.mathGame.correct / (gameState.mathGame.correct + gameState.mathGame.wrong)) * 100) 
-                : 0;
-            
-            showNotification(`🧮 Game finished! Score: ${gameState.mathGame.score}, Accuracy: ${accuracy}%`, 'success');
-        }
-
-        function updateMathDisplay() {
-            document.getElementById('mathScore').textContent = gameState.mathGame.score;
-            document.getElementById('mathCorrect').textContent = gameState.mathGame.correct;
-            document.getElementById('mathWrong').textContent = gameState.mathGame.wrong;
-        }
-
-        // Initialize on page load
-        window.addEventListener('load', function() {
-            showMainMenu();
-        });
-    </script>
-</body>
-</html>
+            const colors = ['red', 'cyan', '
