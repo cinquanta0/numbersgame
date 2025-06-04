@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎯 NUMERO QUEST - Ultimate Gaming Hub</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&family=Exo+2:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <title>🎯 NUMERO QUEST - Ultimate Gaming Universe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@300;400;700;900&family=Rajdhani:wght@300;400;600;700&family=Exo+2:wght@300;400;600;800;900&family=Audiowide&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
         :root {
@@ -13,50 +13,65 @@
             --accent: #ffff00;
             --success: #00ff80;
             --danger: #ff4040;
+            --warning: #ff8000;
             --dark: #0a0a0f;
             --darker: #050508;
-            --glass: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.15);
             --text: #ffffff;
             --text-dim: rgba(255, 255, 255, 0.7);
             --shadow-glow: 0 0 30px;
             --shadow-intense: 0 0 60px;
+            --shadow-mega: 0 0 100px;
         }
 
-        /* THEMES */
+        /* ADVANCED THEMES */
         .theme-cyber {
             --primary: #00ffff;
             --secondary: #ff0080;
             --accent: #ffff00;
-            --bg-gradient: radial-gradient(circle at 20% 80%, #001122 0%, #000511 50%, #000000 100%);
+            --bg-gradient: radial-gradient(ellipse at center, #001122 0%, #000511 50%, #000000 100%);
+            --particle-color: #00ffff;
         }
 
         .theme-neon {
             --primary: #ff00ff;
             --secondary: #00ff00;
             --accent: #ffff00;
-            --bg-gradient: radial-gradient(circle at 80% 20%, #220011 0%, #110022 50%, #000000 100%);
+            --bg-gradient: radial-gradient(ellipse at center, #220011 0%, #110022 50%, #000000 100%);
+            --particle-color: #ff00ff;
         }
 
         .theme-matrix {
             --primary: #00ff41;
             --secondary: #41ff00;
             --accent: #80ff00;
-            --bg-gradient: radial-gradient(circle at 50% 50%, #001100 0%, #000800 50%, #000000 100%);
+            --bg-gradient: radial-gradient(ellipse at center, #001100 0%, #000800 50%, #000000 100%);
+            --particle-color: #00ff41;
         }
 
         .theme-fire {
             --primary: #ff4000;
             --secondary: #ff8000;
             --accent: #ffff00;
-            --bg-gradient: radial-gradient(circle at 30% 70%, #220800 0%, #110400 50%, #000000 100%);
+            --bg-gradient: radial-gradient(ellipse at center, #220800 0%, #110400 50%, #000000 100%);
+            --particle-color: #ff4000;
         }
 
         .theme-ice {
             --primary: #40c0ff;
             --secondary: #80e0ff;
             --accent: #c0f0ff;
-            --bg-gradient: radial-gradient(circle at 70% 30%, #002244 0%, #001122 50%, #000000 100%);
+            --bg-gradient: radial-gradient(ellipse at center, #002244 0%, #001122 50%, #000000 100%);
+            --particle-color: #40c0ff;
+        }
+
+        .theme-galaxy {
+            --primary: #8a2be2;
+            --secondary: #ff69b4;
+            --accent: #ffd700;
+            --bg-gradient: radial-gradient(ellipse at center, #2d1b69 0%, #0f0f23 50%, #000000 100%);
+            --particle-color: #8a2be2;
         }
 
         * {
@@ -67,61 +82,99 @@
 
         body {
             font-family: 'Rajdhani', sans-serif;
-            background: var(--bg-gradient, radial-gradient(circle at 20% 80%, #001122 0%, #000511 50%, #000000 100%));
+            background: var(--bg-gradient, radial-gradient(ellipse at center, #001122 0%, #000511 50%, #000000 100%));
             color: var(--text);
             min-height: 100vh;
             overflow-x: hidden;
             position: relative;
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* ANIMATED BACKGROUND */
-        .bg-animation {
+        /* ADVANCED BACKGROUND SYSTEM */
+        .bg-system {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: -2;
-            opacity: 0.3;
+            z-index: -3;
+            overflow: hidden;
+        }
+
+        .particle-field {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0.6;
         }
 
         .particle {
             position: absolute;
-            background: var(--primary);
+            background: var(--particle-color, var(--primary));
             border-radius: 50%;
             pointer-events: none;
-            animation: float 6s ease-in-out infinite;
+            animation: particleFloat 8s ease-in-out infinite;
         }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
-            50% { transform: translateY(-20px) rotate(180deg); opacity: 0.8; }
+        @keyframes particleFloat {
+            0%, 100% { 
+                transform: translateY(0px) translateX(0px) rotate(0deg); 
+                opacity: 0.3; 
+                filter: blur(0px);
+            }
+            25% { 
+                transform: translateY(-30px) translateX(15px) rotate(90deg); 
+                opacity: 0.8; 
+                filter: blur(1px);
+            }
+            50% { 
+                transform: translateY(-20px) translateX(-10px) rotate(180deg); 
+                opacity: 1; 
+                filter: blur(0px);
+            }
+            75% { 
+                transform: translateY(-40px) translateX(20px) rotate(270deg); 
+                opacity: 0.6; 
+                filter: blur(2px);
+            }
         }
 
         .grid-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
+            position: absolute;
             width: 100%;
             height: 100%;
             background-image: 
-                linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
-            background-size: 50px 50px;
-            z-index: -1;
-            animation: gridMove 20s linear infinite;
+                linear-gradient(rgba(0, 255, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 60px 60px;
+            animation: gridFlow 25s linear infinite;
+            opacity: 0.4;
         }
 
-        @keyframes gridMove {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(50px, 50px); }
+        @keyframes gridFlow {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            100% { transform: translate(60px, 60px) rotate(360deg); }
         }
 
-        /* GLASSMORPHISM COMPONENTS */
+        .energy-waves {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 70%, rgba(0, 255, 255, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 30%, rgba(255, 0, 128, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 50% 50%, rgba(255, 255, 0, 0.05) 0%, transparent 70%);
+            animation: energyPulse 6s ease-in-out infinite;
+        }
+
+        @keyframes energyPulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.1); }
+        }
+
+        /* ULTRA GLASSMORPHISM */
         .glass {
             background: var(--glass);
-            backdrop-filter: blur(20px);
+            backdrop-filter: blur(25px) saturate(180%);
             border: 1px solid var(--glass-border);
             border-radius: 20px;
             position: relative;
@@ -135,43 +188,70 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            transition: left 0.8s ease;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+            transition: left 1s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .glass:hover::before {
             left: 100%;
         }
 
-        /* NEON EFFECTS */
+        /* MEGA NEON EFFECTS */
         .neon {
             text-shadow: 
                 0 0 5px currentColor,
                 0 0 10px currentColor,
                 0 0 20px currentColor,
-                0 0 40px currentColor;
-            animation: neonPulse 2s ease-in-out infinite alternate;
+                0 0 40px currentColor,
+                0 0 80px currentColor;
+            animation: neonPulse 3s ease-in-out infinite alternate;
         }
 
         @keyframes neonPulse {
-            from { filter: brightness(1); }
-            to { filter: brightness(1.2); }
+            from { 
+                filter: brightness(1) hue-rotate(0deg); 
+                text-shadow: 
+                    0 0 5px currentColor,
+                    0 0 10px currentColor,
+                    0 0 20px currentColor,
+                    0 0 40px currentColor;
+            }
+            to { 
+                filter: brightness(1.3) hue-rotate(10deg); 
+                text-shadow: 
+                    0 0 10px currentColor,
+                    0 0 20px currentColor,
+                    0 0 40px currentColor,
+                    0 0 80px currentColor,
+                    0 0 120px currentColor;
+            }
         }
 
         .neon-border {
             border: 2px solid var(--primary);
             box-shadow: 
                 inset 0 0 20px rgba(0, 255, 255, 0.1),
-                0 0 20px rgba(0, 255, 255, 0.3);
-            animation: borderGlow 3s ease-in-out infinite alternate;
+                0 0 20px rgba(0, 255, 255, 0.3),
+                0 0 40px rgba(0, 255, 255, 0.1);
+            animation: borderGlow 4s ease-in-out infinite alternate;
         }
 
         @keyframes borderGlow {
-            from { box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.1), 0 0 20px rgba(0, 255, 255, 0.3); }
-            to { box-shadow: inset 0 0 30px rgba(0, 255, 255, 0.2), 0 0 40px rgba(0, 255, 255, 0.5); }
+            from { 
+                box-shadow: 
+                    inset 0 0 20px rgba(0, 255, 255, 0.1),
+                    0 0 20px rgba(0, 255, 255, 0.3),
+                    0 0 40px rgba(0, 255, 255, 0.1);
+            }
+            to { 
+                box-shadow: 
+                    inset 0 0 30px rgba(0, 255, 255, 0.2),
+                    0 0 40px rgba(0, 255, 255, 0.5),
+                    0 0 80px rgba(0, 255, 255, 0.3);
+            }
         }
 
-        /* LOGIN SCREEN */
+        /* LOGIN SCREEN ULTRA */
         .login-screen {
             position: fixed;
             top: 0;
@@ -186,42 +266,53 @@
         }
 
         .login-container {
-            max-width: 450px;
+            max-width: 500px;
             width: 90%;
             padding: 3rem;
             text-align: center;
             position: relative;
-            animation: loginFloat 6s ease-in-out infinite;
+            animation: loginFloat 8s ease-in-out infinite;
         }
 
         @keyframes loginFloat {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            25% { transform: translateY(-15px) rotate(1deg); }
+            50% { transform: translateY(-10px) rotate(0deg); }
+            75% { transform: translateY(-20px) rotate(-1deg); }
         }
 
         .login-title {
-            font-family: 'Orbitron', monospace;
-            font-size: 3rem;
+            font-family: 'Audiowide', cursive;
+            font-size: 3.5rem;
             font-weight: 900;
-            background: linear-gradient(45deg, var(--primary), var(--accent), var(--secondary));
-            background-size: 200% 200%;
+            background: linear-gradient(45deg, var(--primary), var(--accent), var(--secondary), var(--primary));
+            background-size: 300% 300%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            animation: gradientShift 3s ease-in-out infinite;
+            animation: gradientShift 4s ease-in-out infinite;
             margin-bottom: 1rem;
+            filter: drop-shadow(0 0 20px rgba(0, 255, 255, 0.5));
         }
 
         @keyframes gradientShift {
             0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
+            25% { background-position: 100% 50%; }
+            50% { background-position: 50% 100%; }
+            75% { background-position: 50% 0%; }
         }
 
         .login-subtitle {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             color: var(--text-dim);
             margin-bottom: 2rem;
             font-weight: 300;
+            animation: subtitleGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes subtitleGlow {
+            from { text-shadow: 0 0 10px var(--accent); }
+            to { text-shadow: 0 0 25px var(--accent); }
         }
 
         .form-group {
@@ -231,21 +322,25 @@
 
         .form-input {
             width: 100%;
-            padding: 1rem 1.5rem;
-            background: rgba(0, 0, 0, 0.3);
+            padding: 1.2rem 1.5rem;
+            background: rgba(0, 0, 0, 0.4);
             border: 2px solid transparent;
             border-radius: 15px;
             color: var(--text);
             font-size: 1rem;
             font-family: inherit;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             outline: none;
+            backdrop-filter: blur(10px);
         }
 
         .form-input:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            box-shadow: 
+                0 0 20px rgba(0, 255, 255, 0.3),
+                inset 0 0 20px rgba(0, 255, 255, 0.1);
             transform: scale(1.02);
+            background: rgba(0, 0, 0, 0.6);
         }
 
         .form-input::placeholder {
@@ -253,18 +348,18 @@
         }
 
         .btn {
-            padding: 1rem 2rem;
+            padding: 1.2rem 2.5rem;
             border: none;
             border-radius: 15px;
             font-family: inherit;
             font-size: 1.1rem;
-            font-weight: 600;
+            font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
         }
 
         .btn::before {
@@ -274,8 +369,8 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s ease;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.6s ease;
         }
 
         .btn:hover::before {
@@ -285,23 +380,23 @@
         .btn-primary {
             background: linear-gradient(45deg, var(--primary), var(--secondary));
             color: var(--dark);
-            box-shadow: var(--shadow-glow) rgba(0, 255, 255, 0.3);
+            box-shadow: var(--shadow-glow) rgba(0, 255, 255, 0.4);
         }
 
         .btn-primary:hover {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: var(--shadow-intense) rgba(0, 255, 255, 0.5);
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: var(--shadow-intense) rgba(0, 255, 255, 0.6);
         }
 
         .btn-secondary {
             background: linear-gradient(45deg, var(--secondary), var(--danger));
             color: var(--text);
-            box-shadow: var(--shadow-glow) rgba(255, 0, 128, 0.3);
+            box-shadow: var(--shadow-glow) rgba(255, 0, 128, 0.4);
         }
 
         .btn-secondary:hover {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: var(--shadow-intense) rgba(255, 0, 128, 0.5);
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: var(--shadow-intense) rgba(255, 0, 128, 0.6);
         }
 
         .btn-full {
@@ -315,11 +410,13 @@
             text-decoration: underline;
             transition: all 0.3s ease;
             margin-top: 1rem;
+            font-weight: 600;
         }
 
         .auth-toggle:hover {
             color: var(--primary);
             transform: scale(1.05);
+            text-shadow: 0 0 10px currentColor;
         }
 
         .error-message, .success-message {
@@ -327,23 +424,24 @@
             border-radius: 10px;
             margin-top: 1rem;
             font-weight: 600;
+            backdrop-filter: blur(10px);
         }
 
         .error-message {
-            background: rgba(255, 64, 64, 0.1);
+            background: rgba(255, 64, 64, 0.15);
             border: 1px solid var(--danger);
             color: var(--danger);
         }
 
         .success-message {
-            background: rgba(0, 255, 128, 0.1);
+            background: rgba(0, 255, 128, 0.15);
             border: 1px solid var(--success);
             color: var(--success);
         }
 
-        /* MAIN INTERFACE */
+        /* MAIN INTERFACE ULTRA */
         .main-container {
-            max-width: 1400px;
+            max-width: 1600px;
             margin: 0 auto;
             padding: 2rem;
         }
@@ -355,25 +453,27 @@
         }
 
         .main-title {
-            font-family: 'Orbitron', monospace;
-            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-family: 'Audiowide', cursive;
+            font-size: clamp(3rem, 10vw, 6rem);
             font-weight: 900;
-            background: linear-gradient(45deg, var(--primary), var(--accent), var(--secondary));
-            background-size: 200% 200%;
+            background: linear-gradient(45deg, var(--primary), var(--accent), var(--secondary), var(--primary));
+            background-size: 300% 300%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            animation: gradientShift 3s ease-in-out infinite;
+            animation: gradientShift 4s ease-in-out infinite;
             margin-bottom: 1rem;
+            filter: drop-shadow(0 0 30px rgba(0, 255, 255, 0.5));
         }
 
         .subtitle {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             color: var(--text-dim);
             font-weight: 300;
+            animation: subtitleGlow 3s ease-in-out infinite alternate;
         }
 
-        /* NAVIGATION */
+        /* NAVIGATION ULTRA */
         .nav-bar {
             position: fixed;
             top: 20px;
@@ -381,43 +481,61 @@
             z-index: 1000;
             display: flex;
             gap: 1rem;
+            flex-wrap: wrap;
         }
 
         .nav-btn {
-            padding: 0.8rem 1.5rem;
+            padding: 1rem 1.5rem;
             background: var(--glass);
             backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
             border-radius: 25px;
             color: var(--primary);
             text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
+            font-weight: 700;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .nav-btn:hover::before {
+            left: 100%;
         }
 
         .nav-btn:hover {
             background: var(--primary);
             color: var(--dark);
-            transform: scale(1.05);
-            box-shadow: var(--shadow-glow) rgba(0, 255, 255, 0.5);
+            transform: scale(1.1);
+            box-shadow: var(--shadow-glow) rgba(0, 255, 255, 0.6);
         }
 
-        /* USER INFO */
+        /* USER PANEL ULTRA */
         .user-panel {
             position: fixed;
             top: 20px;
             left: 20px;
             z-index: 1000;
-            padding: 1rem;
+            padding: 1.2rem;
             background: var(--glass);
             backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
-            border-radius: 15px;
+            border-radius: 20px;
             display: none;
             align-items: center;
             gap: 1rem;
-            animation: slideIn 0.5s ease;
+            animation: slideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .user-panel.active {
@@ -425,102 +543,254 @@
         }
 
         @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-100%); }
-            to { opacity: 1; transform: translateX(0); }
+            from { opacity: 0; transform: translateX(-100%) scale(0.8); }
+            to { opacity: 1; transform: translateX(0) scale(1); }
         }
 
         .user-avatar {
-            width: 50px;
-            height: 50px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
             background: linear-gradient(45deg, var(--primary), var(--secondary));
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 700;
-            font-size: 1.2rem;
+            font-weight: 900;
+            font-size: 1.5rem;
             color: var(--dark);
+            box-shadow: var(--shadow-glow) rgba(0, 255, 255, 0.5);
+            animation: avatarPulse 3s ease-in-out infinite;
         }
 
-        /* GAME GRID */
+        @keyframes avatarPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* GAMES GRID ULTRA */
         .games-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 2.5rem;
             margin-bottom: 3rem;
         }
 
         .game-card {
-            padding: 2rem;
+            padding: 2.5rem;
             text-align: center;
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
-            min-height: 250px;
+            min-height: 300px;
             display: flex;
             flex-direction: column;
             justify-content: center;
+            border-radius: 25px;
+        }
+
+        .game-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, var(--primary), var(--secondary), var(--accent));
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            border-radius: 25px;
+            z-index: -1;
+        }
+
+        .game-card:hover::after {
+            opacity: 0.1;
         }
 
         .game-card:hover {
-            transform: translateY(-10px) scale(1.02);
-            box-shadow: var(--shadow-intense) rgba(0, 255, 255, 0.3);
+            transform: translateY(-15px) scale(1.03);
+            box-shadow: var(--shadow-mega) rgba(0, 255, 255, 0.4);
         }
 
         .game-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            animation: iconFloat 4s ease-in-out infinite;
+            font-size: 5rem;
+            margin-bottom: 1.5rem;
+            animation: iconFloat 6s ease-in-out infinite;
+            filter: drop-shadow(0 0 20px currentColor);
         }
 
         @keyframes iconFloat {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-15px) rotate(5deg); }
+            0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
+            25% { transform: translateY(-20px) rotate(5deg) scale(1.1); }
+            50% { transform: translateY(-10px) rotate(0deg) scale(1.05); }
+            75% { transform: translateY(-25px) rotate(-5deg) scale(1.1); }
         }
 
         .game-title {
             font-family: 'Orbitron', monospace;
-            font-size: 1.8rem;
+            font-size: 2rem;
             font-weight: 700;
             color: var(--accent);
             margin-bottom: 1rem;
+            text-shadow: 0 0 20px currentColor;
         }
 
         .game-description {
             color: var(--text-dim);
             line-height: 1.6;
-            font-size: 1rem;
+            font-size: 1.1rem;
+            font-weight: 400;
         }
 
-        /* STATS PANEL */
-        .stats-panel {
-            padding: 2rem;
+        /* MULTIPLAYER SECTION */
+        .multiplayer-section {
+            background: var(--glass);
+            backdrop-filter: blur(25px);
+            border: 2px solid var(--primary);
+            border-radius: 25px;
+            padding: 3rem;
             margin-bottom: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .multiplayer-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(var(--primary), transparent, var(--secondary), transparent, var(--accent), transparent);
+            opacity: 0.1;
+            animation: multiplayerRotate 15s linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes multiplayerRotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .multiplayer-title {
+            font-family: 'Audiowide', cursive;
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .room-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .room-input {
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.4);
+            border: 2px solid var(--glass-border);
+            border-radius: 15px;
+            color: var(--text);
+            font-size: 1.1rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .room-input:focus {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-glow) rgba(0, 255, 255, 0.3);
+            outline: none;
+        }
+
+        .players-list {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .player-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background: var(--glass);
+            border-radius: 10px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .player-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--dark);
+        }
+
+        .player-status {
+            margin-left: auto;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .status-ready {
+            background: var(--success);
+            color: var(--dark);
+        }
+
+        .status-waiting {
+            background: var(--warning);
+            color: var(--dark);
+        }
+
+        .status-playing {
+            background: var(--primary);
+            color: var(--dark);
+        }
+
+        /* STATS PANEL ULTRA */
+        .stats-panel {
+            padding: 3rem;
+            margin-bottom: 3rem;
+            position: relative;
         }
 
         .stats-title {
-            font-family: 'Orbitron', monospace;
-            font-size: 2rem;
+            font-family: 'Audiowide', cursive;
+            font-size: 2.5rem;
             text-align: center;
             color: var(--accent);
             margin-bottom: 2rem;
+            text-shadow: 0 0 30px currentColor;
         }
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
         }
 
         .stat-card {
-            padding: 2rem;
+            padding: 2.5rem;
             text-align: center;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 15px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 20px;
             border: 1px solid var(--glass-border);
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
+            backdrop-filter: blur(15px);
         }
 
         .stat-card::before {
@@ -532,171 +802,224 @@
             height: 200%;
             background: conic-gradient(var(--primary), transparent, var(--primary));
             opacity: 0;
-            transition: opacity 0.3s ease;
-            animation: rotate 4s linear infinite;
+            transition: opacity 0.4s ease;
+            animation: statRotate 6s linear infinite;
             z-index: -1;
         }
 
         .stat-card:hover::before {
-            opacity: 0.1;
+            opacity: 0.15;
         }
 
-        @keyframes rotate {
+        .stat-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: var(--shadow-intense) rgba(0, 255, 255, 0.4);
+        }
+
+        @keyframes statRotate {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
 
         .stat-value {
             font-family: 'Orbitron', monospace;
-            font-size: 2.5rem;
-            font-weight: 700;
+            font-size: 3rem;
+            font-weight: 900;
             color: var(--primary);
             margin-bottom: 0.5rem;
-            text-shadow: 0 0 20px currentColor;
+            text-shadow: 0 0 25px currentColor;
+            animation: statGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes statGlow {
+            from { 
+                text-shadow: 0 0 25px currentColor;
+                transform: scale(1);
+            }
+            to { 
+                text-shadow: 0 0 40px currentColor;
+                transform: scale(1.05);
+            }
         }
 
         .stat-label {
             color: var(--text-dim);
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
+            font-size: 0.9rem;
         }
 
-        /* GAME INTERFACE */
+        /* GAME INTERFACE ULTRA */
         .game-interface {
-            padding: 2rem;
+            padding: 3rem;
             margin-bottom: 2rem;
+            position: relative;
         }
 
         .game-header {
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 3rem;
         }
 
         .game-title-main {
-            font-family: 'Orbitron', monospace;
-            font-size: 2.5rem;
+            font-family: 'Audiowide', cursive;
+            font-size: 3rem;
             color: var(--accent);
             margin-bottom: 1rem;
+            text-shadow: 0 0 30px currentColor;
         }
 
         .difficulty-selector {
             display: flex;
             justify-content: center;
-            gap: 1rem;
-            margin: 2rem 0;
+            gap: 1.5rem;
+            margin: 3rem 0;
             flex-wrap: wrap;
         }
 
         .difficulty-btn {
-            padding: 1rem 2rem;
-            border: 2px solid transparent;
-            border-radius: 15px;
+            padding: 1.5rem 2rem;
+            border: 3px solid transparent;
+            border-radius: 20px;
             background: var(--glass);
             color: var(--text);
             cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 600;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 700;
             text-align: center;
-            min-width: 150px;
+            min-width: 180px;
+            backdrop-filter: blur(15px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .difficulty-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .difficulty-btn:hover::before,
+        .difficulty-btn.active::before {
+            left: 100%;
         }
 
         .difficulty-btn.active,
         .difficulty-btn:hover {
             border-color: var(--primary);
-            background: rgba(0, 255, 255, 0.1);
-            transform: scale(1.05);
-            box-shadow: var(--shadow-glow) rgba(0, 255, 255, 0.3);
+            background: rgba(0, 255, 255, 0.15);
+            transform: scale(1.1);
+            box-shadow: var(--shadow-glow) rgba(0, 255, 255, 0.4);
         }
 
-        .difficulty-easy { border-color: var(--success); }
-        .difficulty-normal { border-color: var(--accent); }
-        .difficulty-hard { border-color: var(--danger); }
+        .difficulty-easy { 
+            border-color: var(--success); 
+        }
+        .difficulty-normal { 
+            border-color: var(--accent); 
+        }
+        .difficulty-hard { 
+            border-color: var(--danger); 
+        }
 
-        /* GAME AREA */
+        /* GAME AREA ULTRA */
         .game-area {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            margin: 2rem 0;
+            gap: 3rem;
+            margin: 3rem 0;
         }
 
         .control-panel {
-            padding: 2rem;
+            padding: 3rem;
+            position: relative;
         }
 
         .game-input {
             width: 100%;
-            padding: 1.5rem;
-            background: rgba(0, 0, 0, 0.3);
-            border: 2px solid var(--glass-border);
-            border-radius: 15px;
+            padding: 2rem;
+            background: rgba(0, 0, 0, 0.4);
+            border: 3px solid var(--glass-border);
+            border-radius: 20px;
             color: var(--text);
-            font-size: 1.2rem;
+            font-size: 1.5rem;
             font-family: 'Orbitron', monospace;
-            margin-bottom: 1.5rem;
-            transition: all 0.3s ease;
+            margin-bottom: 2rem;
+            transition: all 0.4s ease;
+            backdrop-filter: blur(10px);
         }
 
         .game-input:focus {
             border-color: var(--primary);
-            box-shadow: var(--shadow-glow) rgba(0, 255, 255, 0.3);
+            box-shadow: var(--shadow-glow) rgba(0, 255, 255, 0.4);
             outline: none;
+            transform: scale(1.02);
         }
 
         .hint-display {
             text-align: center;
-            font-size: 1.2rem;
-            font-weight: 600;
+            font-size: 1.4rem;
+            font-weight: 700;
             color: var(--primary);
-            margin-top: 1rem;
-            min-height: 2rem;
+            margin-top: 2rem;
+            min-height: 3rem;
+            text-shadow: 0 0 15px currentColor;
         }
 
         .history-panel {
-            padding: 2rem;
-            max-height: 400px;
+            padding: 3rem;
+            max-height: 500px;
             overflow-y: auto;
         }
 
         .history-item {
-            padding: 1rem;
+            padding: 1.5rem;
             margin-bottom: 1rem;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
             border-left: 4px solid var(--primary);
-            animation: slideInRight 0.5s ease;
+            animation: slideInRight 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
         }
 
         @keyframes slideInRight {
-            from { opacity: 0; transform: translateX(50px); }
+            from { opacity: 0; transform: translateX(100px); }
             to { opacity: 1; transform: translateX(0); }
         }
 
-        /* PROGRESS BAR */
+        /* PROGRESS BAR ULTRA */
         .progress-container {
-            margin: 2rem 0;
-            padding: 2rem;
+            margin: 3rem 0;
+            padding: 3rem;
             text-align: center;
+            position: relative;
         }
 
         .progress-bar {
             width: 100%;
-            height: 20px;
+            height: 25px;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
+            border-radius: 15px;
             overflow: hidden;
-            margin: 1rem 0;
+            margin: 2rem 0;
             position: relative;
+            border: 2px solid var(--primary);
         }
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(45deg, var(--primary), var(--accent));
-            border-radius: 10px;
-            transition: width 1s ease;
+            background: linear-gradient(45deg, var(--primary), var(--accent), var(--secondary));
+            background-size: 200% 100%;
+            border-radius: 15px;
+            transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
-            animation: progressShimmer 2s linear infinite;
+            animation: progressShimmer 3s linear infinite;
         }
 
         @keyframes progressShimmer {
@@ -704,76 +1027,99 @@
             100% { background-position: 200% 0; }
         }
 
-        /* TIMER */
+        /* TIMER ULTRA */
         .timer-display {
             font-family: 'Orbitron', monospace;
-            font-size: 3rem;
-            font-weight: 700;
+            font-size: 4rem;
+            font-weight: 900;
             color: var(--secondary);
             text-align: center;
-            margin: 1rem 0;
-            text-shadow: 0 0 30px currentColor;
-            animation: timerPulse 1s ease-in-out infinite;
+            margin: 2rem 0;
+            text-shadow: 0 0 40px currentColor;
+            animation: timerPulse 1.5s ease-in-out infinite;
         }
 
         @keyframes timerPulse {
             0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+            50% { transform: scale(1.15); }
         }
 
         .timer-warning {
             color: var(--danger) !important;
-            animation: timerWarning 0.5s ease-in-out infinite;
+            animation: timerWarning 0.8s ease-in-out infinite;
         }
 
         @keyframes timerWarning {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.2); }
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.2) rotate(-2deg); }
+            75% { transform: scale(1.2) rotate(2deg); }
         }
 
-        /* SETTINGS */
+        /* SETTINGS ULTRA */
         .settings-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin: 2rem 0;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2.5rem;
+            margin: 3rem 0;
         }
 
         .setting-group {
-            padding: 2rem;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 15px;
+            padding: 2.5rem;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 20px;
             border: 1px solid var(--glass-border);
+            backdrop-filter: blur(15px);
         }
 
         .setting-title {
             font-family: 'Orbitron', monospace;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             color: var(--accent);
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
+            text-shadow: 0 0 15px currentColor;
         }
 
         .theme-grid {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 1rem;
-            margin: 1rem 0;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin: 2rem 0;
         }
 
         .theme-option {
             aspect-ratio: 1;
-            border-radius: 10px;
+            border-radius: 15px;
             cursor: pointer;
             border: 3px solid transparent;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
+            overflow: hidden;
+        }
+
+        .theme-option::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transition: all 0.4s ease;
+            transform: translate(-50%, -50%);
+        }
+
+        .theme-option:hover::before,
+        .theme-option.active::before {
+            width: 100%;
+            height: 100%;
         }
 
         .theme-option:hover,
         .theme-option.active {
             border-color: var(--accent);
-            transform: scale(1.1);
-            box-shadow: var(--shadow-glow) rgba(255, 255, 0, 0.5);
+            transform: scale(1.15);
+            box-shadow: var(--shadow-glow) rgba(255, 255, 0, 0.6);
         }
 
         .theme-cyber { background: radial-gradient(circle, #001122, #000511); }
@@ -781,28 +1127,241 @@
         .theme-matrix { background: radial-gradient(circle, #001100, #000800); }
         .theme-fire { background: radial-gradient(circle, #220800, #110400); }
         .theme-ice { background: radial-gradient(circle, #002244, #001122); }
+        .theme-galaxy { background: radial-gradient(circle, #2d1b69, #0f0f23); }
 
         .slider {
             width: 100%;
-            height: 8px;
-            border-radius: 4px;
+            height: 12px;
+            border-radius: 6px;
             background: rgba(255, 255, 255, 0.2);
             outline: none;
-            margin: 1rem 0;
+            margin: 2rem 0;
             cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .slider:hover {
+            background: rgba(255, 255, 255, 0.3);
         }
 
         .slider::-webkit-slider-thumb {
             appearance: none;
-            width: 20px;
-            height: 20px;
+            width: 25px;
+            height: 25px;
             border-radius: 50%;
             background: var(--primary);
             cursor: pointer;
-            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
+            transition: all 0.3s ease;
         }
 
-        /* RESPONSIVE */
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 25px rgba(0, 255, 255, 0.8);
+        }
+
+        /* MEMORY GAME ULTRA */
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin: 3rem 0;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .memory-card {
+            aspect-ratio: 1;
+            background: var(--glass);
+            border: 3px solid var(--glass-border);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(15px);
+        }
+
+        .memory-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .memory-card:hover::before {
+            opacity: 0.1;
+        }
+
+        .memory-card:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-glow) rgba(0, 255, 255, 0.4);
+        }
+
+        .memory-card.flipped {
+            background: linear-gradient(45deg, var(--accent), var(--primary));
+            color: var(--dark);
+            transform: rotateY(180deg) scale(1.05);
+        }
+
+        .memory-card.matched {
+            background: linear-gradient(45deg, var(--success), var(--primary));
+            animation: matchPulse 0.8s ease;
+        }
+
+        @keyframes matchPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+
+        /* REACTION GAME ULTRA */
+        .reaction-area {
+            position: relative;
+            height: 500px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 3px solid var(--glass-border);
+            border-radius: 25px;
+            overflow: hidden;
+            margin: 3rem 0;
+            backdrop-filter: blur(10px);
+        }
+
+        .reaction-target {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, var(--secondary), var(--danger));
+            border-radius: 50%;
+            cursor: pointer;
+            animation: targetPulse 1.5s ease-in-out infinite;
+            box-shadow: var(--shadow-glow) rgba(255, 0, 128, 0.6);
+            border: 3px solid var(--accent);
+        }
+
+        @keyframes targetPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        /* COLOR GAME ULTRA */
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin: 3rem 0;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .color-button {
+            aspect-ratio: 1;
+            border: 4px solid var(--glass-border);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 1.4rem;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text);
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .color-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .color-button:hover::before {
+            transform: translateX(100%);
+        }
+
+        .color-button:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-glow) rgba(255, 255, 255, 0.4);
+            border-color: var(--primary);
+        }
+
+        /* PATTERN GAME ULTRA */
+        .pattern-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin: 3rem 0;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .pattern-button {
+            aspect-ratio: 1;
+            border: 4px solid var(--glass-border);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 2rem;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text);
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pattern-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle, var(--primary), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .pattern-button:hover::before {
+            opacity: 0.3;
+        }
+
+        .pattern-button:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-glow) rgba(255, 255, 255, 0.4);
+        }
+
+        .pattern-button.active {
+            background: var(--primary);
+            color: var(--dark);
+            box-shadow: var(--shadow-intense) rgba(0, 255, 255, 0.8);
+            transform: scale(1.2);
+        }
+
+        /* RESPONSIVE ULTRA */
         @media (max-width: 768px) {
             .main-container {
                 padding: 1rem;
@@ -810,7 +1369,7 @@
 
             .games-grid {
                 grid-template-columns: 1fr;
-                gap: 1rem;
+                gap: 2rem;
             }
 
             .game-area {
@@ -840,6 +1399,22 @@
                 left: auto;
                 margin-bottom: 2rem;
             }
+
+            .room-controls {
+                grid-template-columns: 1fr;
+            }
+
+            .theme-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .memory-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .color-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
 
         /* UTILITY CLASSES */
@@ -848,180 +1423,77 @@
         .mb-2 { margin-bottom: 2rem; }
         .mt-2 { margin-top: 2rem; }
 
-        /* LOADING SPINNER */
+        /* LOADING SPINNER ULTRA */
         .spinner {
             display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
+            width: 25px;
+            height: 25px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
             border-top-color: var(--primary);
-            animation: spin 1s ease-in-out infinite;
-            margin-right: 10px;
+            animation: spin 1.2s ease-in-out infinite;
+            margin-right: 15px;
         }
 
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
 
-        /* MEMORY GAME */
-        .memory-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1rem;
-            margin: 2rem 0;
-            max-width: 500px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .memory-card {
-            aspect-ratio: 1;
+        /* NOTIFICATION SYSTEM */
+        .notification {
+            position: fixed;
+            top: 100px;
+            right: 20px;
             background: var(--glass);
-            border: 2px solid var(--glass-border);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
             border-radius: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .memory-card:hover {
-            transform: scale(1.05);
-            box-shadow: var(--shadow-glow) rgba(0, 255, 255, 0.3);
-        }
-
-        .memory-card.flipped {
-            background: linear-gradient(45deg, var(--accent), var(--primary));
-            color: var(--dark);
-            transform: rotateY(180deg);
-        }
-
-        .memory-card.matched {
-            background: linear-gradient(45deg, var(--success), var(--primary));
-            animation: matchPulse 0.6s ease;
-        }
-
-        @keyframes matchPulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
-
-        /* REACTION GAME */
-        .reaction-area {
-            position: relative;
-            height: 400px;
-            background: rgba(0, 0, 0, 0.2);
-            border: 2px solid var(--glass-border);
-            border-radius: 20px;
-            overflow: hidden;
-            margin: 2rem 0;
-        }
-
-        .reaction-target {
-            position: absolute;
-            width: 80px;
-            height: 80px;
-            background: radial-gradient(circle, var(--secondary), var(--danger));
-            border-radius: 50%;
-            cursor: pointer;
-            animation: targetPulse 1s ease-in-out infinite;
-            box-shadow: var(--shadow-glow) rgba(255, 0, 128, 0.5);
-        }
-
-        @keyframes targetPulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-
-        /* COLOR GAME */
-        .color-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-            margin: 2rem 0;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .color-button {
-            aspect-ratio: 1;
-            border: 3px solid var(--glass-border);
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 1.2rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            padding: 1rem 1.5rem;
             color: var(--text);
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            font-weight: 600;
+            z-index: 10000;
+            animation: notificationSlide 0.5s ease;
+            max-width: 300px;
         }
 
-        .color-button:hover {
-            transform: scale(1.05);
-            box-shadow: var(--shadow-glow) rgba(255, 255, 255, 0.3);
+        @keyframes notificationSlide {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
 
-        /* PATTERN GAME */
-        .pattern-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-            margin: 2rem 0;
-            max-width: 400px;
-            margin-left: auto;
-            margin-right: auto;
+        .notification.success {
+            border-color: var(--success);
+            color: var(--success);
         }
 
-        .pattern-button {
-            aspect-ratio: 1;
-            border: 3px solid var(--glass-border);
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 1.5rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--text);
-            background: var(--glass);
+        .notification.error {
+            border-color: var(--danger);
+            color: var(--danger);
         }
 
-        .pattern-button:hover {
-            transform: scale(1.05);
-            box-shadow: var(--shadow-glow) rgba(255, 255, 255, 0.3);
-        }
-
-        .pattern-button.active {
-            background: var(--primary);
-            color: var(--dark);
-            box-shadow: var(--shadow-intense) rgba(0, 255, 255, 0.8);
+        .notification.info {
+            border-color: var(--primary);
+            color: var(--primary);
         }
     </style>
 </head>
 <body class="theme-cyber">
-    <!-- Background Animation -->
-    <div class="bg-animation" id="bgAnimation"></div>
-    <div class="grid-overlay"></div>
+    <!-- Advanced Background System -->
+    <div class="bg-system">
+        <div class="particle-field" id="particleField"></div>
+        <div class="grid-overlay"></div>
+        <div class="energy-waves"></div>
+    </div>
 
     <!-- Login Screen -->
     <div id="loginScreen" class="login-screen">
         <div class="login-container glass neon-border">
             <h1 class="login-title neon">🎯 NUMERO QUEST</h1>
-            <p class="login-subtitle">Ultimate Gaming Experience</p>
+            <p class="login-subtitle">Ultimate Gaming Universe</p>
             
             <!-- Login Form -->
             <div id="loginForm" class="auth-form">
-                <h3 style="color: var(--accent); margin-bottom: 1.5rem; font-family: 'Orbitron', monospace;">🔐 ACCESS</h3>
+                <h3 style="color: var(--accent); margin-bottom: 1.5rem; font-family: 'Orbitron', monospace;">🔐 ACCESS PORTAL</h3>
                 <div class="form-group">
                     <input type="email" class="form-input" placeholder="📧 Email Address" id="loginEmail">
                 </div>
@@ -1030,19 +1502,19 @@
                 </div>
                 <button class="btn btn-primary btn-full" onclick="loginUser()">
                     <span id="loginSpinner" class="spinner hidden"></span>
-                    <span>🚀 LOGIN</span>
+                    <span>🚀 ENTER UNIVERSE</span>
                 </button>
                 <div id="loginError" class="error-message hidden"></div>
                 <div class="auth-toggle" onclick="showRegisterForm()">
-                    Don't have an account? Register here! 📝
+                    New to the universe? Create account! 📝
                 </div>
             </div>
 
             <!-- Register Form -->
             <div id="registerForm" class="auth-form hidden">
-                <h3 style="color: var(--accent); margin-bottom: 1.5rem; font-family: 'Orbitron', monospace;">📝 REGISTER</h3>
+                <h3 style="color: var(--accent); margin-bottom: 1.5rem; font-family: 'Orbitron', monospace;">📝 JOIN UNIVERSE</h3>
                 <div class="form-group">
-                    <input type="text" class="form-input" placeholder="👤 Full Name" id="registerName">
+                    <input type="text" class="form-input" placeholder="👤 Commander Name" id="registerName">
                 </div>
                 <div class="form-group">
                     <input type="email" class="form-input" placeholder="📧 Email Address" id="registerEmail">
@@ -1055,7 +1527,7 @@
                 </div>
                 <button class="btn btn-primary btn-full" onclick="registerUser()">
                     <span id="registerSpinner" class="spinner hidden"></span>
-                    <span>✨ REGISTER</span>
+                    <span>✨ CREATE ACCOUNT</span>
                 </button>
                 <div id="registerError" class="error-message hidden"></div>
                 <div id="registerSuccess" class="success-message hidden"></div>
@@ -1067,7 +1539,7 @@
             <!-- Guest Login -->
             <div style="margin-top: 2rem; padding-top: 2rem; border-top: 2px solid var(--glass-border);">
                 <button class="btn btn-secondary btn-full" onclick="loginAsGuest()">
-                    <span>👤 CONTINUE AS GUEST</span>
+                    <span>👤 GUEST ACCESS</span>
                 </button>
                 <p style="font-size: 0.9rem; color: var(--text-dim); margin-top: 1rem; text-align: center;">
                     Guest mode: Progress won't be saved permanently
@@ -1080,10 +1552,10 @@
     <div id="userPanel" class="user-panel">
         <div id="userAvatar" class="user-avatar">U</div>
         <div>
-            <div id="userName" style="font-weight: 700; color: var(--accent);">User Name</div>
-            <div id="userEmail" style="font-size: 0.9rem; color: var(--text-dim);">user@example.com</div>
+            <div id="userName" style="font-weight: 700; color: var(--accent);">Commander</div>
+            <div id="userEmail" style="font-size: 0.9rem; color: var(--text-dim);">user@universe.com</div>
         </div>
-        <button class="btn btn-secondary" onclick="logout()" style="padding: 0.5rem 1rem;">Logout</button>
+        <button class="btn btn-secondary" onclick="logout()" style="padding: 0.8rem 1.5rem;">Logout</button>
     </div>
 
     <!-- Navigation -->
@@ -1094,23 +1566,66 @@
         <div class="nav-btn" onclick="showSettings()">
             ⚙️ Settings
         </div>
+        <div class="nav-btn" onclick="showMultiplayer()">
+            🌌 Multiplayer
+        </div>
     </div>
 
     <div class="main-container">
         <!-- Header -->
         <header class="header">
             <h1 class="main-title neon">🎯 NUMERO QUEST</h1>
-            <p class="subtitle">Ultimate Gaming Hub - Challenge Your Mind!</p>
+            <p class="subtitle">Ultimate Gaming Universe - Challenge Your Mind!</p>
         </header>
 
         <!-- Main Menu -->
         <div id="mainMenu">
+            <!-- Multiplayer Section -->
+            <div class="multiplayer-section glass neon-border">
+                <h2 class="multiplayer-title neon">🌌 GALACTIC MULTIPLAYER ARENA</h2>
+                <p style="text-align: center; font-size: 1.2rem; color: var(--text-dim); margin-bottom: 2rem;">
+                    Battle players across the universe in real-time epic challenges!
+                </p>
+                
+                <div class="room-controls">
+                    <div>
+                        <input type="text" class="room-input" placeholder="🏠 Room Name" id="roomName" maxlength="20">
+                        <button class="btn btn-primary btn-full" onclick="createRoom()">
+                            🚀 Create Room
+                        </button>
+                    </div>
+                    <div>
+                        <input type="text" class="room-input" placeholder="🔑 Room Code" id="roomCode" maxlength="6">
+                        <button class="btn btn-secondary btn-full" onclick="joinRoom()">
+                            🌟 Join Room
+                        </button>
+                    </div>
+                </div>
+
+                <div id="multiplayerStatus" class="text-center" style="margin: 2rem 0;">
+                    <p style="font-size: 1.1rem; color: var(--accent);">Ready to battle! Create or join a room to start.</p>
+                </div>
+
+                <div id="playersPanel" class="players-list hidden">
+                    <h3 style="color: var(--accent); margin-bottom: 1rem; font-family: 'Orbitron', monospace;">👥 Battle Squad</h3>
+                    <div id="playersList"></div>
+                    <div style="text-align: center; margin-top: 2rem;">
+                        <button class="btn btn-success btn-full" onclick="startMultiplayerGame()" id="startGameBtn" disabled>
+                            ⚡ START BATTLE
+                        </button>
+                        <button class="btn btn-secondary" onclick="leaveRoom()" style="margin-top: 1rem;">
+                            🚪 Leave Room
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <div class="games-grid">
                 <div class="game-card glass neon-border" onclick="showGameMode('numberQuest')">
                     <div class="game-icon">🎯</div>
                     <div class="game-title">Number Quest</div>
                     <div class="game-description">
-                        Classic number guessing game with 10 progressive levels for each difficulty!
+                        Epic number guessing adventure with 10 progressive levels across multiple difficulties!
                     </div>
                 </div>
 
@@ -1118,7 +1633,7 @@
                     <div class="game-icon">🧠</div>
                     <div class="game-title">Memory Challenge</div>
                     <div class="game-description">
-                        Test your memory! Find matching pairs of cards in the shortest time possible.
+                        Test your neural pathways! Find matching pairs in this mind-bending memory game.
                     </div>
                 </div>
 
@@ -1126,7 +1641,7 @@
                     <div class="game-icon">⚡</div>
                     <div class="game-title">Reaction Time</div>
                     <div class="game-description">
-                        Test your reflexes! Click on targets that appear as fast as possible.
+                        Lightning-fast reflex testing! Click targets as they appear in this high-speed challenge.
                     </div>
                 </div>
 
@@ -1134,7 +1649,7 @@
                     <div class="game-icon">🔄</div>
                     <div class="game-title">Pattern Master</div>
                     <div class="game-description">
-                        Memorize and repeat increasingly complex sequences. How far can you go?
+                        Master complex sequences! Memorize and repeat increasingly difficult patterns.
                     </div>
                 </div>
 
@@ -1142,7 +1657,7 @@
                     <div class="game-icon">🌈</div>
                     <div class="game-title">Color Match</div>
                     <div class="game-description">
-                        Match the right colors under time pressure. Precision and speed are key!
+                        Chromatic chaos! Match colors under intense time pressure in this visual challenge.
                     </div>
                 </div>
 
@@ -1150,18 +1665,18 @@
                     <div class="game-icon">🧮</div>
                     <div class="game-title">Quick Math</div>
                     <div class="game-description">
-                        Solve math operations as fast as possible. Train your brain!
+                        Mathematical mayhem! Solve equations at light speed to boost your brain power.
                     </div>
                 </div>
             </div>
 
             <!-- Stats Panel -->
             <div class="stats-panel glass neon-border">
-                <h3 class="stats-title neon">📊 Your Epic Statistics</h3>
+                <h3 class="stats-title neon">📊 Commander Statistics</h3>
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-value neon" id="totalGames">0</div>
-                        <div class="stat-label">Total Games</div>
+                        <div class="stat-label">Total Battles</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-value neon" id="totalWins">0</div>
@@ -1175,6 +1690,70 @@
                         <div class="stat-value neon" id="winRate">0%</div>
                         <div class="stat-label">Win Rate</div>
                     </div>
+                    <div class="stat-card">
+                        <div class="stat-value neon" id="multiplayerWins">0</div>
+                        <div class="stat-label">MP Victories</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value neon" id="totalRooms">0</div>
+                        <div class="stat-label">Rooms Created</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Multiplayer Game Screen -->
+        <div id="multiplayerGame" class="hidden">
+            <div class="game-interface glass neon-border">
+                <div class="game-header">
+                    <h2 class="game-title-main neon">🌌 Galactic Battle Arena</h2>
+                    <div id="multiplayerGameInfo" style="text-align: center; margin: 1rem 0;">
+                        <span style="color: var(--accent); font-weight: bold;">Room: </span>
+                        <span id="currentRoomName" style="color: var(--primary);">-</span>
+                        <span style="margin: 0 2rem; color: var(--accent); font-weight: bold;">Players: </span>
+                        <span id="currentPlayerCount" style="color: var(--primary);">0</span>
+                    </div>
+                </div>
+
+                <div class="stats-grid mb-2">
+                    <div class="stat-card">
+                        <div class="stat-value neon" id="mpCurrentNumber">?</div>
+                        <div class="stat-label">Target Number</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value neon" id="mpAttemptsLeft">10</div>
+                        <div class="stat-label">Attempts</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value neon" id="mpCurrentScore">0</div>
+                        <div class="stat-label">Your Score</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value neon" id="mpRoundTime">30</div>
+                        <div class="stat-label">Round Time</div>
+                    </div>
+                </div>
+
+                <div class="game-area">
+                    <div class="control-panel glass neon-border">
+                        <h3 class="text-center neon" style="margin-bottom: 2rem;">🎯 Battle Control</h3>
+                        <input type="number" id="mpGuessInput" class="game-input" placeholder="Enter your guess" min="0">
+                        <button id="mpSubmitGuess" class="btn btn-primary btn-full" onclick="makeMultiplayerGuess()">
+                            ⚡ FIRE GUESS!
+                        </button>
+                        <div id="mpHint" class="hint-display"></div>
+                    </div>
+
+                    <div class="history-panel glass neon-border">
+                        <h3 class="text-center neon" style="margin-bottom: 2rem;">🏆 Battle Leaderboard</h3>
+                        <div id="mpLeaderboard" style="max-height: 400px; overflow-y: auto;"></div>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <button class="btn btn-secondary" onclick="leaveMultiplayerGame()">
+                        🚪 Leave Battle
+                    </button>
                 </div>
             </div>
         </div>
@@ -1258,7 +1837,7 @@
 
                     <div class="history-panel glass neon-border">
                         <h3 class="text-center neon" style="margin-bottom: 2rem;">📜 Attempt History</h3>
-                        <div id="history" style="max-height: 300px; overflow-y: auto;"></div>
+                        <div id="history" style="max-height: 400px; overflow-y: auto;"></div>
                     </div>
                 </div>
 
@@ -1503,13 +2082,13 @@
         <div id="settings" class="hidden">
             <div class="game-interface glass neon-border">
                 <div class="game-header">
-                    <h2 class="game-title-main neon">⚙️ Epic Settings</h2>
+                    <h2 class="game-title-main neon">⚙️ Universe Settings</h2>
                 </div>
                 
                 <div class="settings-grid">
                     <!-- Audio Settings -->
                     <div class="setting-group">
-                        <div class="setting-title neon">🎵 Audio</div>
+                        <div class="setting-title neon">🎵 Audio Control</div>
                         <div style="margin: 1rem 0;">
                             <label style="display: block; margin-bottom: 0.5rem;">Music Volume:</label>
                             <input type="range" class="slider" id="musicVolume" min="0" max="100" value="50" onchange="setMusicVolume(this.value)">
@@ -1524,22 +2103,23 @@
 
                     <!-- Theme Settings -->
                     <div class="setting-group">
-                        <div class="setting-title neon">🎨 Themes</div>
+                        <div class="setting-title neon">🎨 Universe Themes</div>
                         <div class="theme-grid">
                             <div class="theme-option theme-cyber active" onclick="setTheme('cyber')" data-theme="cyber"></div>
                             <div class="theme-option theme-neon" onclick="setTheme('neon')" data-theme="neon"></div>
                             <div class="theme-option theme-matrix" onclick="setTheme('matrix')" data-theme="matrix"></div>
                             <div class="theme-option theme-fire" onclick="setTheme('fire')" data-theme="fire"></div>
                             <div class="theme-option theme-ice" onclick="setTheme('ice')" data-theme="ice"></div>
+                            <div class="theme-option theme-galaxy" onclick="setTheme('galaxy')" data-theme="galaxy"></div>
                         </div>
                         <div class="text-center" style="margin-top: 1rem; font-size: 0.9rem; color: var(--text-dim);">
-                            Cyber • Neon • Matrix • Fire • Ice
+                            Cyber • Neon • Matrix • Fire • Ice • Galaxy
                         </div>
                     </div>
 
                     <!-- Game Settings -->
                     <div class="setting-group">
-                        <div class="setting-title neon">🎮 Game</div>
+                        <div class="setting-title neon">🎮 Game Control</div>
                         <button class="btn btn-secondary btn-full" onclick="resetAllStats()">
                             🗑️ Reset Statistics
                         </button>
@@ -1567,7 +2147,7 @@
 
                 <div class="text-center mt-2">
                     <button class="btn btn-primary" onclick="showMainMenu()">
-                        🏠 Back to Menu
+                        🏠 Back to Universe
                     </button>
                 </div>
             </div>
@@ -1578,6 +2158,17 @@
         // Game State Management
         let currentUser = null;
         let isLoggedIn = false;
+
+        // Multiplayer State
+        let multiplayerState = {
+            inRoom: false,
+            roomName: '',
+            roomCode: '',
+            players: [],
+            isHost: false,
+            gameActive: false,
+            currentGame: null
+        };
 
         // Game State
         let gameState = {
@@ -1683,11 +2274,9 @@
 
         // Initialize application
         document.addEventListener('DOMContentLoaded', function() {
-            createBackgroundAnimation();
+            createAdvancedBackground();
             loadSettings();
             checkLoginStatus();
-            
-            // Event listeners
             setupEventListeners();
         });
 
@@ -1697,6 +2286,13 @@
             if (guessInput) {
                 guessInput.addEventListener('keypress', function(e) {
                     if (e.key === 'Enter') makeGuess();
+                });
+            }
+
+            const mpGuessInput = document.getElementById('mpGuessInput');
+            if (mpGuessInput) {
+                mpGuessInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') makeMultiplayerGuess();
                 });
             }
 
@@ -1728,25 +2324,55 @@
                     if (e.key === 'Enter') registerUser();
                 });
             }
+
+            // Multiplayer listeners
+            const roomCode = document.getElementById('roomCode');
+            if (roomCode) {
+                roomCode.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') joinRoom();
+                });
+            }
+
+            const roomName = document.getElementById('roomName');
+            if (roomName) {
+                roomName.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') createRoom();
+                });
+            }
         }
 
-        // Background Animation
-        function createBackgroundAnimation() {
-            const bgAnimation = document.getElementById('bgAnimation');
-            const numParticles = settings.reduceParticles ? 20 : 50;
+        // Advanced Background System
+        function createAdvancedBackground() {
+            const particleField = document.getElementById('particleField');
+            const numParticles = settings.reduceParticles ? 30 : 80;
 
-            bgAnimation.innerHTML = '';
+            particleField.innerHTML = '';
             for (let i = 0; i < numParticles; i++) {
                 const particle = document.createElement('div');
                 particle.className = 'particle';
                 particle.style.left = Math.random() * 100 + '%';
                 particle.style.top = Math.random() * 100 + '%';
-                particle.style.width = Math.random() * 4 + 2 + 'px';
+                particle.style.width = Math.random() * 6 + 2 + 'px';
                 particle.style.height = particle.style.width;
-                particle.style.animationDelay = Math.random() * 6 + 's';
-                particle.style.animationDuration = (Math.random() * 4 + 4) + 's';
-                bgAnimation.appendChild(particle);
+                particle.style.animationDelay = Math.random() * 8 + 's';
+                particle.style.animationDuration = (Math.random() * 6 + 6) + 's';
+                particleField.appendChild(particle);
             }
+        }
+
+        // Notification System
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.animation = 'notificationSlide 0.5s ease reverse';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 500);
+            }, 3000);
         }
 
         // Authentication Functions
@@ -1816,9 +2442,8 @@
             const password = document.getElementById('registerPassword').value;
             const confirmPassword = document.getElementById('registerConfirm').value;
 
-            // Validations
             if (!name) {
-                showError('registerError', '❌ Please enter your name!');
+                showError('registerError', '❌ Please enter your commander name!');
                 return;
             }
 
@@ -1847,19 +2472,15 @@
                 return;
             }
 
-            // Check if user already exists
             const existingUsers = JSON.parse(localStorage.getItem('numeroquest-users') || '{}');
             if (existingUsers[email]) {
                 showError('registerError', '❌ Email already registered! Please login.');
                 return;
             }
 
-            // Show spinner
             document.getElementById('registerSpinner').classList.remove('hidden');
 
-            // Simulate registration
             setTimeout(() => {
-                // Save user
                 const userData = {
                     name: name,
                     email: email,
@@ -1873,13 +2494,11 @@
                 document.getElementById('registerSpinner').classList.add('hidden');
                 showSuccess('registerSuccess', '✅ Registration completed! You can now login.');
 
-                // Clear form
                 document.getElementById('registerName').value = '';
                 document.getElementById('registerEmail').value = '';
                 document.getElementById('registerPassword').value = '';
                 document.getElementById('registerConfirm').value = '';
 
-                // Show login form after 2 seconds
                 setTimeout(() => {
                     showLoginForm();
                     document.getElementById('loginEmail').value = email;
@@ -1904,10 +2523,8 @@
                 return;
             }
 
-            // Show spinner
             document.getElementById('loginSpinner').classList.remove('hidden');
 
-            // Simulate login
             setTimeout(() => {
                 const existingUsers = JSON.parse(localStorage.getItem('numeroquest-users') || '{}');
                 const userData = existingUsers[email];
@@ -1924,7 +2541,6 @@
                     return;
                 }
 
-                // Login successful
                 currentUser = {
                     name: userData.name,
                     email: userData.email,
@@ -1936,14 +2552,15 @@
 
                 document.getElementById('loginSpinner').classList.add('hidden');
 
-                // Confetti effect
                 if (typeof confetti !== 'undefined') {
                     confetti({
-                        particleCount: 100,
+                        particleCount: 150,
                         spread: 70,
                         origin: { y: 0.6 }
                     });
                 }
+
+                showNotification('🚀 Welcome to the Universe!', 'success');
 
                 setTimeout(() => {
                     showGameHub();
@@ -1954,21 +2571,26 @@
 
         function loginAsGuest() {
             currentUser = {
-                name: 'Guest',
-                email: 'guest@numeroquest.com',
+                name: 'Guest Commander',
+                email: 'guest@universe.com',
                 provider: 'Guest'
             };
 
             isLoggedIn = true;
             localStorage.setItem('numeroquest-user', JSON.stringify(currentUser));
+            showNotification('👤 Entered as Guest', 'info');
             showGameHub();
         }
 
         function logout() {
             if (confirm('Are you sure you want to logout?')) {
+                if (multiplayerState.inRoom) {
+                    leaveRoom();
+                }
                 currentUser = null;
                 isLoggedIn = false;
                 localStorage.removeItem('numeroquest-user');
+                showNotification('👋 Logged out successfully', 'info');
                 showLoginScreen();
             }
         }
@@ -1980,6 +2602,446 @@
                 
                 const avatar = document.getElementById('userAvatar');
                 avatar.textContent = currentUser.name.charAt(0).toUpperCase();
+            }
+        }
+
+        // Multiplayer Functions
+        function showMultiplayer() {
+            showMainMenu();
+            document.querySelector('.multiplayer-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function createRoom() {
+            const roomName = document.getElementById('roomName').value.trim();
+            if (!roomName) {
+                showNotification('❌ Please enter a room name!', 'error');
+                return;
+            }
+
+            if (roomName.length < 3) {
+                showNotification('❌ Room name too short!', 'error');
+                return;
+            }
+
+            // Generate room code
+            const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+            
+            multiplayerState = {
+                inRoom: true,
+                roomName: roomName,
+                roomCode: roomCode,
+                players: [{
+                    name: currentUser.name,
+                    email: currentUser.email,
+                    status: 'ready',
+                    score: 0,
+                    isHost: true
+                }],
+                isHost: true,
+                gameActive: false,
+                currentGame: null
+            };
+
+            updateMultiplayerUI();
+            showNotification(`🚀 Room "${roomName}" created! Code: ${roomCode}`, 'success');
+            
+            // Save to localStorage for demo purposes
+            localStorage.setItem('numeroquest-room-' + roomCode, JSON.stringify(multiplayerState));
+            
+            // Update stats
+            const userKey = currentUser.email;
+            const totalRooms = parseInt(localStorage.getItem(`numeroquest-total-rooms-${userKey}`) || 0) + 1;
+            localStorage.setItem(`numeroquest-total-rooms-${userKey}`, totalRooms);
+            loadStats();
+        }
+
+        function joinRoom() {
+            const roomCode = document.getElementById('roomCode').value.trim().toUpperCase();
+            if (!roomCode) {
+                showNotification('❌ Please enter a room code!', 'error');
+                return;
+            }
+
+            // Try to load room from localStorage
+            const roomData = localStorage.getItem('numeroquest-room-' + roomCode);
+            if (!roomData) {
+                showNotification('❌ Room not found!', 'error');
+                return;
+            }
+
+            const room = JSON.parse(roomData);
+            
+            // Check if player already in room
+            const existingPlayer = room.players.find(p => p.email === currentUser.email);
+            if (existingPlayer) {
+                showNotification('❌ You are already in this room!', 'error');
+                return;
+            }
+
+            // Add player to room
+            room.players.push({
+                name: currentUser.name,
+                email: currentUser.email,
+                status: 'waiting',
+                score: 0,
+                isHost: false
+            });
+
+            multiplayerState = room;
+            multiplayerState.isHost = false;
+
+            // Save updated room
+            localStorage.setItem('numeroquest-room-' + roomCode, JSON.stringify(multiplayerState));
+
+            updateMultiplayerUI();
+            showNotification(`🌟 Joined room "${room.roomName}"!`, 'success');
+        }
+
+        function leaveRoom() {
+            if (!multiplayerState.inRoom) return;
+
+            if (multiplayerState.isHost) {
+                // Host leaving - delete room
+                localStorage.removeItem('numeroquest-room-' + multiplayerState.roomCode);
+                showNotification('🏠 Room closed', 'info');
+            } else {
+                // Player leaving - remove from room
+                const roomData = localStorage.getItem('numeroquest-room-' + multiplayerState.roomCode);
+                if (roomData) {
+                    const room = JSON.parse(roomData);
+                    room.players = room.players.filter(p => p.email !== currentUser.email);
+                    localStorage.setItem('numeroquest-room-' + multiplayerState.roomCode, JSON.stringify(room));
+                }
+                showNotification('👋 Left room', 'info');
+            }
+
+            multiplayerState = {
+                inRoom: false,
+                roomName: '',
+                roomCode: '',
+                players: [],
+                isHost: false,
+                gameActive: false,
+                currentGame: null
+            };
+
+            updateMultiplayerUI();
+        }
+
+        function updateMultiplayerUI() {
+            const playersPanel = document.getElementById('playersPanel');
+            const playersList = document.getElementById('playersList');
+            const startGameBtn = document.getElementById('startGameBtn');
+            const multiplayerStatus = document.getElementById('multiplayerStatus');
+
+            if (multiplayerState.inRoom) {
+                playersPanel.classList.remove('hidden');
+                multiplayerStatus.innerHTML = `
+                    <p style="color: var(--success); font-weight: bold;">🏠 Room: ${multiplayerState.roomName}</p>
+                    <p style="color: var(--primary); font-weight: bold;">🔑 Code: ${multiplayerState.roomCode}</p>
+                `;
+
+                // Update players list
+                playersList.innerHTML = '';
+                multiplayerState.players.forEach(player => {
+                    const playerEl = document.createElement('div');
+                    playerEl.className = 'player-item';
+                    
+                    const statusClass = player.status === 'ready' ? 'status-ready' : 
+                                       player.status === 'playing' ? 'status-playing' : 'status-waiting';
+                    
+                    const hostBadge = player.isHost ? ' 👑' : '';
+                    
+                    playerEl.innerHTML = `
+                        <div class="player-avatar">${player.name.charAt(0).toUpperCase()}</div>
+                        <div>
+                            <div style="font-weight: bold;">${player.name}${hostBadge}</div>
+                            <div style="font-size: 0.8rem; opacity: 0.8;">Score: ${player.score}</div>
+                        </div>
+                        <div class="player-status ${statusClass}">${player.status.toUpperCase()}</div>
+                    `;
+                    
+                    playersList.appendChild(playerEl);
+                });
+
+                // Update start button
+                if (multiplayerState.isHost) {
+                    const readyPlayers = multiplayerState.players.filter(p => p.status === 'ready').length;
+                    startGameBtn.disabled = readyPlayers < 2;
+                    startGameBtn.style.display = 'block';
+                } else {
+                    startGameBtn.style.display = 'none';
+                }
+
+            } else {
+                playersPanel.classList.add('hidden');
+                multiplayerStatus.innerHTML = `
+                    <p style="font-size: 1.1rem; color: var(--accent);">Ready to battle! Create or join a room to start.</p>
+                `;
+            }
+        }
+
+        function startMultiplayerGame() {
+            if (!multiplayerState.isHost) return;
+            
+            const readyPlayers = multiplayerState.players.filter(p => p.status === 'ready').length;
+            if (readyPlayers < 2) {
+                showNotification('❌ Need at least 2 ready players!', 'error');
+                return;
+            }
+
+            // Start multiplayer number quest
+            multiplayerState.gameActive = true;
+            multiplayerState.currentGame = 'numberQuest';
+            
+            // Set all players to playing
+            multiplayerState.players.forEach(player => {
+                player.status = 'playing';
+                player.score = 0;
+            });
+
+            // Generate secret number (1-100 for multiplayer)
+            const secretNumber = Math.floor(Math.random() * 100) + 1;
+            
+            // Initialize multiplayer game state
+            gameState.multiplayerQuest = {
+                secretNumber: secretNumber,
+                attemptsLeft: 10,
+                maxAttempts: 10,
+                score: 0,
+                gameStarted: true,
+                roundTime: 30,
+                timer: null
+            };
+
+            // Save room state
+            localStorage.setItem('numeroquest-room-' + multiplayerState.roomCode, JSON.stringify(multiplayerState));
+
+            showMultiplayerGame();
+            startMultiplayerRound();
+            showNotification('⚡ Battle started!', 'success');
+        }
+
+        function showMultiplayerGame() {
+            hideAllScreens();
+            document.getElementById('multiplayerGame').classList.remove('hidden');
+            
+            // Update room info
+            document.getElementById('currentRoomName').textContent = multiplayerState.roomName;
+            document.getElementById('currentPlayerCount').textContent = multiplayerState.players.length;
+        }
+
+        function startMultiplayerRound() {
+            if (!gameState.multiplayerQuest) return;
+
+            gameState.multiplayerQuest.roundTime = 30;
+            gameState.multiplayerQuest.gameStarted = true;
+
+            // Update UI
+            document.getElementById('mpCurrentNumber').textContent = '?';
+            document.getElementById('mpAttemptsLeft').textContent = gameState.multiplayerQuest.attemptsLeft;
+            document.getElementById('mpCurrentScore').textContent = gameState.multiplayerQuest.score;
+            document.getElementById('mpRoundTime').textContent = gameState.multiplayerQuest.roundTime;
+            document.getElementById('mpHint').textContent = 'Guess the number between 1-100!';
+
+            // Start round timer
+            gameState.multiplayerQuest.timer = setInterval(() => {
+                gameState.multiplayerQuest.roundTime--;
+                document.getElementById('mpRoundTime').textContent = gameState.multiplayerQuest.roundTime;
+                
+                if (gameState.multiplayerQuest.roundTime <= 5) {
+                    document.getElementById('mpRoundTime').classList.add('timer-warning');
+                }
+                
+                if (gameState.multiplayerQuest.roundTime <= 0) {
+                    endMultiplayerRound(false);
+                }
+            }, 1000);
+
+            updateMultiplayerLeaderboard();
+            document.getElementById('mpGuessInput').focus();
+        }
+
+        function makeMultiplayerGuess() {
+            if (!gameState.multiplayerQuest || !gameState.multiplayerQuest.gameStarted) return;
+            
+            const guess = parseInt(document.getElementById('mpGuessInput').value);
+            
+            if (isNaN(guess) || guess < 1 || guess > 100) {
+                showNotification('❌ Enter a number between 1-100!', 'error');
+                return;
+            }
+            
+            gameState.multiplayerQuest.attemptsLeft--;
+            
+            let hint = '';
+            let isCorrect = false;
+            
+            if (guess === gameState.multiplayerQuest.secretNumber) {
+                hint = '🎉 PERFECT! You found it!';
+                isCorrect = true;
+                
+                // Calculate score
+                const timeBonus = gameState.multiplayerQuest.roundTime * 10;
+                const attemptsBonus = gameState.multiplayerQuest.attemptsLeft * 50;
+                const roundScore = 1000 + timeBonus + attemptsBonus;
+                gameState.multiplayerQuest.score += roundScore;
+                
+                // Update player score in room
+                const player = multiplayerState.players.find(p => p.email === currentUser.email);
+                if (player) {
+                    player.score = gameState.multiplayerQuest.score;
+                    localStorage.setItem('numeroquest-room-' + multiplayerState.roomCode, JSON.stringify(multiplayerState));
+                }
+                
+                if (typeof confetti !== 'undefined') {
+                    confetti({
+                        particleCount: 100,
+                        spread: 70,
+                        origin: { y: 0.6 }
+                    });
+                }
+                
+                endMultiplayerRound(true);
+                
+            } else if (guess < gameState.multiplayerQuest.secretNumber) {
+                const diff = gameState.multiplayerQuest.secretNumber - guess;
+                if (diff <= 5) {
+                    hint = '🔥 Very close! Try HIGHER!';
+                } else if (diff <= 15) {
+                    hint = '📈 HIGHER!';
+                } else {
+                    hint = '⬆️ Much HIGHER!';
+                }
+            } else {
+                const diff = guess - gameState.multiplayerQuest.secretNumber;
+                if (diff <= 5) {
+                    hint = '🔥 Very close! Try LOWER!';
+                } else if (diff <= 15) {
+                    hint = '📉 LOWER!';
+                } else {
+                    hint = '⬇️ Much LOWER!';
+                }
+            }
+            
+            document.getElementById('mpHint').textContent = hint;
+            document.getElementById('mpAttemptsLeft').textContent = gameState.multiplayerQuest.attemptsLeft;
+            document.getElementById('mpCurrentScore').textContent = gameState.multiplayerQuest.score;
+            
+            // Check if out of attempts
+            if (gameState.multiplayerQuest.attemptsLeft <= 0 && !isCorrect) {
+                endMultiplayerRound(false);
+            }
+            
+            document.getElementById('mpGuessInput').value = '';
+            document.getElementById('mpGuessInput').focus();
+            updateMultiplayerLeaderboard();
+        }
+
+        function endMultiplayerRound(won) {
+            if (!gameState.multiplayerQuest) return;
+
+            gameState.multiplayerQuest.gameStarted = false;
+            
+            if (gameState.multiplayerQuest.timer) {
+                clearInterval(gameState.multiplayerQuest.timer);
+            }
+            
+            document.getElementById('mpRoundTime').classList.remove('timer-warning');
+            
+            if (won) {
+                document.getElementById('mpHint').textContent = `🏆 Round won! Number was ${gameState.multiplayerQuest.secretNumber}`;
+                showNotification('🏆 Round Victory!', 'success');
+            } else {
+                document.getElementById('mpHint').textContent = `💀 Round lost! Number was ${gameState.multiplayerQuest.secretNumber}`;
+                showNotification('💀 Round Over', 'error');
+            }
+            
+            document.getElementById('mpCurrentNumber').textContent = gameState.multiplayerQuest.secretNumber;
+            document.getElementById('mpSubmitGuess').disabled = true;
+            document.getElementById('mpGuessInput').disabled = true;
+            
+            // Update multiplayer stats
+            if (won) {
+                const userKey = currentUser.email;
+                const mpWins = parseInt(localStorage.getItem(`numeroquest-mp-wins-${userKey}`) || 0) + 1;
+                localStorage.setItem(`numeroquest-mp-wins-${userKey}`, mpWins);
+                loadStats();
+            }
+            
+            updateMultiplayerLeaderboard();
+            
+            // Auto-restart after 5 seconds if host
+            if (multiplayerState.isHost) {
+                setTimeout(() => {
+                    if (confirm('Start next round?')) {
+                        resetMultiplayerRound();
+                    }
+                }, 3000);
+            }
+        }
+
+        function resetMultiplayerRound() {
+            if (!multiplayerState.isHost) return;
+
+            // Generate new secret number
+            const secretNumber = Math.floor(Math.random() * 100) + 1;
+            
+            gameState.multiplayerQuest = {
+                secretNumber: secretNumber,
+                attemptsLeft: 10,
+                maxAttempts: 10,
+                score: gameState.multiplayerQuest ? gameState.multiplayerQuest.score : 0,
+                gameStarted: false,
+                roundTime: 30,
+                timer: null
+            };
+            
+            document.getElementById('mpSubmitGuess').disabled = false;
+            document.getElementById('mpGuessInput').disabled = false;
+            document.getElementById('mpHint').textContent = '';
+            
+            startMultiplayerRound();
+        }
+
+        function updateMultiplayerLeaderboard() {
+            const leaderboard = document.getElementById('mpLeaderboard');
+            if (!leaderboard) return;
+
+            // Sort players by score
+            const sortedPlayers = [...multiplayerState.players].sort((a, b) => b.score - a.score);
+            
+            leaderboard.innerHTML = '';
+            sortedPlayers.forEach((player, index) => {
+                const playerEl = document.createElement('div');
+                playerEl.className = 'player-item';
+                
+                const rankEmoji = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`;
+                const isCurrentPlayer = player.email === currentUser.email;
+                
+                playerEl.style.background = isCurrentPlayer ? 'rgba(0, 255, 255, 0.1)' : 'var(--glass)';
+                playerEl.style.border = isCurrentPlayer ? '2px solid var(--primary)' : '1px solid var(--glass-border)';
+                
+                playerEl.innerHTML = `
+                    <div style="font-size: 1.5rem; margin-right: 1rem;">${rankEmoji}</div>
+                    <div class="player-avatar">${player.name.charAt(0).toUpperCase()}</div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: bold; color: ${isCurrentPlayer ? 'var(--primary)' : 'var(--text)'};">
+                            ${player.name}${player.isHost ? ' 👑' : ''}
+                        </div>
+                        <div style="font-size: 0.9rem; opacity: 0.8;">Score: ${player.score}</div>
+                    </div>
+                    <div class="player-status status-${player.status}">${player.status.toUpperCase()}</div>
+                `;
+                
+                leaderboard.appendChild(playerEl);
+            });
+        }
+
+        function leaveMultiplayerGame() {
+            if (confirm('Are you sure you want to leave the battle?')) {
+                leaveRoom();
+                showMainMenu();
             }
         }
 
@@ -1998,10 +3060,8 @@
         }
 
         function applySettings() {
-            // Apply theme
             document.body.className = `theme-${settings.theme}`;
             
-            // Update settings UI
             const musicVolume = document.getElementById('musicVolume');
             if (musicVolume) {
                 musicVolume.value = settings.musicVolume;
@@ -2012,7 +3072,6 @@
                 if (reduceAnimations) reduceAnimations.checked = settings.reduceAnimations;
                 if (reduceParticles) reduceParticles.checked = settings.reduceParticles;
                 
-                // Update active theme
                 document.querySelectorAll('.theme-option').forEach(option => {
                     option.classList.remove('active');
                 });
@@ -2033,13 +3092,16 @@
             const activeTheme = document.querySelector(`[data-theme="${theme}"]`);
             if (activeTheme) activeTheme.classList.add('active');
             
+            createAdvancedBackground();
             saveSettings();
+            showNotification(`🎨 Theme changed to ${theme}`, 'success');
         }
 
         function toggleMusic() {
             settings.musicEnabled = !settings.musicEnabled;
             updateMusicStatus();
             saveSettings();
+            showNotification(`🎵 Music ${settings.musicEnabled ? 'enabled' : 'disabled'}`, 'info');
         }
 
         function updateMusicStatus() {
@@ -2064,12 +3126,14 @@
         function toggleAnimations(reduce) {
             settings.reduceAnimations = reduce;
             saveSettings();
+            showNotification(`⚡ Animations ${reduce ? 'reduced' : 'restored'}`, 'info');
         }
 
         function toggleParticles(reduce) {
             settings.reduceParticles = reduce;
-            createBackgroundAnimation();
+            createAdvancedBackground();
             saveSettings();
+            showNotification(`✨ Particles ${reduce ? 'reduced' : 'restored'}`, 'info');
         }
 
         // Statistics Functions
@@ -2080,10 +3144,14 @@
             const totalGames = localStorage.getItem(`numeroquest-total-games-${userKey}`) || 0;
             const totalWins = localStorage.getItem(`numeroquest-total-wins-${userKey}`) || 0;
             const bestScore = localStorage.getItem(`numeroquest-best-score-${userKey}`) || 0;
+            const multiplayerWins = localStorage.getItem(`numeroquest-mp-wins-${userKey}`) || 0;
+            const totalRooms = localStorage.getItem(`numeroquest-total-rooms-${userKey}`) || 0;
             
             document.getElementById('totalGames').textContent = totalGames;
             document.getElementById('totalWins').textContent = totalWins;
             document.getElementById('bestScore').textContent = bestScore;
+            document.getElementById('multiplayerWins').textContent = multiplayerWins;
+            document.getElementById('totalRooms').textContent = totalRooms;
             
             const winRate = totalGames > 0 ? Math.round((totalWins / totalGames) * 100) : 0;
             document.getElementById('winRate').textContent = winRate + '%';
@@ -2111,15 +3179,17 @@
                     localStorage.removeItem(`numeroquest-total-games-${userKey}`);
                     localStorage.removeItem(`numeroquest-total-wins-${userKey}`);
                     localStorage.removeItem(`numeroquest-best-score-${userKey}`);
+                    localStorage.removeItem(`numeroquest-mp-wins-${userKey}`);
+                    localStorage.removeItem(`numeroquest-total-rooms-${userKey}`);
                 }
                 loadStats();
-                alert('✅ Statistics reset!');
+                showNotification('✅ Statistics reset!', 'success');
             }
         }
 
         function exportStats() {
             if (!isLoggedIn) {
-                alert('You must be logged in to export statistics!');
+                showNotification('❌ Must be logged in to export!', 'error');
                 return;
             }
             
@@ -2129,6 +3199,8 @@
                 totalGames: localStorage.getItem(`numeroquest-total-games-${userKey}`) || 0,
                 totalWins: localStorage.getItem(`numeroquest-total-wins-${userKey}`) || 0,
                 bestScore: localStorage.getItem(`numeroquest-best-score-${userKey}`) || 0,
+                multiplayerWins: localStorage.getItem(`numeroquest-mp-wins-${userKey}`) || 0,
+                totalRooms: localStorage.getItem(`numeroquest-total-rooms-${userKey}`) || 0,
                 settings: settings
             };
             
@@ -2142,36 +3214,54 @@
             link.click();
             
             URL.revokeObjectURL(url);
+            showNotification('📤 Stats exported!', 'success');
         }
 
         function showCredits() {
-            alert(`🎯 NUMERO QUEST - Ultimate Gaming Hub
+            const creditsText = `🎯 NUMERO QUEST - Ultimate Gaming Universe
 
-🔐 Authentication System:
-• Complete registration with email and password
-• Secure login with validation
-• Guest mode available
+🔐 Advanced Authentication System:
+• Complete registration with email validation
+• Secure login with password protection
+• Guest mode for quick access
 • Personalized user statistics
 • Local data storage
 
+🌌 Multiplayer Features:
+• Real-time room creation and joining
+• Live leaderboards and scoring
+• Host controls and game management
+• Battle statistics tracking
+• Cross-player competition
+
 🎮 Game Modes:
-• Number Quest - Guess the secret number
-• Memory Challenge - Find matching pairs
-• Reaction Time - Test your reflexes
-• Pattern Master - Memorize sequences
-• Color Match - Match colors quickly
-• Quick Math - Solve math problems
+• Number Quest - Epic number guessing adventure
+• Memory Challenge - Neural pathway testing
+• Reaction Time - Lightning reflex challenges
+• Pattern Master - Sequence memorization
+• Color Match - Chromatic chaos
+• Quick Math - Mathematical mayhem
 
-🎨 Features:
-• 5 Customizable themes
-• Background music
-• Progressive level system
-• Detailed user statistics
-• Epic visual effects
-• Complete authentication system
+🎨 Advanced Features:
+• 6 Ultra-modern themes (Cyber, Neon, Matrix, Fire, Ice, Galaxy)
+• Advanced particle systems and animations
+• Glassmorphism UI with neon effects
+• Responsive design for all devices
+• Performance optimization settings
+• Complete statistics system
 
-Version 5.0 - Ultimate Gaming Experience
-Created with ❤️ to challenge your mind!`);
+⚡ Technical Excellence:
+• Ultra-smooth animations with CSS3
+• Advanced background particle systems
+• Real-time multiplayer simulation
+• Comprehensive notification system
+• Modern glassmorphism design
+• Optimized for performance
+
+Version 5.0 - Ultimate Gaming Universe
+Created with ❤️ and cutting-edge technology!`;
+
+            alert(creditsText);
         }
 
         // Navigation Functions
@@ -2193,14 +3283,14 @@ Created with ❤️ to challenge your mind!`);
         }
 
         function hideAllScreens() {
-            const screens = ['mainMenu', 'numberQuest', 'memoryChallenge', 'reactionTime', 'patternMaster', 'colorMatch', 'quickMath', 'settings'];
+            const screens = ['mainMenu', 'numberQuest', 'memoryChallenge', 'reactionTime', 'patternMaster', 'colorMatch', 'quickMath', 'settings', 'multiplayerGame'];
             screens.forEach(screen => {
                 const element = document.getElementById(screen);
                 if (element) element.classList.add('hidden');
             });
         }
 
-        // Number Quest Game Functions
+        // Number Quest Functions
         function selectDifficulty(difficulty) {
             gameState.numberQuest.difficulty = difficulty;
             
@@ -2240,18 +3330,15 @@ Created with ❤️ to challenge your mind!`);
         function startNumberQuestTimer() {
             gameState.numberQuest.timer = setInterval(() => {
                 gameState.numberQuest.timeLeft--;
-                const timerDisplay = document.getElementById('timerDisplay');
-                if (timerDisplay) {
-                    timerDisplay.textContent = gameState.numberQuest.timeLeft;
-                    
-                    if (gameState.numberQuest.timeLeft <= 10) {
-                        timerDisplay.classList.add('timer-warning');
-                    }
-                    
-                    if (gameState.numberQuest.timeLeft <= 0) {
-                        clearInterval(gameState.numberQuest.timer);
-                        endNumberQuestLevel(false);
-                    }
+                document.getElementById('timerDisplay').textContent = gameState.numberQuest.timeLeft;
+                
+                if (gameState.numberQuest.timeLeft <= 10) {
+                    document.getElementById('timerDisplay').classList.add('timer-warning');
+                }
+                
+                if (gameState.numberQuest.timeLeft <= 0) {
+                    clearInterval(gameState.numberQuest.timer);
+                    endNumberQuestLevel(false);
                 }
             }, 1000);
         }
@@ -2277,15 +3364,13 @@ Created with ❤️ to challenge your mind!`);
                 hint = '🎉 PERFECT! Level completed!';
                 isCorrect = true;
                 
-                // Calculate level score
                 const baseScore = currentLevelConfig.max;
                 const attemptsBonus = gameState.numberQuest.attemptsLeft * 20;
                 const timeBonus = config.hasTimer ? gameState.numberQuest.timeLeft * 5 : 0;
                 gameState.numberQuest.levelScore = baseScore + attemptsBonus + timeBonus;
                 gameState.numberQuest.score += gameState.numberQuest.levelScore;
                 
-                // Confetti effect
-                if (typeof confetti !== 'undefined' && !settings.reduceParticles) {
+                if (typeof confetti !== 'undefined') {
                     confetti({
                         particleCount: 100,
                         spread: 70,
@@ -2298,7 +3383,7 @@ Created with ❤️ to challenge your mind!`);
             } else if (guess < gameState.numberQuest.secretNumber) {
                 const diff = gameState.numberQuest.secretNumber - guess;
                 if (diff <= 5) {
-                    hint = '🔥 Very hot! Try a HIGHER number!';
+                    hint = '🔥 Very hot! Try HIGHER!';
                 } else if (diff <= 15) {
                     hint = '📈 HIGHER!';
                 } else if (diff <= 50) {
@@ -2309,7 +3394,7 @@ Created with ❤️ to challenge your mind!`);
             } else {
                 const diff = guess - gameState.numberQuest.secretNumber;
                 if (diff <= 5) {
-                    hint = '🔥 Very hot! Try a LOWER number!';
+                    hint = '🔥 Very hot! Try LOWER!';
                 } else if (diff <= 15) {
                     hint = '📉 LOWER!';
                 } else if (diff <= 50) {
@@ -2319,7 +3404,6 @@ Created with ❤️ to challenge your mind!`);
                 }
             }
             
-            // Add to history
             gameState.numberQuest.history.unshift({
                 guess: guess,
                 hint: hint,
@@ -2330,7 +3414,6 @@ Created with ❤️ to challenge your mind!`);
             updateNumberQuestDisplay();
             updateNumberQuestHistory();
             
-            // Check game over
             if (gameState.numberQuest.attemptsLeft <= 0 && !isCorrect) {
                 endNumberQuestLevel(false);
             }
@@ -2348,7 +3431,6 @@ Created with ❤️ to challenge your mind!`);
             
             if (won) {
                 if (gameState.numberQuest.currentLevel < 10) {
-                    // Next level
                     setTimeout(() => {
                         gameState.numberQuest.currentLevel++;
                         showHint(`🎊 Level ${gameState.numberQuest.currentLevel}/10 - Score: +${gameState.numberQuest.levelScore}`);
@@ -2357,11 +3439,10 @@ Created with ❤️ to challenge your mind!`);
                         }, 2000);
                     }, 1500);
                 } else {
-                    // Game completed!
                     showHint(`🏆 ALL LEVELS COMPLETED! Final score: ${gameState.numberQuest.score}`);
                     saveStats(true, gameState.numberQuest.score);
+                    showNotification('🏆 Quest Completed!', 'success');
                     
-                    // Reset for new game
                     setTimeout(() => {
                         resetNumberQuest();
                     }, 3000);
@@ -2375,10 +3456,8 @@ Created with ❤️ to challenge your mind!`);
                 }, 2000);
             }
             
-            const submitGuess = document.getElementById('submitGuess');
-            const guessInput = document.getElementById('guessInput');
-            if (submitGuess) submitGuess.disabled = true;
-            if (guessInput) guessInput.disabled = true;
+            document.getElementById('submitGuess').disabled = true;
+            document.getElementById('guessInput').disabled = true;
         }
 
         function resetNumberQuest() {
@@ -2396,21 +3475,13 @@ Created with ❤️ to challenge your mind!`);
                 timeLeft: 40
             };
             
-            const submitGuess = document.getElementById('submitGuess');
-            const guessInput = document.getElementById('guessInput');
-            const hint = document.getElementById('hint');
-            const history = document.getElementById('history');
-            const timerDisplay = document.getElementById('timerDisplay');
-            const levelProgress = document.getElementById('levelProgress');
-            const numberGameArea = document.getElementById('numberGameArea');
-            
-            if (submitGuess) submitGuess.disabled = false;
-            if (guessInput) guessInput.disabled = false;
-            if (hint) hint.textContent = '';
-            if (history) history.innerHTML = '';
-            if (timerDisplay) timerDisplay.classList.remove('timer-warning');
-            if (levelProgress) levelProgress.classList.add('hidden');
-            if (numberGameArea) numberGameArea.classList.add('hidden');
+            document.getElementById('submitGuess').disabled = false;
+            document.getElementById('guessInput').disabled = false;
+            document.getElementById('hint').textContent = '';
+            document.getElementById('history').innerHTML = '';
+            document.getElementById('timerDisplay').classList.remove('timer-warning');
+            document.getElementById('levelProgress').classList.add('hidden');
+            document.getElementById('numberGameArea').classList.add('hidden');
             
             updateNumberQuestDisplay();
         }
@@ -2419,48 +3490,29 @@ Created with ❤️ to challenge your mind!`);
             const config = numberQuestDifficulties[gameState.numberQuest.difficulty];
             const currentLevelConfig = config.levels[gameState.numberQuest.currentLevel - 1];
             
-            const elements = {
-                attemptsLeft: document.getElementById('attemptsLeft'),
-                currentScore: document.getElementById('currentScore'),
-                levelScore: document.getElementById('levelScore'),
-                currentLevel: document.getElementById('currentLevel'),
-                levelRange: document.getElementById('levelRange'),
-                levelFill: document.getElementById('levelFill'),
-                guessInput: document.getElementById('guessInput'),
-                currentNumber: document.getElementById('currentNumber')
-            };
+            document.getElementById('attemptsLeft').textContent = gameState.numberQuest.attemptsLeft;
+            document.getElementById('currentScore').textContent = gameState.numberQuest.score;
+            document.getElementById('levelScore').textContent = gameState.numberQuest.levelScore;
+            document.getElementById('currentLevel').textContent = gameState.numberQuest.currentLevel;
+            document.getElementById('levelRange').textContent = `Range: ${currentLevelConfig.min}-${currentLevelConfig.max}`;
             
-            if (elements.attemptsLeft) elements.attemptsLeft.textContent = gameState.numberQuest.attemptsLeft;
-            if (elements.currentScore) elements.currentScore.textContent = gameState.numberQuest.score;
-            if (elements.levelScore) elements.levelScore.textContent = gameState.numberQuest.levelScore;
-            if (elements.currentLevel) elements.currentLevel.textContent = gameState.numberQuest.currentLevel;
-            if (elements.levelRange) elements.levelRange.textContent = `Range: ${currentLevelConfig.min}-${currentLevelConfig.max}`;
-            
-            // Update progress bar
             const progress = (gameState.numberQuest.currentLevel / 10) * 100;
-            if (elements.levelFill) elements.levelFill.style.width = progress + '%';
+            document.getElementById('levelFill').style.width = progress + '%';
             
-            // Update input
-            if (elements.guessInput) {
-                elements.guessInput.min = currentLevelConfig.min;
-                elements.guessInput.max = currentLevelConfig.max;
-                elements.guessInput.placeholder = `Number (${currentLevelConfig.min}-${currentLevelConfig.max})`;
-            }
+            const guessInput = document.getElementById('guessInput');
+            guessInput.min = currentLevelConfig.min;
+            guessInput.max = currentLevelConfig.max;
+            guessInput.placeholder = `Number (${currentLevelConfig.min}-${currentLevelConfig.max})`;
             
-            // Show secret number only if game finished
-            if (elements.currentNumber) {
-                if (!gameState.numberQuest.gameStarted && gameState.numberQuest.secretNumber > 0) {
-                    elements.currentNumber.textContent = gameState.numberQuest.secretNumber;
-                } else {
-                    elements.currentNumber.textContent = '?';
-                }
+            if (!gameState.numberQuest.gameStarted && gameState.numberQuest.secretNumber > 0) {
+                document.getElementById('currentNumber').textContent = gameState.numberQuest.secretNumber;
+            } else {
+                document.getElementById('currentNumber').textContent = '?';
             }
         }
 
         function updateNumberQuestHistory() {
             const historyEl = document.getElementById('history');
-            if (!historyEl) return;
-            
             historyEl.innerHTML = '';
             
             gameState.numberQuest.history.forEach((entry, index) => {
@@ -2468,11 +3520,11 @@ Created with ❤️ to challenge your mind!`);
                 entryEl.className = 'history-item';
                 
                 entryEl.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                        <span style="font-weight: 700; color: var(--accent);">Attempt ${gameState.numberQuest.maxAttempts - entry.attemptsLeft}</span>
-                        <span style="font-size: 1.2rem; font-weight: 700; color: var(--primary);">${entry.guess}</span>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-weight: bold; color: var(--accent);">Attempt ${gameState.numberQuest.maxAttempts - entry.attemptsLeft}</span>
+                        <span style="font-size: 1.2rem; font-weight: bold; color: var(--primary);">${entry.guess}</span>
                     </div>
-                    <div style="color: var(--text-dim);">${entry.hint}</div>
+                    <div style="margin-top: 0.5rem; color: var(--text-dim);">${entry.hint}</div>
                 `;
                 
                 historyEl.appendChild(entryEl);
@@ -2480,8 +3532,7 @@ Created with ❤️ to challenge your mind!`);
         }
 
         function showHint(message) {
-            const hint = document.getElementById('hint');
-            if (hint) hint.textContent = message;
+            document.getElementById('hint').textContent = message;
         }
 
         // Memory Game Functions
@@ -2501,8 +3552,7 @@ Created with ❤️ to challenge your mind!`);
             
             gameState.memoryGame.timer = setInterval(() => {
                 gameState.memoryGame.time++;
-                const memoryTime = document.getElementById('memoryTime');
-                if (memoryTime) memoryTime.textContent = gameState.memoryGame.time;
+                document.getElementById('memoryTime').textContent = gameState.memoryGame.time;
             }, 1000);
         }
 
@@ -2514,22 +3564,17 @@ Created with ❤️ to challenge your mind!`);
             
             gameState.memoryGame.cards = [];
             
-            // Create pairs
             for (let i = 0; i < pairsNeeded; i++) {
                 const symbol = symbols[i % symbols.length];
                 gameState.memoryGame.cards.push(symbol, symbol);
             }
             
-            // Shuffle
             for (let i = gameState.memoryGame.cards.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [gameState.memoryGame.cards[i], gameState.memoryGame.cards[j]] = [gameState.memoryGame.cards[j], gameState.memoryGame.cards[i]];
             }
             
-            // Create grid
             const grid = document.getElementById('memoryGrid');
-            if (!grid) return;
-            
             grid.innerHTML = '';
             
             gameState.memoryGame.cards.forEach((symbol, index) => {
@@ -2547,7 +3592,7 @@ Created with ❤️ to challenge your mind!`);
             if (gameState.memoryGame.flippedCards.length >= 2) return;
             
             const card = document.querySelector(`[data-index="${index}"]`);
-            if (!card || card.classList.contains('flipped') || card.classList.contains('matched')) return;
+            if (card.classList.contains('flipped') || card.classList.contains('matched')) return;
             
             card.classList.add('flipped');
             card.textContent = card.dataset.symbol;
@@ -2568,17 +3613,15 @@ Created with ❤️ to challenge your mind!`);
             const firstCard = document.querySelector(`[data-index="${first}"]`);
             const secondCard = document.querySelector(`[data-index="${second}"]`);
             
-            if (firstCard && secondCard && firstCard.dataset.symbol === secondCard.dataset.symbol) {
-                // Match!
+            if (firstCard.dataset.symbol === secondCard.dataset.symbol) {
                 firstCard.classList.add('matched');
                 secondCard.classList.add('matched');
                 gameState.memoryGame.pairs++;
                 
                 if (gameState.memoryGame.pairs === 8) {
-                    // Level completed
                     clearInterval(gameState.memoryGame.timer);
                     
-                    if (typeof confetti !== 'undefined' && !settings.reduceParticles) {
+                    if (typeof confetti !== 'undefined') {
                         confetti({
                             particleCount: 100,
                             spread: 70,
@@ -2587,20 +3630,15 @@ Created with ❤️ to challenge your mind!`);
                     }
                     
                     setTimeout(() => {
-                        alert(`🎉 Level completed!\nTime: ${gameState.memoryGame.time}s\nMoves: ${gameState.memoryGame.moves}`);
+                        showNotification(`🎉 Level completed! Time: ${gameState.memoryGame.time}s, Moves: ${gameState.memoryGame.moves}`, 'success');
                         startMemoryGame();
                     }, 1000);
                 }
             } else {
-                // No match
-                if (firstCard) {
-                    firstCard.classList.remove('flipped');
-                    firstCard.textContent = '?';
-                }
-                if (secondCard) {
-                    secondCard.classList.remove('flipped');
-                    secondCard.textContent = '?';
-                }
+                firstCard.classList.remove('flipped');
+                secondCard.classList.remove('flipped');
+                firstCard.textContent = '?';
+                secondCard.textContent = '?';
             }
             
             gameState.memoryGame.flippedCards = [];
@@ -2608,18 +3646,12 @@ Created with ❤️ to challenge your mind!`);
         }
 
         function updateMemoryDisplay() {
-            const elements = {
-                memoryLevel: document.getElementById('memoryLevel'),
-                memoryPairs: document.getElementById('memoryPairs'),
-                memoryMoves: document.getElementById('memoryMoves')
-            };
-            
-            if (elements.memoryLevel) elements.memoryLevel.textContent = gameState.memoryGame.level;
-            if (elements.memoryPairs) elements.memoryPairs.textContent = gameState.memoryGame.pairs;
-            if (elements.memoryMoves) elements.memoryMoves.textContent = gameState.memoryGame.moves;
+            document.getElementById('memoryLevel').textContent = gameState.memoryGame.level;
+            document.getElementById('memoryPairs').textContent = gameState.memoryGame.pairs;
+            document.getElementById('memoryMoves').textContent = gameState.memoryGame.moves;
         }
 
-        // Reaction Time Functions
+        // Reaction Game Functions
         function startReactionGame() {
             gameState.reactionGame = {
                 score: 0,
@@ -2634,8 +3666,7 @@ Created with ❤️ to challenge your mind!`);
             
             gameState.reactionGame.timer = setInterval(() => {
                 gameState.reactionGame.timeLeft--;
-                const reactionTimeLeft = document.getElementById('reactionTimeLeft');
-                if (reactionTimeLeft) reactionTimeLeft.textContent = gameState.reactionGame.timeLeft;
+                document.getElementById('reactionTimeLeft').textContent = gameState.reactionGame.timeLeft;
                 
                 if (gameState.reactionGame.timeLeft <= 0) {
                     endReactionGame();
@@ -2649,14 +3680,12 @@ Created with ❤️ to challenge your mind!`);
             if (!gameState.reactionGame.gameActive) return;
             
             const area = document.getElementById('reactionArea');
-            if (!area) return;
-            
             area.innerHTML = '';
             
             const target = document.createElement('div');
             target.className = 'reaction-target';
-            target.style.left = Math.random() * (area.offsetWidth - 80) + 'px';
-            target.style.top = Math.random() * (area.offsetHeight - 80) + 'px';
+            target.style.left = Math.random() * (area.offsetWidth - 100) + 'px';
+            target.style.top = Math.random() * (area.offsetHeight - 100) + 'px';
             
             target.onclick = () => {
                 gameState.reactionGame.hits++;
@@ -2671,7 +3700,6 @@ Created with ❤️ to challenge your mind!`);
             
             area.appendChild(target);
             
-            // Remove target after 2 seconds
             setTimeout(() => {
                 if (target.parentNode) {
                     gameState.reactionGame.misses++;
@@ -2688,27 +3716,19 @@ Created with ❤️ to challenge your mind!`);
         function endReactionGame() {
             gameState.reactionGame.gameActive = false;
             clearInterval(gameState.reactionGame.timer);
-            
-            const area = document.getElementById('reactionArea');
-            if (area) area.innerHTML = '';
+            document.getElementById('reactionArea').innerHTML = '';
             
             const accuracy = gameState.reactionGame.hits + gameState.reactionGame.misses > 0 
                 ? Math.round((gameState.reactionGame.hits / (gameState.reactionGame.hits + gameState.reactionGame.misses)) * 100) 
                 : 0;
             
-            alert(`🎯 Game finished!\nScore: ${gameState.reactionGame.score}\nAccuracy: ${accuracy}%`);
+            showNotification(`🎯 Game finished! Score: ${gameState.reactionGame.score}, Accuracy: ${accuracy}%`, 'success');
         }
 
         function updateReactionDisplay() {
-            const elements = {
-                reactionScore: document.getElementById('reactionScore'),
-                reactionHits: document.getElementById('reactionHits'),
-                reactionMisses: document.getElementById('reactionMisses')
-            };
-            
-            if (elements.reactionScore) elements.reactionScore.textContent = gameState.reactionGame.score;
-            if (elements.reactionHits) elements.reactionHits.textContent = gameState.reactionGame.hits;
-            if (elements.reactionMisses) elements.reactionMisses.textContent = gameState.reactionGame.misses;
+            document.getElementById('reactionScore').textContent = gameState.reactionGame.score;
+            document.getElementById('reactionHits').textContent = gameState.reactionGame.hits;
+            document.getElementById('reactionMisses').textContent = gameState.reactionGame.misses;
         }
 
         // Pattern Game Functions
@@ -2744,27 +3764,18 @@ Created with ❤️ to challenge your mind!`);
             let index = 0;
             const interval = setInterval(() => {
                 if (index > 0) {
-                    // Reset previous
                     const prevButton = document.querySelector(`#patternGrid .pattern-button:nth-child(${gameState.patternGame.sequence[index - 1] + 1})`);
-                    if (prevButton) {
-                        prevButton.classList.remove('active');
-                    }
+                    prevButton.classList.remove('active');
                 }
                 
                 if (index < gameState.patternGame.sequence.length) {
-                    // Highlight current
                     const button = document.querySelector(`#patternGrid .pattern-button:nth-child(${gameState.patternGame.sequence[index] + 1})`);
-                    if (button) {
-                        button.classList.add('active');
-                    }
+                    button.classList.add('active');
                     index++;
                 } else {
-                    // Reset last and end
                     if (index > 0) {
                         const lastButton = document.querySelector(`#patternGrid .pattern-button:nth-child(${gameState.patternGame.sequence[index - 1] + 1})`);
-                        if (lastButton) {
-                            lastButton.classList.remove('active');
-                        }
+                        lastButton.classList.remove('active');
                     }
                     clearInterval(interval);
                     gameState.patternGame.showingPattern = false;
@@ -2780,27 +3791,25 @@ Created with ❤️ to challenge your mind!`);
             const currentIndex = gameState.patternGame.userSequence.length - 1;
             
             if (gameState.patternGame.userSequence[currentIndex] !== gameState.patternGame.sequence[currentIndex]) {
-                // Error
                 gameState.patternGame.lives--;
                 updatePatternDisplay();
                 
                 if (gameState.patternGame.lives <= 0) {
-                    alert(`💀 Game Over!\nLevel reached: ${gameState.patternGame.level}\nScore: ${gameState.patternGame.score}`);
+                    showNotification(`💀 Game Over! Level reached: ${gameState.patternGame.level}, Score: ${gameState.patternGame.score}`, 'error');
                     return;
                 }
                 
-                alert('❌ Wrong sequence! Try again.');
+                showNotification('❌ Wrong sequence! Try again.', 'error');
                 setTimeout(() => {
                     showPattern();
                 }, 1000);
                 
             } else if (gameState.patternGame.userSequence.length === gameState.patternGame.sequence.length) {
-                // Sequence completed
                 gameState.patternGame.score += gameState.patternGame.level * 100;
                 gameState.patternGame.level++;
                 updatePatternDisplay();
                 
-                if (typeof confetti !== 'undefined' && !settings.reduceParticles) {
+                if (typeof confetti !== 'undefined') {
                     confetti({
                         particleCount: 50,
                         spread: 50,
@@ -2815,17 +3824,10 @@ Created with ❤️ to challenge your mind!`);
         }
 
         function updatePatternDisplay() {
-            const elements = {
-                patternLevel: document.getElementById('patternLevel'),
-                patternSequence: document.getElementById('patternSequence'),
-                patternScore: document.getElementById('patternScore'),
-                patternLives: document.getElementById('patternLives')
-            };
-            
-            if (elements.patternLevel) elements.patternLevel.textContent = gameState.patternGame.level;
-            if (elements.patternSequence) elements.patternSequence.textContent = gameState.patternGame.sequence.length;
-            if (elements.patternScore) elements.patternScore.textContent = gameState.patternGame.score;
-            if (elements.patternLives) elements.patternLives.textContent = gameState.patternGame.lives;
+            document.getElementById('patternLevel').textContent = gameState.patternGame.level;
+            document.getElementById('patternSequence').textContent = gameState.patternGame.sequence.length;
+            document.getElementById('patternScore').textContent = gameState.patternGame.score;
+            document.getElementById('patternLives').textContent = gameState.patternGame.lives;
         }
 
         // Color Game Functions
@@ -2845,8 +3847,7 @@ Created with ❤️ to challenge your mind!`);
             
             gameState.colorGame.timer = setInterval(() => {
                 gameState.colorGame.timeLeft--;
-                const colorTime = document.getElementById('colorTime');
-                if (colorTime) colorTime.textContent = gameState.colorGame.timeLeft;
+                document.getElementById('colorTime').textContent = gameState.colorGame.timeLeft;
                 
                 if (gameState.colorGame.timeLeft <= 0) {
                     endColorGame();
@@ -2861,8 +3862,7 @@ Created with ❤️ to challenge your mind!`);
             const randomIndex = Math.floor(Math.random() * colors.length);
             gameState.colorGame.targetColor = colors[randomIndex];
             
-            const targetColor = document.getElementById('targetColor');
-            if (targetColor) targetColor.textContent = colorNames[randomIndex];
+            document.getElementById('targetColor').textContent = colorNames[randomIndex];
         }
 
         function colorClick(color) {
@@ -2888,19 +3888,13 @@ Created with ❤️ to challenge your mind!`);
                 ? Math.round((gameState.colorGame.correct / (gameState.colorGame.correct + gameState.colorGame.wrong)) * 100) 
                 : 0;
             
-            alert(`🌈 Game finished!\nScore: ${gameState.colorGame.score}\nAccuracy: ${accuracy}%`);
+            showNotification(`🌈 Game finished! Score: ${gameState.colorGame.score}, Accuracy: ${accuracy}%`, 'success');
         }
 
         function updateColorDisplay() {
-            const elements = {
-                colorScore: document.getElementById('colorScore'),
-                colorCorrect: document.getElementById('colorCorrect'),
-                colorWrong: document.getElementById('colorWrong')
-            };
-            
-            if (elements.colorScore) elements.colorScore.textContent = gameState.colorGame.score;
-            if (elements.colorCorrect) elements.colorCorrect.textContent = gameState.colorGame.correct;
-            if (elements.colorWrong) elements.colorWrong.textContent = gameState.colorGame.wrong;
+            document.getElementById('colorScore').textContent = gameState.colorGame.score;
+            document.getElementById('colorCorrect').textContent = gameState.colorGame.correct;
+            document.getElementById('colorWrong').textContent = gameState.colorGame.wrong;
         }
 
         // Math Game Functions
@@ -2920,8 +3914,7 @@ Created with ❤️ to challenge your mind!`);
             
             gameState.mathGame.timer = setInterval(() => {
                 gameState.mathGame.timeLeft--;
-                const mathTime = document.getElementById('mathTime');
-                if (mathTime) mathTime.textContent = gameState.mathGame.timeLeft;
+                document.getElementById('mathTime').textContent = gameState.mathGame.timeLeft;
                 
                 if (gameState.mathGame.timeLeft <= 0) {
                     endMathGame();
@@ -2954,14 +3947,9 @@ Created with ❤️ to challenge your mind!`);
             }
             
             gameState.mathGame.currentQuestion = { a, b, operation, answer };
-            const mathQuestion = document.getElementById('mathQuestion');
-            if (mathQuestion) mathQuestion.textContent = `${a} ${operation} ${b} = ?`;
-            
-            const mathInput = document.getElementById('mathInput');
-            if (mathInput) {
-                mathInput.value = '';
-                mathInput.focus();
-            }
+            document.getElementById('mathQuestion').textContent = `${a} ${operation} ${b} = ?`;
+            document.getElementById('mathInput').value = '';
+            document.getElementById('mathInput').focus();
         }
 
         function submitMathAnswer() {
@@ -2988,24 +3976,18 @@ Created with ❤️ to challenge your mind!`);
                 ? Math.round((gameState.mathGame.correct / (gameState.mathGame.correct + gameState.mathGame.wrong)) * 100) 
                 : 0;
             
-            alert(`🧮 Game finished!\nScore: ${gameState.mathGame.score}\nAccuracy: ${accuracy}%`);
+            showNotification(`🧮 Game finished! Score: ${gameState.mathGame.score}, Accuracy: ${accuracy}%`, 'success');
         }
 
         function updateMathDisplay() {
-            const elements = {
-                mathScore: document.getElementById('mathScore'),
-                mathCorrect: document.getElementById('mathCorrect'),
-                mathWrong: document.getElementById('mathWrong')
-            };
-            
-            if (elements.mathScore) elements.mathScore.textContent = gameState.mathGame.score;
-            if (elements.mathCorrect) elements.mathCorrect.textContent = gameState.mathGame.correct;
-            if (elements.mathWrong) elements.mathWrong.textContent = gameState.mathGame.wrong;
+            document.getElementById('mathScore').textContent = gameState.mathGame.score;
+            document.getElementById('mathCorrect').textContent = gameState.mathGame.correct;
+            document.getElementById('mathWrong').textContent = gameState.mathGame.wrong;
         }
 
-        console.log('🎯 NUMERO QUEST - Ultimate Gaming Hub Loaded!');
-        console.log('🔐 Complete authentication system active!');
-        console.log('🌟 6 game modes available with enhanced graphics!');
+        console.log('🎯 Numero Quest Ultimate Gaming Universe loaded!');
+        console.log('🌌 Multiplayer system active!');
+        console.log('🎮 6 game modes + advanced features ready!');
     </script>
 </body>
 </html>
