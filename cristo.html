@@ -238,31 +238,34 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 100vh; /* Cambiato da 100% a 100vh */
+            height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 9999;
             background: var(--bg-gradient);
-            overflow-y: auto; /* Aggiunto per scroll su mobile */
         }
 
         .login-container {
             max-width: 500px;
             width: 90%;
-            padding: 2rem; /* Ridotto da 3rem */
+            padding: 3rem;
             text-align: center;
             position: relative;
             animation: loginFloat 10s ease-in-out infinite;
             transform-style: preserve-3d;
-            margin: 1rem; /* Aggiunto margine per mobile */
-            max-height: 90vh; /* Limitato l'altezza */
-            overflow-y: auto; /* Scroll interno se necessario */
+        }
+
+        @keyframes loginFloat {
+            0%, 100% { transform: translateY(0px) rotateX(0deg); }
+            25% { transform: translateY(-10px) rotateX(2deg); }
+            50% { transform: translateY(-5px) rotateX(0deg); }
+            75% { transform: translateY(-15px) rotateX(-2deg); }
         }
 
         .login-title {
             font-family: 'Audiowide', cursive;
-            font-size: clamp(2rem, 8vw, 3.5rem); /* Responsive font size */
+            font-size: 3.5rem;
             font-weight: 900;
             background: linear-gradient(45deg, var(--primary), var(--accent), var(--secondary), var(--primary));
             background-size: 200% 200%;
@@ -1248,255 +1251,61 @@
 
         /* RESPONSIVE 3D */
         @media (max-width: 768px) {
-            .login-container {
-                padding: 1.5rem;
-                width: 95%;
-                margin: 0.5rem;
-            }
-            
-            .login-title {
-                font-size: 2.5rem;
-                margin-bottom: 0.5rem;
-            }
-            
-            .login-subtitle {
-                font-size: 1.1rem;
-                margin-bottom: 1.5rem;
-            }
-            
-            .form-input {
-                padding: 1rem;
-                font-size: 16px; /* Previene zoom su iOS */
-            }
-            
-            .btn {
-                padding: 1rem 2rem;
-                font-size: 1rem;
-            }
-            
-            /* Disabilita animazioni 3D su mobile per performance */
-            .login-container {
-                animation: none;
-            }
-            
-            .glass:hover::before {
-                left: 0; /* Disabilita effetto hover su mobile */
-            }
-            
-            /* Ottimizzazioni per viewport mobile */
             .main-container {
-                padding: 0.5rem;
+                padding: 1rem;
             }
-            
+
             .games-grid {
                 grid-template-columns: 1fr;
-                gap: 1.5rem;
+                gap: 2rem;
             }
-            
-            .game-card {
-                padding: 1.5rem;
-                min-height: 200px;
-            }
-            
-            .game-icon {
-                font-size: 3rem;
-            }
-            
-            .game-title {
-                font-size: 1.5rem;
-            }
-            
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 1rem;
-            }
-            
-            .stat-card {
-                padding: 1.5rem;
-            }
-            
-            .stat-value {
-                font-size: 2rem;
-            }
-            
-            /* Navigation mobile */
-            .nav-bar {
-                position: fixed;
-                top: 10px;
-                right: 10px;
-                flex-direction: column;
-                gap: 0.5rem;
-            }
-            
-            .nav-btn {
-                padding: 0.8rem 1rem;
-                font-size: 0.9rem;
-            }
-            
-            .user-panel {
-                position: fixed;
-                top: 10px;
-                left: 10px;
-                padding: 0.8rem;
-                flex-direction: column;
-                text-align: center;
-            }
-            
-            .user-avatar {
-                width: 40px;
-                height: 40px;
-                font-size: 1rem;
-            }
-            
-            /* Game interfaces mobile */
+
             .game-area {
                 grid-template-columns: 1fr;
-                gap: 1.5rem;
             }
-            
-            .control-panel, .history-panel {
-                padding: 1.5rem;
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
-            
-            .game-input {
-                padding: 1rem;
-                font-size: 1.2rem;
-            }
-            
+
             .difficulty-selector {
                 flex-direction: column;
                 align-items: center;
-                gap: 1rem;
             }
-            
-            .difficulty-btn {
-                min-width: 250px;
-                padding: 1rem;
+
+            .nav-bar {
+                position: relative;
+                top: auto;
+                right: auto;
+                justify-content: center;
+                margin-bottom: 2rem;
             }
-            
-            /* Memory game mobile */
-            .memory-grid {
-                grid-template-columns: repeat(4, 1fr);
-                gap: 0.5rem;
-                max-width: 100%;
+
+            .user-panel {
+                position: relative;
+                top: auto;
+                left: auto;
+                margin-bottom: 2rem;
             }
-            
-            .memory-card {
-                font-size: 1.5rem;
-            }
-            
-            /* Color game mobile */
-            .color-grid {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 1rem;
-                max-width: 100%;
-            }
-            
-            .color-button {
-                font-size: 1rem;
-            }
-            
-            /* Pattern game mobile */
-            .pattern-grid {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 1rem;
-                max-width: 100%;
-            }
-            
-            .pattern-button {
-                font-size: 1.5rem;
-            }
-            
-            /* Reaction game mobile */
-            .reaction-area {
-                height: 300px;
-            }
-            
-            .reaction-target {
-                width: 60px;
-                height: 60px;
-            }
-            
-            /* Settings mobile */
-            .settings-grid {
-                grid-template-columns: 1fr;
-                gap: 1.5rem;
-            }
-            
+
             .theme-grid {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 1rem;
+                grid-template-columns: repeat(2, 1fr);
             }
-            
-            /* Disabilita effetti 3D su mobile per performance */
+
+            .memory-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .color-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            /* Disable 3D effects on mobile for performance */
             .game-card:hover,
             .stat-card:hover,
             .difficulty-btn:hover,
-            .theme-option:hover,
-            .memory-card:hover,
-            .color-button:hover,
-            .pattern-button:hover {
-                transform: translateY(-2px);
-            }
-            
-            /* Ottimizzazioni touch */
-            .btn, .game-card, .nav-btn, .difficulty-btn, .memory-card, .color-button, .pattern-button {
-                -webkit-tap-highlight-color: transparent;
-                touch-action: manipulation;
-            }
-        }
-
-        /* Ottimizzazioni per schermi molto piccoli */
-        @media (max-width: 480px) {
-            .login-container {
-                padding: 1rem;
-                width: 98%;
-            }
-            
-            .login-title {
-                font-size: 2rem;
-            }
-            
-            .form-input, .btn {
-                font-size: 16px; /* Previene zoom su iOS */
-            }
-            
-            .main-title {
-                font-size: 2.5rem;
-            }
-            
-            .subtitle {
-                font-size: 1.2rem;
-            }
-            
-            .game-card {
-                padding: 1rem;
-                min-height: 180px;
-            }
-            
-            .stat-card {
-                padding: 1rem;
-            }
-            
-            .stat-value {
-                font-size: 1.5rem;
-            }
-        }
-
-        /* Ottimizzazioni per landscape mobile */
-        @media (max-width: 768px) and (orientation: landscape) {
-            .login-screen {
-                align-items: flex-start;
-                padding-top: 2rem;
-            }
-            
-            .login-container {
-                max-height: 85vh;
-                overflow-y: auto;
-            }
-            
-            .reaction-area {
-                height: 250px;
+            .theme-option:hover {
+                transform: translateY(-5px);
             }
         }
 
@@ -2412,35 +2221,18 @@
                 isLoggedIn = true;
                 showGameHub();
             } else {
-                // Assicura che la schermata di login sia visibile
-                document.getElementById('loginScreen').style.display = 'flex';
-                document.getElementById('loginScreen').style.visibility = 'visible';
-                document.getElementById('userPanel').classList.remove('active');
-                
-                // Scroll to top per assicurarsi che sia visibile
-                window.scrollTo(0, 0);
+                showLoginScreen();
             }
         }
 
         function showLoginScreen() {
-            const loginScreen = document.getElementById('loginScreen');
-            loginScreen.style.display = 'flex';
-            loginScreen.style.visibility = 'visible';
-            loginScreen.style.opacity = '1';
+            document.getElementById('loginScreen').style.display = 'flex';
             document.getElementById('userPanel').classList.remove('active');
-            
-            // Assicura che sia in primo piano
-            loginScreen.style.zIndex = '9999';
-            
-            // Scroll to top
-            window.scrollTo(0, 0);
-            document.body.style.overflow = 'hidden'; // Previene scroll del body
         }
 
         function showGameHub() {
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('userPanel').classList.add('active');
-            document.body.style.overflow = 'auto'; // Ripristina scroll del body
             updateUserInfo();
             loadStats();
         }
