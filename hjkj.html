@@ -1,0 +1,3040 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>🔥 ULTIMATE BOSS RUSH - HELL'S NIGHTMARE EDITION 🔥</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Orbitron', monospace;
+            background: linear-gradient(45deg, #0a0a0a, #1a0033, #330066, #660033, #0a0a0a);
+            background-size: 500% 500%;
+            animation: epicGradient 12s ease infinite;
+            color: #ffffff;
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+
+        @keyframes epicGradient {
+            0%, 100% { background-position: 0% 50%; }
+            25% { background-position: 100% 0%; }
+            50% { background-position: 100% 100%; }
+            75% { background-position: 0% 100%; }
+        }
+
+        #gameContainer {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* Enhanced Menu Styling */
+        .menu-content {
+            text-align: center;
+            max-width: min(1200px, 95vw);
+            padding: min(3rem, 5vw);
+            background: rgba(0, 0, 0, 0.95);
+            border-radius: 25px;
+            border: 4px solid;
+            border-image: linear-gradient(45deg, #ff0000, #ff1493, #ff4500, #ff6b6b, #dc143c) 1;
+            box-shadow: 0 0 80px rgba(255, 0, 0, 0.6);
+            backdrop-filter: blur(15px);
+            margin: 1rem;
+        }
+
+        .game-title {
+            font-size: clamp(2rem, 8vw, 4.5rem);
+            font-weight: 900;
+            background: linear-gradient(45deg, #ff0000, #ff1493, #ff4500, #ff6b6b, #dc143c, #8b0000);
+            background-size: 400% 400%;
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: hellText 3s ease infinite;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 0 40px rgba(255, 0, 0, 0.8);
+            letter-spacing: 2px;
+        }
+
+        .game-subtitle {
+            font-size: clamp(1rem, 4vw, 1.6rem);
+            color: #ff0000;
+            margin-bottom: 2rem;
+            text-shadow: 0 0 25px #ff0000;
+            animation: hellPulse 2s ease infinite;
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        @keyframes hellText {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        @keyframes hellPulse {
+            0%, 100% { opacity: 1; transform: scale(1); text-shadow: 0 0 25px #ff0000; }
+            50% { opacity: 0.7; transform: scale(1.08); text-shadow: 0 0 40px #ff0000, 0 0 60px #ff4500; }
+        }
+
+        .menu-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(280px, 80vw), 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .menu-btn {
+            padding: clamp(1rem, 3vw, 1.8rem) clamp(1.5rem, 4vw, 2.5rem);
+            font-size: clamp(0.9rem, 3vw, 1.3rem);
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            background: linear-gradient(45deg, rgba(255, 0, 0, 0.2), rgba(255, 20, 147, 0.2));
+            color: white;
+            border: 3px solid transparent;
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            touch-action: manipulation;
+        }
+
+        .menu-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 0, 0, 0.4), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .menu-btn:hover::before,
+        .menu-btn:active::before {
+            left: 100%;
+        }
+
+        .menu-btn:hover,
+        .menu-btn:active {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(255, 0, 0, 0.6);
+            border-color: #ff0000;
+        }
+
+        .menu-btn.primary {
+            background: linear-gradient(45deg, #ff0000, #ff1493, #ff4500, #dc143c);
+            background-size: 300% 300%;
+            animation: hellGradient 2s ease infinite;
+            font-size: clamp(1rem, 3.5vw, 1.6rem);
+        }
+
+        .menu-btn.home-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: clamp(0.8rem, 2vw, 1rem) clamp(1.2rem, 3vw, 2rem);
+            font-size: clamp(0.8rem, 2.5vw, 1.1rem);
+            background: linear-gradient(45deg, #ff0000, #ff1493);
+            border: 2px solid #ff0000;
+            border-radius: 15px;
+            z-index: 1000;
+        }
+
+        .menu-btn.new-feature {
+            background: linear-gradient(45deg, #00ff00, #32cd32, #00ff7f, #90ee90);
+            border-color: #00ff00;
+            animation: newFeatureGlow 2s ease infinite alternate;
+        }
+
+        @keyframes newFeatureGlow {
+            0% { box-shadow: 0 0 20px rgba(0, 255, 0, 0.4); }
+            100% { box-shadow: 0 0 40px rgba(0, 255, 0, 0.8); }
+        }
+
+        @keyframes hellGradient {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        /* Mobile Controls - Fixed positioning and improved touch handling */
+        .mobile-controls {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 180px;
+            background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.9));
+            display: none;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .mobile-controls.active {
+            display: block;
+        }
+
+        .mobile-joystick {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 3px solid rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            pointer-events: all;
+            touch-action: none;
+        }
+
+        .mobile-joystick-knob {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 35px;
+            height: 35px;
+            background: rgba(255, 0, 0, 0.9);
+            border: 2px solid #fff;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.1s ease;
+            pointer-events: none;
+        }
+
+        .mobile-action-buttons {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            pointer-events: all;
+        }
+
+        .mobile-action-btn {
+            width: 55px;
+            height: 55px;
+            background: rgba(255, 0, 0, 0.9);
+            border: 3px solid #fff;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: manipulation;
+            user-select: none;
+            transition: all 0.2s ease;
+        }
+
+        .mobile-action-btn:active {
+            background: rgba(255, 0, 0, 1);
+            transform: scale(0.95);
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.8);
+        }
+
+        /* Enhanced HUD with Mobile Optimization */
+        .hud {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: clamp(100px, 18vh, 140px);
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.95), transparent);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 clamp(1rem, 3vw, 2rem);
+            z-index: 10;
+            flex-wrap: wrap;
+        }
+
+        .hud-section {
+            display: flex;
+            gap: clamp(0.5rem, 2vw, 1.5rem);
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .stat-box {
+            background: rgba(0, 0, 0, 0.9);
+            padding: clamp(0.4rem, 1.5vw, 0.8rem);
+            border-radius: 12px;
+            border: 2px solid;
+            text-align: center;
+            min-width: clamp(70px, 12vw, 100px);
+            backdrop-filter: blur(5px);
+        }
+
+        .stat-box.bosses { border-color: #ffd700; box-shadow: 0 0 15px rgba(255, 215, 0, 0.4); }
+        .stat-box.lives { border-color: #ff0000; box-shadow: 0 0 15px rgba(255, 0, 0, 0.6); }
+        .stat-box.energy { border-color: #00ffff; box-shadow: 0 0 15px rgba(0, 255, 255, 0.4); }
+        .stat-box.score { border-color: #9932cc; box-shadow: 0 0 15px rgba(153, 50, 204, 0.4); }
+        .stat-box.stress { border-color: #ff4500; box-shadow: 0 0 15px rgba(255, 69, 0, 0.6); }
+
+        .stat-label {
+            font-size: clamp(0.6rem, 1.8vw, 0.8rem);
+            opacity: 0.9;
+            margin-bottom: 0.2rem;
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        .stat-value {
+            font-size: clamp(0.9rem, 2.5vw, 1.2rem);
+            font-weight: 900;
+        }
+
+        /* Health bars - improved mobile layout */
+        .health-container {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .health-bar-wrapper {
+            text-align: center;
+        }
+
+        .health-bar {
+            width: clamp(120px, 25vw, 180px);
+            height: 16px;
+            background: #333;
+            border-radius: 8px;
+            border: 2px solid;
+            overflow: hidden;
+        }
+
+        .health-fill {
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .health-text {
+            font-size: clamp(0.6rem, 1.5vw, 0.8rem);
+            margin-top: 0.2rem;
+        }
+
+        /* Canvas Responsive */
+        #gameCanvas {
+            display: block;
+            background: radial-gradient(circle at center, #1a0033, #0a0a0a);
+            border: 3px solid;
+            border-image: linear-gradient(45deg, #ff0000, #ff1493, #ff4500, #dc143c) 1;
+            max-width: 100%;
+            max-height: 100%;
+            touch-action: none;
+        }
+
+        /* Stats Display Responsive */
+        .stats-display {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(clamp(140px, 28vw, 180px), 1fr));
+            gap: clamp(1rem, 3vw, 1.5rem);
+            padding: clamp(1rem, 3vw, 2rem);
+            background: rgba(255, 0, 0, 0.1);
+            border-radius: 20px;
+            border: 3px solid #ff0000;
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.4);
+            margin: 1rem 0;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: clamp(0.8rem, 2vw, 1rem);
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            border: 2px solid rgba(255, 0, 0, 0.3);
+        }
+
+        .stat-item .stat-value {
+            font-size: clamp(1.3rem, 3.5vw, 1.8rem);
+            font-weight: 900;
+            color: #ffd700;
+            text-shadow: 0 0 15px #ffd700;
+        }
+
+        /* Level Grid Responsive */
+        .level-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(clamp(180px, 35vw, 220px), 1fr));
+            gap: clamp(1rem, 3vw, 1.5rem);
+            margin: 2rem 0;
+            max-height: 60vh;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .level-card {
+            padding: clamp(1rem, 3vw, 1.5rem);
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 15px;
+            border: 3px solid #ff0000;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            text-align: center;
+            position: relative;
+        }
+
+        .level-card:hover,
+        .level-card:active {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(255, 0, 0, 0.6);
+        }
+
+        .level-card.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+            border-color: #666;
+        }
+
+        .level-number {
+            font-size: clamp(1.5rem, 4vw, 2rem);
+            font-weight: 900;
+            color: #ffd700;
+            margin-bottom: 0.5rem;
+        }
+
+        .level-boss {
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            font-weight: 700;
+            color: #ff0000;
+            margin-bottom: 0.5rem;
+        }
+
+        .level-difficulty {
+            font-size: clamp(0.9rem, 2vw, 1rem);
+            margin-bottom: 0.5rem;
+        }
+
+        .level-phases, .level-warning {
+            font-size: clamp(0.8rem, 1.8vw, 0.9rem);
+            opacity: 0.8;
+            margin-bottom: 0.3rem;
+        }
+
+        /* Mobile-specific adjustments */
+        @media (max-width: 768px) {
+            .hud {
+                height: 90px;
+                padding: 0 0.5rem;
+            }
+            
+            .hud-section {
+                gap: 0.4rem;
+            }
+            
+            .stat-box {
+                min-width: 60px;
+                padding: 0.4rem;
+            }
+
+            .menu-content {
+                padding: 1.5rem;
+                margin: 0.5rem;
+            }
+
+            .health-container {
+                gap: 0.5rem;
+            }
+
+            .health-bar {
+                width: clamp(100px, 30vw, 140px);
+                height: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .game-title {
+                font-size: 1.8rem;
+                letter-spacing: 1px;
+            }
+            
+            .game-subtitle {
+                font-size: 0.9rem;
+            }
+            
+            .menu-btn {
+                padding: 0.8rem 1.2rem;
+                font-size: 0.8rem;
+            }
+
+            .stats-display {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.8rem;
+                padding: 1rem;
+            }
+
+            .mobile-joystick {
+                width: 90px;
+                height: 90px;
+            }
+
+            .mobile-action-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 1rem;
+            }
+        }
+
+        /* Touch-friendly improvements */
+        @media (hover: none) and (pointer: coarse) {
+            .menu-btn:hover {
+                transform: none;
+                box-shadow: none;
+                border-color: transparent;
+            }
+            
+            .menu-btn:active {
+                transform: scale(0.98);
+                box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
+            }
+
+            .level-card:hover {
+                transform: none;
+                box-shadow: none;
+            }
+
+            .level-card:active {
+                transform: scale(0.98);
+                box-shadow: 0 4px 15px rgba(255, 0, 0, 0.4);
+            }
+        }
+
+        /* Notification System */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(45deg, #ff0000, #ff1493);
+            color: white;
+            padding: clamp(0.8rem, 2vw, 1rem) clamp(1.2rem, 3vw, 2rem);
+            border-radius: 15px;
+            border: 2px solid #ff0000;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.6);
+            z-index: 3000;
+            animation: slideInRight 0.5s ease, fadeOut 0.5s ease 4.5s forwards;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+            max-width: 80vw;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            to { opacity: 0; transform: translateX(100%); }
+        }
+
+        /* Additional responsive elements */
+        .endless-hud, .speedrun-timer, .phase-indicator {
+            font-size: clamp(0.8rem, 2vw, 1rem);
+            padding: clamp(0.5rem, 2vw, 1rem);
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 10px;
+            border: 2px solid #ff0000;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+        }
+
+        .stress-indicator {
+            position: absolute;
+            top: 50%;
+            left: 20px;
+            transform: translateY(-50%);
+            width: clamp(30px, 6vw, 50px);
+            height: clamp(100px, 20vh, 150px);
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #ff4500;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .stress-fill {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(0deg, #ff0000, #ff4500, #ffff00);
+            transition: height 0.3s ease;
+        }
+
+        .stress-text {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: clamp(0.6rem, 1.5vw, 0.8rem);
+            color: #ff4500;
+            font-weight: bold;
+        }
+
+        .intensity-meter {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: clamp(150px, 40vw, 300px);
+            height: clamp(12px, 2.5vh, 16px);
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #ff0000;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .intensity-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff00, #ffff00, #ff4500, #ff0000);
+            transition: width 0.3s ease;
+        }
+
+        /* Particles */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #ff0000;
+            border-radius: 50%;
+            opacity: 0.8;
+            animation: hellParticleFloat 3s linear infinite;
+        }
+
+        @keyframes hellParticleFloat {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.8;
+            }
+            90% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-10px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Improved visual effects */
+        .transformation-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle, transparent 30%, rgba(255, 0, 0, 0.3) 70%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .transformation-overlay.active {
+            opacity: 1;
+            animation: transformationPulse 2s ease infinite;
+        }
+
+        @keyframes transformationPulse {
+            0%, 100% { background: radial-gradient(circle, transparent 30%, rgba(255, 0, 0, 0.3) 70%); }
+            50% { background: radial-gradient(circle, transparent 20%, rgba(255, 0, 0, 0.6) 80%); }
+        }
+
+        .difficulty-warning {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 0, 0, 0.95);
+            color: white;
+            padding: clamp(1rem, 4vw, 2rem) clamp(1.5rem, 5vw, 3rem);
+            border-radius: 20px;
+            font-size: clamp(1.2rem, 4vw, 2rem);
+            font-weight: 900;
+            text-align: center;
+            opacity: 0;
+            animation: warningFlash 0.3s ease infinite alternate;
+            z-index: 2000;
+            max-width: 90vw;
+        }
+
+        @keyframes warningFlash {
+            0% { opacity: 0.8; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+        }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+    
+    <!-- Notification Container -->
+    <div id="notificationContainer"></div>
+    
+    <!-- Mobile Controls -->
+    <div class="mobile-controls" id="mobileControls">
+        <div class="mobile-joystick" id="mobileJoystick">
+            <div class="mobile-joystick-knob" id="mobileJoystickKnob"></div>
+        </div>
+        <div class="mobile-action-buttons">
+            <div class="mobile-action-btn" id="mobileShoot">🔫</div>
+            <div class="mobile-action-btn" id="mobileBulletTime">🕐</div>
+            <div class="mobile-action-btn" id="mobileBarrier">🛡️</div>
+            <div class="mobile-action-btn" id="mobileDesperation">💥</div>
+        </div>
+    </div>
+    
+    <div id="gameContainer">
+        <!-- Main Menu -->
+        <div class="screen active" id="mainMenu">
+            <div class="menu-content">
+                <h1 class="game-title">ULTIMATE BOSS RUSH</h1>
+                <p class="game-subtitle">HELL'S NIGHTMARE EDITION - Where Legends Die</p>
+                
+                <div class="menu-buttons">
+                    <button class="menu-btn primary" onclick="showScreen('levelSelect')">🔥 ENTER HELL</button>
+                    <button class="menu-btn new-feature" onclick="startEndlessMode()">♾️ ENDLESS NIGHTMARE</button>
+                    <button class="menu-btn new-feature" onclick="startSpeedrun()">⚡ SPEEDRUN MODE</button>
+                    <button class="menu-btn" onclick="showScreen('skillTree')">⚡ SURVIVAL SKILLS</button>
+                    <button class="menu-btn" onclick="showScreen('achievements')">🏆 HALL OF PAIN</button>
+                    <button class="menu-btn" onclick="showScreen('stats')">📊 DEATH STATISTICS</button>
+                    <button class="menu-btn" onclick="showScreen('controls')">🎯 COMBAT MANUAL</button>
+                </div>
+                
+                <div class="stats-display">
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalBossesDefeated">0</div>
+                        <div>Demons Slain</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="highestLevel">1</div>
+                        <div>Deepest Circle</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalScore">0</div>
+                        <div>Pain Score</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="skillPoints">0</div>
+                        <div>Soul Fragments</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Skill Tree -->
+        <div class="screen" id="skillTree">
+            <button class="menu-btn home-btn" onclick="showScreen('mainMenu')">🏠 HOME</button>
+            <div class="menu-content">
+                <h2 class="game-subtitle">Survival Skills - Forge Your Soul</h2>
+                <p style="margin-bottom: 2rem; color: #ff0000;">Soul Fragments Available: <span id="availableSkillPoints">0</span></p>
+                
+                <div class="stats-display" id="skillTreeGrid">
+                    <!-- Skills will be generated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Achievements -->
+        <div class="screen" id="achievements">
+            <button class="menu-btn home-btn" onclick="showScreen('mainMenu')">🏠 HOME</button>
+            <div class="menu-content">
+                <h2 class="game-subtitle">Hall of Pain</h2>
+                
+                <div class="stats-display" id="achievementsList">
+                    <!-- Achievements will be generated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Level Selection -->
+        <div class="screen" id="levelSelect">
+            <button class="menu-btn home-btn" onclick="showScreen('mainMenu')">🏠 HOME</button>
+            <div class="menu-content">
+                <h2 class="game-subtitle">Choose Your Torment</h2>
+                
+                <div class="level-grid" id="levelGrid">
+                    <!-- Levels will be generated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="screen" id="stats">
+            <button class="menu-btn home-btn" onclick="showScreen('mainMenu')">🏠 HOME</button>
+            <div class="menu-content">
+                <h2 class="game-subtitle">Death Statistics</h2>
+                
+                <div class="stats-display">
+                    <div class="stat-item">
+                        <div class="stat-value" id="statTotalBosses">0</div>
+                        <div>Total Demons Slain</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="statHighestLevel">1</div>
+                        <div>Deepest Circle Reached</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="statBestScore">0</div>
+                        <div>Highest Pain Score</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="statTotalDeaths">0</div>
+                        <div>Total Deaths</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="statSurvivalTime">0</div>
+                        <div>Longest Survival (sec)</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="statAchievements">0</div>
+                        <div>Torments Endured</div>
+                    </div>
+                </div>
+                
+                <div class="menu-buttons" style="margin-top: 2rem;">
+                    <button class="menu-btn" onclick="resetStats()" style="background: linear-gradient(45deg, #ff4500, #ff0000);">
+                        🗑️ PURGE SOUL
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="screen" id="controls">
+            <button class="menu-btn home-btn" onclick="showScreen('mainMenu')">🏠 HOME</button>
+            <div class="menu-content">
+                <h2 class="game-subtitle">Combat Manual</h2>
+                
+                <div style="text-align: left; max-width: 700px; margin: 0 auto;">
+                    <div style="margin-bottom: 2rem; padding: 1.5rem; background: rgba(0,0,0,0.5); border-radius: 15px;">
+                        <h3 style="color: #ff0000; margin-bottom: 1rem;">Basic Survival</h3>
+                        <p><strong>W A S D</strong> or <strong>Virtual Joystick</strong> - Move (precision required)</p>
+                        <p><strong>Mouse</strong> or <strong>Tap</strong> - Aim and Fire</p>
+                        <p><strong>Space</strong> or <strong>🔫 Button</strong> - Fire</p>
+                        <p><strong>Right Click</strong> or <strong>Hold Fire</strong> - Charged shot</p>
+                    </div>
+                    
+                    <div style="margin-bottom: 2rem; padding: 1.5rem; background: rgba(0,0,0,0.5); border-radius: 15px;">
+                        <h3 style="color: #ff1493; margin-bottom: 1rem;">Advanced Combat</h3>
+                        <p><strong>E</strong> or <strong>🛡️ Button</strong> - Emergency barrier</p>
+                        <p><strong>F</strong> or <strong>🕐 Button</strong> - Bullet time</p>
+                        <p><strong>C</strong> or <strong>💥 Button</strong> - Desperation attack</p>
+                        <p><strong>Shift</strong> - Precision Mode</p>
+                    </div>
+                    
+                    <div style="margin-bottom: 2rem; padding: 1.5rem; background: rgba(0,0,0,0.5); border-radius: 15px;">
+                        <h3 style="color: #32cd32; margin-bottom: 1rem;">Mobile Controls</h3>
+                        <p><strong>Virtual Joystick</strong> - Movement control</p>
+                        <p><strong>Tap Screen</strong> - Aim and fire</p>
+                        <p><strong>Action Buttons</strong> - Special abilities</p>
+                        <p><strong>Double Tap</strong> - Emergency actions</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div class="screen" id="gameScreen">
+            <!-- Speedrun Timer -->
+            <div class="speedrun-timer" id="speedrunTimer" style="display: none;">
+                <div>TIME: <span id="speedrunTime">00:00</span></div>
+            </div>
+            
+            <!-- Endless Mode HUD -->
+            <div class="endless-hud" id="endlessHud" style="display: none;">
+                <div class="wave-counter">WAVE <span id="currentWave">1</span></div>
+                <div class="difficulty-multiplier">x<span id="difficultyMultiplier">1.0</span></div>
+            </div>
+            
+            <div class="hud">
+                <div class="hud-section">
+                    <div class="stat-box bosses">
+                        <div class="stat-label">CIRCLE</div>
+                        <div class="stat-value" id="currentLevel">1</div>
+                    </div>
+                    <div class="stat-box lives">
+                        <div class="stat-label">SOULS</div>
+                        <div class="stat-value" id="playerLives">1</div>
+                    </div>
+                    <div class="stat-box energy">
+                        <div class="stat-label">ENERGY</div>
+                        <div class="stat-value" id="playerEnergy">100</div>
+                    </div>
+                    <div class="stat-box stress">
+                        <div class="stat-label">STRESS</div>
+                        <div class="stat-value" id="playerStress">0</div>
+                    </div>
+                </div>
+                
+                <div class="health-container">
+                    <div class="health-bar-wrapper">
+                        <div style="font-size: clamp(0.7rem, 2vw, 0.9rem); margin-bottom: 0.3rem;">PLAYER</div>
+                        <div class="health-bar" style="border-color: #ff0000;">
+                            <div id="playerHealthFill" class="health-fill" style="background: linear-gradient(90deg, #ff0000, #ff4500, #ffff00); width: 100%;"></div>
+                        </div>
+                        <div id="playerHealthText" class="health-text">100 / 100</div>
+                    </div>
+                    
+                    <div class="health-bar-wrapper">
+                        <div style="font-size: clamp(0.7rem, 2vw, 0.9rem); margin-bottom: 0.3rem;">DEMON</div>
+                        <div class="health-bar" style="border-color: #ff1493;">
+                            <div id="bossHealthFill" class="health-fill" style="background: linear-gradient(90deg, #8b0000, #ff0000, #ff4500); width: 100%;"></div>
+                        </div>
+                        <div id="bossHealthText" class="health-text">5000 / 5000</div>
+                    </div>
+                </div>
+                
+                <div class="hud-section">
+                    <div class="stat-box score">
+                        <div class="stat-label">PAIN</div>
+                        <div class="stat-value" id="playerScore">0</div>
+                    </div>
+                    <button class="menu-btn home-btn" onclick="forfeitSoul()" style="position: relative; top: 0; left: 0; background: linear-gradient(45deg, #8b0000, #ff0000); padding: clamp(0.5rem, 2vw, 1rem);">
+                        💀 FORFEIT
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Stress Indicator -->
+            <div class="stress-indicator" id="stressIndicator">
+                <div class="stress-text">STRESS</div>
+                <div class="stress-fill" id="stressFill"></div>
+            </div>
+            
+            <!-- Bullet Hell Intensity -->
+            <div class="intensity-meter" id="intensityMeter">
+                <div class="intensity-fill" id="intensityFill"></div>
+            </div>
+            
+            <!-- Difficulty Warning -->
+            <div class="difficulty-warning" id="difficultyWarning" style="display: none;">
+                ⚠️ ADAPTIVE HELL PROTOCOL ACTIVATED ⚠️
+            </div>
+            
+            <!-- Transformation Overlay -->
+            <div class="transformation-overlay" id="transformationOverlay"></div>
+            
+            <canvas id="gameCanvas" width="1920" height="1080"></canvas>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div class="screen" id="gameOver">
+            <div style="text-align: center; padding: clamp(2rem, 5vw, 3rem); background: rgba(0, 0, 0, 0.95); border-radius: 25px; border: 4px solid #ff0000; box-shadow: 0 0 60px rgba(255, 0, 0, 0.8); margin: 1rem; max-width: 90vw;">
+                <h2 style="font-size: clamp(2rem, 8vw, 4rem); color: #ff0000; margin-bottom: 2rem; text-shadow: 0 0 30px #ff0000;">SOUL CONSUMED</h2>
+                <div style="margin: 2rem 0;">
+                    <div style="font-size: clamp(1.2rem, 4vw, 1.5rem); margin-bottom: 1rem;">Pain Endured: <span id="finalScore" style="color: #ffd700;">0</span></div>
+                    <div style="font-size: clamp(1rem, 3vw, 1.2rem); margin-bottom: 1rem;">Circle Reached: <span id="finalLevel" style="color: #ff4500;">1</span></div>
+                    <div style="font-size: clamp(1rem, 3vw, 1.2rem); margin-bottom: 1rem;">Survival Time: <span id="finalTime" style="color: #ff6b6b;">0s</span></div>
+                    <div style="font-size: clamp(1rem, 3vw, 1.2rem);">Soul Fragments Earned: <span id="earnedSkillPoints" style="color: #32cd32;">0</span></div>
+                </div>
+                
+                <div class="menu-buttons">
+                    <button class="menu-btn primary" onclick="restartGame()">🔄 FACE HELL AGAIN</button>
+                    <button class="menu-btn" onclick="showScreen('skillTree')">⚡ STRENGTHEN SOUL</button>
+                    <button class="menu-btn" onclick="showScreen('levelSelect')">📋 CHOOSE TORMENT</button>
+                    <button class="menu-btn" onclick="showScreen('mainMenu')">🏠 ESCAPE HELL</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Victory Screen -->
+        <div class="screen" id="victory">
+            <div style="text-align: center; padding: clamp(2rem, 5vw, 3rem); background: rgba(0, 0, 0, 0.95); border-radius: 25px; border: 4px solid #ffd700; box-shadow: 0 0 60px rgba(255, 215, 0, 0.8); margin: 1rem; max-width: 90vw;">
+                <h2 style="font-size: clamp(2rem, 8vw, 4rem); color: #ffd700; margin-bottom: 2rem; text-shadow: 0 0 30px #ffd700;">HELL CONQUERED!</h2>
+                <div style="margin: 2rem 0;">
+                    <div style="font-size: clamp(1.5rem, 5vw, 2rem); margin-bottom: 1rem; color: #ffd700;">👑 DEMON SLAYER SUPREME! 👑</div>
+                    <div style="font-size: clamp(1.2rem, 4vw, 1.5rem); margin-bottom: 1rem;">Final Pain Score: <span id="victoryScore" style="color: #ffd700;">0</span></div>
+                    <div style="font-size: clamp(1rem, 3vw, 1.2rem); margin-bottom: 1rem;">All 20 Circles of Hell Conquered!</div>
+                    <div style="font-size: clamp(1rem, 3vw, 1.2rem); margin-bottom: 1rem;">Total Survival Time: <span id="victoryTime" style="color: #ff6b6b;">0s</span></div>
+                    <div style="font-size: clamp(1rem, 3vw, 1.2rem);">You have transcended mortal limits!</div>
+                </div>
+                
+                <div class="menu-buttons">
+                    <button class="menu-btn primary" onclick="showScreen('levelSelect')">🔥 CONQUER AGAIN</button>
+                    <button class="menu-btn" onclick="showScreen('achievements')">🏆 VIEW TORMENTS</button>
+                    <button class="menu-btn" onclick="showScreen('stats')">📊 VIEW PAIN</button>
+                    <button class="menu-btn" onclick="showScreen('mainMenu')">🏠 ASCEND</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced Game State with Mobile Support and Improved Difficulty Curve
+        let gameState = {
+            currentScreen: 'mainMenu',
+            currentLevel: 1,
+            gameRunning: false,
+            gamePaused: false,
+            gameMode: 'campaign', // 'campaign', 'endless', 'speedrun'
+            endlessWave: 1,
+            speedrunStartTime: 0,
+            isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
+            touchControls: {
+                joystick: { 
+                    active: false, 
+                    startX: 0, 
+                    startY: 0, 
+                    currentX: 0, 
+                    currentY: 0,
+                    touchId: null
+                },
+                shooting: false,
+                lastTouchTime: 0
+            },
+            player: {
+                x: 0,
+                y: 0,
+                health: 100,
+                maxHealth: 100,
+                lives: 1,
+                score: 0,
+                energy: 100,
+                maxEnergy: 100,
+                stress: 0,
+                maxStress: 100,
+                skills: {},
+                emergencyBarriers: 1,
+                bulletTimeEnergy: 100,
+                precisionMode: false,
+                invulnerabilityFrames: 0
+            },
+            boss: null,
+            bullets: [],
+            enemyBullets: [],
+            particles: [],
+            powerUpItems: [],
+            environmentalHazards: [],
+            currentPhase: 0,
+            bulletHellIntensity: 0,
+            adaptiveDifficulty: 1.0,
+            keys: {},
+            mouse: {x: 0, y: 0},
+            levelStartTime: 0,
+            totalSurvivalTime: 0,
+            skillPoints: 0,
+            achievements: [],
+            bulletTimeActive: false,
+            timeScale: 1,
+            screenShake: 0,
+            transformationActive: false
+        };
+
+        // Improved Level Data with Better Difficulty Progression
+        const HELL_LEVEL_DATA = [
+            // Early levels - Much easier
+            {level: 1, boss: "Lost Soul", difficulty: "Gentle", health: 500, phases: 1, speed: 1.5, attackPatterns: ['basic'], weaknesses: ['light'], bulletSpeed: 2, bulletCount: 1},
+            {level: 2, boss: "Restless Spirit", difficulty: "Mild", health: 700, phases: 2, speed: 1.8, attackPatterns: ['basic', 'spiral'], weaknesses: ['light'], bulletSpeed: 2.5, bulletCount: 1},
+            {level: 3, boss: "Minor Demon", difficulty: "Moderate", health: 900, phases: 2, speed: 2.0, attackPatterns: ['basic', 'spiral'], weaknesses: ['holy'], bulletSpeed: 3, bulletCount: 1.2},
+            {level: 4, boss: "Shadow Imp", difficulty: "Challenging", health: 1200, phases: 2, speed: 2.2, attackPatterns: ['basic', 'spiral', 'tracking'], weaknesses: ['light'], bulletSpeed: 3.2, bulletCount: 1.3},
+            {level: 5, boss: "Fire Sprite", difficulty: "Tough", health: 1500, phases: 3, speed: 2.5, attackPatterns: ['basic', 'spiral', 'tracking'], weaknesses: ['water'], bulletSpeed: 3.5, bulletCount: 1.4},
+            
+            // Mid levels - Gradual increase
+            {level: 6, boss: "Tormented Wraith", difficulty: "Painful", health: 1800, phases: 3, speed: 2.8, attackPatterns: ['basic', 'spiral', 'tracking', 'wave'], weaknesses: ['light'], bulletSpeed: 3.8, bulletCount: 1.5},
+            {level: 7, boss: "Screaming Banshee", difficulty: "Agonizing", health: 2200, phases: 3, speed: 3.0, attackPatterns: ['basic', 'spiral', 'tracking', 'wave'], weaknesses: ['silence'], bulletSpeed: 4, bulletCount: 1.6},
+            {level: 8, boss: "Burning Demon", difficulty: "Excruciating", health: 2600, phases: 3, speed: 3.2, attackPatterns: ['basic', 'spiral', 'tracking', 'wave', 'meteor'], weaknesses: ['ice'], bulletSpeed: 4.2, bulletCount: 1.7},
+            {level: 9, boss: "Shadow Fiend", difficulty: "Unbearable", health: 3000, phases: 4, speed: 3.5, attackPatterns: ['basic', 'spiral', 'tracking', 'wave', 'meteor'], weaknesses: ['light'], bulletSpeed: 4.5, bulletCount: 1.8},
+            {level: 10, boss: "Hell Hound Alpha", difficulty: "Merciless", health: 3500, phases: 4, speed: 3.8, attackPatterns: ['basic', 'spiral', 'tracking', 'wave', 'meteor', 'laser'], weaknesses: ['holy'], bulletSpeed: 4.8, bulletCount: 2},
+            
+            // Late levels - Significantly harder
+            {level: 11, boss: "Infernal Golem", difficulty: "Ruthless", health: 4200, phases: 4, speed: 4.0, attackPatterns: ['basic', 'spiral', 'tracking', 'wave', 'meteor', 'laser'], weaknesses: ['lightning'], bulletSpeed: 5.2, bulletCount: 2.2},
+            {level: 12, boss: "Plague Bringer", difficulty: "Sadistic", health: 5000, phases: 5, speed: 4.3, attackPatterns: ['basic', 'spiral', 'tracking', 'wave', 'meteor', 'laser', 'poison'], weaknesses: ['purification'], bulletSpeed: 5.5, bulletCount: 2.4},
+            {level: 13, boss: "Void Stalker", difficulty: "Diabolical", health: 5800, phases: 5, speed: 4.6, attackPatterns: ['basic', 'spiral', 'tracking', 'wave', 'meteor', 'laser', 'void_rift'], weaknesses: ['reality'], bulletSpeed: 5.8, bulletCount: 2.6},
+            {level: 14, boss: "Crimson Overlord", difficulty: "Hellish", health: 6600, phases: 5, speed: 4.9, attackPatterns: ['basic', 'spiral', 'tracking', 'wave', 'meteor', 'laser', 'blood_rain'], weaknesses: ['divine'], bulletSpeed: 6.2, bulletCount: 2.8},
+            {level: 15, boss: "Nightmare Incarnate", difficulty: "Apocalyptic", health: 7500, phases: 6, speed: 5.2, attackPatterns: ['basic', 'spiral', 'tracking', 'wave', 'meteor', 'laser', 'fear_aura'], weaknesses: ['courage'], bulletSpeed: 6.5, bulletCount: 3},
+            
+            // Final levels - Extremely challenging
+            {level: 16, boss: "Abyssal Leviathan", difficulty: "Cataclysmic", health: 8500, phases: 6, speed: 5.6, attackPatterns: ['basic', 'spiral', 'tracking', 'wave', 'meteor', 'laser', 'tidal_wave'], weaknesses: ['earth'], bulletSpeed: 7, bulletCount: 3.2},
+            {level: 17, boss: "Chaos Primordial", difficulty: "World-Ending", health: 9500, phases: 7, speed: 6.0, attackPatterns: ['basic', 'spiral', 'tracking', 'wave', 'meteor', 'laser', 'chaos_storm'], weaknesses: ['order'], bulletSpeed: 7.5, bulletCount: 3.5},
+            {level: 18, boss: "Death's Avatar", difficulty: "Soul-Crushing", health: 10800, phases: 7, speed: 6.5, attackPatterns: ['basic', 'spiral', 'tracking', 'wave', 'meteor', 'laser', 'death_ray'], weaknesses: ['life'], bulletSpeed: 8, bulletCount: 3.8},
+            {level: 19, boss: "Reality Shatterer", difficulty: "Mind-Breaking", health: 12200, phases: 8, speed: 7.0, attackPatterns: ['basic', 'spiral', 'tracking', 'wave', 'meteor', 'laser', 'reality_break'], weaknesses: ['truth'], bulletSpeed: 8.5, bulletCount: 4.2},
+            {level: 20, boss: "The Final Nightmare", difficulty: "ABSOLUTE", health: 15000, phases: 10, speed: 8.0, attackPatterns: ['basic', 'spiral', 'tracking', 'wave', 'meteor', 'laser', 'ultimate_hell'], weaknesses: ['hope'], bulletSpeed: 9, bulletCount: 5}
+        ];
+
+        // Enhanced Skill Tree
+        const SURVIVAL_SKILLS = {
+            'pain_tolerance': {name: 'Pain Tolerance', icon: '🛡️', cost: 10, description: '+50 max health, -25% stress gain', maxLevel: 3},
+            'energy_mastery': {name: 'Energy Mastery', icon: '⚡', cost: 8, description: '+25% energy regen, +20 max energy', maxLevel: 4},
+            'precision_aim': {name: 'Precision Aim', icon: '🎯', cost: 12, description: '+50% damage, smaller hitbox', maxLevel: 3},
+            'bullet_time': {name: 'Bullet Time Master', icon: '⏰', cost: 15, description: '50% less bullet time drain', maxLevel: 2},
+            'stress_control': {name: 'Stress Control', icon: '🧘', cost: 20, description: 'Stress decreases over time', maxLevel: 1},
+            'barrier_tech': {name: 'Barrier Technology', icon: '🔰', cost: 25, description: '+1 emergency barrier per phase', maxLevel: 2},
+            'soul_link': {name: 'Soul Link', icon: '👻', cost: 30, description: 'Gain energy from enemy deaths', maxLevel: 1},
+            'hell_walker': {name: 'Hell Walker', icon: '🔥', cost: 35, description: 'Immune to environmental damage', maxLevel: 1},
+            'demon_slayer': {name: 'Demon Slayer', icon: '⚔️', cost: 40, description: '+100% damage to final phases', maxLevel: 1},
+            'time_master': {name: 'Time Master', icon: '🌀', cost: 50, description: 'Auto bullet-time when near death', maxLevel: 1},
+            'nightmare_ender': {name: 'Nightmare Ender', icon: '💀', cost: 100, description: 'Instant kill bosses below 10% health', maxLevel: 1},
+            'mobile_master': {name: 'Mobile Master', icon: '📱', cost: 30, description: 'Enhanced touch controls and mobile UI', maxLevel: 1}
+        };
+
+        // Enhanced Achievement System
+        const HELL_ACHIEVEMENTS = {
+            'first_pain': {name: 'First Pain', description: 'Survive your first demon encounter', icon: '🩸', unlocked: false},
+            'stress_master': {name: 'Stress Master', description: 'Reach 100% stress and survive', icon: '🤯', unlocked: false},
+            'bullet_dancer': {name: 'Bullet Dancer', description: 'Survive 1000 bullets in one level', icon: '💃', unlocked: false},
+            'hell_walker': {name: 'Hell Walker', description: 'Reach Circle 10', icon: '🔥', unlocked: false},
+            'demon_slayer': {name: 'Demon Slayer', description: 'Reach Circle 15', icon: '⚔️', unlocked: false},
+            'nightmare_ender': {name: 'Nightmare Ender', description: 'Reach Circle 20', icon: '💀', unlocked: false},
+            'perfect_hell': {name: 'Perfect Hell', description: 'Complete a level without taking damage', icon: '👑', unlocked: false},
+            'speed_demon': {name: 'Speed Demon', description: 'Complete a level in under 30 seconds', icon: '⚡', unlocked: false},
+            'ultimate_survivor': {name: 'Ultimate Survivor', description: 'Conquer all 20 Circles of Hell', icon: '🏆', unlocked: false},
+            'endless_legend': {name: 'Endless Legend', description: 'Survive 50 waves in endless mode', icon: '♾️', unlocked: false},
+            'speedrun_god': {name: 'Speedrun God', description: 'Complete campaign in under 10 minutes', icon: '⚡', unlocked: false},
+            'mobile_warrior': {name: 'Mobile Warrior', description: 'Complete 10 levels on mobile', icon: '📱', unlocked: false}
+        };
+
+        // Canvas and context
+        let canvas, ctx;
+        let animationId;
+
+        // Initialize the game
+        function initGame() {
+            canvas = document.getElementById('gameCanvas');
+            ctx = canvas.getContext('2d');
+            
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            
+            loadGameData();
+            updateUI();
+            generateLevelGrid();
+            generateSkillTree();
+            generateAchievements();
+            createHellParticles();
+            setupEventListeners();
+            setupMobileControls();
+
+            // Show mobile controls notification if on mobile device
+            if (gameState.isMobile) {
+                showNotification('Mobile controls detected! Touch to play.', 'info');
+            }
+        }
+
+        function resizeCanvas() {
+            const container = document.getElementById('gameContainer');
+            const rect = container.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+        }
+
+        // Enhanced Mobile Controls Setup with Better Touch Handling
+        function setupMobileControls() {
+            if (!gameState.isMobile) return;
+
+            const joystick = document.getElementById('mobileJoystick');
+            const joystickKnob = document.getElementById('mobileJoystickKnob');
+            const shootBtn = document.getElementById('mobileShoot');
+            const bulletTimeBtn = document.getElementById('mobileBulletTime');
+            const barrierBtn = document.getElementById('mobileBarrier');
+            const desperationBtn = document.getElementById('mobileDesperation');
+
+            // Improved joystick controls with better touch handling
+            joystick.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const rect = joystick.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                
+                gameState.touchControls.joystick.active = true;
+                gameState.touchControls.joystick.startX = centerX;
+                gameState.touchControls.joystick.startY = centerY;
+                gameState.touchControls.joystick.touchId = touch.identifier;
+            }, { passive: false });
+
+            document.addEventListener('touchmove', (e) => {
+                if (!gameState.touchControls.joystick.active) return;
+                
+                // Find the touch that corresponds to our joystick
+                let relevantTouch = null;
+                for (let touch of e.touches) {
+                    if (touch.identifier === gameState.touchControls.joystick.touchId) {
+                        relevantTouch = touch;
+                        break;
+                    }
+                }
+                
+                if (!relevantTouch) return;
+                
+                e.preventDefault();
+                
+                const centerX = gameState.touchControls.joystick.startX;
+                const centerY = gameState.touchControls.joystick.startY;
+                
+                const deltaX = relevantTouch.clientX - centerX;
+                const deltaY = relevantTouch.clientY - centerY;
+                const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                const maxDistance = 40; // Reduced for better mobile control
+                
+                if (distance <= maxDistance) {
+                    gameState.touchControls.joystick.currentX = deltaX;
+                    gameState.touchControls.joystick.currentY = deltaY;
+                } else {
+                    const angle = Math.atan2(deltaY, deltaX);
+                    gameState.touchControls.joystick.currentX = Math.cos(angle) * maxDistance;
+                    gameState.touchControls.joystick.currentY = Math.sin(angle) * maxDistance;
+                }
+
+                // Update knob position
+                joystickKnob.style.transform = `translate(-50%, -50%) translate(${gameState.touchControls.joystick.currentX}px, ${gameState.touchControls.joystick.currentY}px)`;
+            }, { passive: false });
+
+            document.addEventListener('touchend', (e) => {
+                // Check if our joystick touch ended
+                let touchEnded = true;
+                for (let touch of e.touches) {
+                    if (touch.identifier === gameState.touchControls.joystick.touchId) {
+                        touchEnded = false;
+                        break;
+                    }
+                }
+                
+                if (touchEnded && gameState.touchControls.joystick.active) {
+                    gameState.touchControls.joystick.active = false;
+                    gameState.touchControls.joystick.currentX = 0;
+                    gameState.touchControls.joystick.currentY = 0;
+                    gameState.touchControls.joystick.touchId = null;
+                    joystickKnob.style.transform = 'translate(-50%, -50%)';
+                }
+            }, { passive: false });
+
+            // Action buttons with improved feedback
+            shootBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                gameState.keys['shoot'] = true;
+                shootBtn.style.transform = 'scale(0.9)';
+            }, { passive: false });
+
+            shootBtn.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                gameState.keys['shoot'] = false;
+                shootBtn.style.transform = 'scale(1)';
+            }, { passive: false });
+
+            bulletTimeBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                toggleBulletTime();
+                bulletTimeBtn.style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                    bulletTimeBtn.style.transform = 'scale(1)';
+                }, 150);
+            }, { passive: false });
+
+            barrierBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                useEmergencyBarrier();
+                barrierBtn.style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                    barrierBtn.style.transform = 'scale(1)';
+                }, 150);
+            }, { passive: false });
+
+            desperationBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                desperationAttack();
+                desperationBtn.style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                    desperationBtn.style.transform = 'scale(1)';
+                }, 150);
+            }, { passive: false });
+
+            // Canvas touch controls for aiming and shooting
+            canvas.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const rect = canvas.getBoundingClientRect();
+                gameState.mouse.x = touch.clientX - rect.left;
+                gameState.mouse.y = touch.clientY - rect.top;
+                
+                // Auto-shoot on touch
+                gameState.touchControls.shooting = true;
+                gameState.keys['shoot'] = true;
+            }, { passive: false });
+
+            canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const rect = canvas.getBoundingClientRect();
+                gameState.mouse.x = touch.clientX - rect.left;
+                gameState.mouse.y = touch.clientY - rect.top;
+            }, { passive: false });
+
+            canvas.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                gameState.touchControls.shooting = false;
+                gameState.keys['shoot'] = false;
+            }, { passive: false });
+        }
+
+        function setupEventListeners() {
+            document.addEventListener('keydown', (e) => {
+                gameState.keys[e.key.toLowerCase()] = true;
+                gameState.keys[e.code] = true;
+                
+                if (gameState.currentScreen === 'gameScreen' && gameState.gameRunning) {
+                    switch(e.key.toLowerCase()) {
+                        case 'escape':
+                            forfeitSoul();
+                            break;
+                        case 'r':
+                            restartCurrentLevel();
+                            break;
+                        case 'f':
+                            toggleBulletTime();
+                            break;
+                        case 'e':
+                            useEmergencyBarrier();
+                            break;
+                        case 'c':
+                            desperationAttack();
+                            break;
+                        case 'shift':
+                            gameState.player.precisionMode = true;
+                            break;
+                    }
+                }
+            });
+            
+            document.addEventListener('keyup', (e) => {
+                gameState.keys[e.key.toLowerCase()] = false;
+                gameState.keys[e.code] = false;
+                
+                if (e.key.toLowerCase() === 'shift') {
+                    gameState.player.precisionMode = false;
+                }
+            });
+            
+            if (!gameState.isMobile) {
+                canvas.addEventListener('mousemove', (e) => {
+                    const rect = canvas.getBoundingClientRect();
+                    gameState.mouse.x = e.clientX - rect.left;
+                    gameState.mouse.y = e.clientY - rect.top;
+                });
+                
+                canvas.addEventListener('mousedown', (e) => {
+                    if (e.button === 0) {
+                        gameState.keys['shoot'] = true;
+                    } else if (e.button === 2) {
+                        gameState.keys['charged_shot'] = true;
+                    }
+                });
+                
+                canvas.addEventListener('mouseup', (e) => {
+                    if (e.button === 0) {
+                        gameState.keys['shoot'] = false;
+                    } else if (e.button === 2) {
+                        gameState.keys['charged_shot'] = false;
+                    }
+                });
+                
+                canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+            }
+        }
+
+        // Screen management
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            
+            document.getElementById(screenId).classList.add('active');
+            gameState.currentScreen = screenId;
+            
+            // Show/hide mobile controls
+            const mobileControls = document.getElementById('mobileControls');
+            if (screenId === 'gameScreen' && gameState.isMobile) {
+                mobileControls.classList.add('active');
+            } else {
+                mobileControls.classList.remove('active');
+            }
+            
+            if (screenId === 'gameScreen') {
+                if (!gameState.gameRunning) {
+                    startGame();
+                } else {
+                    resumeGame();
+                }
+            } else {
+                if (gameState.gameRunning) {
+                    pauseGame();
+                }
+            }
+        }
+
+        // Enhanced Level Management
+        function generateLevelGrid() {
+            const levelGrid = document.getElementById('levelGrid');
+            levelGrid.innerHTML = '';
+            
+            const savedData = JSON.parse(localStorage.getItem('hellBossRushSave') || '{}');
+            const highestLevel = savedData.highestLevel || 1;
+            
+            HELL_LEVEL_DATA.forEach((levelData, index) => {
+                const levelCard = document.createElement('div');
+                levelCard.className = 'level-card';
+                
+                if (levelData.level <= highestLevel) {
+                    if (savedData.completedLevels && savedData.completedLevels.includes(levelData.level)) {
+                        levelCard.classList.add('completed');
+                    }
+                    levelCard.onclick = () => startLevel(levelData.level);
+                } else {
+                    levelCard.classList.add('locked');
+                }
+                
+                const phaseText = `${levelData.phases} Phase${levelData.phases > 1 ? 's' : ''} of Torment`;
+                const warningText = levelData.level >= 16 ? 'REALITY BREAKING' : 
+                                   levelData.level >= 11 ? 'SANITY THREATENING' : 
+                                   levelData.level >= 6 ? 'SOUL CRUSHING' : 
+                                   levelData.level >= 3 ? 'CHALLENGING' : 'MANAGEABLE';
+                
+                levelCard.innerHTML = `
+                    <div class="level-number">${levelData.level}</div>
+                    <div class="level-boss">${levelData.boss}</div>
+                    <div class="level-difficulty" style="color: ${getDifficultyColor(levelData.difficulty)}">${levelData.difficulty}</div>
+                    <div class="level-phases">${phaseText}</div>
+                    <div class="level-warning">${warningText}</div>
+                    ${levelData.level > highestLevel ? '<div style="color: #666;">🔒 SOUL REQUIRED</div>' : ''}
+                `;
+                
+                levelGrid.appendChild(levelCard);
+            });
+        }
+
+        function getDifficultyColor(difficulty) {
+            const colors = {
+                'Gentle': '#90ee90',
+                'Mild': '#32cd32',
+                'Moderate': '#ffff00',
+                'Challenging': '#ffa500',
+                'Tough': '#ff6347',
+                'Painful': '#ff4500',
+                'Agonizing': '#ff1493',
+                'Excruciating': '#ff0000',
+                'Unbearable': '#dc143c',
+                'Merciless': '#8b0000',
+                'Ruthless': '#660000',
+                'Sadistic': '#4b0000',
+                'Diabolical': '#330000',
+                'Hellish': '#220000',
+                'Apocalyptic': '#110000',
+                'Cataclysmic': '#ff6666',
+                'World-Ending': '#ff3333',
+                'Soul-Crushing': '#ff0033',
+                'Mind-Breaking': '#cc0033',
+                'ABSOLUTE': '#ff00ff'
+            };
+            return colors[difficulty] || '#ff0000';
+        }
+
+        // Enhanced Skill Tree System
+        function generateSkillTree() {
+            const skillTreeGrid = document.getElementById('skillTreeGrid');
+            skillTreeGrid.innerHTML = '';
+            
+            const savedData = JSON.parse(localStorage.getItem('hellBossRushSave') || '{}');
+            const purchasedSkills = savedData.skills || {};
+            
+            Object.entries(SURVIVAL_SKILLS).forEach(([skillId, skillData]) => {
+                const skillNode = document.createElement('div');
+                skillNode.className = 'stat-item';
+                
+                const currentLevel = purchasedSkills[skillId] || 0;
+                const canPurchase = gameState.skillPoints >= skillData.cost && currentLevel < skillData.maxLevel;
+                
+                if (canPurchase) {
+                    skillNode.style.borderColor = '#ff0000';
+                    skillNode.style.cursor = 'pointer';
+                    skillNode.onclick = () => purchaseSkill(skillId);
+                }
+                
+                if (currentLevel > 0) {
+                    skillNode.style.borderColor = '#32cd32';
+                    skillNode.style.background = 'linear-gradient(135deg, rgba(50, 205, 50, 0.2), rgba(0, 0, 0, 0.8))';
+                }
+                
+                skillNode.innerHTML = `
+                    <div style="font-size: clamp(1.5rem, 4vw, 2rem); margin-bottom: 0.5rem;">${skillData.icon}</div>
+                    <div style="font-size: clamp(0.9rem, 2.5vw, 1.1rem); font-weight: 700; color: ${currentLevel > 0 ? '#32cd32' : '#ff0000'};">${skillData.name}</div>
+                    <div style="font-size: clamp(0.8rem, 2vw, 0.9rem); margin-bottom: 0.5rem;">${skillData.description}</div>
+                    <div style="font-size: clamp(0.7rem, 1.8vw, 0.8rem); color: #888;">Level: ${currentLevel}/${skillData.maxLevel}</div>
+                    <div style="font-size: clamp(0.8rem, 2vw, 0.9rem); color: #ffd700;">Cost: ${skillData.cost} SF</div>
+                `;
+                
+                skillTreeGrid.appendChild(skillNode);
+            });
+        }
+
+        function purchaseSkill(skillId) {
+            const skillData = SURVIVAL_SKILLS[skillId];
+            const savedData = JSON.parse(localStorage.getItem('hellBossRushSave') || '{}');
+            
+            if (!savedData.skills) savedData.skills = {};
+            if (!savedData.skillPoints) savedData.skillPoints = 0;
+            
+            const currentLevel = savedData.skills[skillId] || 0;
+            
+            if (savedData.skillPoints >= skillData.cost && currentLevel < skillData.maxLevel) {
+                savedData.skillPoints -= skillData.cost;
+                savedData.skills[skillId] = currentLevel + 1;
+                
+                localStorage.setItem('hellBossRushSave', JSON.stringify(savedData));
+                
+                gameState.skillPoints = savedData.skillPoints;
+                gameState.player.skills = savedData.skills;
+                
+                updateUI();
+                generateSkillTree();
+                applySkillEffects();
+                
+                showNotification(`${skillData.name} upgraded!`, 'achievement');
+            }
+        }
+
+        function applySkillEffects() {
+            const skills = gameState.player.skills;
+            
+            if (skills.pain_tolerance) {
+                gameState.player.maxHealth = 100 + (skills.pain_tolerance * 50);
+                if (gameState.player.health > gameState.player.maxHealth) {
+                    gameState.player.health = gameState.player.maxHealth;
+                }
+            }
+            
+            if (skills.energy_mastery) {
+                gameState.player.maxEnergy = 100 + (skills.energy_mastery * 20);
+            }
+        }
+
+        // Achievement System
+        function generateAchievements() {
+            const achievementsList = document.getElementById('achievementsList');
+            achievementsList.innerHTML = '';
+            
+            const savedData = JSON.parse(localStorage.getItem('hellBossRushSave') || '{}');
+            const unlockedAchievements = savedData.achievements || [];
+            
+            Object.entries(HELL_ACHIEVEMENTS).forEach(([achievementId, achievementData]) => {
+                const achievementItem = document.createElement('div');
+                achievementItem.className = 'stat-item';
+                
+                const isUnlocked = unlockedAchievements.includes(achievementId);
+                
+                if (isUnlocked) {
+                    achievementItem.style.borderColor = '#32cd32';
+                    achievementItem.style.background = 'linear-gradient(135deg, rgba(50, 205, 50, 0.2), rgba(0, 0, 0, 0.8))';
+                } else {
+                    achievementItem.style.borderColor = '#666';
+                    achievementItem.style.opacity = '0.6';
+                }
+                
+                achievementItem.innerHTML = `
+                    <div style="font-size: clamp(1.5rem, 4vw, 2rem); margin-bottom: 0.5rem;">${achievementData.icon}</div>
+                    <div style="font-size: clamp(0.9rem, 2.5vw, 1.1rem); font-weight: 700; color: ${isUnlocked ? '#32cd32' : '#666'};">${achievementData.name}</div>
+                    <div style="font-size: clamp(0.8rem, 2vw, 0.9rem); color: ${isUnlocked ? '#ffffff' : '#888'};">${achievementData.description}</div>
+                    ${isUnlocked ? '<div style="font-size: clamp(0.7rem, 1.8vw, 0.8rem); color: #ffd700; margin-top: 0.5rem;">✓ ENDURED</div>' : '<div style="font-size: clamp(0.7rem, 1.8vw, 0.8rem); color: #666; margin-top: 0.5rem;">🔒 LOCKED</div>'}
+                `;
+                
+                achievementsList.appendChild(achievementItem);
+            });
+        }
+
+        function unlockAchievement(achievementId) {
+            const savedData = JSON.parse(localStorage.getItem('hellBossRushSave') || '{}');
+            if (!savedData.achievements) savedData.achievements = [];
+            
+            if (!savedData.achievements.includes(achievementId)) {
+                savedData.achievements.push(achievementId);
+                localStorage.setItem('hellBossRushSave', JSON.stringify(savedData));
+                
+                gameState.skillPoints += 15;
+                savedData.skillPoints = (savedData.skillPoints || 0) + 15;
+                localStorage.setItem('hellBossRushSave', JSON.stringify(savedData));
+                
+                updateUI();
+                generateAchievements();
+                
+                const achievement = HELL_ACHIEVEMENTS[achievementId];
+                showNotification(`🏆 ${achievement.name} Unlocked! +15 Soul Fragments`, 'achievement');
+            }
+        }
+
+        // Enhanced Game Logic
+        function startLevel(level) {
+            gameState.gameMode = 'campaign';
+            gameState.currentLevel = level;
+            showScreen('gameScreen');
+        }
+
+        function startEndlessMode() {
+            gameState.gameMode = 'endless';
+            gameState.endlessWave = 1;
+            gameState.adaptiveDifficulty = 1.0;
+            showScreen('gameScreen');
+        }
+
+        function startSpeedrun() {
+            gameState.gameMode = 'speedrun';
+            gameState.speedrunStartTime = Date.now();
+            gameState.currentLevel = 1;
+            showScreen('gameScreen');
+        }
+
+        function startGame() {
+            gameState.gameRunning = true;
+            gameState.gamePaused = false;
+            gameState.levelStartTime = Date.now();
+            gameState.bulletTimeActive = false;
+            gameState.timeScale = 1;
+            gameState.currentPhase = 0;
+            gameState.bulletHellIntensity = 0;
+            gameState.adaptiveDifficulty = 1.0;
+            gameState.screenShake = 0;
+            gameState.transformationActive = false;
+            
+            // Initialize player with skills
+            const savedData = JSON.parse(localStorage.getItem('hellBossRushSave') || '{}');
+            const skills = savedData.skills || {};
+            
+            gameState.player.x = canvas.width / 2;
+            gameState.player.y = canvas.height - 100;
+            gameState.player.health = 100 + (skills.pain_tolerance || 0) * 50;
+            gameState.player.maxHealth = 100 + (skills.pain_tolerance || 0) * 50;
+            gameState.player.energy = 100 + (skills.energy_mastery || 0) * 20;
+            gameState.player.maxEnergy = 100 + (skills.energy_mastery || 0) * 20;
+            gameState.player.stress = 0;
+            gameState.player.emergencyBarriers = 1 + (skills.barrier_tech || 0);
+            gameState.player.bulletTimeEnergy = 100;
+            gameState.player.skills = skills;
+            gameState.player.invulnerabilityFrames = 0;
+            
+            // Initialize boss based on game mode
+            if (gameState.gameMode === 'endless') {
+                generateEndlessBoss();
+            } else {
+                initializeCampaignBoss();
+            }
+            
+            // Clear arrays
+            gameState.bullets = [];
+            gameState.enemyBullets = [];
+            gameState.particles = [];
+            gameState.powerUpItems = [];
+            gameState.environmentalHazards = [];
+            
+            updateUI();
+            gameLoop();
+        }
+
+        function initializeCampaignBoss() {
+            const levelData = HELL_LEVEL_DATA[gameState.currentLevel - 1];
+            
+            gameState.boss = {
+                x: canvas.width / 2,
+                y: 100,
+                health: levelData.health * gameState.adaptiveDifficulty,
+                maxHealth: levelData.health * gameState.adaptiveDifficulty,
+                speed: levelData.speed,
+                attackPatterns: levelData.attackPatterns,
+                phases: levelData.phases,
+                currentPhase: 1,
+                attackCooldown: 0,
+                moveDirection: 1,
+                specialCooldown: 0,
+                phaseTransition: false,
+                enraged: false,
+                bulletCount: levelData.bulletCount || 1,
+                bulletSpeed: levelData.bulletSpeed || 4,
+                attackSpeed: 1
+            };
+        }
+
+        function generateEndlessBoss() {
+            const randomLevel = Math.floor(Math.random() * HELL_LEVEL_DATA.length);
+            const baseBoss = HELL_LEVEL_DATA[randomLevel];
+            
+            gameState.boss = {
+                x: canvas.width / 2,
+                y: 100,
+                health: baseBoss.health * gameState.adaptiveDifficulty,
+                maxHealth: baseBoss.health * gameState.adaptiveDifficulty,
+                speed: baseBoss.speed * (1 + gameState.adaptiveDifficulty * 0.1),
+                attackPatterns: [...baseBoss.attackPatterns],
+                phases: Math.min(baseBoss.phases + Math.floor(gameState.endlessWave / 10), 10),
+                currentPhase: 1,
+                attackCooldown: 0,
+                moveDirection: 1,
+                specialCooldown: 0,
+                phaseTransition: false,
+                enraged: false,
+                bulletCount: (baseBoss.bulletCount || 1) * (1 + gameState.endlessWave * 0.1),
+                bulletSpeed: (baseBoss.bulletSpeed || 4) * (1 + gameState.endlessWave * 0.05),
+                attackSpeed: 1 + (gameState.endlessWave * 0.05)
+            };
+        }
+
+        function gameLoop() {
+            if (!gameState.gameRunning || gameState.gamePaused) return;
+            
+            update();
+            render();
+            
+            animationId = requestAnimationFrame(gameLoop);
+        }
+
+        function update() {
+            const deltaTime = gameState.timeScale;
+            
+            updatePlayer(deltaTime);
+            updateBoss(deltaTime);
+            updateBullets(deltaTime);
+            updateEnemyBullets(deltaTime);
+            updateParticles(deltaTime);
+            updateStressSystem();
+            updateBulletTime();
+            updateAdaptiveDifficulty();
+            updateScreenShake();
+            checkCollisions();
+            
+            // Mode-specific updates
+            if (gameState.gameMode === 'endless') {
+                updateEndlessMode();
+            } else if (gameState.gameMode === 'speedrun') {
+                updateSpeedrunTimer();
+            }
+            
+            checkBossPhaseTransition();
+            
+            if (gameState.boss.health <= 0) {
+                levelComplete();
+            } else if (gameState.player.health <= 0 && gameState.player.invulnerabilityFrames <= 0) {
+                gameOver();
+            }
+        }
+
+        function updatePlayer(deltaTime) {
+            const player = gameState.player;
+            const skills = gameState.player.skills;
+            let speed = player.precisionMode ? 3 : 7; // Increased base speed for better mobile experience
+            
+            if (skills.precision_aim && player.precisionMode) {
+                speed *= 0.6;
+            }
+            
+            speed *= deltaTime;
+            
+            // Mobile joystick movement with improved sensitivity
+            if (gameState.isMobile && gameState.touchControls.joystick.active) {
+                const joystickStrength = 0.15; // Increased sensitivity
+                const moveX = gameState.touchControls.joystick.currentX * joystickStrength;
+                const moveY = gameState.touchControls.joystick.currentY * joystickStrength;
+                
+                player.x += moveX;
+                player.y += moveY;
+            }
+            
+            // Keyboard movement
+            if ((gameState.keys['w'] || gameState.keys['ArrowUp']) && player.y > 50) {
+                player.y -= speed;
+            }
+            if ((gameState.keys['s'] || gameState.keys['ArrowDown']) && player.y < canvas.height - 50) {
+                player.y += speed;
+            }
+            if ((gameState.keys['a'] || gameState.keys['ArrowLeft']) && player.x > 50) {
+                player.x -= speed;
+            }
+            if ((gameState.keys['d'] || gameState.keys['ArrowRight']) && player.x < canvas.width - 50) {
+                player.x += speed;
+            }
+            
+            // Keep player in bounds
+            player.x = Math.max(50, Math.min(canvas.width - 50, player.x));
+            player.y = Math.max(50, Math.min(canvas.height - 50, player.y));
+            
+            // Shooting with improved mobile handling
+            if ((gameState.keys['shoot'] || gameState.keys[' '] || gameState.keys['Space'] || gameState.touchControls.shooting) && player.energy > 0) {
+                if (Math.random() < 0.15) { // Slightly increased fire rate
+                    shoot();
+                    player.energy = Math.max(0, player.energy - 1.5); // Reduced energy cost
+                }
+            }
+            
+            if (gameState.keys['charged_shot'] && player.energy >= 10) {
+                chargedShot();
+                player.energy -= 10;
+                gameState.keys['charged_shot'] = false;
+            }
+            
+            // Energy regeneration
+            if (player.energy < player.maxEnergy) {
+                const regenRate = skills.energy_mastery ? 1.0 : 0.7; // Increased regen rate
+                player.energy = Math.min(player.maxEnergy, player.energy + regenRate);
+            }
+            
+            if (player.invulnerabilityFrames > 0) {
+                player.invulnerabilityFrames--;
+            }
+            
+            updateUI();
+        }
+
+        function updateBoss(deltaTime) {
+            const boss = gameState.boss;
+            const levelData = HELL_LEVEL_DATA[gameState.currentLevel - 1] || HELL_LEVEL_DATA[0];
+            
+            // Enhanced movement patterns
+            if (boss.currentPhase >= 3) {
+                boss.x += boss.moveDirection * boss.speed * deltaTime * (1 + Math.sin(Date.now() * 0.01) * 0.5);
+                if (Math.random() < 0.02) {
+                    boss.moveDirection *= -1;
+                }
+            } else {
+                boss.x += boss.moveDirection * boss.speed * deltaTime;
+            }
+            
+            if (boss.x <= 100 || boss.x >= canvas.width - 100) {
+                boss.moveDirection *= -1;
+            }
+            
+            // Attack patterns with improved difficulty scaling
+            if (boss.attackCooldown <= 0) {
+                const pattern = boss.attackPatterns[Math.floor(Math.random() * boss.attackPatterns.length)];
+                executeAttackPattern(pattern);
+                
+                // Improved attack speed calculation based on level
+                let baseSpeed = 60; // Base attack cooldown
+                if (gameState.currentLevel <= 5) {
+                    baseSpeed = 80; // Slower attacks for early levels
+                } else if (gameState.currentLevel <= 10) {
+                    baseSpeed = 60;
+                } else if (gameState.currentLevel <= 15) {
+                    baseSpeed = 45;
+                } else {
+                    baseSpeed = 30; // Faster attacks for late levels
+                }
+                
+                boss.attackCooldown = baseSpeed / (boss.attackSpeed * gameState.adaptiveDifficulty);
+            } else {
+                boss.attackCooldown -= deltaTime;
+            }
+            
+            // Environmental hazards for higher levels
+            if (gameState.currentLevel >= 8 && Math.random() < 0.001 * gameState.adaptiveDifficulty) {
+                createEnvironmentalHazard();
+            }
+        }
+
+        function executeAttackPattern(pattern) {
+            const boss = gameState.boss;
+            const levelData = HELL_LEVEL_DATA[gameState.currentLevel - 1] || HELL_LEVEL_DATA[0];
+            const bulletSpeed = levelData.bulletSpeed || 4;
+            const bulletCount = boss.bulletCount;
+            
+            switch (pattern) {
+                case 'basic':
+                    for (let i = 0; i < Math.floor(3 * bulletCount); i++) {
+                        gameState.enemyBullets.push({
+                            x: boss.x + (i - 1) * 30,
+                            y: boss.y + 50,
+                            vx: (i - 1) * 0.5,
+                            vy: bulletSpeed,
+                            color: '#ff0000',
+                            size: 8,
+                            damage: 20
+                        });
+                    }
+                    break;
+                    
+                case 'spiral':
+                    const spiralCount = Math.floor(8 * bulletCount);
+                    for (let i = 0; i < spiralCount; i++) {
+                        const angle = (i / spiralCount) * Math.PI * 2 + (Date.now() * 0.01);
+                        gameState.enemyBullets.push({
+                            x: boss.x,
+                            y: boss.y + 50,
+                            vx: Math.cos(angle) * 3,
+                            vy: Math.sin(angle) * 3 + bulletSpeed,
+                            color: '#ff1493',
+                            size: 6,
+                            damage: 15
+                        });
+                    }
+                    break;
+                    
+                case 'tracking':
+                    const dx = gameState.player.x - boss.x;
+                    const dy = gameState.player.y - boss.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    
+                    for (let i = 0; i < Math.floor(2 * bulletCount); i++) {
+                        gameState.enemyBullets.push({
+                            x: boss.x,
+                            y: boss.y + 50,
+                            vx: (dx / dist) * bulletSpeed + (Math.random() - 0.5) * 1,
+                            vy: (dy / dist) * bulletSpeed + (Math.random() - 0.5) * 1,
+                            color: '#ff4500',
+                            size: 10,
+                            damage: 25,
+                            tracking: true,
+                            trackingStrength: 0.05
+                        });
+                    }
+                    break;
+                    
+                case 'laser':
+                    for (let i = 0; i < 20; i++) {
+                        gameState.enemyBullets.push({
+                            x: boss.x,
+                            y: boss.y + 50 + i * 15,
+                            vx: 0,
+                            vy: bulletSpeed * 1.5,
+                            color: '#ffff00',
+                            size: 12,
+                            damage: 30
+                        });
+                    }
+                    break;
+                    
+                case 'wave':
+                    for (let i = 0; i < Math.floor(10 * bulletCount); i++) {
+                        const angle = (i / 10) * Math.PI * 2;
+                        gameState.enemyBullets.push({
+                            x: boss.x,
+                            y: boss.y + 50,
+                            vx: Math.cos(angle) * 2,
+                            vy: Math.sin(angle) * 2 + bulletSpeed,
+                            color: '#9932cc',
+                            size: 8,
+                            damage: 20,
+                            wave: true,
+                            waveOffset: i * 0.5
+                        });
+                    }
+                    break;
+                    
+                case 'meteor':
+                    for (let i = 0; i < Math.floor(5 * bulletCount); i++) {
+                        gameState.enemyBullets.push({
+                            x: Math.random() * canvas.width,
+                            y: -50,
+                            vx: (Math.random() - 0.5) * 3,
+                            vy: bulletSpeed * 1.2,
+                            color: '#ff6600',
+                            size: 15,
+                            damage: 35,
+                            meteor: true
+                        });
+                    }
+                    break;
+                    
+                case 'ultimate_hell':
+                    for (let i = 0; i < Math.floor(30 * bulletCount); i++) {
+                        const angle = Math.random() * Math.PI * 2;
+                        const speed = Math.random() * 6 + 3;
+                        gameState.enemyBullets.push({
+                            x: boss.x,
+                            y: boss.y + 50,
+                            vx: Math.cos(angle) * speed,
+                            vy: Math.sin(angle) * speed,
+                            color: '#ff00ff',
+                            size: 20,
+                            damage: 45,
+                            ultimate: true
+                        });
+                    }
+                    break;
+            }
+            
+            gameState.bulletHellIntensity = Math.min(100, gameState.bulletHellIntensity + 3);
+        }
+
+        function shoot() {
+            const player = gameState.player;
+            const skills = gameState.player.skills;
+            let damage = 20; // Increased base damage
+            
+            if (skills.precision_aim && player.precisionMode) {
+                damage *= 1.5;
+            }
+            
+            // Calculate aim direction
+            let targetX = gameState.mouse.x;
+            let targetY = gameState.mouse.y;
+            
+            // For mobile, aim towards boss if no specific target
+            if (gameState.isMobile && gameState.boss) {
+                targetX = gameState.boss.x;
+                targetY = gameState.boss.y;
+            }
+            
+            const dx = targetX - player.x;
+            const dy = targetY - player.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            
+            const speed = 12; // Increased bullet speed
+            const vx = dist > 0 ? (dx / dist) * speed : 0;
+            const vy = dist > 0 ? (dy / dist) * speed : -speed;
+            
+            gameState.bullets.push({
+                x: player.x,
+                y: player.y - 20,
+                vx: vx,
+                vy: vy,
+                color: '#00ffff',
+                size: 6,
+                damage: damage
+            });
+        }
+
+        function chargedShot() {
+            const player = gameState.player;
+            const skills = gameState.player.skills;
+            let damage = 60; // Increased charged shot damage
+            
+            if (skills.precision_aim) {
+                damage *= 2;
+            }
+            
+            gameState.bullets.push({
+                x: player.x,
+                y: player.y - 20,
+                vx: 0,
+                vy: -15,
+                color: '#ffff00',
+                size: 12,
+                damage: damage,
+                charged: true
+            });
+        }
+
+        function toggleBulletTime() {
+            const player = gameState.player;
+            
+            if (player.bulletTimeEnergy > 20) {
+                gameState.bulletTimeActive = !gameState.bulletTimeActive;
+                
+                if (gameState.bulletTimeActive) {
+                    gameState.timeScale = 0.3; // Less extreme slow-mo for mobile
+                } else {
+                    gameState.timeScale = 1;
+                }
+            }
+        }
+
+        function updateBulletTime() {
+            const player = gameState.player;
+            const skills = gameState.player.skills;
+            
+            if (gameState.bulletTimeActive) {
+                const drainRate = skills.bullet_time ? 1 : 1.5; // Reduced drain rate
+                player.bulletTimeEnergy -= drainRate;
+                
+                if (player.bulletTimeEnergy <= 0) {
+                    gameState.bulletTimeActive = false;
+                    gameState.timeScale = 1;
+                    player.bulletTimeEnergy = 0;
+                }
+            } else if (player.bulletTimeEnergy < 100) {
+                player.bulletTimeEnergy += 0.4; // Faster recharge
+            }
+            
+            if (skills.time_master && player.health < player.maxHealth * 0.15 && !gameState.bulletTimeActive) {
+                gameState.timeScale = 0.4;
+            } else if (!gameState.bulletTimeActive) {
+                gameState.timeScale = 1;
+            }
+        }
+
+        function updateStressSystem() {
+            const player = gameState.player;
+            const skills = gameState.player.skills;
+            
+            let stressIncrease = 0;
+            
+            gameState.enemyBullets.forEach(bullet => {
+                const dist = Math.sqrt(
+                    Math.pow(bullet.x - player.x, 2) + 
+                    Math.pow(bullet.y - player.y, 2)
+                );
+                
+                if (dist < 80) { // Reduced stress range for mobile
+                    stressIncrease += (80 - dist) * 0.008;
+                }
+            });
+            
+            stressIncrease += gameState.boss.currentPhase * 0.05; // Reduced stress from phases
+            
+            if (skills.pain_tolerance) {
+                stressIncrease *= (1 - skills.pain_tolerance * 0.25);
+            }
+            
+            player.stress = Math.min(player.maxStress, player.stress + stressIncrease);
+            
+            if (skills.stress_control && player.stress > 0) {
+                player.stress = Math.max(0, player.stress - 0.3);
+            }
+            
+            if (player.stress >= 80) {
+                gameState.screenShake = Math.max(gameState.screenShake, 3); // Reduced shake for mobile
+            }
+            
+            if (player.stress >= 100) {
+                unlockAchievement('stress_master');
+            }
+        }
+
+        function updateAdaptiveDifficulty() {
+            const survivalTime = (Date.now() - gameState.levelStartTime) / 1000;
+            
+            // More gradual difficulty increase
+            if (survivalTime > 90) {
+                gameState.adaptiveDifficulty = Math.min(2.0, gameState.adaptiveDifficulty + 0.005);
+                
+                if (gameState.adaptiveDifficulty > 1.5) {
+                    showDifficultyWarning();
+                }
+            }
+            
+            gameState.boss.bulletCount = 1 + (gameState.adaptiveDifficulty - 1) * 0.3;
+            gameState.boss.attackSpeed = gameState.adaptiveDifficulty;
+        }
+
+        function showDifficultyWarning() {
+            const warning = document.getElementById('difficultyWarning');
+            warning.style.display = 'block';
+            
+            setTimeout(() => {
+                warning.style.display = 'none';
+            }, 2000);
+        }
+
+        function updateScreenShake() {
+            if (gameState.screenShake > 0) {
+                gameState.screenShake *= 0.9;
+                if (gameState.screenShake < 0.1) {
+                    gameState.screenShake = 0;
+                }
+            }
+        }
+
+        function checkBossPhaseTransition() {
+            const boss = gameState.boss;
+            const healthPercent = boss.health / boss.maxHealth;
+            const phaseThreshold = (boss.phases - boss.currentPhase) / boss.phases;
+            
+            if (healthPercent <= phaseThreshold && boss.currentPhase < boss.phases) {
+                triggerPhaseTransition(boss.currentPhase + 1);
+            }
+        }
+
+        function triggerPhaseTransition(newPhase) {
+            gameState.boss.currentPhase = newPhase;
+            gameState.boss.phaseTransition = true;
+            gameState.transformationActive = true;
+            
+            document.getElementById('transformationOverlay').classList.add('active');
+            gameState.screenShake = 8; // Reduced shake for mobile
+            
+            gameState.boss.speed *= 1.1;
+            gameState.boss.bulletCount *= 1.2;
+            
+            createTransformationEffect();
+            
+            setTimeout(() => {
+                gameState.boss.phaseTransition = false;
+                gameState.transformationActive = false;
+                document.getElementById('transformationOverlay').classList.remove('active');
+            }, 2000);
+        }
+
+        function createTransformationEffect() {
+            for (let i = 0; i < 50; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 10 + 3;
+                gameState.particles.push({
+                    x: gameState.boss.x,
+                    y: gameState.boss.y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    color: '#ff0000',
+                    size: Math.random() * 8 + 4,
+                    life: 60,
+                    maxLife: 60,
+                    alpha: 1
+                });
+            }
+        }
+
+        function useEmergencyBarrier() {
+            if (gameState.player.emergencyBarriers > 0) {
+                gameState.player.emergencyBarriers--;
+                gameState.player.invulnerabilityFrames = 120; // Reduced for mobile
+                
+                gameState.enemyBullets = gameState.enemyBullets.filter(bullet => {
+                    const dist = Math.sqrt(
+                        Math.pow(bullet.x - gameState.player.x, 2) + 
+                        Math.pow(bullet.y - gameState.player.y, 2)
+                    );
+                    return dist > 120; // Smaller barrier range
+                });
+                
+                createBarrierEffect();
+                updateUI();
+            }
+        }
+
+        function createBarrierEffect() {
+            for (let i = 0; i < 30; i++) {
+                const angle = (i / 30) * Math.PI * 2;
+                gameState.particles.push({
+                    x: gameState.player.x,
+                    y: gameState.player.y,
+                    vx: Math.cos(angle) * 8,
+                    vy: Math.sin(angle) * 8,
+                    color: '#00ffff',
+                    size: 6,
+                    life: 60,
+                    maxLife: 60,
+                    alpha: 1
+                });
+            }
+        }
+
+        function desperationAttack() {
+            if (gameState.player.health < gameState.player.maxHealth * 0.3) { // Easier trigger condition
+                const damage = 150; // Reduced damage
+                
+                for (let i = 0; i < 15; i++) {
+                    const angle = (i / 15) * Math.PI * 2;
+                    gameState.bullets.push({
+                        x: gameState.player.x,
+                        y: gameState.player.y - 20,
+                        vx: Math.cos(angle) * 6,
+                        vy: Math.sin(angle) * 6 - 3,
+                        color: '#ff0000',
+                        size: 10,
+                        damage: damage,
+                        desperation: true
+                    });
+                }
+                
+                gameState.player.health = Math.max(1, gameState.player.health - 20); // Reduced health cost
+                updateUI();
+            }
+        }
+
+        function createEnvironmentalHazard() {
+            const hazardTypes = ['meteor_shower', 'energy_wave'];
+            const hazardType = hazardTypes[Math.floor(Math.random() * hazardTypes.length)];
+            
+            const hazard = {
+                type: hazardType,
+                x: Math.random() * canvas.width,
+                y: -50,
+                size: 40,
+                damage: 30, // Reduced damage
+                warningTime: 60,
+                active: false
+            };
+            
+            gameState.environmentalHazards.push(hazard);
+        }
+
+        function updateEndlessMode() {
+            if (gameState.gameMode !== 'endless') return;
+            
+            document.getElementById('endlessHud').style.display = 'block';
+            document.getElementById('currentWave').textContent = gameState.endlessWave;
+            document.getElementById('difficultyMultiplier').textContent = gameState.adaptiveDifficulty.toFixed(1);
+            
+            if (gameState.boss && gameState.boss.health <= 0) {
+                gameState.endlessWave++;
+                gameState.adaptiveDifficulty += 0.15; // Slower difficulty increase
+                
+                generateEndlessBoss();
+                
+                if (gameState.endlessWave >= 50) {
+                    unlockAchievement('endless_legend');
+                }
+            }
+        }
+
+        function updateSpeedrunTimer() {
+            if (gameState.gameMode !== 'speedrun') return;
+            
+            document.getElementById('speedrunTimer').style.display = 'block';
+            const elapsed = (Date.now() - gameState.speedrunStartTime) / 1000;
+            const minutes = Math.floor(elapsed / 60);
+            const seconds = Math.floor(elapsed % 60);
+            document.getElementById('speedrunTime').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            if (gameState.currentLevel >= 20 && elapsed < 600) {
+                unlockAchievement('speedrun_god');
+            }
+        }
+
+        function updateBullets(deltaTime) {
+            gameState.bullets = gameState.bullets.filter(bullet => {
+                bullet.x += bullet.vx * deltaTime;
+                bullet.y += bullet.vy * deltaTime;
+                
+                return bullet.y > -50 && bullet.y < canvas.height + 50 &&
+                       bullet.x > -50 && bullet.x < canvas.width + 50;
+            });
+        }
+
+        function updateEnemyBullets(deltaTime) {
+            gameState.enemyBullets = gameState.enemyBullets.filter(bullet => {
+                bullet.x += bullet.vx * deltaTime;
+                bullet.y += bullet.vy * deltaTime;
+                
+                if (bullet.tracking && Math.random() < 0.1) {
+                    const dx = gameState.player.x - bullet.x;
+                    const dy = gameState.player.y - bullet.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    
+                    bullet.vx += (dx / dist) * (bullet.trackingStrength || 0.3);
+                    bullet.vy += (dy / dist) * (bullet.trackingStrength || 0.3);
+                }
+                
+                if (bullet.wave) {
+                    bullet.x += Math.sin(Date.now() * 0.01 + bullet.waveOffset) * 2;
+                }
+                
+                return bullet.y > -50 && bullet.y < canvas.height + 50 &&
+                       bullet.x > -50 && bullet.x < canvas.width + 50;
+            });
+        }
+
+        function updateParticles(deltaTime) {
+            gameState.particles = gameState.particles.filter(particle => {
+                particle.x += particle.vx * deltaTime;
+                particle.y += particle.vy * deltaTime;
+                particle.life -= deltaTime;
+                particle.alpha = particle.life / particle.maxLife;
+                
+                return particle.life > 0;
+            });
+        }
+
+        function checkCollisions() {
+            // Player bullets vs Boss
+            gameState.bullets.forEach((bullet, bulletIndex) => {
+                const boss = gameState.boss;
+                
+                const dist = Math.sqrt(
+                    Math.pow(bullet.x - boss.x, 2) + 
+                    Math.pow(bullet.y - boss.y, 2)
+                );
+                
+                if (dist < 50) { // Slightly larger hitbox for easier hitting
+                    let damage = bullet.damage;
+                    
+                    if (gameState.player.skills.nightmare_ender && boss.health < boss.maxHealth * 0.1) {
+                        damage = boss.health;
+                    }
+                    
+                    if (gameState.player.skills.demon_slayer && boss.currentPhase >= boss.phases - 1) {
+                        damage *= 2;
+                    }
+                    
+                    gameState.player.score += Math.floor(damage);
+                    boss.health -= damage;
+                    gameState.bullets.splice(bulletIndex, 1);
+                    
+                    createHitParticles(bullet.x, bullet.y, bullet.color);
+                    updateUI();
+                }
+            });
+            
+            // Enemy bullets vs Player
+            gameState.enemyBullets.forEach((bullet, bulletIndex) => {
+                const player = gameState.player;
+                
+                if (player.invulnerabilityFrames > 0) return;
+                
+                let hitboxSize = player.precisionMode ? 12 : 20; // Slightly larger hitbox for mobile
+                if (player.skills.precision_aim && player.precisionMode) {
+                    hitboxSize = 8;
+                }
+                
+                const dist = Math.sqrt(
+                    Math.pow(bullet.x - player.x, 2) + 
+                    Math.pow(bullet.y - player.y, 2)
+                );
+                
+                if (dist < hitboxSize) {
+                    let damage = bullet.damage || 20;
+                    
+                    // Reduced damage for early levels
+                    if (gameState.currentLevel <= 5) {
+                        damage *= 0.7;
+                    } else if (gameState.currentLevel <= 10) {
+                        damage *= 0.85;
+                    }
+                    
+                    player.health -= damage;
+                    gameState.enemyBullets.splice(bulletIndex, 1);
+                    player.invulnerabilityFrames = 40; // Longer invulnerability for mobile
+                    
+                    player.stress = Math.min(player.maxStress, player.stress + 8);
+                    gameState.screenShake = 5;
+                    
+                    createHitParticles(bullet.x, bullet.y, '#ff0000');
+                    updateUI();
+                }
+            });
+            
+            if (gameState.enemyBullets.length >= 1000) {
+                unlockAchievement('bullet_dancer');
+            }
+        }
+
+        function createHitParticles(x, y, color) {
+            for (let i = 0; i < 15; i++) {
+                gameState.particles.push({
+                    x: x,
+                    y: y,
+                    vx: (Math.random() - 0.5) * 10,
+                    vy: (Math.random() - 0.5) * 10,
+                    color: color,
+                    size: Math.random() * 6 + 2,
+                    life: 40,
+                    maxLife: 40,
+                    alpha: 1
+                });
+            }
+        }
+
+        function levelComplete() {
+            gameState.gameRunning = false;
+            
+            const survivalTime = (Date.now() - gameState.levelStartTime) / 1000;
+            gameState.totalSurvivalTime += survivalTime;
+            
+            // Calculate scoring
+            const timeBonus = Math.max(0, 15000 - (survivalTime * 80));
+            const healthBonus = gameState.player.health * 40;
+            const phaseBonus = gameState.boss.phases * 800;
+            const stressBonus = (100 - gameState.player.stress) * 15;
+            
+            gameState.player.score += timeBonus + healthBonus + phaseBonus + stressBonus;
+            
+            // Award soul fragments
+            let fragmentsEarned = Math.floor(gameState.currentLevel * 1.5) + 3;
+            
+            if (gameState.gameMode === 'endless') {
+                fragmentsEarned = Math.floor(gameState.endlessWave * 0.4);
+            } else if (gameState.gameMode === 'speedrun') {
+                fragmentsEarned = Math.floor(survivalTime < 30 ? 40 : 20);
+            }
+            
+            gameState.skillPoints += fragmentsEarned;
+            
+            // Update statistics
+            const savedData = JSON.parse(localStorage.getItem('hellBossRushSave') || '{}');
+            savedData.totalBossesDefeated = (savedData.totalBossesDefeated || 0) + 1;
+            
+            if (gameState.gameMode === 'campaign') {
+                savedData.highestLevel = Math.max(savedData.highestLevel || 1, gameState.currentLevel + 1);
+            } else if (gameState.gameMode === 'endless') {
+                savedData.endlessBestWave = Math.max(savedData.endlessBestWave || 0, gameState.endlessWave);
+                savedData.endlessBestScore = Math.max(savedData.endlessBestScore || 0, gameState.player.score);
+            } else if (gameState.gameMode === 'speedrun') {
+                const currentTime = gameState.totalSurvivalTime;
+                if (!savedData.speedrunBestTime || currentTime < savedData.speedrunBestTime) {
+                    savedData.speedrunBestTime = currentTime;
+                }
+            }
+            
+            savedData.bestScore = Math.max(savedData.bestScore || 0, gameState.player.score);
+            savedData.skillPoints = (savedData.skillPoints || 0) + fragmentsEarned;
+            savedData.longestSurvival = Math.max(savedData.longestSurvival || 0, survivalTime);
+            
+            if (!savedData.completedLevels) {
+                savedData.completedLevels = [];
+            }
+            if (gameState.gameMode === 'campaign' && !savedData.completedLevels.includes(gameState.currentLevel)) {
+                savedData.completedLevels.push(gameState.currentLevel);
+            }
+            
+            // Mobile achievement
+            if (gameState.isMobile) {
+                const mobileCompletions = (savedData.mobileCompletions || 0) + 1;
+                savedData.mobileCompletions = mobileCompletions;
+                if (mobileCompletions >= 10) {
+                    unlockAchievement('mobile_warrior');
+                }
+            }
+            
+            // Achievement checks
+            if (gameState.currentLevel === 1) unlockAchievement('first_pain');
+            if (gameState.currentLevel === 10) unlockAchievement('hell_walker');
+            if (gameState.currentLevel === 15) unlockAchievement('demon_slayer');
+            if (gameState.currentLevel === 20) unlockAchievement('nightmare_ender');
+            
+            if (survivalTime < 30) {
+                unlockAchievement('speed_demon');
+            }
+            
+            if (gameState.player.health === gameState.player.maxHealth) {
+                unlockAchievement('perfect_hell');
+            }
+            
+            if (gameState.gameMode === 'endless' && gameState.endlessWave >= 50) {
+                unlockAchievement('endless_legend');
+            }
+            
+            if (gameState.gameMode === 'speedrun' && gameState.totalSurvivalTime < 600) {
+                unlockAchievement('speedrun_god');
+            }
+            
+            localStorage.setItem('hellBossRushSave', JSON.stringify(savedData));
+            
+            if (gameState.gameMode === 'campaign' && gameState.currentLevel >= 20) {
+                unlockAchievement('ultimate_survivor');
+                document.getElementById('victoryScore').textContent = gameState.player.score.toLocaleString();
+                document.getElementById('victoryTime').textContent = Math.floor(gameState.totalSurvivalTime);
+                showScreen('victory');
+            } else if (gameState.gameMode === 'campaign') {
+                setTimeout(() => {
+                    gameState.currentLevel++;
+                    startGame();
+                }, 3000);
+            } else {
+                // Continue endless or return to menu for other modes
+                if (gameState.gameMode === 'endless') {
+                    setTimeout(() => {
+                        startGame();
+                    }, 2000);
+                } else {
+                    showScreen('mainMenu');
+                }
+            }
+            
+            updateUI();
+            generateLevelGrid();
+        }
+
+        function gameOver() {
+            gameState.gameRunning = false;
+            
+            const survivalTime = (Date.now() - gameState.levelStartTime) / 1000;
+            
+            let soulFragmentsEarned = Math.floor(gameState.currentLevel * 0.8) + Math.floor(survivalTime / 15);
+            
+            if (gameState.gameMode === 'endless') {
+                soulFragmentsEarned = Math.floor(gameState.endlessWave * 0.3);
+            }
+            
+            gameState.skillPoints += soulFragmentsEarned;
+            
+            const savedData = JSON.parse(localStorage.getItem('hellBossRushSave') || '{}');
+            savedData.totalDeaths = (savedData.totalDeaths || 0) + 1;
+            savedData.skillPoints = (savedData.skillPoints || 0) + soulFragmentsEarned;
+            savedData.longestSurvival = Math.max(savedData.longestSurvival || 0, survivalTime);
+            
+            if (gameState.gameMode === 'endless') {
+                savedData.endlessBestWave = Math.max(savedData.endlessBestWave || 0, gameState.endlessWave);
+                savedData.endlessBestScore = Math.max(savedData.endlessBestScore || 0, gameState.player.score);
+            }
+            
+            localStorage.setItem('hellBossRushSave', JSON.stringify(savedData));
+            
+            document.getElementById('finalScore').textContent = gameState.player.score.toLocaleString();
+            document.getElementById('finalLevel').textContent = gameState.gameMode === 'endless' ? 
+                `Wave ${gameState.endlessWave}` : gameState.currentLevel;
+            document.getElementById('finalTime').textContent = Math.floor(survivalTime);
+            document.getElementById('earnedSkillPoints').textContent = soulFragmentsEarned;
+            
+            showScreen('gameOver');
+            updateUI();
+        }
+
+        function forfeitSoul() {
+            if (confirm('Are you sure you want to forfeit your soul and return to the menu?')) {
+                gameState.gameRunning = false;
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                }
+                showScreen('mainMenu');
+            }
+        }
+
+        function restartGame() {
+            gameState.gameRunning = false;
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+            }
+            startGame();
+        }
+
+        function restartCurrentLevel() {
+            restartGame();
+        }
+
+        function pauseGame() {
+            gameState.gamePaused = true;
+        }
+
+        function resumeGame() {
+            gameState.gamePaused = false;
+            gameLoop();
+        }
+
+        // Rendering Functions
+        function render() {
+            ctx.fillStyle = '#0a0a0a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            if (gameState.screenShake > 0) {
+                ctx.save();
+                ctx.translate(
+                    (Math.random() - 0.5) * gameState.screenShake,
+                    (Math.random() - 0.5) * gameState.screenShake
+                );
+            }
+            
+            renderHellBackground();
+            renderPlayer();
+            renderBoss();
+            renderBullets();
+            renderEnemyBullets();
+            renderParticles();
+            
+            if (gameState.bulletTimeActive) {
+                renderBulletTimeOverlay();
+            }
+            
+            if (gameState.player.stress >= 80) {
+                renderStressOverlay();
+            }
+            
+            if (gameState.screenShake > 0) {
+                ctx.restore();
+            }
+        }
+
+        function renderHellBackground() {
+            ctx.save();
+            ctx.globalAlpha = 0.3;
+            
+            for (let i = 0; i < 100; i++) {
+                const x = (Date.now() * 0.02 + i * 25) % (canvas.width + 80);
+                const y = (i * 15) % canvas.height;
+                const size = Math.sin(Date.now() * 0.002 + i) * 2 + 2;
+                
+                const colors = ['#ff0000', '#ff4500', '#ff6600', '#ff8800'];
+                ctx.fillStyle = colors[i % colors.length];
+                ctx.beginPath();
+                ctx.arc(x, y, size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            ctx.restore();
+        }
+
+        function renderPlayer() {
+            const player = gameState.player;
+            
+            ctx.save();
+            ctx.translate(player.x, player.y);
+            
+            if (player.invulnerabilityFrames > 0 && Math.floor(player.invulnerabilityFrames / 5) % 2) {
+                ctx.globalAlpha = 0.5;
+            }
+            
+            ctx.fillStyle = player.precisionMode ? '#ffff00' : '#00ffff';
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
+            
+            // Scale for mobile
+            const scale = gameState.isMobile ? 1.3 : 1;
+            ctx.scale(scale, scale);
+            
+            ctx.beginPath();
+            ctx.moveTo(0, -20);
+            ctx.lineTo(-12, 12);
+            ctx.lineTo(-4, 8);
+            ctx.lineTo(0, 4);
+            ctx.lineTo(4, 8);
+            ctx.lineTo(12, 12);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+            
+            ctx.fillStyle = '#ff6b6b';
+            ctx.globalAlpha = 0.7;
+            for (let i = 0; i < 3; i++) {
+                ctx.beginPath();
+                ctx.arc(-5 + i * 5, 16, 4 - i, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            if (player.invulnerabilityFrames > 0) {
+                ctx.globalAlpha = 0.4;
+                ctx.strokeStyle = '#00ffff';
+                ctx.lineWidth = 6;
+                ctx.beginPath();
+                ctx.arc(0, 0, 30, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+            
+            if (player.precisionMode) {
+                ctx.globalAlpha = 0.6;
+                ctx.strokeStyle = '#ffff00';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(0, 0, 18, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+            
+            ctx.restore();
+        }
+
+        function renderBoss() {
+            const boss = gameState.boss;
+            
+            ctx.save();
+            ctx.translate(boss.x, boss.y);
+            
+            if (boss.phaseTransition) {
+                ctx.globalAlpha = 0.7 + Math.sin(Date.now() * 0.02) * 0.3;
+            }
+            
+            const phaseColors = ['#ff1493', '#ff0000', '#8b0000', '#660000', '#330000'];
+            ctx.fillStyle = phaseColors[Math.min(boss.currentPhase - 1, phaseColors.length - 1)];
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 3;
+            
+            const size = 50 + (boss.currentPhase * 8);
+            ctx.beginPath();
+            ctx.rect(-size, -size/2, size*2, size);
+            ctx.fill();
+            ctx.stroke();
+            
+            const wingSize = 35 + (boss.currentPhase * 4);
+            ctx.beginPath();
+            ctx.moveTo(-size - wingSize, -15);
+            ctx.lineTo(-size, -25);
+            ctx.lineTo(-size, 25);
+            ctx.lineTo(-size - wingSize, 15);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(size + wingSize, -15);
+            ctx.lineTo(size, -25);
+            ctx.lineTo(size, 25);
+            ctx.lineTo(size + wingSize, 15);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+            
+            const coreSize = 12 + Math.sin(Date.now() * 0.03) * 6 + (boss.currentPhase * 2);
+            const coreColors = ['#ffff00', '#ff8800', '#ff4400', '#ff0000', '#8b0000'];
+            ctx.fillStyle = coreColors[Math.min(boss.currentPhase - 1, coreColors.length - 1)];
+            ctx.beginPath();
+            ctx.arc(0, 0, coreSize, 0, Math.PI * 2);
+            ctx.fill();
+            
+            if (boss.currentPhase >= 3) {
+                ctx.globalAlpha = 0.3;
+                ctx.fillStyle = '#ff0000';
+                ctx.beginPath();
+                ctx.arc(0, 0, size + 15, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            if (boss.currentPhase >= 5) {
+                ctx.globalAlpha = 0.2;
+                for (let i = 0; i < 4; i++) {
+                    ctx.strokeStyle = '#ff00ff';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, size + (i * 8), 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+            }
+            
+            ctx.restore();
+        }
+
+        function renderBullets() {
+            gameState.bullets.forEach(bullet => {
+                ctx.save();
+                
+                if (bullet.charged || bullet.desperation) {
+                    ctx.shadowColor = bullet.color;
+                    ctx.shadowBlur = 10;
+                }
+                
+                ctx.fillStyle = bullet.color;
+                ctx.beginPath();
+                ctx.arc(bullet.x, bullet.y, bullet.size, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.globalAlpha = 0.6;
+                ctx.fillStyle = bullet.color;
+                ctx.beginPath();
+                ctx.arc(bullet.x, bullet.y + 8, bullet.size * 0.7, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.restore();
+            });
+        }
+
+        function renderEnemyBullets() {
+            gameState.enemyBullets.forEach(bullet => {
+                ctx.save();
+                
+                ctx.fillStyle = bullet.color;
+                ctx.beginPath();
+                ctx.arc(bullet.x, bullet.y, bullet.size, 0, Math.PI * 2);
+                ctx.fill();
+                
+                if (bullet.size > 12) {
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.arc(bullet.x, bullet.y, bullet.size, 0, Math.PI * 2);
+                    ctx.stroke();
+                    
+                    ctx.globalAlpha = 0.5;
+                    ctx.fillStyle = bullet.color;
+                    ctx.beginPath();
+                    ctx.arc(bullet.x, bullet.y, bullet.size + Math.sin(Date.now() * 0.02) * 3, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                
+                if (bullet.tracking) {
+                    ctx.strokeStyle = '#ff0000';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.arc(bullet.x, bullet.y, bullet.size + 5, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+                
+                if (bullet.ultimate) {
+                    ctx.shadowColor = bullet.color;
+                    ctx.shadowBlur = 15;
+                    
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.arc(bullet.x, bullet.y, bullet.size + 3, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+                
+                ctx.restore();
+            });
+        }
+
+        function renderParticles() {
+            gameState.particles.forEach(particle => {
+                ctx.save();
+                ctx.globalAlpha = particle.alpha;
+                ctx.fillStyle = particle.color;
+                ctx.shadowColor = particle.color;
+                ctx.shadowBlur = 5;
+                ctx.beginPath();
+                ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            });
+        }
+
+        function renderBulletTimeOverlay() {
+            ctx.save();
+            ctx.globalAlpha = 0.2;
+            ctx.fillStyle = '#00ffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.globalAlpha = 1;
+            ctx.fillStyle = '#00ffff';
+            ctx.font = `bold ${Math.min(24, canvas.width * 0.03)}px Orbitron`;
+            ctx.textAlign = 'center';
+            ctx.fillText('BULLET TIME', canvas.width / 2, 50);
+            
+            ctx.restore();
+        }
+
+        function renderStressOverlay() {
+            ctx.save();
+            ctx.globalAlpha = 0.1 + (gameState.player.stress / 100) * 0.2;
+            ctx.fillStyle = '#ff0000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            if (gameState.player.stress >= 90) {
+                ctx.globalAlpha = 0.6;
+                ctx.strokeStyle = '#ff0000';
+                ctx.lineWidth = 2;
+                for (let i = 0; i < 8; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(Math.random() * canvas.width, Math.random() * canvas.height);
+                    ctx.lineTo(Math.random() * canvas.width, Math.random() * canvas.height);
+                    ctx.stroke();
+                }
+            }
+            
+            ctx.restore();
+        }
+
+        // UI Management
+        function updateUI() {
+            document.getElementById('currentLevel').textContent = gameState.gameMode === 'endless' ? 
+                `W${gameState.endlessWave}` : gameState.currentLevel;
+            document.getElementById('playerLives').textContent = gameState.player.lives;
+            document.getElementById('playerEnergy').textContent = Math.floor(gameState.player.energy);
+            document.getElementById('playerScore').textContent = gameState.player.score.toLocaleString();
+            document.getElementById('playerStress').textContent = Math.floor(gameState.player.stress);
+            
+            const playerHealthPercent = (gameState.player.health / gameState.player.maxHealth) * 100;
+            document.getElementById('playerHealthFill').style.width = Math.max(0, playerHealthPercent) + '%';
+            document.getElementById('playerHealthText').textContent = 
+                `${Math.max(0, Math.floor(gameState.player.health))} / ${gameState.player.maxHealth}`;
+            
+            if (gameState.boss) {
+                const bossHealthPercent = (gameState.boss.health / gameState.boss.maxHealth) * 100;
+                document.getElementById('bossHealthFill').style.width = Math.max(0, bossHealthPercent) + '%';
+                document.getElementById('bossHealthText').textContent = 
+                    `${Math.max(0, Math.floor(gameState.boss.health))} / ${gameState.boss.maxHealth}`;
+            }
+            
+            const stressPercent = (gameState.player.stress / gameState.player.maxStress) * 100;
+            document.getElementById('stressFill').style.height = stressPercent + '%';
+            
+            document.getElementById('intensityFill').style.width = gameState.bulletHellIntensity + '%';
+            
+            const savedData = JSON.parse(localStorage.getItem('hellBossRushSave') || '{}');
+            document.getElementById('totalBossesDefeated').textContent = savedData.totalBossesDefeated || 0;
+            document.getElementById('highestLevel').textContent = savedData.highestLevel || 1;
+            document.getElementById('totalScore').textContent = (savedData.bestScore || 0).toLocaleString();
+            document.getElementById('skillPoints').textContent = savedData.skillPoints || 0;
+            document.getElementById('availableSkillPoints').textContent = savedData.skillPoints || 0;
+            
+            // Statistics screen
+            document.getElementById('statTotalBosses').textContent = savedData.totalBossesDefeated || 0;
+            document.getElementById('statHighestLevel').textContent = savedData.highestLevel || 1;
+            document.getElementById('statBestScore').textContent = (savedData.bestScore || 0).toLocaleString();
+            document.getElementById('statTotalDeaths').textContent = savedData.totalDeaths || 0;
+            document.getElementById('statSurvivalTime').textContent = Math.floor(savedData.longestSurvival || 0);
+            document.getElementById('statAchievements').textContent = (savedData.achievements || []).length;
+            
+            gameState.skillPoints = savedData.skillPoints || 0;
+        }
+
+        // Data persistence
+        function saveGameData() {
+            const savedData = JSON.parse(localStorage.getItem('hellBossRushSave') || '{}');
+            localStorage.setItem('hellBossRushSave', JSON.stringify(savedData));
+        }
+
+        function loadGameData() {
+            const savedData = JSON.parse(localStorage.getItem('hellBossRushSave') || '{}');
+            gameState.skillPoints = savedData.skillPoints || 0;
+            gameState.player.skills = savedData.skills || {};
+        }
+
+        function resetStats() {
+            if (confirm('Are you sure you want to purge your soul? This will delete all progress, skills, and achievements!')) {
+                localStorage.removeItem('hellBossRushSave');
+                gameState.currentLevel = 1;
+                gameState.skillPoints = 0;
+                gameState.player.skills = {};
+                updateUI();
+                generateLevelGrid();
+                generateSkillTree();
+                generateAchievements();
+                showNotification('Soul purged! All progress reset.', 'achievement');
+            }
+        }
+
+        // Notification System
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            
+            if (type === 'achievement') {
+                notification.style.background = 'linear-gradient(45deg, #ffd700, #ffff00)';
+                notification.style.color = '#000';
+            }
+            
+            document.getElementById('notificationContainer').appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+
+        // Particle system for menu
+        function createHellParticles() {
+            const particlesContainer = document.getElementById('particles');
+            
+            for (let i = 0; i < 25; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 3 + 's';
+                particle.style.animationDuration = (Math.random() * 2 + 3) + 's';
+                
+                const colors = ['#ff0000', '#ff4500', '#ff6600', '#dc143c', '#8b0000'];
+                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Initialize the game when the page loads
+        window.addEventListener('load', initGame);
+    </script>
+</body>
+</html>
