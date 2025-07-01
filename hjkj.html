@@ -1030,10 +1030,7 @@
 
         let canvas, ctx;
         let animationId;
-        // --- Caricamento della spritesheet (metti subito dopo let canvas, ctx;) ---
-const spriteSheet = new Image();
-spriteSheet.src = "spritesheet.png";
-        
+
         function initGame() {
             canvas = document.getElementById('gameCanvas');
             ctx = canvas.getContext('2d');
@@ -2512,54 +2509,177 @@ spriteSheet.src = "spritesheet.png";
             }
         }
 
-       // --- Sfondo animato SOLO stelle ---
-// Sostituisci tutta la funzione renderSpaceBackground con questa:
+        function renderSpaceBackground() {
+            ctx.save();
+            ctx.globalAlpha = 0.4;
+            
+            for (let i = 0; i < 150; i++) {
+                const x = (Date.now() * 0.01 + i * 30) % (canvas.width + 100);
+                const y = (i * 20) % canvas.height;
+                const size = Math.sin(Date.now() * 0.001 + i) * 2 + 2;
+                
+                const colors = ['#ffffff', '#00bcd4', '#2196f3', '#9c27b0'];
+                ctx.fillStyle = colors[i % colors.length];
+                ctx.beginPath();
+                ctx.arc(x, y, size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            ctx.restore();
+        }
 
-function renderSpaceBackground() {
-    if (!spriteSheet.complete) return;
-    // Crop solo la fascia di stelle (senza navi): primi 640px in altezza
-    const srcX = 0, srcY = 0, srcW = 768, srcH = 640;
-    // Scorrimento verticale continuo
-    const scroll = (Date.now() * 0.09) % srcH;
-    ctx.drawImage(spriteSheet, srcX, srcY, srcW, srcH, 0, -scroll, canvas.width, srcH);
-    ctx.drawImage(spriteSheet, srcX, srcY, srcW, srcH, 0, srcH - scroll, canvas.width, srcH);
-}
+        function renderPlayer() {
+            const player = gameState.player;
+            
+            ctx.save();
+            ctx.translate(player.x, player.y);
+            ctx.rotate(player.angle);
+            
+            if (player.invulnerabilityFrames > 0 && Math.floor(player.invulnerabilityFrames / 8) % 2) {
+                ctx.globalAlpha = 0.5;
+            }
+            
+            const scale = gameState.isMobile ? 1.4 : 1.2;
+            ctx.scale(scale, scale);
+            
+            // Main ship body
+            ctx.fillStyle = player.precisionMode ? '#ffd700' : '#00bcd4';
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
+            
+            ctx.beginPath();
+            ctx.moveTo(0, -25);
+            ctx.lineTo(-15, 15);
+            ctx.lineTo(-8, 12);
+            ctx.lineTo(0, 8);
+            ctx.lineTo(8, 12);
+            ctx.lineTo(15, 15);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+            
+            // Cockpit
+            ctx.fillStyle = '#2196f3';
+            ctx.beginPath();
+            ctx.ellipse(0, -8, 6, 10, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Engine trails
+            ctx.fillStyle = '#4caf50';
+            ctx.globalAlpha = 0.8;
+            for (let i = 0; i < 3; i++) {
+                ctx.beginPath();
+                ctx.ellipse(-6 + i * 6, 18, 3, 8 + Math.random() * 4, 0, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            // Shield effect
+            if (player.invulnerabilityFrames > 0) {
+                ctx.globalAlpha = 0.3;
+                ctx.strokeStyle = '#00bcd4';
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.arc(0, 0, 35, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+            
+            // Precision mode indicator
+            if (player.precisionMode) {
+                ctx.globalAlpha = 0.5;
+                ctx.strokeStyle = '#ffd700';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(0, 0, 22, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+            
+            ctx.restore();
+        }
 
-        // --- Player: crop nave rossa ---
-// Sostituisci tutta la funzione renderPlayer con questa:
-
-function renderPlayer() {
-    const player = gameState.player;
-    ctx.save();
-    ctx.translate(player.x, player.y);
-    ctx.rotate(player.angle);
-
-    // Nave rossa (da crop): x=256, y=640, w=64, h=64
-    const sw = 64, sh = 64;
-    const scale = 2.2; // ingrandisci per 1920x1080
-    const dw = sw * scale, dh = sh * scale;
-
-    ctx.drawImage(spriteSheet, 256, 640, sw, sh, -dw/2, -dh/2, dw, dh);
-    ctx.restore();
-}
-
-        // --- Enemy: crop nave verde ---
-// Sostituisci tutta la funzione renderEnemy con questa:
-
-function renderEnemy() {
-    const enemy = gameState.enemy;
-    ctx.save();
-    ctx.translate(enemy.x, enemy.y);
-    ctx.rotate(enemy.angle);
-
-    // Nave verde (da crop): x=350, y=48, w=67, h=56
-    const sw = 67, sh = 56;
-    const scale = 2.2 + (enemy.currentPhase * 0.08); // cresce con la fase
-    const dw = sw * scale, dh = sh * scale;
-
-    ctx.drawImage(spriteSheet, 350, 48, sw, sh, -dw/2, -dh/2, dw, dh);
-    ctx.restore();
-}
+        function renderEnemy() {
+            const enemy = gameState.enemy;
+            
+            ctx.save();
+            ctx.translate(enemy.x, enemy.y);
+            ctx.rotate(enemy.angle);
+            
+            if (enemy.phaseTransition) {
+                ctx.globalAlpha = 0.6 + Math.sin(Date.now() * 0.03) * 0.4;
+            }
+            
+            const phaseColors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5'];
+            const mainColor = phaseColors[Math.min(enemy.currentPhase - 1, phaseColors.length - 1)];
+            
+            const size = 60 + (enemy.currentPhase * 10);
+            const scale = 1 + (enemy.currentPhase * 0.1);
+            ctx.scale(scale, scale);
+            
+            // Main enemy body
+            ctx.fillStyle = mainColor;
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 3;
+            
+            ctx.beginPath();
+            ctx.moveTo(0, -30);
+            ctx.lineTo(-25, 10);
+            ctx.lineTo(-15, 20);
+            ctx.lineTo(0, 15);
+            ctx.lineTo(15, 20);
+            ctx.lineTo(25, 10);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+            
+            // Wings
+            const wingSize = 40 + (enemy.currentPhase * 5);
+            ctx.beginPath();
+            ctx.moveTo(-25 - wingSize, -10);
+            ctx.lineTo(-25, -20);
+            ctx.lineTo(-25, 20);
+            ctx.lineTo(-25 - wingSize, 10);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+            
+            ctx.beginPath();
+            ctx.moveTo(25 + wingSize, -10);
+            ctx.lineTo(25, -20);
+            ctx.lineTo(25, 20);
+            ctx.lineTo(25 + wingSize, 10);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+            
+            // Core
+            const coreSize = 15 + Math.sin(Date.now() * 0.04) * 5 + (enemy.currentPhase * 3);
+            const coreColors = ['#ff9800', '#ff5722', '#f44336', '#e91e63', '#9c27b0'];
+            ctx.fillStyle = coreColors[Math.min(enemy.currentPhase - 1, coreColors.length - 1)];
+            ctx.beginPath();
+            ctx.arc(0, 0, coreSize, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Phase indicators
+            if (enemy.currentPhase >= 3) {
+                ctx.globalAlpha = 0.4;
+                ctx.fillStyle = mainColor;
+                ctx.beginPath();
+                ctx.arc(0, 0, size + 20, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            if (enemy.currentPhase >= 5) {
+                ctx.globalAlpha = 0.3;
+                for (let i = 0; i < 6; i++) {
+                    ctx.strokeStyle = '#ffd700';
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, size + (i * 10), 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+            }
+            
+            ctx.restore();
+        }
 
         function renderBullets() {
             gameState.bullets.forEach(bullet => {
