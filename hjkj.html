@@ -1030,7 +1030,10 @@
 
         let canvas, ctx;
         let animationId;
-
+        // --- SPRITESHEET LOAD ---
+const spriteSheet = new Image();
+spriteSheet.src = "spritesheet.png"; // Assicurati che il nome corrisponda al file
+// Ricorda: il disegno avviene solo dopo che l'immagine è caricata!
         function initGame() {
             canvas = document.getElementById('gameCanvas');
             ctx = canvas.getContext('2d');
@@ -2510,176 +2513,61 @@
         }
 
         function renderSpaceBackground() {
-            ctx.save();
-            ctx.globalAlpha = 0.4;
-            
-            for (let i = 0; i < 150; i++) {
-                const x = (Date.now() * 0.01 + i * 30) % (canvas.width + 100);
-                const y = (i * 20) % canvas.height;
-                const size = Math.sin(Date.now() * 0.001 + i) * 2 + 2;
-                
-                const colors = ['#ffffff', '#00bcd4', '#2196f3', '#9c27b0'];
-                ctx.fillStyle = colors[i % colors.length];
-                ctx.beginPath();
-                ctx.arc(x, y, size, 0, Math.PI * 2);
-                ctx.fill();
-            }
-            
-            ctx.restore();
-        }
+    // Ritaglia solo la parte stellata dello sfondo (senza navi e proiettili)
+    // In questo esempio prendiamo tutta la larghezza, e la fascia alta di 300px
+    // (Adatta i valori se vuoi una porzione diversa)
+    if (!spriteSheet.complete) return;
 
+    const bgHeight = 300; // altezza parte stellata (adatta se vuoi)
+    const bgWidth = spriteSheet.width;
+
+    // Effetto di scrolling verticale lento
+    const scroll = (Date.now() * 0.04) % bgHeight;
+    ctx.drawImage(spriteSheet, 0, 0, bgWidth, bgHeight, 0, -scroll, canvas.width, bgHeight);
+    ctx.drawImage(spriteSheet, 0, 0, bgWidth, bgHeight, 0, bgHeight - scroll, canvas.width, bgHeight);
+}
         function renderPlayer() {
-            const player = gameState.player;
-            
-            ctx.save();
-            ctx.translate(player.x, player.y);
-            ctx.rotate(player.angle);
-            
-            if (player.invulnerabilityFrames > 0 && Math.floor(player.invulnerabilityFrames / 8) % 2) {
-                ctx.globalAlpha = 0.5;
-            }
-            
-            const scale = gameState.isMobile ? 1.4 : 1.2;
-            ctx.scale(scale, scale);
-            
-            // Main ship body
-            ctx.fillStyle = player.precisionMode ? '#ffd700' : '#00bcd4';
-            ctx.strokeStyle = '#ffffff';
-            ctx.lineWidth = 2;
-            
-            ctx.beginPath();
-            ctx.moveTo(0, -25);
-            ctx.lineTo(-15, 15);
-            ctx.lineTo(-8, 12);
-            ctx.lineTo(0, 8);
-            ctx.lineTo(8, 12);
-            ctx.lineTo(15, 15);
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
-            
-            // Cockpit
-            ctx.fillStyle = '#2196f3';
-            ctx.beginPath();
-            ctx.ellipse(0, -8, 6, 10, 0, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Engine trails
-            ctx.fillStyle = '#4caf50';
-            ctx.globalAlpha = 0.8;
-            for (let i = 0; i < 3; i++) {
-                ctx.beginPath();
-                ctx.ellipse(-6 + i * 6, 18, 3, 8 + Math.random() * 4, 0, 0, Math.PI * 2);
-                ctx.fill();
-            }
-            
-            // Shield effect
-            if (player.invulnerabilityFrames > 0) {
-                ctx.globalAlpha = 0.3;
-                ctx.strokeStyle = '#00bcd4';
-                ctx.lineWidth = 4;
-                ctx.beginPath();
-                ctx.arc(0, 0, 35, 0, Math.PI * 2);
-                ctx.stroke();
-            }
-            
-            // Precision mode indicator
-            if (player.precisionMode) {
-                ctx.globalAlpha = 0.5;
-                ctx.strokeStyle = '#ffd700';
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.arc(0, 0, 22, 0, Math.PI * 2);
-                ctx.stroke();
-            }
-            
-            ctx.restore();
-        }
+    const player = gameState.player;
+    ctx.save();
+    ctx.translate(player.x, player.y);
+    ctx.rotate(player.angle);
+
+    // NAVICELLA ROSSA: da coordinate (0, 640), dimensioni circa 64x64
+    // (Adatta se necessario, si può misurare col tool di ispezione immagini)
+    const sx = 0;
+    const sy = 640; // posizione nave rossa nel file
+    const sw = 64;
+    const sh = 64;
+    const scale = gameState.isMobile ? 1.4 : 1.2;
+    const dw = sw * scale;
+    const dh = sh * scale;
+
+    ctx.drawImage(spriteSheet, sx, sy, sw, sh, -dw/2, -dh/2, dw, dh);
+
+    ctx.restore();
+}
 
         function renderEnemy() {
-            const enemy = gameState.enemy;
-            
-            ctx.save();
-            ctx.translate(enemy.x, enemy.y);
-            ctx.rotate(enemy.angle);
-            
-            if (enemy.phaseTransition) {
-                ctx.globalAlpha = 0.6 + Math.sin(Date.now() * 0.03) * 0.4;
-            }
-            
-            const phaseColors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5'];
-            const mainColor = phaseColors[Math.min(enemy.currentPhase - 1, phaseColors.length - 1)];
-            
-            const size = 60 + (enemy.currentPhase * 10);
-            const scale = 1 + (enemy.currentPhase * 0.1);
-            ctx.scale(scale, scale);
-            
-            // Main enemy body
-            ctx.fillStyle = mainColor;
-            ctx.strokeStyle = '#ffffff';
-            ctx.lineWidth = 3;
-            
-            ctx.beginPath();
-            ctx.moveTo(0, -30);
-            ctx.lineTo(-25, 10);
-            ctx.lineTo(-15, 20);
-            ctx.lineTo(0, 15);
-            ctx.lineTo(15, 20);
-            ctx.lineTo(25, 10);
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
-            
-            // Wings
-            const wingSize = 40 + (enemy.currentPhase * 5);
-            ctx.beginPath();
-            ctx.moveTo(-25 - wingSize, -10);
-            ctx.lineTo(-25, -20);
-            ctx.lineTo(-25, 20);
-            ctx.lineTo(-25 - wingSize, 10);
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
-            
-            ctx.beginPath();
-            ctx.moveTo(25 + wingSize, -10);
-            ctx.lineTo(25, -20);
-            ctx.lineTo(25, 20);
-            ctx.lineTo(25 + wingSize, 10);
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
-            
-            // Core
-            const coreSize = 15 + Math.sin(Date.now() * 0.04) * 5 + (enemy.currentPhase * 3);
-            const coreColors = ['#ff9800', '#ff5722', '#f44336', '#e91e63', '#9c27b0'];
-            ctx.fillStyle = coreColors[Math.min(enemy.currentPhase - 1, coreColors.length - 1)];
-            ctx.beginPath();
-            ctx.arc(0, 0, coreSize, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Phase indicators
-            if (enemy.currentPhase >= 3) {
-                ctx.globalAlpha = 0.4;
-                ctx.fillStyle = mainColor;
-                ctx.beginPath();
-                ctx.arc(0, 0, size + 20, 0, Math.PI * 2);
-                ctx.fill();
-            }
-            
-            if (enemy.currentPhase >= 5) {
-                ctx.globalAlpha = 0.3;
-                for (let i = 0; i < 6; i++) {
-                    ctx.strokeStyle = '#ffd700';
-                    ctx.lineWidth = 3;
-                    ctx.beginPath();
-                    ctx.arc(0, 0, size + (i * 10), 0, Math.PI * 2);
-                    ctx.stroke();
-                }
-            }
-            
-            ctx.restore();
-        }
+    const enemy = gameState.enemy;
+    ctx.save();
+    ctx.translate(enemy.x, enemy.y);
+    ctx.rotate(enemy.angle);
+
+    // NAVICELLA VERDE: da coordinate (0, 0), dimensioni circa 64x64
+    const sx = 0;
+    const sy = 0; // posizione nave verde
+    const sw = 64;
+    const sh = 64;
+    // Puoi renderla più grande in base alla fase, come prima
+    const scale = 1 + (enemy.currentPhase * 0.1);
+
+    const dw = sw * scale;
+    const dh = sh * scale;
+
+    ctx.drawImage(spriteSheet, sx, sy, sw, sh, -dw/2, -dh/2, dw, dh);
+
+    ctx.restore();
+}
 
         function renderBullets() {
             gameState.bullets.forEach(bullet => {
