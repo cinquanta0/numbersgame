@@ -956,7 +956,11 @@
                 invulnerabilityFrames: 0,
                 angle: 0
             },
-            enemy: null,
+            enemy: {
+  x: 400,
+  y: 200
+},
+
             bullets: [],
             enemyBullets: [],
             particles: [],
@@ -2497,7 +2501,11 @@ if (backgroundY >= canvas.height) backgroundY = 0;
 ctx.drawImage(backgroundImage, 0, backgroundY, canvas.width, canvas.height);
 ctx.drawImage(backgroundImage, 0, backgroundY - canvas.height, canvas.width, canvas.height);
   
-           
+if (enemyImage.complete && gameState.enemy) {
+  ctx.drawImage(enemyImage, gameState.enemy.x, gameState.enemy.y, 80, 80);
+}
+          
+            
             if (gameState.screenShake > 0) {
                 ctx.save();
                 ctx.translate(
