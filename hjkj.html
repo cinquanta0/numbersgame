@@ -956,11 +956,7 @@
                 invulnerabilityFrames: 0,
                 angle: 0
             },
-            enemy: {
-  x: 400,
-  y: 200
-},
-
+            enemy: null,
             bullets: [],
             enemyBullets: [],
             particles: [],
@@ -1034,14 +1030,6 @@
 
         let canvas, ctx;
         let animationId;
-        // IMMAGINI
-const backgroundImage = new Image();
-backgroundImage.src = 'space-background.png';
-
-const enemyImage = new Image();
-enemyImage.src = 'alien-enemy.png';
-
-let backgroundY = 0; // posizione verticale dello sfondo
 
         function initGame() {
             canvas = document.getElementById('gameCanvas');
@@ -2494,17 +2482,8 @@ let backgroundY = 0; // posizione verticale dello sfondo
         }
 
         function render() {
-          // SFONDO ANIMATO
-backgroundY += 1;
-if (backgroundY >= canvas.height) backgroundY = 0;
-
-ctx.drawImage(backgroundImage, 0, backgroundY, canvas.width, canvas.height);
-ctx.drawImage(backgroundImage, 0, backgroundY - canvas.height, canvas.width, canvas.height);
-  
-if (enemyImage.complete && gameState.enemy) {
-  ctx.drawImage(enemyImage, gameState.enemy.x, gameState.enemy.y, 80, 80);
-}
-          
+            ctx.fillStyle = '#0a0a2e';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
             
             if (gameState.screenShake > 0) {
                 ctx.save();
