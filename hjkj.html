@@ -1030,6 +1030,13 @@
 
         let canvas, ctx;
         let animationId;
+        const backgroundImage = new Image();
+backgroundImage.src = 'space-background.png';
+
+const enemyImage = new Image();
+enemyImage.src = 'alien-enemy.png';
+
+let backgroundY = 0; // per far scorrere lo sfondo
 
         function initGame() {
             canvas = document.getElementById('gameCanvas');
@@ -2482,6 +2489,14 @@
         }
 
         function render() {
+        // Scorrimento verso il basso
+backgroundY += 1;
+if (backgroundY >= canvas.height) backgroundY = 0;
+
+// Disegna lo sfondo due volte per creare il loop infinito
+ctx.drawImage(backgroundImage, 0, backgroundY, canvas.width, canvas.height);
+ctx.drawImage(backgroundImage, 0, backgroundY - canvas.height, canvas.width, canvas.height);
+   
             ctx.fillStyle = '#0a0a2e';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
