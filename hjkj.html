@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -25,8 +25,6 @@
             color: #ffffff;
             overflow: hidden;
             touch-action: manipulation;
-            width: 100vw;
-            height: 100vh;
         }
 
         @keyframes cosmicGradient {
@@ -40,8 +38,6 @@
             width: 100vw;
             height: 100vh;
             position: relative;
-            display: flex;
-            flex-direction: column;
         }
 
         .screen {
@@ -55,7 +51,6 @@
             justify-content: center;
             flex-direction: column;
             overflow-y: auto;
-            padding: 20px;
         }
 
         .screen.active {
@@ -64,19 +59,19 @@
 
         .menu-content {
             text-align: center;
-            max-width: min(95vw, 600px);
-            padding: clamp(1.5rem, 4vw, 2.5rem);
-            background: rgba(0, 0, 0, 0.95);
-            border-radius: 20px;
-            border: 3px solid;
+            max-width: min(1200px, 95vw);
+            padding: min(3rem, 5vw);
+            background: rgba(0, 0, 0, 0.9);
+            border-radius: 25px;
+            border: 4px solid;
             border-image: linear-gradient(45deg, #00bcd4, #2196f3, #3f51b5, #9c27b0, #e91e63) 1;
-            box-shadow: 0 0 40px rgba(0, 188, 212, 0.6);
+            box-shadow: 0 0 80px rgba(0, 188, 212, 0.4);
             backdrop-filter: blur(15px);
-            margin: 1rem auto;
+            margin: 1rem;
         }
 
         .game-title {
-            font-size: clamp(2rem, 7vw, 3.5rem);
+            font-size: clamp(2rem, 8vw, 4.5rem);
             font-weight: 900;
             background: linear-gradient(45deg, #00bcd4, #2196f3, #3f51b5, #9c27b0, #e91e63, #ff9800);
             background-size: 400% 400%;
@@ -84,13 +79,13 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             animation: stellarText 4s ease infinite;
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem;
             text-shadow: 0 0 40px rgba(0, 188, 212, 0.6);
             letter-spacing: 2px;
         }
 
         .game-subtitle {
-            font-size: clamp(1rem, 3.5vw, 1.4rem);
+            font-size: clamp(1rem, 4vw, 1.6rem);
             color: #00bcd4;
             margin-bottom: 2rem;
             text-shadow: 0 0 25px #00bcd4;
@@ -104,64 +99,75 @@
         }
 
         @keyframes stellarPulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.9; transform: scale(1.02); }
+            0%, 100% { opacity: 1; transform: scale(1); text-shadow: 0 0 25px #00bcd4; }
+            50% { opacity: 0.8; transform: scale(1.05); text-shadow: 0 0 40px #00bcd4, 0 0 60px #2196f3; }
         }
 
         .menu-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 1.2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(280px, 80vw), 1fr));
+            gap: 1.5rem;
             margin-bottom: 2rem;
         }
 
         .menu-btn {
-            padding: clamp(1rem, 3vw, 1.5rem) clamp(1.5rem, 4vw, 2.5rem);
-            font-size: clamp(1rem, 3vw, 1.2rem);
+            padding: clamp(1rem, 3vw, 1.8rem) clamp(1.5rem, 4vw, 2.5rem);
+            font-size: clamp(0.9rem, 3vw, 1.3rem);
             font-family: 'Orbitron', monospace;
             font-weight: 700;
             border: none;
-            border-radius: 15px;
+            border-radius: 20px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            background: linear-gradient(45deg, rgba(0, 188, 212, 0.3), rgba(33, 150, 243, 0.3));
+            transition: all 0.4s ease;
+            background: linear-gradient(45deg, rgba(0, 188, 212, 0.2), rgba(33, 150, 243, 0.2));
             color: white;
-            border: 2px solid rgba(0, 188, 212, 0.5);
+            border: 3px solid transparent;
             position: relative;
             overflow: hidden;
             text-transform: uppercase;
             touch-action: manipulation;
+        }
+
+        .menu-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
             width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 188, 212, 0.4), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .menu-btn:hover::before,
+        .menu-btn:active::before {
+            left: 100%;
         }
 
         .menu-btn:hover,
-        .menu-btn:focus,
         .menu-btn:active {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 8px 25px rgba(0, 188, 212, 0.5);
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(0, 188, 212, 0.4);
             border-color: #00bcd4;
-            background: linear-gradient(45deg, rgba(0, 188, 212, 0.5), rgba(33, 150, 243, 0.5));
         }
 
         .menu-btn.primary {
             background: linear-gradient(45deg, #00bcd4, #2196f3, #3f51b5, #9c27b0);
             background-size: 300% 300%;
             animation: stellarGradient 3s ease infinite;
-            font-size: clamp(1.1rem, 3.5vw, 1.4rem);
-            border-color: #00bcd4;
+            font-size: clamp(1rem, 3.5vw, 1.6rem);
         }
 
         .menu-btn.home-btn {
             position: absolute;
             top: 20px;
             left: 20px;
-            padding: clamp(0.8rem, 2vw, 1rem) clamp(1.2rem, 3vw, 1.8rem);
-            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            padding: clamp(0.8rem, 2vw, 1rem) clamp(1.2rem, 3vw, 2rem);
+            font-size: clamp(0.8rem, 2.5vw, 1.1rem);
             background: linear-gradient(45deg, #00bcd4, #2196f3);
             border: 2px solid #00bcd4;
-            border-radius: 12px;
+            border-radius: 15px;
             z-index: 1000;
-            width: auto;
         }
 
         @keyframes stellarGradient {
@@ -169,13 +175,12 @@
             50% { background-position: 100% 50%; }
         }
 
-        /* Controlli mobile */
         .mobile-controls {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            height: clamp(180px, 30vh, 220px);
+            height: 180px;
             background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.9));
             display: none;
             z-index: 1000;
@@ -188,12 +193,12 @@
 
         .mobile-joystick {
             position: absolute;
-            bottom: 30px;
-            left: 30px;
-            width: clamp(100px, 18vw, 140px);
-            height: clamp(100px, 18vw, 140px);
-            background: rgba(0, 188, 212, 0.3);
-            border: 3px solid rgba(0, 188, 212, 0.8);
+            bottom: 20px;
+            left: 20px;
+            width: 100px;
+            height: 100px;
+            background: rgba(0, 188, 212, 0.2);
+            border: 3px solid rgba(0, 188, 212, 0.6);
             border-radius: 50%;
             pointer-events: all;
             touch-action: none;
@@ -203,8 +208,8 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 40%;
-            height: 40%;
+            width: 35px;
+            height: 35px;
             background: rgba(0, 188, 212, 0.9);
             border: 2px solid #fff;
             border-radius: 50%;
@@ -215,22 +220,22 @@
 
         .mobile-action-buttons {
             position: absolute;
-            bottom: 30px;
-            right: 30px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
             pointer-events: all;
         }
 
         .mobile-action-btn {
-            width: clamp(60px, 12vw, 80px);
-            height: clamp(60px, 12vw, 80px);
+            width: 55px;
+            height: 55px;
             background: rgba(0, 188, 212, 0.9);
             border: 3px solid #fff;
             border-radius: 50%;
             color: white;
-            font-size: clamp(1.2rem, 3vw, 1.6rem);
+            font-size: 1.1rem;
             font-weight: bold;
             display: flex;
             align-items: center;
@@ -238,42 +243,40 @@
             touch-action: manipulation;
             user-select: none;
             transition: all 0.2s ease;
-            cursor: pointer;
         }
 
         .mobile-action-btn:active {
             background: rgba(0, 188, 212, 1);
             transform: scale(0.95);
-            box-shadow: 0 0 20px rgba(0, 188, 212, 0.8);
+            box-shadow: 0 0 15px rgba(0, 188, 212, 0.8);
         }
 
-        /* HUD del gioco */
         .hud {
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
-            height: clamp(100px, 15vh, 140px);
+            height: clamp(100px, 18vh, 140px);
             background: linear-gradient(180deg, rgba(0, 0, 0, 0.95), transparent);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: clamp(1rem, 3vw, 1.5rem);
+            padding: 0 clamp(1rem, 3vw, 2rem);
             z-index: 10;
             flex-wrap: wrap;
         }
 
         .hud-section {
             display: flex;
-            gap: clamp(0.5rem, 2vw, 1rem);
+            gap: clamp(0.5rem, 2vw, 1.5rem);
             align-items: center;
             flex-wrap: wrap;
         }
 
         .stat-box {
             background: rgba(0, 0, 0, 0.9);
-            padding: clamp(0.5rem, 1.5vw, 0.8rem);
-            border-radius: 10px;
+            padding: clamp(0.4rem, 1.5vw, 0.8rem);
+            border-radius: 12px;
             border: 2px solid;
             text-align: center;
             min-width: clamp(70px, 12vw, 100px);
@@ -282,18 +285,18 @@
 
         .stat-box.level { border-color: #ffd700; box-shadow: 0 0 15px rgba(255, 215, 0, 0.4); }
         .stat-box.lives { border-color: #00bcd4; box-shadow: 0 0 15px rgba(0, 188, 212, 0.6); }
-        .stat-box.combo { border-color: #ff9800; box-shadow: 0 0 15px rgba(255, 152, 0, 0.4); }
+        .stat-box.energy { border-color: #4caf50; box-shadow: 0 0 15px rgba(76, 175, 80, 0.4); }
         .stat-box.score { border-color: #9c27b0; box-shadow: 0 0 15px rgba(156, 39, 176, 0.4); }
 
         .stat-label {
-            font-size: clamp(0.7rem, 1.8vw, 0.9rem);
+            font-size: clamp(0.6rem, 1.8vw, 0.8rem);
             opacity: 0.9;
             margin-bottom: 0.2rem;
             font-family: 'Rajdhani', sans-serif;
         }
 
         .stat-value {
-            font-size: clamp(1rem, 2.5vw, 1.3rem);
+            font-size: clamp(0.9rem, 2.5vw, 1.2rem);
             font-weight: 900;
         }
 
@@ -311,7 +314,7 @@
 
         .health-bar {
             width: clamp(120px, 25vw, 180px);
-            height: clamp(12px, 2.5vh, 18px);
+            height: 16px;
             background: #333;
             border-radius: 8px;
             border: 2px solid;
@@ -324,8 +327,8 @@
         }
 
         .health-text {
-            font-size: clamp(0.7rem, 1.5vw, 0.9rem);
-            margin-top: 0.3rem;
+            font-size: clamp(0.6rem, 1.5vw, 0.8rem);
+            margin-top: 0.2rem;
         }
 
         #gameCanvas {
@@ -336,56 +339,38 @@
             max-width: 100%;
             max-height: 100%;
             touch-action: none;
-            width: 100vw;
-            height: 100vh;
         }
 
-        /* Sistema combo */
-        .combo-display {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: clamp(2.5rem, 8vw, 4.5rem);
+        .stats-display {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(clamp(140px, 28vw, 180px), 1fr));
+            gap: clamp(1rem, 3vw, 1.5rem);
+            padding: clamp(1rem, 3vw, 2rem);
+            background: rgba(0, 188, 212, 0.1);
+            border-radius: 20px;
+            border: 3px solid #00bcd4;
+            box-shadow: 0 0 30px rgba(0, 188, 212, 0.4);
+            margin: 1rem 0;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: clamp(0.8rem, 2vw, 1rem);
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            border: 2px solid rgba(0, 188, 212, 0.3);
+        }
+
+        .stat-item .stat-value {
+            font-size: clamp(1.3rem, 3.5vw, 1.8rem);
             font-weight: 900;
             color: #ffd700;
-            text-shadow: 0 0 30px #ffd700;
-            opacity: 0;
-            animation: comboPopup 1.2s ease-out;
-            z-index: 100;
-            pointer-events: none;
+            text-shadow: 0 0 15px #ffd700;
         }
 
-        @keyframes comboPopup {
-            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
-            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
-            100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
-        }
-
-        .power-meter {
-            position: absolute;
-            bottom: clamp(200px, 35vh, 250px);
-            left: 50%;
-            transform: translateX(-50%);
-            width: clamp(150px, 35vw, 250px);
-            height: clamp(10px, 2vh, 15px);
-            background: rgba(0, 0, 0, 0.8);
-            border: 2px solid #ff9800;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .power-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #ff9800, #ffc107, #ffeb3b);
-            transition: width 0.3s ease;
-            width: 0%;
-        }
-
-        /* Griglia livelli */
         .level-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(clamp(160px, 30vw, 200px), 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(clamp(180px, 35vw, 220px), 1fr));
             gap: clamp(1rem, 3vw, 1.5rem);
             margin: 2rem 0;
             max-height: 60vh;
@@ -441,42 +426,92 @@
             margin-bottom: 0.3rem;
         }
 
-        /* Statistiche */
-        .stats-display {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(clamp(140px, 28vw, 180px), 1fr));
-            gap: clamp(1rem, 3vw, 1.5rem);
-            padding: clamp(1rem, 3vw, 2rem);
-            background: rgba(0, 188, 212, 0.1);
-            border-radius: 20px;
-            border: 3px solid #00bcd4;
-            box-shadow: 0 0 30px rgba(0, 188, 212, 0.4);
-            margin: 1rem 0;
+        @media (max-width: 768px) {
+            .hud {
+                height: 90px;
+                padding: 0 0.5rem;
+            }
+            
+            .hud-section {
+                gap: 0.4rem;
+            }
+            
+            .stat-box {
+                min-width: 60px;
+                padding: 0.4rem;
+            }
+
+            .menu-content {
+                padding: 1.5rem;
+                margin: 0.5rem;
+            }
+
+            .health-container {
+                gap: 0.5rem;
+            }
+
+            .health-bar {
+                width: clamp(100px, 30vw, 140px);
+                height: 14px;
+            }
         }
 
-        .stat-item {
-            text-align: center;
-            padding: clamp(0.8rem, 2vw, 1rem);
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 15px;
-            border: 2px solid rgba(0, 188, 212, 0.3);
-            cursor: pointer;
-            transition: all 0.3s ease;
+        @media (max-width: 480px) {
+            .game-title {
+                font-size: 1.8rem;
+                letter-spacing: 1px;
+            }
+            
+            .game-subtitle {
+                font-size: 0.9rem;
+            }
+            
+            .menu-btn {
+                padding: 0.8rem 1.2rem;
+                font-size: 0.8rem;
+            }
+
+            .stats-display {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.8rem;
+                padding: 1rem;
+            }
+
+            .mobile-joystick {
+                width: 90px;
+                height: 90px;
+            }
+
+            .mobile-action-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 1rem;
+            }
         }
 
-        .stat-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(0, 188, 212, 0.3);
+        @media (hover: none) and (pointer: coarse) {
+            .menu-btn:hover {
+                transform: none;
+                box-shadow: none;
+                border-color: transparent;
+            }
+            
+            .menu-btn:active {
+                transform: scale(0.98);
+                box-shadow: 0 4px 15px rgba(0, 188, 212, 0.4);
+            }
+
+            .level-card:hover {
+                transform: none;
+                box-shadow: none;
+            }
+
+            .level-card:active {
+                transform: scale(0.98);
+                box-shadow: 0 4px 15px rgba(0, 188, 212, 0.4);
+            }
         }
 
-        .stat-item .stat-value {
-            font-size: clamp(1.3rem, 3.5vw, 1.8rem);
-            font-weight: 900;
-            color: #ffd700;
-            text-shadow: 0 0 15px #ffd700;
-        }
-
-        /* Notifiche */
         .notification {
             position: fixed;
             top: 20px;
@@ -502,7 +537,6 @@
             to { opacity: 0; transform: translateX(100%); }
         }
 
-        /* Particelle */
         .particles {
             position: absolute;
             top: 0;
@@ -520,7 +554,7 @@
             background: #00bcd4;
             border-radius: 50%;
             opacity: 0.8;
-            animation: stellarParticleFloat 6s linear infinite;
+            animation: stellarParticleFloat 4s linear infinite;
         }
 
         @keyframes stellarParticleFloat {
@@ -540,98 +574,81 @@
             }
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .hud {
-                height: 90px;
-                padding: 0.5rem;
-            }
-            
-            .hud-section {
-                gap: 0.4rem;
-            }
-            
-            .stat-box {
-                min-width: 60px;
-                padding: 0.4rem;
-            }
-
-            .menu-content {
-                padding: 1.5rem;
-                margin: 0.5rem;
-            }
-
-            .health-container {
-                gap: 0.5rem;
-            }
-
-            .health-bar {
-                width: clamp(100px, 30vw, 140px);
-                height: 12px;
-            }
+        .transformation-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle, transparent 30%, rgba(0, 188, 212, 0.3) 70%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+            z-index: 100;
         }
 
-        @media (max-width: 480px) {
-            .game-title {
-                font-size: 1.8rem;
-                letter-spacing: 1px;
-            }
-            
-            .game-subtitle {
-                font-size: 0.9rem;
-            }
-            
-            .menu-btn {
-                padding: 0.8rem 1.2rem;
-                font-size: 0.9rem;
-            }
-
-            .stats-display {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 0.8rem;
-                padding: 1rem;
-            }
-
-            .mobile-joystick {
-                width: 90px;
-                height: 90px;
-            }
-
-            .mobile-action-btn {
-                width: 55px;
-                height: 55px;
-                font-size: 1.1rem;
-            }
+        .transformation-overlay.active {
+            opacity: 1;
+            animation: transformationPulse 2s ease infinite;
         }
 
-        /* Orientamento */
-        .orientation-selector {
-            position: fixed;
+        @keyframes transformationPulse {
+            0%, 100% { background: radial-gradient(circle, transparent 30%, rgba(0, 188, 212, 0.3) 70%); }
+            50% { background: radial-gradient(circle, transparent 20%, rgba(0, 188, 212, 0.6) 80%); }
+        }
+
+        .difficulty-warning {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 188, 212, 0.95);
+            color: white;
+            padding: clamp(1rem, 4vw, 2rem) clamp(1.5rem, 5vw, 3rem);
+            border-radius: 20px;
+            font-size: clamp(1.2rem, 4vw, 2rem);
+            font-weight: 900;
+            text-align: center;
+            opacity: 0;
+            animation: warningFlash 0.3s ease infinite alternate;
+            z-index: 2000;
+            max-width: 90vw;
+        }
+
+        @keyframes warningFlash {
+            0% { opacity: 0.8; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+        }
+
+        .endless-hud, .speedrun-timer, .phase-indicator {
+            font-size: clamp(0.8rem, 2vw, 1rem);
+            padding: clamp(0.5rem, 2vw, 1rem);
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 10px;
+            border: 2px solid #00bcd4;
+            position: absolute;
             top: 20px;
             right: 20px;
-            z-index: 2000;
-            display: flex;
-            gap: 10px;
+            z-index: 100;
         }
 
-        .orientation-btn {
-            width: 50px;
-            height: 50px;
-            background: rgba(0, 188, 212, 0.9);
-            border: 2px solid #fff;
-            border-radius: 10px;
-            color: white;
-            font-size: 1.2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
+        .energy-meter {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: clamp(150px, 40vw, 300px);
+            height: clamp(12px, 2.5vh, 16px);
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #00bcd4;
+            border-radius: 8px;
+            overflow: hidden;
         }
 
-        .orientation-btn.active {
-            background: rgba(255, 215, 0, 0.9);
-            border-color: #ffd700;
+        .energy-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4caf50, #8bc34a, #cddc39, #ffeb3b);
+            transition: width 0.3s ease;
         }
     </style>
 </head>
@@ -640,267 +657,268 @@
     
     <div id="notificationContainer"></div>
     
-    <!-- Selettore orientamento -->
-    <div class="orientation-selector" id="orientationSelector" style="display: none;">
-        <button class="orientation-btn active" id="portraitBtn">📱</button>
-        <button class="orientation-btn" id="landscapeBtn">🖥️</button>
-    </div>
-    
     <div class="mobile-controls" id="mobileControls">
         <div class="mobile-joystick" id="mobileJoystick">
             <div class="mobile-joystick-knob" id="mobileJoystickKnob"></div>
         </div>
         <div class="mobile-action-buttons">
-            <button class="mobile-action-btn" id="mobileShoot">🚀</button>
-            <button class="mobile-action-btn" id="mobileSlowTime">⏰</button>
-            <button class="mobile-action-btn" id="mobileShield">🛡️</button>
-            <button class="mobile-action-btn" id="mobileSpecial">⚡</button>
+            <div class="mobile-action-btn" id="mobileShoot">🚀</div>
+            <div class="mobile-action-btn" id="mobileSlowTime">⏰</div>
+            <div class="mobile-action-btn" id="mobileShield">🛡️</div>
+            <div class="mobile-action-btn" id="mobileSpecial">⚡</div>
         </div>
     </div>
     
     <div id="gameContainer">
-        <!-- Menu principale -->
         <div class="screen active" id="mainMenu">
             <div class="menu-content">
                 <h1 class="game-title">STELLAR GUARDIAN</h1>
-                <p class="game-subtitle">COSMIC DEFENSE FORCE - Proteggi la Galassia</p>
+                <p class="game-subtitle">COSMIC DEFENSE FORCE - Protect the Galaxy</p>
                 
                 <div class="menu-buttons">
-                    <button class="menu-btn primary" id="startCampaignBtn">🚀 INIZIA MISSIONE</button>
-                    <button class="menu-btn" id="startEndlessBtn">♾️ DIFESA INFINITA</button>
-                    <button class="menu-btn" id="startSpeedrunBtn">⚡ PROVA A TEMPO</button>
-                    <button class="menu-btn" id="showSkillTreeBtn">⭐ POTENZIAMENTI</button>
-                    <button class="menu-btn" id="showAchievementsBtn">🏆 OBIETTIVI</button>
-                    <button class="menu-btn" id="showStatsBtn">📊 STATISTICHE</button>
-                    <button class="menu-btn" id="showControlsBtn">🎮 CONTROLLI</button>
+                    <button class="menu-btn primary" onclick="showScreen('levelSelect')">🚀 START MISSION</button>
+                    <button class="menu-btn" onclick="startEndlessMode()">♾️ ENDLESS DEFENSE</button>
+                    <button class="menu-btn" onclick="startSpeedrun()">⚡ TIME TRIAL</button>
+                    <button class="menu-btn" onclick="showScreen('skillTree')">⭐ UPGRADES</button>
+                    <button class="menu-btn" onclick="showScreen('achievements')">🏆 ACHIEVEMENTS</button>
+                    <button class="menu-btn" onclick="showScreen('stats')">📊 STATISTICS</button>
+                    <button class="menu-btn" onclick="showScreen('controls')">🎮 CONTROLS</button>
                 </div>
                 
                 <div class="stats-display">
                     <div class="stat-item">
                         <div class="stat-value" id="totalEnemiesDefeated">0</div>
-                        <div>Nemici Sconfitti</div>
+                        <div>Enemies Defeated</div>
                     </div>
                     <div class="stat-item">
                         <div class="stat-value" id="highestLevel">1</div>
-                        <div>Livello Massimo</div>
+                        <div>Highest Level</div>
                     </div>
                     <div class="stat-item">
                         <div class="stat-value" id="totalScore">0</div>
-                        <div>Punteggio Migliore</div>
+                        <div>Best Score</div>
                     </div>
                     <div class="stat-item">
                         <div class="stat-value" id="skillPoints">0</div>
-                        <div>Punti Upgrade</div>
+                        <div>Upgrade Points</div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Schermata di gioco -->
-        <div class="screen" id="gameScreen">
-            <div class="hud">
-                <div class="hud-section">
-                    <div class="stat-box level">
-                        <div class="stat-label">LVL</div>
-                        <div class="stat-value" id="currentLevel">1</div>
-                    </div>
-                    <div class="stat-box lives">
-                        <div class="stat-label">VITE</div>
-                        <div class="stat-value" id="playerLives">1</div>
-                    </div>
-                    <div class="stat-box combo">
-                        <div class="stat-label">COMBO</div>
-                        <div class="stat-value" id="comboCounter">0</div>
-                    </div>
-                </div>
-                
-                <div class="health-container">
-                    <div class="health-bar-wrapper">
-                        <div style="font-size: clamp(0.7rem, 1.8vw, 0.9rem); margin-bottom: 0.3rem;">GUARDIAN</div>
-                        <div class="health-bar" style="border-color: #00bcd4;">
-                            <div id="playerHealthFill" class="health-fill" style="background: linear-gradient(90deg, #4caf50, #8bc34a); width: 100%;"></div>
-                        </div>
-                        <div id="playerHealthText" class="health-text">100/100</div>
-                    </div>
-                    
-                    <div class="health-bar-wrapper">
-                        <div style="font-size: clamp(0.7rem, 1.8vw, 0.9rem); margin-bottom: 0.3rem;">NEMICO</div>
-                        <div class="health-bar" style="border-color: #f44336;">
-                            <div id="enemyHealthFill" class="health-fill" style="background: linear-gradient(90deg, #f44336, #e91e63); width: 100%;"></div>
-                        </div>
-                        <div id="enemyHealthText" class="health-text">1000/1000</div>
-                    </div>
-                </div>
-                
-                <div class="hud-section">
-                    <div class="stat-box score">
-                        <div class="stat-label">PUNTI</div>
-                        <div class="stat-value" id="playerScore">0</div>
-                    </div>
-                    <button class="menu-btn home-btn" id="forfeitBtn">🏠 MENU</button>
-                </div>
-            </div>
-            
-            <div class="power-meter" id="powerMeter">
-                <div class="power-fill" id="powerFill"></div>
-            </div>
-            
-            <canvas id="gameCanvas" width="1920" height="1080"></canvas>
-        </div>
-
-        <!-- Selezione livelli -->
-        <div class="screen" id="levelSelect">
-            <button class="menu-btn home-btn" id="levelSelectHomeBtn">🏠 HOME</button>
-            <div class="menu-content">
-                <h2 class="game-subtitle">Seleziona Missione</h2>
-                
-                <div class="level-grid" id="levelGrid">
-                </div>
-            </div>
-        </div>
-
-        <!-- Potenziamenti -->
         <div class="screen" id="skillTree">
-            <button class="menu-btn home-btn" id="skillTreeHomeBtn">🏠 HOME</button>
+            <button class="menu-btn home-btn" onclick="showScreen('mainMenu')">🏠 HOME</button>
             <div class="menu-content">
-                <h2 class="game-subtitle">Potenziamenti Nave</h2>
-                <p style="margin-bottom: 1.5rem; color: #00bcd4;">Punti Disponibili: <span id="availableSkillPoints">0</span></p>
+                <h2 class="game-subtitle">Ship Upgrades</h2>
+                <p style="margin-bottom: 2rem; color: #00bcd4;">Upgrade Points Available: <span id="availableSkillPoints">0</span></p>
                 
                 <div class="stats-display" id="skillTreeGrid">
                 </div>
             </div>
         </div>
 
-        <!-- Obiettivi -->
         <div class="screen" id="achievements">
-            <button class="menu-btn home-btn" id="achievementsHomeBtn">🏠 HOME</button>
+            <button class="menu-btn home-btn" onclick="showScreen('mainMenu')">🏠 HOME</button>
             <div class="menu-content">
-                <h2 class="game-subtitle">Obiettivi</h2>
+                <h2 class="game-subtitle">Achievements</h2>
                 
                 <div class="stats-display" id="achievementsList">
                 </div>
             </div>
         </div>
 
-        <!-- Statistiche -->
-        <div class="screen" id="stats">
-            <button class="menu-btn home-btn" id="statsHomeBtn">🏠 HOME</button>
+        <div class="screen" id="levelSelect">
+            <button class="menu-btn home-btn" onclick="showScreen('mainMenu')">🏠 HOME</button>
             <div class="menu-content">
-                <h2 class="game-subtitle">Statistiche Missione</h2>
+                <h2 class="game-subtitle">Select Mission</h2>
+                
+                <div class="level-grid" id="levelGrid">
+                </div>
+            </div>
+        </div>
+
+        <div class="screen" id="stats">
+            <button class="menu-btn home-btn" onclick="showScreen('mainMenu')">🏠 HOME</button>
+            <div class="menu-content">
+                <h2 class="game-subtitle">Mission Statistics</h2>
                 
                 <div class="stats-display">
                     <div class="stat-item">
                         <div class="stat-value" id="statTotalEnemies">0</div>
-                        <div>Nemici Totali</div>
+                        <div>Total Enemies Defeated</div>
                     </div>
                     <div class="stat-item">
                         <div class="stat-value" id="statHighestLevel">1</div>
-                        <div>Livello Massimo</div>
+                        <div>Highest Level Reached</div>
                     </div>
                     <div class="stat-item">
                         <div class="stat-value" id="statBestScore">0</div>
-                        <div>Punteggio Migliore</div>
+                        <div>Highest Score</div>
                     </div>
                     <div class="stat-item">
                         <div class="stat-value" id="statTotalDeaths">0</div>
-                        <div>Navi Perse</div>
+                        <div>Ships Lost</div>
                     </div>
                     <div class="stat-item">
                         <div class="stat-value" id="statSurvivalTime">0</div>
-                        <div>Sopravvivenza Max (sec)</div>
+                        <div>Longest Survival (sec)</div>
                     </div>
                     <div class="stat-item">
                         <div class="stat-value" id="statAchievements">0</div>
-                        <div>Obiettivi Sbloccati</div>
+                        <div>Achievements Unlocked</div>
                     </div>
                 </div>
                 
-                <div class="menu-buttons" style="margin-top: 1.5rem;">
-                    <button class="menu-btn" id="resetStatsBtn" style="background: linear-gradient(45deg, #f44336, #e91e63);">
-                        🗑️ RESET DATI
+                <div class="menu-buttons" style="margin-top: 2rem;">
+                    <button class="menu-btn" onclick="resetStats()" style="background: linear-gradient(45deg, #f44336, #e91e63);">
+                        🗑️ RESET DATA
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- Controlli -->
         <div class="screen" id="controls">
-            <button class="menu-btn home-btn" id="controlsHomeBtn">🏠 HOME</button>
+            <button class="menu-btn home-btn" onclick="showScreen('mainMenu')">🏠 HOME</button>
             <div class="menu-content">
-                <h2 class="game-subtitle">Controlli</h2>
+                <h2 class="game-subtitle">Controls</h2>
                 
-                <div style="text-align: left; max-width: 100%; margin: 0 auto;">
-                    <div style="margin-bottom: 1.5rem; padding: 1rem; background: rgba(0,0,0,0.5); border-radius: 12px;">
-                        <h3 style="color: #00bcd4; margin-bottom: 0.8rem;">Controlli Base</h3>
-                        <p><strong>W A S D</strong> o <strong>Frecce</strong> - Muovi nave</p>
-                        <p><strong>Mouse</strong> o <strong>Touch</strong> - Mira e spara</p>
-                        <p><strong>Spazio</strong> o <strong>Click</strong> - Spara</p>
-                        <p><strong>Click Destro</strong> - Colpo carico</p>
+                <div style="text-align: left; max-width: 700px; margin: 0 auto;">
+                    <div style="margin-bottom: 2rem; padding: 1.5rem; background: rgba(0,0,0,0.5); border-radius: 15px;">
+                        <h3 style="color: #00bcd4; margin-bottom: 1rem;">Basic Controls</h3>
+                        <p><strong>W A S D</strong> or <strong>Arrow Keys</strong> - Move ship</p>
+                        <p><strong>Mouse</strong> or <strong>Touch</strong> - Aim and fire</p>
+                        <p><strong>Space</strong> or <strong>Click</strong> - Fire weapons</p>
+                        <p><strong>Right Click</strong> or <strong>Hold</strong> - Charged shot</p>
                     </div>
                     
-                    <div style="margin-bottom: 1.5rem; padding: 1rem; background: rgba(0,0,0,0.5); border-radius: 12px;">
-                        <h3 style="color: #2196f3; margin-bottom: 0.8rem;">Abilità Speciali</h3>
-                        <p><strong>E</strong> o <strong>🛡️</strong> - Scudo energia</p>
-                        <p><strong>F</strong> o <strong>⏰</strong> - Rallenta tempo</p>
-                        <p><strong>C</strong> o <strong>⚡</strong> - Attacco speciale</p>
-                        <p><strong>Shift</strong> - Modalità precisione</p>
+                    <div style="margin-bottom: 2rem; padding: 1.5rem; background: rgba(0,0,0,0.5); border-radius: 15px;">
+                        <h3 style="color: #2196f3; margin-bottom: 1rem;">Special Abilities</h3>
+                        <p><strong>E</strong> or <strong>🛡️ Button</strong> - Energy shield</p>
+                        <p><strong>F</strong> or <strong>⏰ Button</strong> - Slow time</p>
+                        <p><strong>C</strong> or <strong>⚡ Button</strong> - Special attack</p>
+                        <p><strong>Shift</strong> - Precision mode</p>
                     </div>
                     
-                    <div style="margin-bottom: 1.5rem; padding: 1rem; background: rgba(0,0,0,0.5); border-radius: 12px;">
-                        <h3 style="color: #4caf50; margin-bottom: 0.8rem;">Controlli Mobile</h3>
-                        <p><strong>Joystick Virtuale</strong> - Muovi nave</p>
-                        <p><strong>Tocca Schermo</strong> - Mira e spara</p>
-                        <p><strong>Pulsanti Azione</strong> - Abilità speciali</p>
-                        <p><strong>Doppio Tocco</strong> - Azioni emergenza</p>
+                    <div style="margin-bottom: 2rem; padding: 1.5rem; background: rgba(0,0,0,0.5); border-radius: 15px;">
+                        <h3 style="color: #4caf50; margin-bottom: 1rem;">Mobile Controls</h3>
+                        <p><strong>Virtual Joystick</strong> - Move ship</p>
+                        <p><strong>Tap Screen</strong> - Aim and fire</p>
+                        <p><strong>Action Buttons</strong> - Special abilities</p>
+                        <p><strong>Double Tap</strong> - Emergency actions</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Game Over -->
+        <div class="screen" id="gameScreen">
+            <div class="speedrun-timer" id="speedrunTimer" style="display: none;">
+                <div>TIME: <span id="speedrunTime">00:00</span></div>
+            </div>
+            
+            <div class="endless-hud" id="endlessHud" style="display: none;">
+                <div class="wave-counter">WAVE <span id="currentWave">1</span></div>
+                <div class="difficulty-multiplier">x<span id="difficultyMultiplier">1.0</span></div>
+            </div>
+            
+            <div class="hud">
+                <div class="hud-section">
+                    <div class="stat-box level">
+                        <div class="stat-label">LEVEL</div>
+                        <div class="stat-value" id="currentLevel">1</div>
+                    </div>
+                    <div class="stat-box lives">
+                        <div class="stat-label">SHIPS</div>
+                        <div class="stat-value" id="playerLives">1</div>
+                    </div>
+                    <div class="stat-box energy">
+                        <div class="stat-label">ENERGY</div>
+                        <div class="stat-value" id="playerEnergy">100</div>
+                    </div>
+                </div>
+                
+                <div class="health-container">
+                    <div class="health-bar-wrapper">
+                        <div style="font-size: clamp(0.7rem, 2vw, 0.9rem); margin-bottom: 0.3rem;">GUARDIAN</div>
+                        <div class="health-bar" style="border-color: #00bcd4;">
+                            <div id="playerHealthFill" class="health-fill" style="background: linear-gradient(90deg, #4caf50, #8bc34a, #cddc39); width: 100%;"></div>
+                        </div>
+                        <div id="playerHealthText" class="health-text">100 / 100</div>
+                    </div>
+                    
+                    <div class="health-bar-wrapper">
+                        <div style="font-size: clamp(0.7rem, 2vw, 0.9rem); margin-bottom: 0.3rem;">ENEMY</div>
+                        <div class="health-bar" style="border-color: #f44336;">
+                            <div id="enemyHealthFill" class="health-fill" style="background: linear-gradient(90deg, #f44336, #e91e63, #9c27b0); width: 100%;"></div>
+                        </div>
+                        <div id="enemyHealthText" class="health-text">1000 / 1000</div>
+                    </div>
+                </div>
+                
+                <div class="hud-section">
+                    <div class="stat-box score">
+                        <div class="stat-label">SCORE</div>
+                        <div class="stat-value" id="playerScore">0</div>
+                    </div>
+                    <button class="menu-btn home-btn" onclick="forfeitMission()" style="position: relative; top: 0; left: 0; background: linear-gradient(45deg, #f44336, #e91e63); padding: clamp(0.5rem, 2vw, 1rem);">
+                        🏠 RETREAT
+                    </button>
+                </div>
+            </div>
+            
+            <div class="energy-meter" id="energyMeter">
+                <div class="energy-fill" id="energyFill"></div>
+            </div>
+            
+            <div class="difficulty-warning" id="difficultyWarning" style="display: none;">
+                ⚠️ ADAPTIVE DIFFICULTY ENGAGED ⚠️
+            </div>
+            
+            <div class="transformation-overlay" id="transformationOverlay"></div>
+            
+            <canvas id="gameCanvas" width="1920" height="1080"></canvas>
+        </div>
+
         <div class="screen" id="gameOver">
-            <div style="text-align: center; padding: clamp(1.5rem, 4vw, 2.5rem); background: rgba(0, 0, 0, 0.95); border-radius: 20px; border: 3px solid #f44336; box-shadow: 0 0 40px rgba(244, 67, 54, 0.8); margin: 1rem; max-width: 90vw;">
-                <h2 style="font-size: clamp(1.8rem, 6vw, 3rem); color: #f44336; margin-bottom: 1.5rem; text-shadow: 0 0 20px #f44336;">MISSIONE FALLITA</h2>
-                <div style="margin: 1.5rem 0;">
-                    <div style="font-size: clamp(1rem, 3vw, 1.2rem); margin-bottom: 0.8rem;">Punteggio: <span id="finalScore" style="color: #ffd700;">0</span></div>
-                    <div style="font-size: clamp(0.9rem, 2.5vw, 1rem); margin-bottom: 0.8rem;">Livello Raggiunto: <span id="finalLevel" style="color: #00bcd4;">1</span></div>
-                    <div style="font-size: clamp(0.9rem, 2.5vw, 1rem); margin-bottom: 0.8rem;">Tempo Sopravvivenza: <span id="finalTime" style="color: #4caf50;">0s</span></div>
-                    <div style="font-size: clamp(0.9rem, 2.5vw, 1rem);">Punti Upgrade Guadagnati: <span id="earnedSkillPoints" style="color: #9c27b0;">0</span></div>
+            <div style="text-align: center; padding: clamp(2rem, 5vw, 3rem); background: rgba(0, 0, 0, 0.95); border-radius: 25px; border: 4px solid #f44336; box-shadow: 0 0 60px rgba(244, 67, 54, 0.8); margin: 1rem; max-width: 90vw;">
+                <h2 style="font-size: clamp(2rem, 8vw, 4rem); color: #f44336; margin-bottom: 2rem; text-shadow: 0 0 30px #f44336;">MISSION FAILED</h2>
+                <div style="margin: 2rem 0;">
+                    <div style="font-size: clamp(1.2rem, 4vw, 1.5rem); margin-bottom: 1rem;">Score: <span id="finalScore" style="color: #ffd700;">0</span></div>
+                    <div style="font-size: clamp(1rem, 3vw, 1.2rem); margin-bottom: 1rem;">Level Reached: <span id="finalLevel" style="color: #00bcd4;">1</span></div>
+                    <div style="font-size: clamp(1rem, 3vw, 1.2rem); margin-bottom: 1rem;">Survival Time: <span id="finalTime" style="color: #4caf50;">0s</span></div>
+                    <div style="font-size: clamp(1rem, 3vw, 1.2rem);">Upgrade Points Earned: <span id="earnedSkillPoints" style="color: #9c27b0;">0</span></div>
                 </div>
                 
                 <div class="menu-buttons">
-                    <button class="menu-btn primary" id="retryBtn">🔄 RIPROVA</button>
-                    <button class="menu-btn" id="upgradeFromGameOverBtn">⭐ POTENZIA NAVE</button>
-                    <button class="menu-btn" id="selectLevelFromGameOverBtn">📋 SELEZIONA MISSIONE</button>
-                    <button class="menu-btn" id="mainMenuFromGameOverBtn">🏠 MENU PRINCIPALE</button>
+                    <button class="menu-btn primary" onclick="restartGame()">🔄 RETRY MISSION</button>
+                    <button class="menu-btn" onclick="showScreen('skillTree')">⭐ UPGRADE SHIP</button>
+                    <button class="menu-btn" onclick="showScreen('levelSelect')">📋 SELECT MISSION</button>
+                    <button class="menu-btn" onclick="showScreen('mainMenu')">🏠 MAIN MENU</button>
                 </div>
             </div>
         </div>
 
-        <!-- Vittoria -->
         <div class="screen" id="victory">
-            <div style="text-align: center; padding: clamp(1.5rem, 4vw, 2.5rem); background: rgba(0, 0, 0, 0.95); border-radius: 20px; border: 3px solid #ffd700; box-shadow: 0 0 40px rgba(255, 215, 0, 0.8); margin: 1rem; max-width: 90vw;">
-                <h2 style="font-size: clamp(1.8rem, 6vw, 3rem); color: #ffd700; margin-bottom: 1.5rem; text-shadow: 0 0 20px #ffd700;">GALASSIA SALVATA!</h2>
-                <div style="margin: 1.5rem 0;">
-                    <div style="font-size: clamp(1.2rem, 4vw, 1.8rem); margin-bottom: 1rem; color: #ffd700;">👑 GUARDIANO STELLARE SUPREMO! 👑</div>
-                    <div style="font-size: clamp(1rem, 3vw, 1.2rem); margin-bottom: 0.8rem;">Punteggio Finale: <span id="victoryScore" style="color: #ffd700;">0</span></div>
-                    <div style="font-size: clamp(0.9rem, 2.5vw, 1rem); margin-bottom: 0.8rem;">Tutti i 20 Livelli Completati!</div>
-                    <div style="font-size: clamp(0.9rem, 2.5vw, 1rem); margin-bottom: 0.8rem;">Tempo Totale: <span id="victoryTime" style="color: #4caf50;">0s</span></div>
-                    <div style="font-size: clamp(0.9rem, 2.5vw, 1rem);">Sei il difensore spaziale definitivo!</div>
+            <div style="text-align: center; padding: clamp(2rem, 5vw, 3rem); background: rgba(0, 0, 0, 0.95); border-radius: 25px; border: 4px solid #ffd700; box-shadow: 0 0 60px rgba(255, 215, 0, 0.8); margin: 1rem; max-width: 90vw;">
+                <h2 style="font-size: clamp(2rem, 8vw, 4rem); color: #ffd700; margin-bottom: 2rem; text-shadow: 0 0 30px #ffd700;">GALAXY SAVED!</h2>
+                <div style="margin: 2rem 0;">
+                    <div style="font-size: clamp(1.5rem, 5vw, 2rem); margin-bottom: 1rem; color: #ffd700;">👑 STELLAR GUARDIAN SUPREME! 👑</div>
+                    <div style="font-size: clamp(1.2rem, 4vw, 1.5rem); margin-bottom: 1rem;">Final Score: <span id="victoryScore" style="color: #ffd700;">0</span></div>
+                    <div style="font-size: clamp(1rem, 3vw, 1.2rem); margin-bottom: 1rem;">All 20 Levels Completed!</div>
+                    <div style="font-size: clamp(1rem, 3vw, 1.2rem); margin-bottom: 1rem;">Total Time: <span id="victoryTime" style="color: #4caf50;">0s</span></div>
+                    <div style="font-size: clamp(1rem, 3vw, 1.2rem);">You are the ultimate space defender!</div>
                 </div>
                 
                 <div class="menu-buttons">
-                    <button class="menu-btn primary" id="playAgainBtn">🚀 GIOCA ANCORA</button>
-                    <button class="menu-btn" id="viewAchievementsBtn">🏆 VEDI OBIETTIVI</button>
-                    <button class="menu-btn" id="viewStatsBtn">📊 VEDI STATISTICHE</button>
-                    <button class="menu-btn" id="mainMenuFromVictoryBtn">🏠 MENU PRINCIPALE</button>
+                    <button class="menu-btn primary" onclick="showScreen('levelSelect')">🚀 PLAY AGAIN</button>
+                    <button class="menu-btn" onclick="showScreen('achievements')">🏆 VIEW ACHIEVEMENTS</button>
+                    <button class="menu-btn" onclick="showScreen('stats')">📊 VIEW STATS</button>
+                    <button class="menu-btn" onclick="showScreen('mainMenu')">🏠 MAIN MENU</button>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Stato del gioco
         let gameState = {
             currentScreen: 'mainMenu',
             currentLevel: 1,
@@ -909,7 +927,6 @@
             gameMode: 'campaign',
             endlessWave: 1,
             speedrunStartTime: 0,
-            orientation: 'portrait',
             isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
             touchControls: {
                 joystick: { 
@@ -937,15 +954,7 @@
                 slowTimeEnergy: 100,
                 precisionMode: false,
                 invulnerabilityFrames: 0,
-                angle: 0,
-                powerLevel: 0,
-                maxPowerLevel: 100
-            },
-            combo: {
-                count: 0,
-                multiplier: 1,
-                timer: 0,
-                maxTimer: 180
+                angle: 0
             },
             enemy: null,
             bullets: [],
@@ -967,76 +976,78 @@
             transformationActive: false
         };
 
-        // Dati dei livelli
         const LEVEL_DATA = [
-            {level: 1, enemy: "Drone Scout", difficulty: "Facile", health: 800, phases: 1, speed: 2, attackPatterns: ['basic'], bulletSpeed: 3, bulletCount: 1},
-            {level: 2, enemy: "Caccia Stellare", difficulty: "Facile", health: 1200, phases: 2, speed: 2.5, attackPatterns: ['basic', 'spread'], bulletSpeed: 3.5, bulletCount: 1.2},
-            {level: 3, enemy: "Incrociatore d'Assalto", difficulty: "Medio", health: 1600, phases: 2, speed: 3, attackPatterns: ['basic', 'spread', 'tracking'], bulletSpeed: 4, bulletCount: 1.4},
-            {level: 4, enemy: "Fregata da Battaglia", difficulty: "Medio", health: 2200, phases: 3, speed: 3.2, attackPatterns: ['basic', 'spread', 'tracking'], bulletSpeed: 4.2, bulletCount: 1.6},
-            {level: 5, enemy: "Distruttore Pesante", difficulty: "Medio", health: 2800, phases: 3, speed: 3.5, attackPatterns: ['basic', 'spread', 'tracking', 'wave'], bulletSpeed: 4.5, bulletCount: 1.8},
-            {level: 6, enemy: "Cannoniera al Plasma", difficulty: "Difficile", health: 3500, phases: 3, speed: 3.8, attackPatterns: ['basic', 'spread', 'tracking', 'wave'], bulletSpeed: 4.8, bulletCount: 2},
-            {level: 7, enemy: "Corazzata Ionica", difficulty: "Difficile", health: 4200, phases: 4, speed: 4, attackPatterns: ['basic', 'spread', 'tracking', 'wave', 'laser'], bulletSpeed: 5, bulletCount: 2.2},
-            {level: 8, enemy: "Dreadnought Quantico", difficulty: "Difficile", health: 5000, phases: 4, speed: 4.2, attackPatterns: ['basic', 'spread', 'tracking', 'wave', 'laser'], bulletSpeed: 5.2, bulletCount: 2.4},
-            {level: 9, enemy: "Portaerei del Vuoto", difficulty: "Molto Difficile", health: 6000, phases: 4, speed: 4.5, attackPatterns: ['basic', 'spread', 'tracking', 'wave', 'laser', 'swarm'], bulletSpeed: 5.5, bulletCount: 2.6},
-            {level: 10, enemy: "Titano Materia Oscura", difficulty: "Molto Difficile", health: 7200, phases: 5, speed: 4.8, attackPatterns: ['basic', 'spread', 'tracking', 'wave', 'laser', 'swarm'], bulletSpeed: 5.8, bulletCount: 2.8},
-            {level: 11, enemy: "Leviatano Cosmico", difficulty: "Estremo", health: 8500, phases: 5, speed: 5, attackPatterns: ['basic', 'spread', 'tracking', 'wave', 'laser', 'swarm', 'spiral'], bulletSpeed: 6, bulletCount: 3},
-            {level: 12, enemy: "Behemoth Stellare", difficulty: "Estremo", health: 10000, phases: 5, speed: 5.2, attackPatterns: ['basic', 'spread', 'tracking', 'wave', 'laser', 'swarm', 'spiral'], bulletSpeed: 6.2, bulletCount: 3.2},
-            {level: 13, enemy: "Signore Galattico", difficulty: "Estremo", health: 12000, phases: 6, speed: 5.5, attackPatterns: ['basic', 'spread', 'tracking', 'wave', 'laser', 'swarm', 'spiral', 'chaos'], bulletSpeed: 6.5, bulletCount: 3.4},
-            {level: 14, enemy: "Squarciatore Dimensionale", difficulty: "Incubo", health: 14000, phases: 6, speed: 5.8, attackPatterns: ['basic', 'spread', 'tracking', 'wave', 'laser', 'swarm', 'spiral', 'chaos'], bulletSpeed: 6.8, bulletCount: 3.6},
-            {level: 15, enemy: "Distruttore Realtà", difficulty: "Incubo", health: 16500, phases: 6, speed: 6, attackPatterns: ['basic', 'spread', 'tracking', 'wave', 'laser', 'swarm', 'spiral', 'chaos', 'ultimate'], bulletSpeed: 7, bulletCount: 3.8},
-            {level: 16, enemy: "Orrore Cosmico", difficulty: "Incubo", health: 19000, phases: 7, speed: 6.2, attackPatterns: ['basic', 'spread', 'tracking', 'wave', 'laser', 'swarm', 'spiral', 'chaos', 'ultimate'], bulletSpeed: 7.2, bulletCount: 4},
-            {level: 17, enemy: "Distruttore Universale", difficulty: "Impossibile", health: 22000, phases: 7, speed: 6.5, attackPatterns: ['basic', 'spread', 'tracking', 'wave', 'laser', 'swarm', 'spiral', 'chaos', 'ultimate'], bulletSpeed: 7.5, bulletCount: 4.2},
-            {level: 18, enemy: "Motore Infinito", difficulty: "Impossibile", health: 25500, phases: 8, speed: 6.8, attackPatterns: ['basic', 'spread', 'tracking', 'wave', 'laser', 'swarm', 'spiral', 'chaos', 'ultimate'], bulletSpeed: 7.8, bulletCount: 4.4},
-            {level: 19, enemy: "Nucleo Onnipotente", difficulty: "Impossibile", health: 29000, phases: 8, speed: 7, attackPatterns: ['basic', 'spread', 'tracking', 'wave', 'laser', 'swarm', 'spiral', 'chaos', 'ultimate'], bulletSpeed: 8, bulletCount: 4.6},
-            {level: 20, enemy: "Il Guardiano Finale", difficulty: "LEGGENDARIO", health: 35000, phases: 10, speed: 7.5, attackPatterns: ['basic', 'spread', 'tracking', 'wave', 'laser', 'swarm', 'spiral', 'chaos', 'ultimate'], bulletSpeed: 8.5, bulletCount: 5}
+            {level: 1, enemy: "Scout Drone", difficulty: "Easy", health: 800, phases: 1, speed: 2, attackPatterns: ['basic'], bulletSpeed: 3, bulletCount: 1},
+            {level: 2, enemy: "Fighter Ship", difficulty: "Easy", health: 1200, phases: 2, speed: 2.5, attackPatterns: ['basic', 'spread'], bulletSpeed: 3.5, bulletCount: 1.2},
+            {level: 3, enemy: "Assault Cruiser", difficulty: "Medium", health: 1600, phases: 2, speed: 3, attackPatterns: ['basic', 'spread', 'tracking'], bulletSpeed: 4, bulletCount: 1.4},
+            {level: 4, enemy: "Battle Frigate", difficulty: "Medium", health: 2200, phases: 3, speed: 3.2, attackPatterns: ['basic', 'spread', 'tracking'], bulletSpeed: 4.2, bulletCount: 1.6},
+            {level: 5, enemy: "Heavy Destroyer", difficulty: "Medium", health: 2800, phases: 3, speed: 3.5, attackPatterns: ['basic', 'spread', 'tracking', 'wave'], bulletSpeed: 4.5, bulletCount: 1.8},
+            {level: 6, enemy: "Plasma Gunship", difficulty: "Hard", health: 3500, phases: 3, speed: 3.8, attackPatterns: ['basic', 'spread', 'tracking', 'wave'], bulletSpeed: 4.8, bulletCount: 2},
+            {level: 7, enemy: "Ion Battleship", difficulty: "Hard", health: 4200, phases: 4, speed: 4, attackPatterns: ['basic', 'spread', 'tracking', 'wave', 'laser'], bulletSpeed: 5, bulletCount: 2.2},
+            {level: 8, enemy: "Quantum Dreadnought", difficulty: "Hard", health: 5000, phases: 4, speed: 4.2, attackPatterns: ['basic', 'spread', 'tracking', 'wave', 'laser'], bulletSpeed: 5.2, bulletCount: 2.4},
+            {level: 9, enemy: "Void Carrier", difficulty: "Very Hard", health: 6000, phases: 4, speed: 4.5, attackPatterns: ['basic', 'spread', 'tracking', 'wave', 'laser', 'swarm'], bulletSpeed: 5.5, bulletCount: 2.6},
+            {level: 10, enemy: "Dark Matter Titan", difficulty: "Very Hard", health: 7200, phases: 5, speed: 4.8, attackPatterns: ['basic', 'spread', 'tracking', 'wave', 'laser', 'swarm'], bulletSpeed: 5.8, bulletCount: 2.8},
+            {level: 11, enemy: "Cosmic Leviathan", difficulty: "Extreme", health: 8500, phases: 5, speed: 5, attackPatterns: ['basic', 'spread', 'tracking', 'wave', 'laser', 'swarm', 'spiral'], bulletSpeed: 6, bulletCount: 3},
+            {level: 12, enemy: "Stellar Behemoth", difficulty: "Extreme", health: 10000, phases: 5, speed: 5.2, attackPatterns: ['basic', 'spread', 'tracking', 'wave', 'laser', 'swarm', 'spiral'], bulletSpeed: 6.2, bulletCount: 3.2},
+            {level: 13, enemy: "Galactic Overlord", difficulty: "Extreme", health: 12000, phases: 6, speed: 5.5, attackPatterns: ['basic', 'spread', 'tracking', 'wave', 'laser', 'swarm', 'spiral', 'chaos'], bulletSpeed: 6.5, bulletCount: 3.4},
+            {level: 14, enemy: "Dimension Ripper", difficulty: "Nightmare", health: 14000, phases: 6, speed: 5.8, attackPatterns: ['basic', 'spread', 'tracking', 'wave', 'laser', 'swarm', 'spiral', 'chaos'], bulletSpeed: 6.8, bulletCount: 3.6},
+            {level: 15, enemy: "Reality Shredder", difficulty: "Nightmare", health: 16500, phases: 6, speed: 6, attackPatterns: ['basic', 'spread', 'tracking', 'wave', 'laser', 'swarm', 'spiral', 'chaos', 'ultimate'], bulletSpeed: 7, bulletCount: 3.8},
+            {level: 16, enemy: "Cosmic Horror", difficulty: "Nightmare", health: 19000, phases: 7, speed: 6.2, attackPatterns: ['basic', 'spread', 'tracking', 'wave', 'laser', 'swarm', 'spiral', 'chaos', 'ultimate'], bulletSpeed: 7.2, bulletCount: 4},
+            {level: 17, enemy: "Universal Destroyer", difficulty: "Impossible", health: 22000, phases: 7, speed: 6.5, attackPatterns: ['basic', 'spread', 'tracking', 'wave', 'laser', 'swarm', 'spiral', 'chaos', 'ultimate'], bulletSpeed: 7.5, bulletCount: 4.2},
+            {level: 18, enemy: "Infinity Engine", difficulty: "Impossible", health: 25500, phases: 8, speed: 6.8, attackPatterns: ['basic', 'spread', 'tracking', 'wave', 'laser', 'swarm', 'spiral', 'chaos', 'ultimate'], bulletSpeed: 7.8, bulletCount: 4.4},
+            {level: 19, enemy: "Omnipotent Core", difficulty: "Impossible", health: 29000, phases: 8, speed: 7, attackPatterns: ['basic', 'spread', 'tracking', 'wave', 'laser', 'swarm', 'spiral', 'chaos', 'ultimate'], bulletSpeed: 8, bulletCount: 4.6},
+            {level: 20, enemy: "The Final Guardian", difficulty: "LEGENDARY", health: 35000, phases: 10, speed: 7.5, attackPatterns: ['basic', 'spread', 'tracking', 'wave', 'laser', 'swarm', 'spiral', 'chaos', 'ultimate'], bulletSpeed: 8.5, bulletCount: 5}
         ];
 
-        // Skill di upgrade
         const UPGRADE_SKILLS = {
-            'hull_armor': {name: 'Corazza Scafo', icon: '🛡️', cost: 10, description: '+50 salute max, +25% resistenza danni', maxLevel: 3},
-            'energy_core': {name: 'Nucleo Energia', icon: '⚡', cost: 8, description: '+25% regen energia, +20 energia max', maxLevel: 4},
-            'targeting_system': {name: 'Sistema Mira', icon: '🎯', cost: 12, description: '+50% danni, precisione migliorata', maxLevel: 3},
-            'time_dilation': {name: 'Dilatazione Tempo', icon: '⏰', cost: 15, description: '50% meno consumo rallenta-tempo', maxLevel: 2},
-            'shield_generator': {name: 'Generatore Scudi', icon: '🔰', cost: 25, description: '+1 scudo emergenza per fase', maxLevel: 2},
-            'combo_master': {name: 'Maestro Combo', icon: '🔥', cost: 20, description: 'Combo durano più a lungo', maxLevel: 2},
-            'power_surge': {name: 'Sovraccarico', icon: '💥', cost: 30, description: 'Attacchi potenti più frequenti', maxLevel: 2},
-            'quantum_link': {name: 'Link Quantico', icon: '🌌', cost: 30, description: 'Guadagna energia distruggendo nemici', maxLevel: 1},
-            'phase_shifter': {name: 'Spostatore Fase', icon: '👻', cost: 35, description: 'Immune ad alcuni attacchi nemici', maxLevel: 1},
-            'weapon_overdrive': {name: 'Sovraccarico Armi', icon: '⚔️', cost: 40, description: '+100% danni nelle fasi finali', maxLevel: 1},
-            'temporal_master': {name: 'Maestro Temporale', icon: '🌀', cost: 50, description: 'Auto rallenta-tempo quando quasi morto', maxLevel: 1},
-            'galaxy_buster': {name: 'Distruggi Galassie', icon: '💥', cost: 100, description: 'Uccisione istantanea nemici sotto 10% salute', maxLevel: 1}
+            'hull_armor': {name: 'Hull Armor', icon: '🛡️', cost: 10, description: '+50 max health, +25% damage resistance', maxLevel: 3},
+            'energy_core': {name: 'Energy Core', icon: '⚡', cost: 8, description: '+25% energy regen, +20 max energy', maxLevel: 4},
+            'targeting_system': {name: 'Targeting System', icon: '🎯', cost: 12, description: '+50% damage, improved accuracy', maxLevel: 3},
+            'time_dilation': {name: 'Time Dilation', icon: '⏰', cost: 15, description: '50% less slow-time drain', maxLevel: 2},
+            'shield_generator': {name: 'Shield Generator', icon: '🔰', cost: 25, description: '+1 emergency shield per phase', maxLevel: 2},
+            'quantum_link': {name: 'Quantum Link', icon: '🌌', cost: 30, description: 'Gain energy from enemy destruction', maxLevel: 1},
+            'phase_shifter': {name: 'Phase Shifter', icon: '👻', cost: 35, description: 'Immune to some enemy attacks', maxLevel: 1},
+            'weapon_overdrive': {name: 'Weapon Overdrive', icon: '⚔️', cost: 40, description: '+100% damage to final phases', maxLevel: 1},
+            'temporal_master': {name: 'Temporal Master', icon: '🌀', cost: 50, description: 'Auto slow-time when near death', maxLevel: 1},
+            'galaxy_buster': {name: 'Galaxy Buster', icon: '💥', cost: 100, description: 'Instant kill enemies below 10% health', maxLevel: 1},
+            'mobile_optimizer': {name: 'Mobile Optimizer', icon: '📱', cost: 30, description: 'Enhanced mobile controls and UI', maxLevel: 1}
         };
 
-        // Obiettivi del gioco
         const GAME_ACHIEVEMENTS = {
-            'first_victory': {name: 'Prima Vittoria', description: 'Completa la tua prima missione', icon: '🎯', unlocked: false},
-            'combo_master': {name: 'Maestro Combo', description: 'Raggiungi una combo di 50', icon: '🔥', unlocked: false},
-            'power_surge': {name: 'Sovraccarico', description: 'Usa 10 attacchi potenti in una partita', icon: '💥', unlocked: false},
-            'bullet_dancer': {name: 'Danzatore Proiettili', description: 'Sopravvivi a 500 proiettili in un livello', icon: '💃', unlocked: false},
-            'space_ace': {name: 'Asso Spaziale', description: 'Raggiungi il Livello 10', icon: '🚀', unlocked: false},
-            'galaxy_defender': {name: 'Difensore Galattico', description: 'Raggiungi il Livello 15', icon: '🌌', unlocked: false},
-            'cosmic_guardian': {name: 'Guardiano Cosmico', description: 'Raggiungi il Livello 20', icon: '👑', unlocked: false},
-            'perfect_mission': {name: 'Missione Perfetta', description: 'Completa un livello senza subire danni', icon: '✨', unlocked: false},
-            'speed_runner': {name: 'Corridore Veloce', description: 'Completa un livello in meno di 30 secondi', icon: '⚡', unlocked: false},
-            'ultimate_guardian': {name: 'Guardiano Supremo', description: 'Completa tutti i 20 livelli', icon: '🏆', unlocked: false},
-            'endless_warrior': {name: 'Guerriero Infinito', description: 'Sopravvivi a 50 ondate in modalità infinita', icon: '♾️', unlocked: false},
-            'mobile_pilot': {name: 'Pilota Mobile', description: 'Completa 10 livelli su mobile', icon: '📱', unlocked: false}
+            'first_victory': {name: 'First Victory', description: 'Complete your first mission', icon: '🎯', unlocked: false},
+            'energy_master': {name: 'Energy Master', description: 'Maintain full energy for 60 seconds', icon: '⚡', unlocked: false},
+            'bullet_dancer': {name: 'Bullet Dancer', description: 'Survive 500 bullets in one level', icon: '💃', unlocked: false},
+            'space_ace': {name: 'Space Ace', description: 'Reach Level 10', icon: '🚀', unlocked: false},
+            'galaxy_defender': {name: 'Galaxy Defender', description: 'Reach Level 15', icon: '🌌', unlocked: false},
+            'cosmic_guardian': {name: 'Cosmic Guardian', description: 'Reach Level 20', icon: '👑', unlocked: false},
+            'perfect_mission': {name: 'Perfect Mission', description: 'Complete a level without taking damage', icon: '✨', unlocked: false},
+            'speed_runner': {name: 'Speed Runner', description: 'Complete a level in under 30 seconds', icon: '⚡', unlocked: false},
+            'ultimate_guardian': {name: 'Ultimate Guardian', description: 'Complete all 20 levels', icon: '🏆', unlocked: false},
+            'endless_warrior': {name: 'Endless Warrior', description: 'Survive 50 waves in endless mode', icon: '♾️', unlocked: false},
+            'time_trial_master': {name: 'Time Trial Master', description: 'Complete campaign in under 10 minutes', icon: '⏱️', unlocked: false},
+            'mobile_pilot': {name: 'Mobile Pilot', description: 'Complete 10 levels on mobile', icon: '📱', unlocked: false}
         };
 
         let canvas, ctx;
         let animationId;
-        let backgroundY = 0;
+        // IMMAGINI
+const backgroundImage = new Image();
+backgroundImage.src = 'space-background.png';
 
-        // Inizializzazione del gioco
+const enemyImage = new Image();
+enemyImage.src = 'alien-enemy2.png';
+
+const playerImage = new Image();
+playerImage.src = 'player-ship.png';
+
+        let backgroundY = 0; // posizione verticale dello sfondo
+
         function initGame() {
-            console.log('Inizializzazione gioco...');
-            
             canvas = document.getElementById('gameCanvas');
             ctx = canvas.getContext('2d');
             
             resizeCanvas();
             window.addEventListener('resize', resizeCanvas);
-            window.addEventListener('orientationchange', handleOrientationChange);
             
             loadGameData();
             updateUI();
@@ -1048,188 +1059,19 @@
             setupMobileControls();
 
             if (gameState.isMobile) {
-                showNotification('Controlli mobile rilevati! Tocca per giocare.', 'info');
-                document.getElementById('orientationSelector').style.display = 'flex';
+                showNotification('Mobile controls detected! Touch to play.', 'info');
             }
-            
-            console.log('Gioco inizializzato con successo!');
         }
 
         function resizeCanvas() {
             const container = document.getElementById('gameContainer');
             const rect = container.getBoundingClientRect();
-            
             canvas.width = rect.width;
             canvas.height = rect.height;
-            
-            // Centra il canvas
-            canvas.style.margin = 'auto';
         }
 
-        function handleOrientationChange() {
-            setTimeout(() => {
-                resizeCanvas();
-                if (gameState.gameRunning) {
-                    // Riposiziona il giocatore se necessario
-                    gameState.player.x = Math.min(gameState.player.x, canvas.width - 50);
-                    gameState.player.y = Math.min(gameState.player.y, canvas.height - 50);
-                }
-            }, 100);
-        }
-
-        function setOrientation(orientation) {
-            gameState.orientation = orientation;
-            
-            document.getElementById('portraitBtn').classList.toggle('active', orientation === 'portrait');
-            document.getElementById('landscapeBtn').classList.toggle('active', orientation === 'landscape');
-            
-            resizeCanvas();
-            showNotification(`Orientamento ${orientation === 'portrait' ? 'verticale' : 'orizzontale'} attivato`, 'info');
-        }
-
-        // Event listeners principali
-        function setupEventListeners() {
-            console.log('Configurazione event listeners...');
-            
-            // Pulsanti menu principale
-            document.getElementById('startCampaignBtn').addEventListener('click', () => {
-                console.log('Avvio campagna');
-                showScreen('levelSelect');
-            });
-            
-            document.getElementById('startEndlessBtn').addEventListener('click', () => {
-                console.log('Avvio modalità infinita');
-                startEndlessMode();
-            });
-            
-            document.getElementById('startSpeedrunBtn').addEventListener('click', () => {
-                console.log('Avvio speedrun');
-                startSpeedrun();
-            });
-            
-            document.getElementById('showSkillTreeBtn').addEventListener('click', () => {
-                console.log('Mostra skill tree');
-                showScreen('skillTree');
-            });
-            
-            document.getElementById('showAchievementsBtn').addEventListener('click', () => {
-                console.log('Mostra achievements');
-                showScreen('achievements');
-            });
-            
-            document.getElementById('showStatsBtn').addEventListener('click', () => {
-                console.log('Mostra statistiche');
-                showScreen('stats');
-            });
-            
-            document.getElementById('showControlsBtn').addEventListener('click', () => {
-                console.log('Mostra controlli');
-                showScreen('controls');
-            });
-
-            // Pulsanti home
-            document.getElementById('levelSelectHomeBtn').addEventListener('click', () => showScreen('mainMenu'));
-            document.getElementById('skillTreeHomeBtn').addEventListener('click', () => showScreen('mainMenu'));
-            document.getElementById('achievementsHomeBtn').addEventListener('click', () => showScreen('mainMenu'));
-            document.getElementById('statsHomeBtn').addEventListener('click', () => showScreen('mainMenu'));
-            document.getElementById('controlsHomeBtn').addEventListener('click', () => showScreen('mainMenu'));
-            document.getElementById('forfeitBtn').addEventListener('click', forfeitMission);
-
-            // Pulsanti game over
-            document.getElementById('retryBtn').addEventListener('click', () => {
-                console.log('Riprova premuto');
-                restartGame();
-            });
-            document.getElementById('upgradeFromGameOverBtn').addEventListener('click', () => showScreen('skillTree'));
-            document.getElementById('selectLevelFromGameOverBtn').addEventListener('click', () => showScreen('levelSelect'));
-            document.getElementById('mainMenuFromGameOverBtn').addEventListener('click', () => showScreen('mainMenu'));
-
-            // Pulsanti vittoria
-            document.getElementById('playAgainBtn').addEventListener('click', () => showScreen('levelSelect'));
-            document.getElementById('viewAchievementsBtn').addEventListener('click', () => showScreen('achievements'));
-            document.getElementById('viewStatsBtn').addEventListener('click', () => showScreen('stats'));
-            document.getElementById('mainMenuFromVictoryBtn').addEventListener('click', () => showScreen('mainMenu'));
-
-            // Reset statistiche
-            document.getElementById('resetStatsBtn').addEventListener('click', resetStats);
-
-            // Orientamento
-            document.getElementById('portraitBtn').addEventListener('click', () => setOrientation('portrait'));
-            document.getElementById('landscapeBtn').addEventListener('click', () => setOrientation('landscape'));
-
-            // Controlli tastiera
-            document.addEventListener('keydown', (e) => {
-                gameState.keys[e.key.toLowerCase()] = true;
-                gameState.keys[e.code] = true;
-                
-                if (gameState.currentScreen === 'gameScreen' && gameState.gameRunning) {
-                    switch(e.key.toLowerCase()) {
-                        case 'escape':
-                            forfeitMission();
-                            break;
-                        case 'r':
-                            restartCurrentLevel();
-                            break;
-                        case 'f':
-                            toggleSlowTime();
-                            break;
-                        case 'e':
-                            useEmergencyShield();
-                            break;
-                        case 'c':
-                            specialAttack();
-                            break;
-                        case 'shift':
-                            gameState.player.precisionMode = true;
-                            break;
-                    }
-                }
-            });
-            
-            document.addEventListener('keyup', (e) => {
-                gameState.keys[e.key.toLowerCase()] = false;
-                gameState.keys[e.code] = false;
-                
-                if (e.key.toLowerCase() === 'shift') {
-                    gameState.player.precisionMode = false;
-                }
-            });
-            
-            // Controlli mouse (solo desktop)
-            if (!gameState.isMobile) {
-                canvas.addEventListener('mousemove', (e) => {
-                    const rect = canvas.getBoundingClientRect();
-                    gameState.mouse.x = e.clientX - rect.left;
-                    gameState.mouse.y = e.clientY - rect.top;
-                });
-                
-                canvas.addEventListener('mousedown', (e) => {
-                    if (e.button === 0) {
-                        gameState.keys['shoot'] = true;
-                    } else if (e.button === 2) {
-                        gameState.keys['charged_shot'] = true;
-                    }
-                });
-                
-                canvas.addEventListener('mouseup', (e) => {
-                    if (e.button === 0) {
-                        gameState.keys['shoot'] = false;
-                    } else if (e.button === 2) {
-                        gameState.keys['charged_shot'] = false;
-                    }
-                });
-                
-                canvas.addEventListener('contextmenu', (e) => e.preventDefault());
-            }
-            
-            console.log('Event listeners configurati!');
-        }
-
-        // Controlli mobile
         function setupMobileControls() {
             if (!gameState.isMobile) return;
-            
-            console.log('Configurazione controlli mobile...');
 
             const joystick = document.getElementById('mobileJoystick');
             const joystickKnob = document.getElementById('mobileJoystickKnob');
@@ -1238,7 +1080,6 @@
             const shieldBtn = document.getElementById('mobileShield');
             const specialBtn = document.getElementById('mobileSpecial');
 
-            // Joystick virtuale
             joystick.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 const touch = e.touches[0];
@@ -1264,6 +1105,7 @@
                 }
                 
                 if (!relevantTouch) return;
+                
                 e.preventDefault();
                 
                 const centerX = gameState.touchControls.joystick.startX;
@@ -1272,7 +1114,7 @@
                 const deltaX = relevantTouch.clientX - centerX;
                 const deltaY = relevantTouch.clientY - centerY;
                 const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-                const maxDistance = 50;
+                const maxDistance = 40;
                 
                 if (distance <= maxDistance) {
                     gameState.touchControls.joystick.currentX = deltaX;
@@ -1304,7 +1146,6 @@
                 }
             }, { passive: false });
 
-            // Pulsanti azione
             shootBtn.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 gameState.keys['shoot'] = true;
@@ -1344,7 +1185,6 @@
                 }, 150);
             }, { passive: false });
 
-            // Touch per sparare sul canvas
             canvas.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 const touch = e.touches[0];
@@ -1369,14 +1209,74 @@
                 gameState.touchControls.shooting = false;
                 gameState.keys['shoot'] = false;
             }, { passive: false });
-            
-            console.log('Controlli mobile configurati!');
         }
 
-        // Gestione schermate
-        function showScreen(screenId) {
-            console.log(`Mostra schermata: ${screenId}`);
+        function setupEventListeners() {
+            document.addEventListener('keydown', (e) => {
+                gameState.keys[e.key.toLowerCase()] = true;
+                gameState.keys[e.code] = true;
+                
+                if (gameState.currentScreen === 'gameScreen'&& gameState.gameRunning) {
+                    switch(e.key.toLowerCase()) {
+                        case 'escape':
+                            forfeitMission();
+                            break;
+                        case 'r':
+                            restartCurrentLevel();
+                            break;
+                        case 'f':
+                            toggleSlowTime();
+                            break;
+                        case 'e':
+                            useEmergencyShield();
+                            break;
+                        case 'c':
+                            specialAttack();
+                            break;
+                        case 'shift':
+                            gameState.player.precisionMode = true;
+                            break;
+                    }
+                }
+            });
             
+            document.addEventListener('keyup', (e) => {
+                gameState.keys[e.key.toLowerCase()] = false;
+                gameState.keys[e.code] = false;
+                
+                if (e.key.toLowerCase() === 'shift') {
+                    gameState.player.precisionMode = false;
+                }
+            });
+            
+            if (!gameState.isMobile) {
+                canvas.addEventListener('mousemove', (e) => {
+                    const rect = canvas.getBoundingClientRect();
+                    gameState.mouse.x = e.clientX - rect.left;
+                    gameState.mouse.y = e.clientY - rect.top;
+                });
+                
+                canvas.addEventListener('mousedown', (e) => {
+                    if (e.button === 0) {
+                        gameState.keys['shoot'] = true;
+                    } else if (e.button === 2) {
+                        gameState.keys['charged_shot'] = true;
+                    }
+                });
+                
+                canvas.addEventListener('mouseup', (e) => {
+                    if (e.button === 0) {
+                        gameState.keys['shoot'] = false;
+                    } else if (e.button === 2) {
+                        gameState.keys['charged_shot'] = false;
+                    }
+                });
+                
+                canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+            }
+        }
+
+        function showScreen(screenId) {
             document.querySelectorAll('.screen').forEach(screen => {
                 screen.classList.remove('active');
             });
@@ -1385,32 +1285,25 @@
             gameState.currentScreen = screenId;
             
             const mobileControls = document.getElementById('mobileControls');
-            const orientationSelector = document.getElementById('orientationSelector');
+            if (screenId === 'gameScreen' && gameState.isMobile) {
+                mobileControls.classList.add('active');
+            } else {
+                mobileControls.classList.remove('active');
+            }
             
             if (screenId === 'gameScreen') {
-                if (gameState.isMobile) {
-                    mobileControls.classList.add('active');
-                    orientationSelector.style.display = 'flex';
-                }
-                
                 if (!gameState.gameRunning) {
                     startGame();
                 } else {
                     resumeGame();
                 }
             } else {
-                mobileControls.classList.remove('active');
-                if (!gameState.isMobile) {
-                    orientationSelector.style.display = 'none';
-                }
-                
                 if (gameState.gameRunning) {
                     pauseGame();
                 }
             }
         }
 
-        // Generazione griglia livelli
         function generateLevelGrid() {
             const levelGrid = document.getElementById('levelGrid');
             levelGrid.innerHTML = '';
@@ -1426,16 +1319,16 @@
                     if (savedData.completedLevels && savedData.completedLevels.includes(levelData.level)) {
                         levelCard.classList.add('completed');
                     }
-                    levelCard.addEventListener('click', () => startLevel(levelData.level));
+                    levelCard.onclick = () => startLevel(levelData.level);
                 } else {
                     levelCard.classList.add('locked');
                 }
                 
-                const phaseText = `${levelData.phases} Fase${levelData.phases > 1 ? 'i' : ''}`;
-                const warningText = levelData.level >= 16 ? 'IMPOSSIBILE' : 
-                                   levelData.level >= 11 ? 'ESTREMO' : 
-                                   levelData.level >= 6 ? 'MOLTO DIFFICILE' : 
-                                   levelData.level >= 3 ? 'IMPEGNATIVO' : 'GESTIBILE';
+                const phaseText = `${levelData.phases} Phase${levelData.phases > 1 ? 's' : ''}`;
+                const warningText = levelData.level >= 16 ? 'IMPOSSIBLE' : 
+                                   levelData.level >= 11 ? 'EXTREME' : 
+                                   levelData.level >= 6 ? 'VERY HARD' : 
+                                   levelData.level >= 3 ? 'CHALLENGING' : 'MANAGEABLE';
                 
                 levelCard.innerHTML = `
                     <div class="level-number">${levelData.level}</div>
@@ -1443,7 +1336,7 @@
                     <div class="level-difficulty" style="color: ${getDifficultyColor(levelData.difficulty)}">${levelData.difficulty}</div>
                     <div class="level-phases">${phaseText}</div>
                     <div class="level-warning">${warningText}</div>
-                    ${levelData.level > highestLevel ? '<div style="color: #666;">🔒 BLOCCATO</div>' : ''}
+                    ${levelData.level > highestLevel ? '<div style="color: #666;">🔒 LOCKED</div>' : ''}
                 `;
                 
                 levelGrid.appendChild(levelCard);
@@ -1452,19 +1345,18 @@
 
         function getDifficultyColor(difficulty) {
             const colors = {
-                'Facile': '#4caf50',
-                'Medio': '#ff9800',
-                'Difficile': '#f44336',
-                'Molto Difficile': '#e91e63',
-                'Estremo': '#9c27b0',
-                'Incubo': '#673ab7',
-                'Impossibile': '#3f51b5',
-                'LEGGENDARIO': '#ffd700'
+                'Easy': '#4caf50',
+                'Medium': '#ff9800',
+                'Hard': '#f44336',
+                'Very Hard': '#e91e63',
+                'Extreme': '#9c27b0',
+                'Nightmare': '#673ab7',
+                'Impossible': '#3f51b5',
+                'LEGENDARY': '#ffd700'
             };
             return colors[difficulty] || '#00bcd4';
         }
 
-        // Generazione albero skill
         function generateSkillTree() {
             const skillTreeGrid = document.getElementById('skillTreeGrid');
             skillTreeGrid.innerHTML = '';
@@ -1482,7 +1374,7 @@
                 if (canPurchase) {
                     skillNode.style.borderColor = '#00bcd4';
                     skillNode.style.cursor = 'pointer';
-                    skillNode.addEventListener('click', () => purchaseSkill(skillId));
+                    skillNode.onclick = () => purchaseSkill(skillId);
                 }
                 
                 if (currentLevel > 0) {
@@ -1491,11 +1383,11 @@
                 }
                 
                 skillNode.innerHTML = `
-                    <div style="font-size: clamp(1.2rem, 3vw, 1.6rem); margin-bottom: 0.4rem;">${skillData.icon}</div>
-                    <div style="font-size: clamp(0.8rem, 2vw, 1rem); font-weight: 700; color: ${currentLevel > 0 ? '#4caf50' : '#00bcd4'};">${skillData.name}</div>
-                    <div style="font-size: clamp(0.7rem, 1.8vw, 0.8rem); margin-bottom: 0.4rem;">${skillData.description}</div>
-                    <div style="font-size: clamp(0.6rem, 1.5vw, 0.7rem); color: #888;">Livello: ${currentLevel}/${skillData.maxLevel}</div>
-                    <div style="font-size: clamp(0.7rem, 1.8vw, 0.8rem); color: #ffd700;">Costo: ${skillData.cost} UP</div>
+                    <div style="font-size: clamp(1.5rem, 4vw, 2rem); margin-bottom: 0.5rem;">${skillData.icon}</div>
+                    <div style="font-size: clamp(0.9rem, 2.5vw, 1.1rem); font-weight: 700; color: ${currentLevel > 0 ? '#4caf50' : '#00bcd4'};">${skillData.name}</div>
+                    <div style="font-size: clamp(0.8rem, 2vw, 0.9rem); margin-bottom: 0.5rem;">${skillData.description}</div>
+                    <div style="font-size: clamp(0.7rem, 1.8vw, 0.8rem); color: #888;">Level: ${currentLevel}/${skillData.maxLevel}</div>
+                    <div style="font-size: clamp(0.8rem, 2vw, 0.9rem); color: #ffd700;">Cost: ${skillData.cost} UP</div>
                 `;
                 
                 skillTreeGrid.appendChild(skillNode);
@@ -1524,7 +1416,7 @@
                 generateSkillTree();
                 applySkillEffects();
                 
-                showNotification(`${skillData.name} potenziato!`, 'achievement');
+                showNotification(`${skillData.name} upgraded!`, 'achievement');
             }
         }
 
@@ -1543,7 +1435,6 @@
             }
         }
 
-        // Generazione obiettivi
         function generateAchievements() {
             const achievementsList = document.getElementById('achievementsList');
             achievementsList.innerHTML = '';
@@ -1566,10 +1457,10 @@
                 }
                 
                 achievementItem.innerHTML = `
-                    <div style="font-size: clamp(1.2rem, 3vw, 1.6rem); margin-bottom: 0.4rem;">${achievementData.icon}</div>
-                    <div style="font-size: clamp(0.8rem, 2vw, 1rem); font-weight: 700; color: ${isUnlocked ? '#4caf50' : '#666'};">${achievementData.name}</div>
-                    <div style="font-size: clamp(0.7rem, 1.8vw, 0.8rem); color: ${isUnlocked ? '#ffffff' : '#888'};">${achievementData.description}</div>
-                    ${isUnlocked ? '<div style="font-size: clamp(0.6rem, 1.5vw, 0.7rem); color: #ffd700; margin-top: 0.4rem;">✓ SBLOCCATO</div>' : '<div style="font-size: clamp(0.6rem, 1.5vw, 0.7rem); color: #666; margin-top: 0.4rem;">🔒 BLOCCATO</div>'}
+                    <div style="font-size: clamp(1.5rem, 4vw, 2rem); margin-bottom: 0.5rem;">${achievementData.icon}</div>
+                    <div style="font-size: clamp(0.9rem, 2.5vw, 1.1rem); font-weight: 700; color: ${isUnlocked ? '#4caf50' : '#666'};">${achievementData.name}</div>
+                    <div style="font-size: clamp(0.8rem, 2vw, 0.9rem); color: ${isUnlocked ? '#ffffff' : '#888'};">${achievementData.description}</div>
+                    ${isUnlocked ? '<div style="font-size: clamp(0.7rem, 1.8vw, 0.8rem); color: #ffd700; margin-top: 0.5rem;">✓ UNLOCKED</div>' : '<div style="font-size: clamp(0.7rem, 1.8vw, 0.8rem); color: #666; margin-top: 0.5rem;">🔒 LOCKED</div>'}
                 `;
                 
                 achievementsList.appendChild(achievementItem);
@@ -1592,20 +1483,17 @@
                 generateAchievements();
                 
                 const achievement = GAME_ACHIEVEMENTS[achievementId];
-                showNotification(`🏆 ${achievement.name} Sbloccato! +15 Punti Upgrade`, 'achievement');
+                showNotification(`🏆 ${achievement.name} Unlocked! +15 Upgrade Points`, 'achievement');
             }
         }
 
-        // Avvio livelli e modalità
         function startLevel(level) {
-            console.log(`Avvio livello ${level}`);
             gameState.gameMode = 'campaign';
             gameState.currentLevel = level;
             showScreen('gameScreen');
         }
 
         function startEndlessMode() {
-            console.log('Avvio modalità infinita');
             gameState.gameMode = 'endless';
             gameState.endlessWave = 1;
             gameState.adaptiveDifficulty = 1.0;
@@ -1613,17 +1501,13 @@
         }
 
         function startSpeedrun() {
-            console.log('Avvio speedrun');
             gameState.gameMode = 'speedrun';
             gameState.speedrunStartTime = Date.now();
             gameState.currentLevel = 1;
             showScreen('gameScreen');
         }
 
-        // Avvio del gioco
         function startGame() {
-            console.log('Avvio gioco...');
-            
             gameState.gameRunning = true;
             gameState.gamePaused = false;
             gameState.levelStartTime = Date.now();
@@ -1634,11 +1518,6 @@
             gameState.adaptiveDifficulty = 1.0;
             gameState.screenShake = 0;
             gameState.transformationActive = false;
-            
-            // Reset combo
-            gameState.combo.count = 0;
-            gameState.combo.multiplier = 1;
-            gameState.combo.timer = 0;
             
             const savedData = JSON.parse(localStorage.getItem('stellarGuardianSave') || '{}');
             const skills = savedData.skills || {};
@@ -1654,8 +1533,6 @@
             gameState.player.skills = skills;
             gameState.player.invulnerabilityFrames = 0;
             gameState.player.angle = 0;
-            gameState.player.powerLevel = 0;
-            gameState.player.maxPowerLevel = 100;
             
             if (gameState.gameMode === 'endless') {
                 generateEndlessEnemy();
@@ -1670,8 +1547,6 @@
             
             updateUI();
             gameLoop();
-            
-            console.log('Gioco avviato!');
         }
 
         function initializeCampaignEnemy() {
@@ -1723,7 +1598,6 @@
             };
         }
 
-        // Loop principale del gioco
         function gameLoop() {
             if (!gameState.gameRunning || gameState.gamePaused) return;
             
@@ -1741,7 +1615,6 @@
             updateBullets(deltaTime);
             updateEnemyBullets(deltaTime);
             updateParticles(deltaTime);
-            updateCombo(deltaTime);
             updateSlowTime();
             updateAdaptiveDifficulty();
             updateScreenShake();
@@ -1755,7 +1628,7 @@
             
             checkEnemyPhaseTransition();
             
-            if (gameState.enemy && gameState.enemy.health <= 0) {
+            if (gameState.enemy.health <= 0) {
                 levelComplete();
             } else if (gameState.player.health <= 0 && gameState.player.invulnerabilityFrames <= 0) {
                 gameOver();
@@ -1773,9 +1646,8 @@
             
             speed *= deltaTime;
             
-            // Controlli mobile joystick
             if (gameState.isMobile && gameState.touchControls.joystick.active) {
-                const joystickStrength = 0.3;
+                const joystickStrength = 0.2;
                 const moveX = gameState.touchControls.joystick.currentX * joystickStrength;
                 const moveY = gameState.touchControls.joystick.currentY * joystickStrength;
                 
@@ -1787,7 +1659,6 @@
                 }
             }
             
-            // Controlli tastiera
             if ((gameState.keys['w'] || gameState.keys['ArrowUp']) && player.y > 50) {
                 player.y -= speed;
                 player.angle = 0;
@@ -1805,38 +1676,27 @@
                 player.angle = Math.PI / 2;
             }
             
-            // Limiti schermo
             player.x = Math.max(50, Math.min(canvas.width - 50, player.x));
             player.y = Math.max(50, Math.min(canvas.height - 50, player.y));
             
-            // Sparo
             if ((gameState.keys['shoot'] || gameState.keys[' '] || gameState.keys['Space'] || gameState.touchControls.shooting) && player.energy > 0) {
-                if (Math.random() < 0.25) {
+                if (Math.random() < 0.2) {
                     shoot();
                     player.energy = Math.max(0, player.energy - 1);
                 }
             }
             
-            // Colpo carico
             if (gameState.keys['charged_shot'] && player.energy >= 10) {
                 chargedShot();
                 player.energy -= 10;
                 gameState.keys['charged_shot'] = false;
             }
             
-            // Attacco potente
-            if (player.powerLevel >= player.maxPowerLevel) {
-                powerAttack();
-                player.powerLevel = 0;
-            }
-            
-            // Rigenerazione energia
             if (player.energy < player.maxEnergy) {
                 const regenRate = skills.energy_core ? 1.2 : 0.8;
                 player.energy = Math.min(player.maxEnergy, player.energy + regenRate);
             }
             
-            // Frame di invulnerabilità
             if (player.invulnerabilityFrames > 0) {
                 player.invulnerabilityFrames--;
             }
@@ -1846,11 +1706,8 @@
 
         function updateEnemy(deltaTime) {
             const enemy = gameState.enemy;
-            if (!enemy) return;
-            
             const levelData = LEVEL_DATA[gameState.currentLevel - 1] || LEVEL_DATA[0];
             
-            // Movimento nemico più fluido
             if (enemy.currentPhase >= 3) {
                 enemy.x += enemy.moveDirection * enemy.speed * deltaTime * (1 + Math.sin(Date.now() * 0.01) * 0.5);
                 enemy.angle += 0.02;
@@ -1862,12 +1719,10 @@
                 enemy.angle += 0.01;
             }
             
-            // Rimbalzo ai bordi
             if (enemy.x <= 100 || enemy.x >= canvas.width - 100) {
                 enemy.moveDirection *= -1;
             }
             
-            // Sistema di attacco
             if (enemy.attackCooldown <= 0) {
                 const pattern = enemy.attackPatterns[Math.floor(Math.random() * enemy.attackPatterns.length)];
                 executeAttackPattern(pattern);
@@ -2044,7 +1899,6 @@
             gameState.bulletHellIntensity = Math.min(100, gameState.bulletHellIntensity + 2);
         }
 
-        // Sistema di sparo
         function shoot() {
             const player = gameState.player;
             const skills = gameState.player.skills;
@@ -2057,7 +1911,6 @@
             let targetX = gameState.mouse.x;
             let targetY = gameState.mouse.y;
             
-            // Auto-aim per mobile
             if (gameState.isMobile && gameState.enemy) {
                 targetX = gameState.enemy.x;
                 targetY = gameState.enemy.y;
@@ -2107,39 +1960,6 @@
             createMuzzleFlash(player.x, player.y - 20, true);
         }
 
-        function powerAttack() {
-            const player = gameState.player;
-            const damage = 150;
-            
-            // Attacco circolare potente
-            for (let i = 0; i < 16; i++) {
-                const angle = (i / 16) * Math.PI * 2;
-                gameState.bullets.push({
-                    x: player.x,
-                    y: player.y - 20,
-                    vx: Math.cos(angle) * 12,
-                    vy: Math.sin(angle) * 12 - 4,
-                    color: '#ff9800',
-                    size: 18,
-                    damage: damage,
-                    power: true
-                });
-            }
-            
-            // Effetti visivi
-            createPowerEffect();
-            gameState.screenShake = 8;
-            
-            // Incrementa contatore attacchi potenti per achievement
-            const savedData = JSON.parse(localStorage.getItem('stellarGuardianSave') || '{}');
-            savedData.powerAttacksUsed = (savedData.powerAttacksUsed || 0) + 1;
-            localStorage.setItem('stellarGuardianSave', JSON.stringify(savedData));
-            
-            if (savedData.powerAttacksUsed >= 10) {
-                unlockAchievement('power_surge');
-            }
-        }
-
         function createMuzzleFlash(x, y, charged = false) {
             const particleCount = charged ? 15 : 8;
             const color = charged ? '#ffd700' : '#00bcd4';
@@ -2159,83 +1979,6 @@
             }
         }
 
-        function createPowerEffect() {
-            for (let i = 0; i < 50; i++) {
-                const angle = Math.random() * Math.PI * 2;
-                const speed = Math.random() * 15 + 8;
-                gameState.particles.push({
-                    x: gameState.player.x,
-                    y: gameState.player.y,
-                    vx: Math.cos(angle) * speed,
-                    vy: Math.sin(angle) * speed,
-                    color: '#ff9800',
-                    size: Math.random() * 12 + 6,
-                    life: 60,
-                    maxLife: 60,
-                    alpha: 1
-                });
-            }
-        }
-
-        // Sistema combo
-        function updateCombo(deltaTime) {
-            if (gameState.combo.timer > 0) {
-                gameState.combo.timer -= deltaTime;
-                
-                if (gameState.combo.timer <= 0) {
-                    resetCombo();
-                }
-            }
-            
-            // Aggiorna moltiplicatore combo
-            if (gameState.combo.count >= 50) {
-                gameState.combo.multiplier = 5;
-                unlockAchievement('combo_master');
-            } else if (gameState.combo.count >= 30) {
-                gameState.combo.multiplier = 4;
-            } else if (gameState.combo.count >= 20) {
-                gameState.combo.multiplier = 3;
-            } else if (gameState.combo.count >= 10) {
-                gameState.combo.multiplier = 2;
-            } else {
-                gameState.combo.multiplier = 1;
-            }
-        }
-
-        function addCombo() {
-            gameState.combo.count++;
-            
-            const skills = gameState.player.skills;
-            const baseTimer = skills.combo_master ? gameState.combo.maxTimer * 1.5 : gameState.combo.maxTimer;
-            gameState.combo.timer = baseTimer;
-            
-            // Mostra popup combo per milestone importanti
-            if (gameState.combo.count % 10 === 0 && gameState.combo.count >= 10) {
-                showComboPopup();
-            }
-            
-            updateUI();
-        }
-
-        function resetCombo() {
-            gameState.combo.count = 0;
-            gameState.combo.multiplier = 1;
-            gameState.combo.timer = 0;
-            updateUI();
-        }
-
-        function showComboPopup() {
-            const popup = document.createElement('div');
-            popup.className = 'combo-display';
-            popup.textContent = `COMBO x${gameState.combo.count}!`;
-            document.getElementById('gameScreen').appendChild(popup);
-            
-            setTimeout(() => {
-                popup.remove();
-            }, 1200);
-        }
-
-        // Abilità speciali
         function toggleSlowTime() {
             const player = gameState.player;
             
@@ -2267,11 +2010,91 @@
                 player.slowTimeEnergy += 0.5;
             }
             
-            // Auto slow-time quando quasi morto
             if (skills.temporal_master && player.health < player.maxHealth * 0.2 && !gameState.slowTimeActive) {
                 gameState.timeScale = 0.5;
             } else if (!gameState.slowTimeActive) {
                 gameState.timeScale = 1;
+            }
+        }
+
+        function updateAdaptiveDifficulty() {
+            const survivalTime = (Date.now() - gameState.levelStartTime) / 1000;
+            
+            if (survivalTime > 120) {
+                gameState.adaptiveDifficulty = Math.min(2.0, gameState.adaptiveDifficulty + 0.003);
+                
+                if (gameState.adaptiveDifficulty > 1.5) {
+                    showDifficultyWarning();
+                }
+            }
+            
+            gameState.enemy.bulletCount = 1 + (gameState.adaptiveDifficulty - 1) * 0.2;
+            gameState.enemy.attackSpeed = gameState.adaptiveDifficulty;
+        }
+
+        function showDifficultyWarning() {
+            const warning = document.getElementById('difficultyWarning');
+            warning.style.display = 'block';
+            
+            setTimeout(() => {
+                warning.style.display = 'none';
+            }, 2000);
+        }
+
+        function updateScreenShake() {
+            if (gameState.screenShake > 0) {
+                gameState.screenShake *= 0.9;
+                if (gameState.screenShake < 0.1) {
+                    gameState.screenShake = 0;
+                }
+            }
+        }
+
+        function checkEnemyPhaseTransition() {
+            const enemy = gameState.enemy;
+            const healthPercent = enemy.health / enemy.maxHealth;
+            const phaseThreshold = (enemy.phases - enemy.currentPhase) / enemy.phases;
+            
+            if (healthPercent <= phaseThreshold && enemy.currentPhase < enemy.phases) {
+                triggerPhaseTransition(enemy.currentPhase + 1);
+            }
+        }
+
+        function triggerPhaseTransition(newPhase) {
+            gameState.enemy.currentPhase = newPhase;
+            gameState.enemy.phaseTransition = true;
+            gameState.transformationActive = true;
+            
+            document.getElementById('transformationOverlay').classList.add('active');
+            gameState.screenShake = 6;
+            
+            gameState.enemy.speed *= 1.1;
+            gameState.enemy.bulletCount *= 1.15;
+            
+            createTransformationEffect();
+            
+            setTimeout(() => {
+                gameState.enemy.phaseTransition = false;
+                gameState.transformationActive = false;
+                document.getElementById('transformationOverlay').classList.remove('active');
+            }, 2000);
+        }
+
+        function createTransformationEffect() {
+            for (let i = 0; i < 40; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 12 + 5;
+                gameState.particles.push({
+                    x: gameState.enemy.x,
+                    y: gameState.enemy.y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    color: '#00bcd4',
+                    size: Math.random() * 10 + 6,
+                    life: 80,
+                    maxLife: 80,
+                    alpha: 1
+                });
             }
         }
 
@@ -2280,7 +2103,6 @@
                 gameState.player.emergencyShields--;
                 gameState.player.invulnerabilityFrames = 180;
                 
-                // Rimuovi proiettili vicini
                 gameState.enemyBullets = gameState.enemyBullets.filter(bullet => {
                     const dist = Math.sqrt(
                         Math.pow(bullet.x - gameState.player.x, 2) + 
@@ -2334,79 +2156,12 @@
             }
         }
 
-        // Aggiornamenti vari
-        function updateAdaptiveDifficulty() {
-            const survivalTime = (Date.now() - gameState.levelStartTime) / 1000;
-            
-            if (survivalTime > 120) {
-                gameState.adaptiveDifficulty = Math.min(2.0, gameState.adaptiveDifficulty + 0.003);
-            }
-            
-            if (gameState.enemy) {
-                gameState.enemy.bulletCount = 1 + (gameState.adaptiveDifficulty - 1) * 0.2;
-                gameState.enemy.attackSpeed = gameState.adaptiveDifficulty;
-            }
-        }
-
-        function updateScreenShake() {
-            if (gameState.screenShake > 0) {
-                gameState.screenShake *= 0.9;
-                if (gameState.screenShake < 0.1) {
-                    gameState.screenShake = 0;
-                }
-            }
-        }
-
-        function checkEnemyPhaseTransition() {
-            const enemy = gameState.enemy;
-            if (!enemy) return;
-            
-            const healthPercent = enemy.health / enemy.maxHealth;
-            const phaseThreshold = (enemy.phases - enemy.currentPhase) / enemy.phases;
-            
-            if (healthPercent <= phaseThreshold && enemy.currentPhase < enemy.phases) {
-                triggerPhaseTransition(enemy.currentPhase + 1);
-            }
-        }
-
-        function triggerPhaseTransition(newPhase) {
-            gameState.enemy.currentPhase = newPhase;
-            gameState.enemy.phaseTransition = true;
-            gameState.transformationActive = true;
-            
-            gameState.screenShake = 6;
-            
-            gameState.enemy.speed *= 1.1;
-            gameState.enemy.bulletCount *= 1.15;
-            
-            createTransformationEffect();
-            
-            setTimeout(() => {
-                gameState.enemy.phaseTransition = false;
-                gameState.transformationActive = false;
-            }, 2000);
-        }
-
-        function createTransformationEffect() {
-            for (let i = 0; i < 40; i++) {
-                const angle = Math.random() * Math.PI * 2;
-                const speed = Math.random() * 12 + 5;
-                gameState.particles.push({
-                    x: gameState.enemy.x,
-                    y: gameState.enemy.y,
-                    vx: Math.cos(angle) * speed,
-                    vy: Math.sin(angle) * speed,
-                    color: '#00bcd4',
-                    size: Math.random() * 10 + 6,
-                    life: 80,
-                    maxLife: 80,
-                    alpha: 1
-                });
-            }
-        }
-
         function updateEndlessMode() {
             if (gameState.gameMode !== 'endless') return;
+            
+            document.getElementById('endlessHud').style.display = 'block';
+            document.getElementById('currentWave').textContent = gameState.endlessWave;
+            document.getElementById('difficultyMultiplier').textContent = gameState.adaptiveDifficulty.toFixed(1);
             
             if (gameState.enemy && gameState.enemy.health <= 0) {
                 gameState.endlessWave++;
@@ -2423,14 +2178,18 @@
         function updateSpeedrunTimer() {
             if (gameState.gameMode !== 'speedrun') return;
             
+            document.getElementById('speedrunTimer').style.display = 'block';
             const elapsed = (Date.now() - gameState.speedrunStartTime) / 1000;
+            const minutes = Math.floor(elapsed / 60);
+            const seconds = Math.floor(elapsed % 60);
+            document.getElementById('speedrunTime').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
             
             if (gameState.currentLevel >= 20 && elapsed < 600) {
                 unlockAchievement('time_trial_master');
             }
         }
 
-        // Aggiornamento proiettili
         function updateBullets(deltaTime) {
             gameState.bullets = gameState.bullets.filter(bullet => {
                 bullet.x += bullet.vx * deltaTime;
@@ -2446,7 +2205,6 @@
                 bullet.x += bullet.vx * deltaTime;
                 bullet.y += bullet.vy * deltaTime;
                 
-                // Tracking bullets
                 if (bullet.tracking && Math.random() < 0.08) {
                     const dx = gameState.player.x - bullet.x;
                     const dy = gameState.player.y - bullet.y;
@@ -2456,7 +2214,6 @@
                     bullet.vy += (dy / dist) * (bullet.trackingStrength || 0.2);
                 }
                 
-                // Wave bullets
                 if (bullet.wave) {
                     bullet.x += Math.sin(Date.now() * 0.01 + bullet.waveOffset) * 1.5;
                 }
@@ -2477,12 +2234,9 @@
             });
         }
 
-        // Collisioni
         function checkCollisions() {
-            // Proiettili giocatore vs nemico
             gameState.bullets.forEach((bullet, bulletIndex) => {
                 const enemy = gameState.enemy;
-                if (!enemy) return;
                 
                 const dist = Math.sqrt(
                     Math.pow(bullet.x - enemy.x, 2) + 
@@ -2492,7 +2246,6 @@
                 if (dist < 60) {
                     let damage = bullet.damage;
                     
-                    // Skill effects
                     if (gameState.player.skills.galaxy_buster && enemy.health < enemy.maxHealth * 0.1) {
                         damage = enemy.health;
                     }
@@ -2501,24 +2254,15 @@
                         damage *= 2;
                     }
                     
-                    // Combo multiplier
-                    damage *= gameState.combo.multiplier;
-                    
                     gameState.player.score += Math.floor(damage);
                     enemy.health -= damage;
                     gameState.bullets.splice(bulletIndex, 1);
-                    
-                    // Incrementa combo e power level
-                    addCombo();
-                    gameState.player.powerLevel = Math.min(gameState.player.maxPowerLevel, 
-                                                          gameState.player.powerLevel + 2);
                     
                     createHitParticles(bullet.x, bullet.y, bullet.color);
                     updateUI();
                 }
             });
             
-            // Proiettili nemico vs giocatore
             gameState.enemyBullets.forEach((bullet, bulletIndex) => {
                 const player = gameState.player;
                 
@@ -2537,14 +2281,12 @@
                 if (dist < hitboxSize) {
                     let damage = bullet.damage || 15;
                     
-                    // Riduzione danni per livelli facili
                     if (gameState.currentLevel <= 5) {
                         damage *= 0.8;
                     } else if (gameState.currentLevel <= 10) {
                         damage *= 0.9;
                     }
                     
-                    // Skill armor
                     if (gameState.player.skills.hull_armor) {
                         damage *= (1 - gameState.player.skills.hull_armor * 0.2);
                     }
@@ -2553,9 +2295,6 @@
                     gameState.enemyBullets.splice(bulletIndex, 1);
                     player.invulnerabilityFrames = 60;
                     
-                    // Reset combo quando colpiti
-                    resetCombo();
-                    
                     gameState.screenShake = 4;
                     
                     createHitParticles(bullet.x, bullet.y, '#f44336');
@@ -2563,7 +2302,6 @@
                 }
             });
             
-            // Achievement per sopravvivenza proiettili
             if (gameState.enemyBullets.length >= 500) {
                 unlockAchievement('bullet_dancer');
             }
@@ -2585,21 +2323,17 @@
             }
         }
 
-        // Completamento livello
         function levelComplete() {
-            console.log('Livello completato!');
             gameState.gameRunning = false;
             
             const survivalTime = (Date.now() - gameState.levelStartTime) / 1000;
             gameState.totalSurvivalTime += survivalTime;
             
-            // Bonus punteggio
             const timeBonus = Math.max(0, 12000 - (survivalTime * 60));
             const healthBonus = gameState.player.health * 50;
             const phaseBonus = gameState.enemy.phases * 1000;
-            const comboBonus = gameState.combo.count * 100;
             
-            gameState.player.score += timeBonus + healthBonus + phaseBonus + comboBonus;
+            gameState.player.score += timeBonus + healthBonus + phaseBonus;
             
             let upgradePointsEarned = Math.floor(gameState.currentLevel * 1.2) + 5;
             
@@ -2611,7 +2345,6 @@
             
             gameState.skillPoints += upgradePointsEarned;
             
-            // Salva dati
             const savedData = JSON.parse(localStorage.getItem('stellarGuardianSave') || '{}');
             savedData.totalEnemiesDefeated = (savedData.totalEnemiesDefeated || 0) + 1;
             
@@ -2638,7 +2371,6 @@
                 savedData.completedLevels.push(gameState.currentLevel);
             }
             
-            // Achievement mobile
             if (gameState.isMobile) {
                 const mobileCompletions = (savedData.mobileCompletions || 0) + 1;
                 savedData.mobileCompletions = mobileCompletions;
@@ -2647,7 +2379,6 @@
                 }
             }
             
-            // Achievement vari
             if (gameState.currentLevel === 1) unlockAchievement('first_victory');
             if (gameState.currentLevel === 10) unlockAchievement('space_ace');
             if (gameState.currentLevel === 15) unlockAchievement('galaxy_defender');
@@ -2661,9 +2392,16 @@
                 unlockAchievement('perfect_mission');
             }
             
+            if (gameState.gameMode === 'endless' && gameState.endlessWave >= 50) {
+                unlockAchievement('endless_warrior');
+            }
+            
+            if (gameState.gameMode === 'speedrun' && gameState.totalSurvivalTime < 600) {
+                unlockAchievement('time_trial_master');
+            }
+            
             localStorage.setItem('stellarGuardianSave', JSON.stringify(savedData));
             
-            // Schermata vittoria o continua
             if (gameState.gameMode === 'campaign' && gameState.currentLevel >= 20) {
                 unlockAchievement('ultimate_guardian');
                 document.getElementById('victoryScore').textContent = gameState.player.score.toLocaleString();
@@ -2688,9 +2426,7 @@
             generateLevelGrid();
         }
 
-        // Game Over
         function gameOver() {
-            console.log('Game Over!');
             gameState.gameRunning = false;
             
             const survivalTime = (Date.now() - gameState.levelStartTime) / 1000;
@@ -2717,7 +2453,7 @@
             
             document.getElementById('finalScore').textContent = gameState.player.score.toLocaleString();
             document.getElementById('finalLevel').textContent = gameState.gameMode === 'endless' ? 
-                `Ondata ${gameState.endlessWave}` : gameState.currentLevel;
+                `Wave ${gameState.endlessWave}` : gameState.currentLevel;
             document.getElementById('finalTime').textContent = Math.floor(survivalTime);
             document.getElementById('earnedSkillPoints').textContent = upgradePointsEarned;
             
@@ -2725,9 +2461,8 @@
             updateUI();
         }
 
-        // Controlli di gioco
         function forfeitMission() {
-            if (confirm('Sei sicuro di voler abbandonare e tornare al menu?')) {
+            if (confirm('Are you sure you want to retreat and return to the menu?')) {
                 gameState.gameRunning = false;
                 if (animationId) {
                     cancelAnimationFrame(animationId);
@@ -2737,7 +2472,6 @@
         }
 
         function restartGame() {
-            console.log('Riavvio gioco...');
             gameState.gameRunning = false;
             if (animationId) {
                 cancelAnimationFrame(animationId);
@@ -2758,21 +2492,16 @@
             gameLoop();
         }
 
-        // Rendering
         function render() {
-            // Sfondo animato
-            backgroundY += 1;
-            if (backgroundY >= canvas.height) backgroundY = 0;
+         // SFONDO ANIMATO
+backgroundY += 1;
+if (backgroundY >= canvas.height) backgroundY = 0;
+
+ctx.drawImage(backgroundImage, 0, backgroundY, canvas.width, canvas.height);
+ctx.drawImage(backgroundImage, 0, backgroundY - canvas.height, canvas.width, canvas.height);
+   
+           
             
-            // Sfondo gradiente
-            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-            gradient.addColorStop(0, '#1a237e');
-            gradient.addColorStop(0.5, '#0a0a2e');
-            gradient.addColorStop(1, '#000051');
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            // Screen shake
             if (gameState.screenShake > 0) {
                 ctx.save();
                 ctx.translate(
@@ -2799,10 +2528,9 @@
 
         function renderSpaceBackground() {
             ctx.save();
-            ctx.globalAlpha = 0.6;
+            ctx.globalAlpha = 0.4;
             
-            // Stelle animate
-            for (let i = 0; i < 100; i++) {
+            for (let i = 0; i < 150; i++) {
                 const x = (Date.now() * 0.01 + i * 30) % (canvas.width + 100);
                 const y = (i * 20) % canvas.height;
                 const size = Math.sin(Date.now() * 0.001 + i) * 2 + 2;
@@ -2818,90 +2546,49 @@
         }
 
         function renderPlayer() {
-            const player = gameState.player;
-            
-            ctx.save();
-            ctx.translate(player.x, player.y);
-            ctx.rotate(player.angle);
-            
-            // Effetto invulnerabilità
-            if (player.invulnerabilityFrames > 0) {
-                ctx.globalAlpha = Math.sin(Date.now() * 0.1) * 0.5 + 0.5;
-            }
-            
-            // Nave giocatore
-            const scale = gameState.isMobile ? 1.3 : 1.0;
-            ctx.scale(scale, scale);
-            
-            ctx.fillStyle = '#00bcd4';
-            ctx.beginPath();
-            ctx.moveTo(0, -25);
-            ctx.lineTo(-18, 18);
-            ctx.lineTo(0, 12);
-            ctx.lineTo(18, 18);
-            ctx.closePath();
-            ctx.fill();
-            
-            // Bordo
-            ctx.strokeStyle = '#ffffff';
-            ctx.lineWidth = 3;
-            ctx.stroke();
-            
-            // Motori
-            ctx.fillStyle = '#ff9800';
-            ctx.fillRect(-10, 18, 5, 10);
-            ctx.fillRect(5, 18, 5, 10);
-            
-            ctx.restore();
-        }
+    const player = gameState.player;
+
+    if (!playerImage.complete) return;
+
+    ctx.save();
+    ctx.translate(player.x, player.y);
+    ctx.rotate(player.angle);
+
+    const scale = gameState.isMobile ? 1.4 : 1.2;
+    ctx.scale(scale, scale);
+
+    const size = 80; // puoi cambiare dimensione della nave qui
+    ctx.drawImage(playerImage, -size / 2, -size / 2, size, size);
+
+    ctx.restore();
+}
+
 
         function renderEnemy() {
-            const enemy = gameState.enemy;
-            if (!enemy) return;
-            
-            ctx.save();
-            ctx.translate(enemy.x, enemy.y);
-            ctx.rotate(enemy.angle);
-            
-            // Effetto trasformazione
-            if (enemy.phaseTransition) {
-                ctx.globalAlpha = Math.sin(Date.now() * 0.05) * 0.5 + 0.5;
-            }
-            
-            const size = 50 + (enemy.currentPhase * 10);
-            const scale = 1 + (enemy.currentPhase * 0.15);
-            ctx.scale(scale, scale);
-            
-            // Corpo nemico
-            ctx.fillStyle = '#f44336';
-            ctx.beginPath();
-            ctx.arc(0, 0, size, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Dettagli
-            ctx.fillStyle = '#ffffff';
-            ctx.beginPath();
-            ctx.arc(-size/3, -size/3, size/6, 0, Math.PI * 2);
-            ctx.arc(size/3, -size/3, size/6, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Bordo
-            ctx.strokeStyle = '#ffffff';
-            ctx.lineWidth = 4;
-            ctx.beginPath();
-            ctx.arc(0, 0, size, 0, Math.PI * 2);
-            ctx.stroke();
-            
-            ctx.restore();
-        }
+    const enemy = gameState.enemy;
+
+    if (!enemy || !enemyImage.complete) return;
+
+    ctx.save();
+    ctx.translate(enemy.x, enemy.y);
+    ctx.rotate(enemy.angle);
+
+    const size = 100 + (enemy.currentPhase * 10); // puoi regolare questa dimensione
+    const scale = 1 + (enemy.currentPhase * 0.05);
+    ctx.scale(scale, scale);
+
+    ctx.drawImage(enemyImage, -size / 2, -size / 2, size, size);
+
+    ctx.restore();
+}
 
         function renderBullets() {
             gameState.bullets.forEach(bullet => {
                 ctx.save();
                 
-                if (bullet.charged || bullet.special || bullet.power) {
+                if (bullet.charged || bullet.special) {
                     ctx.shadowColor = bullet.color;
-                    ctx.shadowBlur = 20;
+                    ctx.shadowBlur = 15;
                 }
                 
                 ctx.fillStyle = bullet.color;
@@ -2909,11 +2596,11 @@
                 ctx.arc(bullet.x, bullet.y, bullet.size, 0, Math.PI * 2);
                 ctx.fill();
                 
-                // Scia
+                // Trail effect
                 ctx.globalAlpha = 0.5;
                 ctx.fillStyle = bullet.color;
                 ctx.beginPath();
-                ctx.arc(bullet.x, bullet.y + 12, bullet.size * 0.6, 0, Math.PI * 2);
+                ctx.arc(bullet.x, bullet.y + 10, bullet.size * 0.6, 0, Math.PI * 2);
                 ctx.fill();
                 
                 ctx.restore();
@@ -2929,10 +2616,9 @@
                 ctx.arc(bullet.x, bullet.y, bullet.size, 0, Math.PI * 2);
                 ctx.fill();
                 
-                // Effetti speciali per proiettili grandi
                 if (bullet.size > 10) {
                     ctx.strokeStyle = '#ffffff';
-                    ctx.lineWidth = 3;
+                    ctx.lineWidth = 2;
                     ctx.beginPath();
                     ctx.arc(bullet.x, bullet.y, bullet.size, 0, Math.PI * 2);
                     ctx.stroke();
@@ -2940,28 +2626,26 @@
                     ctx.globalAlpha = 0.4;
                     ctx.fillStyle = bullet.color;
                     ctx.beginPath();
-                    ctx.arc(bullet.x, bullet.y, bullet.size + Math.sin(Date.now() * 0.03) * 5, 0, Math.PI * 2);
+                    ctx.arc(bullet.x, bullet.y, bullet.size + Math.sin(Date.now() * 0.03) * 4, 0, Math.PI * 2);
                     ctx.fill();
                 }
                 
-                // Tracking bullets
                 if (bullet.tracking) {
                     ctx.strokeStyle = '#f44336';
-                    ctx.lineWidth = 3;
+                    ctx.lineWidth = 2;
                     ctx.beginPath();
-                    ctx.arc(bullet.x, bullet.y, bullet.size + 8, 0, Math.PI * 2);
+                    ctx.arc(bullet.x, bullet.y, bullet.size + 6, 0, Math.PI * 2);
                     ctx.stroke();
                 }
                 
-                // Ultimate bullets
                 if (bullet.ultimate) {
                     ctx.shadowColor = bullet.color;
-                    ctx.shadowBlur = 25;
+                    ctx.shadowBlur = 20;
                     
                     ctx.strokeStyle = '#ffffff';
-                    ctx.lineWidth = 5;
+                    ctx.lineWidth = 4;
                     ctx.beginPath();
-                    ctx.arc(bullet.x, bullet.y, bullet.size + 6, 0, Math.PI * 2);
+                    ctx.arc(bullet.x, bullet.y, bullet.size + 5, 0, Math.PI * 2);
                     ctx.stroke();
                 }
                 
@@ -2975,7 +2659,7 @@
                 ctx.globalAlpha = particle.alpha;
                 ctx.fillStyle = particle.color;
                 ctx.shadowColor = particle.color;
-                ctx.shadowBlur = 10;
+                ctx.shadowBlur = 8;
                 ctx.beginPath();
                 ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
                 ctx.fill();
@@ -2985,41 +2669,39 @@
 
         function renderSlowTimeOverlay() {
             ctx.save();
-            ctx.globalAlpha = 0.2;
+            ctx.globalAlpha = 0.15;
             ctx.fillStyle = '#00bcd4';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
             ctx.globalAlpha = 1;
             ctx.fillStyle = '#00bcd4';
-            ctx.font = `bold ${Math.min(28, canvas.width * 0.05)}px Orbitron`;
+            ctx.font = `bold ${Math.min(28, canvas.width * 0.035)}px Orbitron`;
             ctx.textAlign = 'center';
-            ctx.fillText('DILATAZIONE TEMPORALE ATTIVA', canvas.width / 2, 60);
+            ctx.fillText('TIME DILATION ACTIVE', canvas.width / 2, 60);
             
             ctx.restore();
         }
 
-        // Aggiornamento UI
         function updateUI() {
             document.getElementById('currentLevel').textContent = gameState.gameMode === 'endless' ? 
-                `O${gameState.endlessWave}` : gameState.currentLevel;
+                `W${gameState.endlessWave}` : gameState.currentLevel;
             document.getElementById('playerLives').textContent = gameState.player.lives;
+            document.getElementById('playerEnergy').textContent = Math.floor(gameState.player.energy);
             document.getElementById('playerScore').textContent = gameState.player.score.toLocaleString();
-            document.getElementById('comboCounter').textContent = gameState.combo.count;
             
             const playerHealthPercent = (gameState.player.health / gameState.player.maxHealth) * 100;
             document.getElementById('playerHealthFill').style.width = Math.max(0, playerHealthPercent) + '%';
             document.getElementById('playerHealthText').textContent = 
-                `${Math.max(0, Math.floor(gameState.player.health))}/${gameState.player.maxHealth}`;
+                `${Math.max(0, Math.floor(gameState.player.health))} / ${gameState.player.maxHealth}`;
             
             if (gameState.enemy) {
                 const enemyHealthPercent = (gameState.enemy.health / gameState.enemy.maxHealth) * 100;
                 document.getElementById('enemyHealthFill').style.width = Math.max(0, enemyHealthPercent) + '%';
                 document.getElementById('enemyHealthText').textContent = 
-                    `${Math.max(0, Math.floor(gameState.enemy.health))}/${gameState.enemy.maxHealth}`;
+                    `${Math.max(0, Math.floor(gameState.enemy.health))} / ${gameState.enemy.maxHealth}`;
             }
             
-            const powerPercent = (gameState.player.powerLevel / gameState.player.maxPowerLevel) * 100;
-            document.getElementById('powerFill').style.width = powerPercent + '%';
+            document.getElementById('energyFill').style.width = gameState.bulletHellIntensity + '%';
             
             const savedData = JSON.parse(localStorage.getItem('stellarGuardianSave') || '{}');
             document.getElementById('totalEnemiesDefeated').textContent = savedData.totalEnemiesDefeated || 0;
@@ -3038,7 +2720,6 @@
             gameState.skillPoints = savedData.skillPoints || 0;
         }
 
-        // Gestione dati
         function saveGameData() {
             const savedData = JSON.parse(localStorage.getItem('stellarGuardianSave') || '{}');
             localStorage.setItem('stellarGuardianSave', JSON.stringify(savedData));
@@ -3051,7 +2732,7 @@
         }
 
         function resetStats() {
-            if (confirm('Sei sicuro di voler resettare tutti i dati? Questo cancellerà tutti i progressi, potenziamenti e obiettivi!')) {
+            if (confirm('Are you sure you want to reset all data? This will delete all progress, upgrades, and achievements!')) {
                 localStorage.removeItem('stellarGuardianSave');
                 gameState.currentLevel = 1;
                 gameState.skillPoints = 0;
@@ -3060,11 +2741,10 @@
                 generateLevelGrid();
                 generateSkillTree();
                 generateAchievements();
-                showNotification('Tutti i dati resettati! Ripartendo da zero.', 'achievement');
+                showNotification('All data reset! Starting fresh.', 'achievement');
             }
         }
 
-        // Notifiche
         function showNotification(message, type = 'info') {
             const notification = document.createElement('div');
             notification.className = 'notification';
@@ -3082,7 +2762,6 @@
             }, 5000);
         }
 
-        // Particelle di sfondo
         function createStellarParticles() {
             const particlesContainer = document.getElementById('particles');
             
@@ -3090,8 +2769,8 @@
                 const particle = document.createElement('div');
                 particle.className = 'particle';
                 particle.style.left = Math.random() * 100 + '%';
-                particle.style.animationDelay = Math.random() * 6 + 's';
-                particle.style.animationDuration = (Math.random() * 4 + 6) + 's';
+                particle.style.animationDelay = Math.random() * 4 + 's';
+                particle.style.animationDuration = (Math.random() * 3 + 4) + 's';
                 
                 const colors = ['#00bcd4', '#2196f3', '#3f51b5', '#9c27b0', '#ffffff'];
                 particle.style.background = colors[Math.floor(Math.random() * colors.length)];
@@ -3100,11 +2779,7 @@
             }
         }
 
-        // Inizializzazione
-        window.addEventListener('load', () => {
-            console.log('Pagina caricata, inizializzazione gioco...');
-            initGame();
-        });
+        window.addEventListener('load', initGame);
     </script>
 </body>
 </html>
