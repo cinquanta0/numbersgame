@@ -2611,89 +2611,22 @@ ctx.drawImage(backgroundImage, 0, backgroundY - canvas.height, canvas.width, can
         }
 
         function renderEnemy() {
-            const enemy = gameState.enemy;
-            
-            ctx.save();
-            ctx.translate(enemy.x, enemy.y);
-            ctx.rotate(enemy.angle);
-            
-            if (enemy.phaseTransition) {
-                ctx.globalAlpha = 0.6 + Math.sin(Date.now() * 0.03) * 0.4;
-            }
-            
-            const phaseColors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5'];
-            const mainColor = phaseColors[Math.min(enemy.currentPhase - 1, phaseColors.length - 1)];
-            
-            const size = 60 + (enemy.currentPhase * 10);
-            const scale = 1 + (enemy.currentPhase * 0.1);
-            ctx.scale(scale, scale);
-            
-            // Main enemy body
-            ctx.fillStyle = mainColor;
-            ctx.strokeStyle = '#ffffff';
-            ctx.lineWidth = 3;
-            
-            ctx.beginPath();
-            ctx.moveTo(0, -30);
-            ctx.lineTo(-25, 10);
-            ctx.lineTo(-15, 20);
-            ctx.lineTo(0, 15);
-            ctx.lineTo(15, 20);
-            ctx.lineTo(25, 10);
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
-            
-            // Wings
-            const wingSize = 40 + (enemy.currentPhase * 5);
-            ctx.beginPath();
-            ctx.moveTo(-25 - wingSize, -10);
-            ctx.lineTo(-25, -20);
-            ctx.lineTo(-25, 20);
-            ctx.lineTo(-25 - wingSize, 10);
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
-            
-            ctx.beginPath();
-            ctx.moveTo(25 + wingSize, -10);
-            ctx.lineTo(25, -20);
-            ctx.lineTo(25, 20);
-            ctx.lineTo(25 + wingSize, 10);
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
-            
-            // Core
-            const coreSize = 15 + Math.sin(Date.now() * 0.04) * 5 + (enemy.currentPhase * 3);
-            const coreColors = ['#ff9800', '#ff5722', '#f44336', '#e91e63', '#9c27b0'];
-            ctx.fillStyle = coreColors[Math.min(enemy.currentPhase - 1, coreColors.length - 1)];
-            ctx.beginPath();
-            ctx.arc(0, 0, coreSize, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Phase indicators
-            if (enemy.currentPhase >= 3) {
-                ctx.globalAlpha = 0.4;
-                ctx.fillStyle = mainColor;
-                ctx.beginPath();
-                ctx.arc(0, 0, size + 20, 0, Math.PI * 2);
-                ctx.fill();
-            }
-            
-            if (enemy.currentPhase >= 5) {
-                ctx.globalAlpha = 0.3;
-                for (let i = 0; i < 6; i++) {
-                    ctx.strokeStyle = '#ffd700';
-                    ctx.lineWidth = 3;
-                    ctx.beginPath();
-                    ctx.arc(0, 0, size + (i * 10), 0, Math.PI * 2);
-                    ctx.stroke();
-                }
-            }
-            
-            ctx.restore();
-        }
+    const enemy = gameState.enemy;
+
+    if (!enemy || !enemyImage.complete) return;
+
+    ctx.save();
+    ctx.translate(enemy.x, enemy.y);
+    ctx.rotate(enemy.angle);
+
+    const size = 100 + (enemy.currentPhase * 10); // puoi regolare questa dimensione
+    const scale = 1 + (enemy.currentPhase * 0.05);
+    ctx.scale(scale, scale);
+
+    ctx.drawImage(enemyImage, -size / 2, -size / 2, size, size);
+
+    ctx.restore();
+}
 
         function renderBullets() {
             gameState.bullets.forEach(bullet => {
