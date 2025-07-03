@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌌 Battaglia Galattica - Arena Multiplayer Epica</title>
-    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Orbitron:wght@400;700&family=Roboto:wght@400;700&family=Press+Start+2P&family=Fredoka+One&family=Righteous&display=swap" rel="stylesheet">
+    <title>🌌 Battaglia Galattica - Arena Multiplayer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Orbitron:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
         :root {
@@ -13,7 +13,6 @@
             --accent-gold: #ffd93d;
             --dark-bg: #0a0a0a;
             --card-bg: rgba(255,255,255,0.1);
-            --glow: 0 0 20px currentColor;
             --text-color: white;
             --gradient-bg: linear-gradient(45deg, #0a0a0a, #1a1a2e, #16213e);
             --purple-neon: #bf00ff;
@@ -32,11 +31,9 @@
             color: var(--text-color);
             min-height: 100vh;
             overflow-x: hidden;
-            position: relative;
-            transition: all 0.5s ease;
         }
 
-        /* ANIMAZIONI BACKGROUND MIGLIORATE */
+        /* BACKGROUND OTTIMIZZATO */
         .stars {
             position: fixed;
             top: 0;
@@ -44,146 +41,61 @@
             width: 100%;
             height: 100%;
             z-index: -1;
+            pointer-events: none;
         }
 
         .star {
             position: absolute;
             background: var(--primary-neon);
             border-radius: 50%;
-            animation: twinkle 2s infinite;
-            box-shadow: 0 0 10px currentColor;
+            animation: twinkle 3s infinite ease-in-out;
         }
 
         @keyframes twinkle {
-            0%, 100% { 
-                opacity: 0.3; 
-                transform: scale(1); 
-                box-shadow: 0 0 5px currentColor;
-            }
-            50% { 
-                opacity: 1; 
-                transform: scale(1.5); 
-                box-shadow: 0 0 20px currentColor;
-            }
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
         }
 
         .shooting-star {
             position: absolute;
-            width: 3px;
-            height: 3px;
+            width: 2px;
+            height: 2px;
             background: var(--accent-gold);
             border-radius: 50%;
-            animation: shoot 4s linear infinite;
-            box-shadow: 0 0 15px var(--accent-gold);
+            animation: shoot 6s linear infinite;
         }
 
         @keyframes shoot {
             0% {
-                transform: translateX(-100px) translateY(-100px);
+                transform: translateX(-50px) translateY(-50px);
                 opacity: 0;
-                box-shadow: 0 0 5px var(--accent-gold);
             }
-            10% { 
-                opacity: 1; 
-                box-shadow: 0 0 20px var(--accent-gold);
-            }
-            90% { 
-                opacity: 1; 
-                box-shadow: 0 0 25px var(--accent-gold);
-            }
+            10%, 90% { opacity: 1; }
             100% {
                 transform: translateX(100vw) translateY(100vh);
                 opacity: 0;
-                box-shadow: 0 0 5px var(--accent-gold);
             }
         }
 
-        /* NEBULAE ANIMATE */
-        .nebula {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(40px);
-            opacity: 0.3;
-            animation: nebulaFloat 20s ease-in-out infinite;
-        }
-
-        @keyframes nebulaFloat {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            25% { transform: translate(50px, -30px) scale(1.1); }
-            50% { transform: translate(-30px, 50px) scale(0.9); }
-            75% { transform: translate(-50px, -20px) scale(1.05); }
-        }
-
-        /* HEADER EPICO MIGLIORATO */
+        /* HEADER SEMPLIFICATO */
         .epic-header {
             text-align: center;
-            padding: 3rem 0;
+            padding: 2rem 0;
             background: linear-gradient(90deg, transparent, var(--card-bg), transparent);
-            border-bottom: 3px solid var(--primary-neon);
+            border-bottom: 2px solid var(--primary-neon);
             margin-bottom: 2rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .epic-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            animation: headerSweep 3s infinite;
-        }
-
-        .epic-header::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, var(--primary-neon) 0%, transparent 70%);
-            opacity: 0.1;
-            animation: headerPulse 4s ease-in-out infinite;
-        }
-
-        @keyframes headerSweep {
-            0% { left: -100%; }
-            100% { left: 100%; }
-        }
-
-        @keyframes headerPulse {
-            0%, 100% { transform: scale(1) rotate(0deg); }
-            50% { transform: scale(1.2) rotate(180deg); }
         }
 
         .main-title {
             font-family: 'Bangers', cursive;
-            font-size: clamp(3rem, 10vw, 5rem);
-            background: linear-gradient(45deg, var(--primary-neon), var(--accent-gold), var(--secondary-neon), var(--purple-neon), var(--green-neon));
-            background-size: 500% 500%;
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            background: linear-gradient(45deg, var(--primary-neon), var(--accent-gold), var(--secondary-neon));
+            background-size: 200% 200%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            animation: gradientShift 2s ease-in-out infinite, titleFloat 3s ease-in-out infinite;
+            animation: gradientShift 3s ease-in-out infinite;
             margin-bottom: 1rem;
-            text-shadow: 0 0 50px var(--primary-neon);
-            position: relative;
-        }
-
-        .main-title::before {
-            content: '🌌 ARENA GALATTICA';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: linear-gradient(45deg, transparent, var(--primary-neon), transparent);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            opacity: 0.3;
-            animation: titleGlow 2s ease-in-out infinite alternate;
         }
 
         @keyframes gradientShift {
@@ -191,465 +103,217 @@
             50% { background-position: 100% 50%; }
         }
 
-        @keyframes titleFloat {
-            0%, 100% { transform: translateY(0px) scale(1); }
-            50% { transform: translateY(-15px) scale(1.05); }
-        }
-
-        @keyframes titleGlow {
-            0% { opacity: 0.2; }
-            100% { opacity: 0.6; }
-        }
-
         .subtitle {
             font-family: 'Orbitron', sans-serif;
-            font-size: clamp(1rem, 3vw, 1.5rem);
+            font-size: clamp(0.9rem, 2.5vw, 1.2rem);
             color: var(--accent-gold);
             opacity: 0.9;
-            animation: subtitleGlow 3s ease-in-out infinite alternate;
-            text-shadow: 0 0 20px var(--accent-gold);
-            position: relative;
         }
 
-        @keyframes subtitleGlow {
-            0% { 
-                text-shadow: 0 0 15px var(--accent-gold); 
-                transform: scale(1);
-            }
-            100% { 
-                text-shadow: 0 0 30px var(--accent-gold), 0 0 40px var(--accent-gold); 
-                transform: scale(1.02);
-            }
-        }
-
-        /* NAVIGATION MIGLIORATA */
+        /* NAVIGATION OTTIMIZZATA */
         .nav-controls {
             position: fixed;
-            top: 20px;
-            left: 20px;
+            top: 15px;
+            left: 15px;
             z-index: 1000;
             display: flex;
-            gap: 15px;
-            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
-        .nav-btn {
+        .nav-btn, .home-btn {
             background: var(--card-bg);
             border: 2px solid var(--primary-neon);
-            border-radius: 50px;
-            padding: 15px 25px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            cursor: pointer;
-            transition: all 0.4s ease;
-            backdrop-filter: blur(15px);
-            font-size: 1.1rem;
+            border-radius: 25px;
+            padding: 10px 20px;
             color: var(--primary-neon);
             text-decoration: none;
             font-weight: bold;
-            position: relative;
-            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            font-size: 0.9rem;
         }
 
-        .nav-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(0, 255, 242, 0.3), transparent);
-            transition: left 0.6s ease;
-        }
-
-        .nav-btn:hover::before {
-            left: 100%;
-        }
-
-        .nav-btn:hover {
-            transform: scale(1.1) translateY(-2px);
-            box-shadow: 0 0 30px var(--primary-neon);
-            background: var(--primary-neon);
-            color: var(--dark-bg);
-            border-color: var(--accent-gold);
-        }
-
-        /* HOME BUTTON MIGLIORATO */
         .home-btn {
             position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
+            top: 15px;
+            right: 15px;
             background: linear-gradient(45deg, var(--secondary-neon), var(--purple-neon));
-            border: 3px solid var(--accent-gold);
-            border-radius: 50px;
-            padding: 15px 25px;
+            border-color: var(--accent-gold);
             color: white;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: all 0.4s ease;
-            backdrop-filter: blur(15px);
-            box-shadow: 0 0 20px rgba(255, 107, 107, 0.5);
         }
 
-        .home-btn:hover {
-            transform: scale(1.1) translateY(-3px);
-            box-shadow: 0 0 40px rgba(255, 107, 107, 0.8);
-            background: linear-gradient(45deg, var(--purple-neon), var(--secondary-neon));
+        .nav-btn:hover, .home-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 245, 255, 0.3);
         }
 
-        /* CONTAINER PRINCIPALE */
+        /* CONTAINER */
         .main-container {
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 0 1rem;
         }
 
-        /* SCHERMATA */
+        /* SCREENS */
         .screen {
             display: none;
-            min-height: 80vh;
+            min-height: 70vh;
             padding: 1rem;
         }
 
         .screen.active {
             display: block;
-            animation: screenFadeIn 1s ease;
+            animation: fadeIn 0.5s ease;
         }
 
-        @keyframes screenFadeIn {
-            from { 
-                opacity: 0; 
-                transform: translateY(50px) scale(0.9); 
-            }
-            to { 
-                opacity: 1; 
-                transform: translateY(0) scale(1); 
-            }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
-        /* CARDS SUPER MIGLIORATI */
+        /* CARDS OTTIMIZZATE */
         .card {
             background: var(--card-bg);
-            border: 3px solid transparent;
-            border-radius: 30px;
-            padding: 2.5rem;
+            border: 2px solid rgba(0, 245, 255, 0.3);
+            border-radius: 20px;
+            padding: 2rem;
             margin-bottom: 2rem;
-            backdrop-filter: blur(20px);
-            position: relative;
-            overflow: hidden;
-            transition: all 0.5s ease;
-            border-color: rgba(0, 245, 255, 0.4);
-        }
-
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
-            transition: left 0.8s ease;
-        }
-
-        .card::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: conic-gradient(var(--primary-neon), transparent, var(--purple-neon), transparent, var(--primary-neon));
-            opacity: 0;
-            transition: opacity 0.5s ease;
-            animation: cardRotate 10s linear infinite;
-            z-index: -1;
-        }
-
-        .card:hover::before {
-            left: 100%;
-        }
-
-        .card:hover::after {
-            opacity: 0.1;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
         }
 
         .card:hover {
             border-color: var(--primary-neon);
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 20px 50px rgba(0, 245, 255, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 245, 255, 0.2);
         }
 
-        @keyframes cardRotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        /* STATUS INDICATORS MIGLIORATI */
+        /* STATUS SEMPLIFICATO */
         .status {
             text-align: center;
-            padding: 2rem;
-            border-radius: 25px;
+            padding: 1.5rem;
+            border-radius: 15px;
             margin-bottom: 2rem;
             font-weight: bold;
-            font-size: 1.2rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .status::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: conic-gradient(transparent, currentColor, transparent);
-            opacity: 0.2;
-            animation: statusRotate 4s linear infinite;
-            z-index: -1;
-        }
-
-        @keyframes statusRotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+            font-size: 1.1rem;
         }
 
         .status-online {
-            background: rgba(16, 185, 129, 0.3);
-            border: 3px solid #10b981;
+            background: rgba(16, 185, 129, 0.2);
+            border: 2px solid #10b981;
             color: #10b981;
-            animation: statusPulse 2s ease-in-out infinite;
-            box-shadow: 0 0 30px rgba(16, 185, 129, 0.5);
         }
 
         .status-offline {
-            background: rgba(239, 68, 68, 0.3);
-            border: 3px solid #ef4444;
+            background: rgba(239, 68, 68, 0.2);
+            border: 2px solid #ef4444;
             color: #ef4444;
-            box-shadow: 0 0 30px rgba(239, 68, 68, 0.5);
         }
 
         .status-connecting {
-            background: rgba(251, 191, 36, 0.3);
-            border: 3px solid #fbbf24;
+            background: rgba(251, 191, 36, 0.2);
+            border: 2px solid #fbbf24;
             color: #fbbf24;
-            box-shadow: 0 0 30px rgba(251, 191, 36, 0.5);
         }
 
-        @keyframes statusPulse {
-            0%, 100% { 
-                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7), 0 0 30px rgba(16, 185, 129, 0.5); 
-            }
-            70% { 
-                box-shadow: 0 0 0 15px rgba(16, 185, 129, 0), 0 0 40px rgba(16, 185, 129, 0.8); 
-            }
-        }
-
-        /* DIFFICULTY BADGES MIGLIORATI */
+        /* DIFFICULTY BADGES */
         .difficulty-selector {
-            display: flex;
-            justify-content: center;
-            gap: 1.5rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
             margin: 2rem 0;
-            flex-wrap: wrap;
         }
 
         .difficulty-badge {
-            padding: 1.5rem 2rem;
-            border-radius: 25px;
-            font-size: 1.1rem;
+            padding: 1rem;
+            border-radius: 15px;
+            font-size: 1rem;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.4s ease;
-            border: 3px solid transparent;
-            position: relative;
-            overflow: hidden;
-            backdrop-filter: blur(10px);
-        }
-
-        .difficulty-badge::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            transition: left 0.6s ease;
-        }
-
-        .difficulty-badge:hover::before,
-        .difficulty-badge.active::before {
-            left: 100%;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            text-align: center;
         }
 
         .difficulty-badge:hover,
         .difficulty-badge.active {
-            transform: scale(1.1) translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
 
         .easy { 
             background: linear-gradient(45deg, #4ecdc4, #44a08d); 
             border-color: #4ecdc4;
-            box-shadow: 0 0 20px rgba(78, 205, 196, 0.5);
         }
         .normal { 
             background: linear-gradient(45deg, #667eea, #764ba2); 
             border-color: #667eea;
-            box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
         }
         .hard { 
             background: linear-gradient(45deg, #ff6b6b, #ee5a24); 
             border-color: #ff6b6b;
-            box-shadow: 0 0 20px rgba(255, 107, 107, 0.5);
         }
         .expert { 
             background: linear-gradient(45deg, #a55eea, #26de81); 
             border-color: #a55eea;
-            box-shadow: 0 0 20px rgba(165, 94, 234, 0.5);
         }
 
-        /* GAME STATS GRID MIGLIORATO */
+        /* GAME STATS */
         .game-stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
             margin-bottom: 2rem;
         }
 
         .stat-card {
-            background: rgba(0, 0, 0, 0.7);
-            padding: 2rem;
-            border-radius: 25px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 1.5rem;
+            border-radius: 15px;
             text-align: center;
-            border: 3px solid var(--primary-neon);
-            transition: all 0.4s ease;
-            position: relative;
-            overflow: hidden;
-            backdrop-filter: blur(15px);
-        }
-
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: conic-gradient(var(--primary-neon), transparent, var(--primary-neon));
-            opacity: 0;
-            transition: opacity 0.4s ease;
-            animation: statRotate 6s linear infinite;
-            z-index: -1;
-        }
-
-        .stat-card:hover::before {
-            opacity: 0.15;
+            border: 2px solid var(--primary-neon);
+            transition: all 0.3s ease;
         }
 
         .stat-card:hover {
-            transform: translateY(-8px) scale(1.05);
-            box-shadow: 0 20px 40px rgba(0, 245, 255, 0.4);
-            border-color: var(--accent-gold);
-        }
-
-        @keyframes statRotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 245, 255, 0.3);
         }
 
         .stat-value {
-            font-size: 3rem;
+            font-size: 2.5rem;
             font-weight: bold;
             color: var(--accent-gold);
-            text-shadow: 0 0 20px var(--accent-gold);
-            animation: statGlow 3s ease-in-out infinite alternate;
             font-family: 'Orbitron', sans-serif;
         }
 
-        @keyframes statGlow {
-            0% { 
-                text-shadow: 0 0 20px var(--accent-gold); 
-                transform: scale(1);
-            }
-            100% { 
-                text-shadow: 0 0 35px var(--accent-gold), 0 0 50px var(--accent-gold); 
-                transform: scale(1.05);
-            }
-        }
-
         .stat-label {
-            font-size: 1rem;
-            opacity: 0.9;
-            margin-top: 0.8rem;
-            font-weight: bold;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-top: 0.5rem;
             color: var(--primary-neon);
         }
 
-        /* BOTTONI SUPER EPICI */
+        /* BUTTONS OTTIMIZZATI */
         .button {
-            padding: 2rem 3rem;
+            padding: 1.5rem 2rem;
             border: none;
-            border-radius: 30px;
+            border-radius: 20px;
             font-weight: bold;
             cursor: pointer;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             width: 100%;
-            margin-bottom: 1.5rem;
-            transition: all 0.5s ease;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
             text-transform: uppercase;
-            letter-spacing: 3px;
-            position: relative;
-            overflow: hidden;
-            font-family: 'Fredoka One', cursive;
-            backdrop-filter: blur(10px);
-        }
-
-        .button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
-            transition: left 0.8s ease;
-        }
-
-        .button::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: radial-gradient(circle, rgba(255,255,255,0.3), transparent);
-            transition: all 0.5s ease;
-            transform: translate(-50%, -50%);
-            border-radius: 50%;
-        }
-
-        .button:hover::before {
-            left: 100%;
-        }
-
-        .button:hover::after {
-            width: 300px;
-            height: 300px;
+            letter-spacing: 1px;
+            font-family: 'Orbitron', sans-serif;
         }
 
         .button:hover:not(:disabled) {
-            transform: translateY(-8px) scale(1.05);
-        }
-
-        .button:active {
-            transform: translateY(-4px) scale(1.02);
+            transform: translateY(-3px);
         }
 
         .button:disabled {
@@ -659,75 +323,51 @@
         }
 
         .button-primary {
-            background: linear-gradient(45deg, var(--primary-neon), #00d4ff, var(--green-neon));
+            background: linear-gradient(45deg, var(--primary-neon), #00d4ff);
             color: var(--dark-bg);
-            box-shadow: 0 15px 35px rgba(0, 245, 255, 0.4);
-            border: 2px solid var(--accent-gold);
-        }
-
-        .button-primary:hover {
-            box-shadow: 0 20px 50px rgba(0, 245, 255, 0.6);
+            box-shadow: 0 5px 15px rgba(0, 245, 255, 0.3);
         }
 
         .button-secondary {
-            background: linear-gradient(45deg, var(--secondary-neon), #ff5252, var(--purple-neon));
+            background: linear-gradient(45deg, var(--secondary-neon), #ff5252);
             color: white;
-            box-shadow: 0 15px 35px rgba(255, 107, 107, 0.4);
-            border: 2px solid var(--accent-gold);
-        }
-
-        .button-secondary:hover {
-            box-shadow: 0 20px 50px rgba(255, 107, 107, 0.6);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
         }
 
         .button-success {
-            background: linear-gradient(45deg, #4ecdc4, #44a08d, var(--green-neon));
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
             color: white;
-            box-shadow: 0 15px 35px rgba(78, 205, 196, 0.4);
-            border: 2px solid var(--accent-gold);
-        }
-
-        .button-success:hover {
-            box-shadow: 0 20px 50px rgba(78, 205, 196, 0.6);
+            box-shadow: 0 5px 15px rgba(78, 205, 196, 0.3);
         }
 
         .button-gold {
-            background: linear-gradient(45deg, var(--accent-gold), #ffb300, #ffd700);
+            background: linear-gradient(45deg, var(--accent-gold), #ffb300);
             color: var(--dark-bg);
-            box-shadow: 0 15px 35px rgba(255, 217, 61, 0.4);
-            border: 2px solid var(--primary-neon);
+            box-shadow: 0 5px 15px rgba(255, 217, 61, 0.3);
         }
 
-        .button-gold:hover {
-            box-shadow: 0 20px 50px rgba(255, 217, 61, 0.6);
-        }
-
-        /* INPUT STYLES SUPER EPICI */
+        /* INPUT OTTIMIZZATI */
         .input {
             width: 100%;
-            padding: 2rem;
-            background: rgba(0, 0, 0, 0.7);
-            border: 3px solid var(--primary-neon);
-            border-radius: 25px;
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--primary-neon);
+            border-radius: 15px;
             color: var(--text-color);
-            font-size: 1.3rem;
-            margin-bottom: 2rem;
-            transition: all 0.4s ease;
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
             font-family: 'Orbitron', sans-serif;
-            backdrop-filter: blur(10px);
         }
 
         .input:focus {
             outline: none;
-            box-shadow: 0 0 40px var(--primary-neon);
-            transform: scale(1.03);
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
             border-color: var(--accent-gold);
-            background: rgba(0, 0, 0, 0.8);
         }
 
         .input::placeholder {
-            color: rgba(156, 163, 175, 0.8);
-            font-style: italic;
+            color: rgba(156, 163, 175, 0.7);
         }
 
         /* GRID LAYOUT */
@@ -737,398 +377,222 @@
             gap: 2rem;
         }
 
-        /* TURN INDICATOR SUPER EPICO */
+        /* TURN INDICATOR */
         .turn-indicator {
             text-align: center;
-            padding: 2.5rem;
-            border-radius: 30px;
+            padding: 2rem;
+            border-radius: 20px;
             margin-bottom: 2rem;
             font-weight: bold;
-            font-size: 1.4rem;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.4s ease;
-            backdrop-filter: blur(15px);
+            font-size: 1.2rem;
         }
 
         .turn-active {
-            background: rgba(16, 185, 129, 0.4);
-            border: 3px solid #10b981;
+            background: rgba(16, 185, 129, 0.3);
+            border: 2px solid #10b981;
             color: #10b981;
-            animation: turnPulse 2s infinite;
-            box-shadow: 0 0 40px rgba(16, 185, 129, 0.6);
         }
 
         .turn-waiting {
-            background: rgba(251, 191, 36, 0.3);
-            border: 3px solid #fbbf24;
+            background: rgba(251, 191, 36, 0.2);
+            border: 2px solid #fbbf24;
             color: #fbbf24;
-            box-shadow: 0 0 30px rgba(251, 191, 36, 0.5);
         }
 
-        @keyframes turnPulse {
-            0% { 
-                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7), 0 0 40px rgba(16, 185, 129, 0.6); 
-            }
-            70% { 
-                box-shadow: 0 0 0 20px rgba(16, 185, 129, 0), 0 0 60px rgba(16, 185, 129, 0.9); 
-            }
-            100% { 
-                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0), 0 0 40px rgba(16, 185, 129, 0.6); 
-            }
-        }
-
-        /* CHAT SUPER EPICO */
+        /* CHAT OTTIMIZZATO */
         .chat {
-            height: 400px;
+            height: 300px;
             overflow-y: auto;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 2rem;
-            border-radius: 25px;
-            margin-bottom: 2rem;
-            border: 3px solid var(--primary-neon);
-            position: relative;
-            backdrop-filter: blur(15px);
+            background: rgba(0, 0, 0, 0.5);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 1.5rem;
+            border: 2px solid var(--primary-neon);
         }
 
         .chat::-webkit-scrollbar {
-            width: 12px;
+            width: 8px;
         }
 
         .chat::-webkit-scrollbar-track {
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
+            border-radius: 5px;
         }
 
         .chat::-webkit-scrollbar-thumb {
-            background: linear-gradient(45deg, var(--primary-neon), var(--accent-gold));
-            border-radius: 10px;
-            border: 2px solid rgba(255, 255, 255, 0.1);
+            background: var(--primary-neon);
+            border-radius: 5px;
         }
 
         .chat-message {
-            margin-bottom: 1.5rem;
-            padding: 1.5rem;
-            border-radius: 20px;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 10px;
             background: rgba(255, 255, 255, 0.1);
-            transition: all 0.4s ease;
-            border-left: 5px solid var(--primary-neon);
-            animation: messageSlide 0.6s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        @keyframes messageSlide {
-            from { transform: translateX(-30px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        .chat-message:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateX(8px) scale(1.02);
-            box-shadow: 0 5px 15px rgba(0, 245, 255, 0.3);
+            border-left: 3px solid var(--primary-neon);
         }
 
         .chat-message.system {
-            background: rgba(34, 211, 238, 0.3);
+            background: rgba(34, 211, 238, 0.2);
             border-left-color: #22d3ee;
-            font-weight: bold;
         }
 
-        /* LEADERBOARD SUPER EPICO */
+        /* LEADERBOARD */
         .leaderboard {
-            background: rgba(0, 0, 0, 0.7);
-            padding: 2rem;
-            border-radius: 25px;
-            border: 3px solid var(--accent-gold);
-            backdrop-filter: blur(15px);
+            background: rgba(0, 0, 0, 0.5);
+            padding: 1.5rem;
+            border-radius: 15px;
+            border: 2px solid var(--accent-gold);
         }
 
         .player {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            transition: all 0.4s ease;
-            position: relative;
-            overflow: hidden;
-            border: 3px solid transparent;
-            backdrop-filter: blur(10px);
-        }
-
-        .player::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.8s ease;
-        }
-
-        .player:hover::before {
-            left: 100%;
+            border-radius: 10px;
+            transition: all 0.3s ease;
         }
 
         .player:hover {
-            transform: translateY(-5px) scale(1.03);
             background: rgba(255, 255, 255, 0.2);
-            border-color: var(--primary-neon);
-            box-shadow: 0 10px 25px rgba(0, 245, 255, 0.4);
+            transform: translateX(5px);
         }
 
         .player.current-turn {
-            background: rgba(16, 185, 129, 0.4);
-            border-color: #10b981;
-            transform: scale(1.05);
-            animation: currentPlayerGlow 3s ease-in-out infinite;
+            background: rgba(16, 185, 129, 0.3);
+            border: 2px solid #10b981;
         }
 
-        @keyframes currentPlayerGlow {
-            0%, 100% { 
-                box-shadow: 0 0 20px rgba(16, 185, 129, 0.6); 
-            }
-            50% { 
-                box-shadow: 0 0 35px rgba(16, 185, 129, 0.9); 
-            }
-        }
-
-        /* NOTIFICATION SYSTEM MIGLIORATO */
+        /* NOTIFICATIONS */
         .notification {
             position: fixed;
             top: 2rem;
             right: 2rem;
-            padding: 2rem 2.5rem;
-            border-radius: 25px;
+            padding: 1.5rem 2rem;
+            border-radius: 15px;
             font-weight: bold;
             z-index: 1000;
-            max-width: 450px;
-            backdrop-filter: blur(20px);
-            border: 3px solid;
-            animation: notificationSlide 0.6s ease;
-            font-size: 1.2rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            max-width: 400px;
+            border: 2px solid;
+            animation: slideIn 0.5s ease;
         }
 
-        @keyframes notificationSlide {
-            from { transform: translateX(100%) scale(0.8); opacity: 0; }
-            to { transform: translateX(0) scale(1); opacity: 1; }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
 
         .notification-success {
             background: rgba(16, 185, 129, 0.9);
             border-color: #10b981;
             color: white;
-            box-shadow: 0 0 30px rgba(16, 185, 129, 0.6);
         }
 
         .notification-error {
             background: rgba(239, 68, 68, 0.9);
             border-color: #ef4444;
             color: white;
-            box-shadow: 0 0 30px rgba(239, 68, 68, 0.6);
         }
 
         .notification-info {
             background: rgba(59, 130, 246, 0.9);
             border-color: #3b82f6;
             color: white;
-            box-shadow: 0 0 30px rgba(59, 130, 246, 0.6);
         }
 
-        /* VICTORY SCREEN SUPER EPICO */
+        /* VICTORY SCREEN */
         .victory-screen {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.95);
+            background: rgba(0, 0, 0, 0.9);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 1000;
-            backdrop-filter: blur(15px);
         }
 
         .victory-content {
-            background: linear-gradient(45deg, var(--primary-neon), var(--secondary-neon), var(--purple-neon));
-            padding: 5rem;
-            border-radius: 40px;
+            background: linear-gradient(45deg, var(--primary-neon), var(--secondary-neon));
+            padding: 3rem;
+            border-radius: 25px;
             text-align: center;
-            border: 5px solid var(--accent-gold);
-            box-shadow: 0 40px 80px rgba(0, 245, 255, 0.5);
-            animation: victoryAppear 1.2s ease;
-            position: relative;
-            overflow: hidden;
+            border: 3px solid var(--accent-gold);
+            animation: victoryAppear 0.8s ease;
         }
 
         @keyframes victoryAppear {
-            from { 
-                transform: scale(0.3) rotate(-15deg); 
-                opacity: 0; 
-            }
-            to { 
-                transform: scale(1) rotate(0deg); 
-                opacity: 1; 
-            }
-        }
-
-        .victory-content::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: conic-gradient(var(--accent-gold), transparent, var(--accent-gold));
-            opacity: 0.3;
-            animation: victoryRotate 4s linear infinite;
-            z-index: -1;
-        }
-
-        @keyframes victoryRotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
         }
 
         .victory-title {
             font-family: 'Bangers', cursive;
-            font-size: 5rem;
+            font-size: 3rem;
             font-weight: bold;
-            margin-bottom: 3rem;
+            margin-bottom: 2rem;
             color: var(--dark-bg);
-            animation: victoryBounce 1.5s infinite;
-            text-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
         }
 
-        @keyframes victoryBounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateY(0) scale(1); }
-            40% { transform: translateY(-20px) scale(1.05); }
-            60% { transform: translateY(-10px) scale(1.02); }
-        }
-
-        /* LEVEL PROGRESS SUPER EPICO */
+        /* LEVEL PROGRESS */
         .level-progress {
-            background: rgba(0, 0, 0, 0.7);
-            padding: 3rem;
-            border-radius: 30px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 2rem;
+            border-radius: 20px;
             margin-bottom: 2rem;
             text-align: center;
-            border: 3px solid var(--accent-gold);
-            position: relative;
-            overflow: hidden;
-            backdrop-filter: blur(15px);
-        }
-
-        .level-progress::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, var(--accent-gold) 0%, transparent 70%);
-            opacity: 0.15;
-            animation: levelGlow 6s ease-in-out infinite;
-            z-index: -1;
-        }
-
-        @keyframes levelGlow {
-            0%, 100% { transform: scale(1) rotate(0deg); }
-            50% { transform: scale(1.2) rotate(180deg); }
+            border: 2px solid var(--accent-gold);
         }
 
         .level-title {
             font-family: 'Bangers', cursive;
-            font-size: 2.5rem;
-            font-weight: bold;
-            margin-bottom: 2rem;
-            background: linear-gradient(45deg, var(--accent-gold), #ffb300, var(--green-neon));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: levelTitlePulse 4s ease-in-out infinite;
-        }
-
-        @keyframes levelTitlePulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.08); }
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent-gold);
         }
 
         .level-bar {
             width: 100%;
-            height: 35px;
+            height: 25px;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 25px;
+            border-radius: 15px;
             overflow: hidden;
-            margin: 2rem 0;
-            position: relative;
-            border: 3px solid var(--primary-neon);
+            margin: 1.5rem 0;
+            border: 2px solid var(--primary-neon);
         }
 
         .level-fill {
             height: 100%;
-            background: linear-gradient(45deg, var(--primary-neon), var(--accent-gold), var(--secondary-neon), var(--green-neon));
-            background-size: 300% 100%;
-            border-radius: 25px;
-            transition: width 1.5s ease;
-            position: relative;
-            animation: levelShimmer 3s linear infinite;
+            background: linear-gradient(45deg, var(--primary-neon), var(--accent-gold));
+            border-radius: 15px;
+            transition: width 1s ease;
         }
 
-        @keyframes levelShimmer {
-            0% { background-position: -300% 0; }
-            100% { background-position: 300% 0; }
-        }
-
-        .level-fill::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
-            animation: levelSweep 4s infinite;
-        }
-
-        @keyframes levelSweep {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-
-        /* RESPONSIVE DESIGN MIGLIORATO */
+        /* RESPONSIVE DESIGN */
         @media (max-width: 768px) {
             .grid {
                 grid-template-columns: 1fr;
             }
             
             .main-title {
-                font-size: 3rem;
+                font-size: 2.5rem;
             }
             
-            .main-container {
-                padding: 0.5rem;
+            .nav-controls, .home-btn {
+                position: relative;
+                top: auto;
+                left: auto;
+                right: auto;
+                margin-bottom: 1rem;
             }
-            
+
             .nav-controls {
-                top: 10px;
-                left: 10px;
-                gap: 10px;
-            }
-
-            .nav-btn {
-                padding: 12px 18px;
-                font-size: 1rem;
-            }
-
-            .home-btn {
-                padding: 12px 18px;
-                font-size: 1rem;
+                justify-content: center;
             }
 
             .game-stats {
@@ -1136,106 +600,91 @@
             }
 
             .difficulty-selector {
-                flex-direction: column;
-                align-items: center;
+                grid-template-columns: 1fr;
             }
 
             .card {
-                padding: 2rem;
+                padding: 1.5rem;
             }
 
             .button {
-                padding: 1.5rem 2rem;
+                padding: 1.2rem 1.5rem;
                 font-size: 1rem;
             }
 
             .victory-title {
-                font-size: 3rem;
+                font-size: 2rem;
             }
 
             .victory-content {
-                padding: 3rem;
+                padding: 2rem;
                 margin: 1rem;
+            }
+
+            .chat {
+                height: 250px;
+            }
+
+            .notification {
+                top: 1rem;
+                right: 1rem;
+                left: 1rem;
+                max-width: none;
             }
         }
 
-        /* HIDDEN CLASS */
+        @media (max-width: 480px) {
+            .main-container {
+                padding: 0.5rem;
+            }
+
+            .card {
+                padding: 1rem;
+            }
+
+            .stat-value {
+                font-size: 2rem;
+            }
+
+            .level-title {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* UTILITY CLASSES */
         .hidden {
             display: none !important;
         }
 
-        /* SPECIAL EFFECTS MIGLIORATI */
         .pulse {
-            animation: pulse 3s ease-in-out infinite;
+            animation: pulse 2s ease-in-out infinite;
         }
 
         @keyframes pulse {
             0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.08); }
-        }
-
-        .glow {
-            animation: glow 3s ease-in-out infinite alternate;
-        }
-
-        @keyframes glow {
-            0% { box-shadow: 0 0 25px var(--primary-neon); }
-            100% { box-shadow: 0 0 50px var(--primary-neon); }
-        }
-
-        /* FLOATING PARTICLES */
-        .floating-particle {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: var(--accent-gold);
-            border-radius: 50%;
-            animation: floatUp 8s linear infinite;
-            opacity: 0.7;
-        }
-
-        @keyframes floatUp {
-            0% {
-                transform: translateY(100vh) translateX(0px);
-                opacity: 0;
-            }
-            10% {
-                opacity: 0.7;
-            }
-            90% {
-                opacity: 0.7;
-            }
-            100% {
-                transform: translateY(-100px) translateX(50px);
-                opacity: 0;
-            }
+            50% { transform: scale(1.05); }
         }
     </style>
 </head>
 <body>
-    <!-- STELLE ANIMATE -->
+    <!-- BACKGROUND OTTIMIZZATO -->
     <div class="stars" id="stars"></div>
 
-    <!-- HOME BUTTON -->
+    <!-- NAVIGATION -->
+    <div class="nav-controls">
+        <a href="/" class="nav-btn">🏠 Home</a>
+        <div class="nav-btn" onclick="toggleFullscreen()">🖥️ Fullscreen</div>
+    </div>
+
     <button onclick="window.location.href='cristo.html'" class="home-btn">
         🏠 Torna alla Home
     </button>
 
-    <!-- NAVIGATION -->
-    <div class="nav-controls">
-        <a href="/" class="nav-btn">
-            🏠 Home Galattica
-        </a>
-        <div class="nav-btn" onclick="toggleFullscreen()">
-            🖥️ Fullscreen
-        </div>
-    </div>
-
     <div class="main-container">
-        <!-- HEADER EPICO -->
+        <!-- HEADER -->
         <header class="epic-header">
             <h1 class="main-title">🌌 ARENA GALATTICA</h1>
-            <p class="subtitle">Battaglia Multiplayer Epica - 10 Livelli di Pura Adrenalina</p>
+            <p class="subtitle">Battaglia Multiplayer - 10 Livelli di Adrenalina</p>
         </header>
 
         <!-- NOTIFICATION -->
@@ -1244,10 +693,10 @@
         <!-- VICTORY SCREEN -->
         <div id="victory-screen" class="victory-screen hidden">
             <div class="victory-content">
-                <div class="victory-title">🏆 VITTORIA EPICA!</div>
+                <div class="victory-title">🏆 VITTORIA!</div>
                 <div id="victory-text"></div>
                 <button class="button button-gold" onclick="hideVictoryScreen()" style="margin-top: 2rem; width: auto; padding: 1rem 2rem;">
-                    🎮 Continua l'Avventura
+                    🎮 Continua
                 </button>
             </div>
         </div>
@@ -1256,75 +705,75 @@
         <div id="lobby-screen" class="screen active">
             <!-- Connection Status -->
             <div id="connection-status" class="status status-connecting">
-                🟡 Connessione alla rete galattica in corso...
+                🟡 Connessione in corso...
             </div>
 
             <!-- Difficulty Selection -->
             <div class="card">
-                <h3 style="margin-bottom: 2rem; text-align: center; font-size: 2rem; font-family: 'Bangers', cursive; color: var(--accent-gold);">
-                    ⚔️ Seleziona la Tua Sfida Epica
+                <h3 style="margin-bottom: 2rem; text-align: center; font-size: 1.8rem; font-family: 'Bangers', cursive; color: var(--accent-gold);">
+                    ⚔️ Seleziona Difficoltà
                 </h3>
                 
                 <div class="difficulty-selector">
                     <div class="difficulty-badge easy active" data-difficulty="easy" onclick="selectDifficulty('easy')">
                         🌟 PRINCIPIANTE<br>
-                        <small>1-50 | 8 tentativi | 60s</small>
+                        <small>1-50 | 8 tentativi</small>
                     </div>
                     <div class="difficulty-badge normal" data-difficulty="normal" onclick="selectDifficulty('normal')">
                         ⚡ GUERRIERO<br>
-                        <small>1-100 | 6 tentativi | 45s</small>
+                        <small>1-100 | 6 tentativi</small>
                     </div>
                     <div class="difficulty-badge hard" data-difficulty="hard" onclick="selectDifficulty('hard')">
                         🔥 COMANDANTE<br>
-                        <small>1-200 | 4 tentativi | 35s</small>
+                        <small>1-200 | 4 tentativi</small>
                     </div>
                     <div class="difficulty-badge expert" data-difficulty="expert" onclick="selectDifficulty('expert')">
                         💀 LEGGENDA<br>
-                        <small>1-500 | 3 tentativi | 25s</small>
+                        <small>1-500 | 3 tentativi</small>
                     </div>
                 </div>
             </div>
 
             <!-- Game Form -->
             <div class="card">
-                <h3 style="margin-bottom: 2rem; text-align: center; font-size: 1.8rem; font-family: 'Fredoka One', cursive;">
-                    🚀 Entra nella Battaglia Galattica
+                <h3 style="margin-bottom: 2rem; text-align: center; font-size: 1.6rem;">
+                    🚀 Entra nella Battaglia
                 </h3>
                 
-                <input type="text" id="player-name" class="input" placeholder="Il tuo nome da Comandante Galattico" maxlength="20">
+                <input type="text" id="player-name" class="input" placeholder="Il tuo nome da Comandante" maxlength="20">
                 
                 <button id="create-room" class="button button-primary">
-                    🏠 Crea Nuova Stazione Galattica
+                    🏠 Crea Stazione
                 </button>
 
-                <input type="text" id="room-code" class="input" placeholder="Codice Stazione Galattica (es: ROOM123)" maxlength="12">
+                <input type="text" id="room-code" class="input" placeholder="Codice Stazione (es: ROOM123)" maxlength="12">
                 
                 <button id="join-room" class="button button-secondary">
-                    🚪 Unisciti alla Battaglia Epica
+                    🚪 Unisciti alla Battaglia
                 </button>
             </div>
 
             <!-- Info Section -->
             <div class="card">
-                <h3 style="margin-bottom: 2rem; color: var(--accent-gold); font-family: 'Bangers', cursive; font-size: 1.8rem; text-align: center;">
-                    ℹ️ Regole della Battaglia Galattica Epica
+                <h3 style="margin-bottom: 2rem; color: var(--accent-gold); font-family: 'Bangers', cursive; font-size: 1.6rem; text-align: center;">
+                    ℹ️ Regole del Gioco
                 </h3>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
-                    <div style="background: rgba(0,0,0,0.4); padding: 1.5rem; border-radius: 15px; border: 2px solid var(--primary-neon);">
-                        <h4 style="color: var(--primary-neon); margin-bottom: 1rem;">🎯 Obiettivo</h4>
-                        <p>Completa tutti i 10 livelli epici prima degli altri comandanti e accumula il punteggio più alto!</p>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                    <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 10px; border: 2px solid var(--primary-neon);">
+                        <h4 style="color: var(--primary-neon); margin-bottom: 0.5rem;">🎯 Obiettivo</h4>
+                        <p>Completa tutti i 10 livelli prima degli altri e accumula il punteggio più alto!</p>
                     </div>
-                    <div style="background: rgba(0,0,0,0.4); padding: 1.5rem; border-radius: 15px; border: 2px solid var(--secondary-neon);">
-                        <h4 style="color: var(--secondary-neon); margin-bottom: 1rem;">⚡ Sistema Livelli</h4>
-                        <p>Ogni livello aumenta la difficoltà del numero segreto. Più alto il livello, più punti ottieni!</p>
+                    <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 10px; border: 2px solid var(--secondary-neon);">
+                        <h4 style="color: var(--secondary-neon); margin-bottom: 0.5rem;">⚡ Livelli</h4>
+                        <p>Ogni livello aumenta la difficoltà. Più alto il livello, più punti ottieni!</p>
                     </div>
-                    <div style="background: rgba(0,0,0,0.4); padding: 1.5rem; border-radius: 15px; border: 2px solid var(--accent-gold);">
-                        <h4 style="color: var(--accent-gold); margin-bottom: 1rem;">🏆 Punteggio</h4>
-                        <p>Più veloce indovini, più punti ottieni! Bonus per velocità, livello e tentativi rimasti!</p>
+                    <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 10px; border: 2px solid var(--accent-gold);">
+                        <h4 style="color: var(--accent-gold); margin-bottom: 0.5rem;">🏆 Punteggio</h4>
+                        <p>Più veloce indovini, più punti ottieni! Bonus per velocità e tentativi rimasti!</p>
                     </div>
-                    <div style="background: rgba(0,0,0,0.4); padding: 1.5rem; border-radius: 15px; border: 2px solid #4ecdc4;">
-                        <h4 style="color: #4ecdc4; margin-bottom: 1rem;">👥 Requisiti</h4>
-                        <p>Servono almeno 2 comandanti per iniziare. Massimo 6 giocatori per stanza!</p>
+                    <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 10px; border: 2px solid #4ecdc4;">
+                        <h4 style="color: #4ecdc4; margin-bottom: 0.5rem;">👥 Requisiti</h4>
+                        <p>Servono almeno 2 giocatori per iniziare. Massimo 6 giocatori per stanza!</p>
                     </div>
                 </div>
             </div>
@@ -1336,44 +785,44 @@
             <div class="card">
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
                     <div>
-                        <h2 style="font-family: 'Bangers', cursive; font-size: 2rem;">
+                        <h2 style="font-family: 'Bangers', cursive; font-size: 1.8rem;">
                             🚀 Stazione: <span id="room-display" style="color: var(--accent-gold);"></span>
                         </h2>
-                        <div id="difficulty-info" class="difficulty-badge normal" style="margin-top: 0.5rem;">⚡ Modalità Guerriero</div>
+                        <div id="difficulty-info" class="difficulty-badge normal" style="margin-top: 0.5rem; display: inline-block;">⚡ Modalità Guerriero</div>
                     </div>
-                    <button id="leave-room" class="button button-secondary" style="width: auto; padding: 1rem 2rem;">
-                        🚪 Abbandona Battaglia
+                    <button id="leave-room" class="button button-secondary" style="width: auto; padding: 1rem 1.5rem;">
+                        🚪 Esci
                     </button>
                 </div>
             </div>
 
             <!-- Level Progress -->
             <div class="level-progress">
-                <div class="level-title">📊 Progresso Livelli Galattici Epici</div>
-                <div style="display: flex; justify-content: space-between; margin: 1rem 0; font-size: 1.1rem; font-weight: bold;">
+                <div class="level-title">📊 Progresso Livelli</div>
+                <div style="display: flex; justify-content: space-between; margin: 1rem 0; font-weight: bold;">
                     <span>Livello <span id="current-level" style="color: var(--accent-gold);">1</span>/10</span>
                     <span id="level-info" style="color: var(--primary-neon);">Range: 1-100</span>
                 </div>
                 <div class="level-bar">
                     <div class="level-fill" id="level-fill" style="width: 10%;"></div>
                 </div>
-                <div id="level-winner" style="margin-top: 1rem; font-weight: bold; color: var(--accent-gold); font-size: 1.2rem;"></div>
+                <div id="level-winner" style="margin-top: 1rem; font-weight: bold; color: var(--accent-gold);"></div>
             </div>
 
             <!-- Turn Indicator -->
             <div id="turn-indicator" class="turn-indicator hidden">
-                <div id="turn-text">In attesa di comandanti galattici...</div>
+                <div id="turn-text">In attesa di giocatori...</div>
             </div>
 
             <!-- Game Stats -->
             <div class="game-stats">
                 <div class="stat-card">
                     <div class="stat-value" id="players-count">0</div>
-                    <div class="stat-label">Comandanti</div>
+                    <div class="stat-label">Giocatori</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-value" id="current-round">0</div>
-                    <div class="stat-label">Round Epico</div>
+                    <div class="stat-label">Round</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-value" id="attempts-left">0</div>
@@ -1390,30 +839,30 @@
                 <div>
                     <!-- Controls -->
                     <div class="card">
-                        <h3 style="margin-bottom: 2rem; text-align: center; font-family: 'Bangers', cursive; font-size: 1.8rem; color: var(--accent-gold);">
-                            🎮 Centro Comando Galattico
+                        <h3 style="margin-bottom: 2rem; text-align: center; font-family: 'Bangers', cursive; font-size: 1.6rem; color: var(--accent-gold);">
+                            🎮 Centro Comando
                         </h3>
                         
                         <div id="start-controls">
-                            <button id="start-game" class="button button-success">🎯 Inizia Battaglia Epica Galattica</button>
+                            <button id="start-game" class="button button-success">🎯 Inizia Battaglia</button>
                             <p style="text-align: center; margin-top: 1rem; opacity: 0.8; font-style: italic;">
-                                Solo il comandante principale può iniziare la battaglia
+                                Solo il comandante può iniziare la battaglia
                             </p>
                         </div>
 
                         <div id="game-controls" class="hidden">
-                            <input type="number" id="guess-input" class="input" placeholder="Il tuo numero strategico galattico" min="1" max="100">
-                            <button id="submit-guess" class="button button-success">🚀 Lancia Attacco Numerico Galattico!</button>
-                            <div id="attempts-info" style="text-align: center; margin-top: 1rem; opacity: 0.8; font-weight: bold; font-size: 1.1rem;"></div>
+                            <input type="number" id="guess-input" class="input" placeholder="Il tuo numero" min="1" max="100">
+                            <button id="submit-guess" class="button button-success">🚀 Attacca!</button>
+                            <div id="attempts-info" style="text-align: center; margin-top: 1rem; opacity: 0.8; font-weight: bold;"></div>
                         </div>
                     </div>
 
                     <!-- Chat -->
                     <div class="card">
-                        <h3 style="margin-bottom: 1.5rem; font-family: 'Fredoka One', cursive; color: var(--primary-neon);">💬 Comunicazioni Galattiche</h3>
+                        <h3 style="margin-bottom: 1rem; color: var(--primary-neon);">💬 Chat</h3>
                         <div id="chat-messages" class="chat"></div>
                         <div style="display: flex; gap: 1rem;">
-                            <input type="text" id="chat-input" class="input" placeholder="Invia messaggio ai comandanti galattici..." style="margin-bottom: 0;">
+                            <input type="text" id="chat-input" class="input" placeholder="Scrivi un messaggio..." style="margin-bottom: 0;">
                             <button id="send-chat" class="button button-success" style="width: auto; padding: 1.5rem; margin-bottom: 0;">📤</button>
                         </div>
                     </div>
@@ -1422,8 +871,8 @@
                 <!-- Players & Leaderboard -->
                 <div>
                     <div class="card">
-                        <h3 style="margin-bottom: 2rem; text-align: center; font-family: 'Bangers', cursive; font-size: 1.8rem; color: var(--accent-gold);">
-                            🏆 Classifica Comandanti Galattici
+                        <h3 style="margin-bottom: 2rem; text-align: center; font-family: 'Bangers', cursive; font-size: 1.6rem; color: var(--accent-gold);">
+                            🏆 Classifica
                         </h3>
                         <div id="leaderboard" class="leaderboard"></div>
                     </div>
@@ -1434,48 +883,38 @@
 
     <script>
         // Game State
-        let ws = null;
         let gameData = null;
         let playerId = 'player_' + Math.random().toString(36).substr(2, 9);
         let playerName = '';
         let connectionStatus = 'connecting';
         let selectedDifficulty = 'normal';
 
-        console.log(`🆔 Player ID: ${playerId}`);
-
-        // Crea stelle animate migliorate
+        // Crea stelle ottimizzate (ridotte da 300 a 50)
         function createStars() {
             const starsContainer = document.getElementById('stars');
-            const numStars = 300;
-
+            const numStars = 50; // Ridotto drasticamente
+            
             for (let i = 0; i < numStars; i++) {
                 const star = document.createElement('div');
                 star.className = 'star';
                 star.style.left = Math.random() * 100 + '%';
                 star.style.top = Math.random() * 100 + '%';
-                star.style.width = Math.random() * 6 + 2 + 'px';
+                star.style.width = Math.random() * 4 + 2 + 'px';
                 star.style.height = star.style.width;
                 star.style.animationDelay = Math.random() * 3 + 's';
                 
-                // Colori diversi per le stelle
-                const colors = ['#00fff2', '#ffd93d', '#ff6b6b', '#bf00ff', '#39ff14'];
+                const colors = ['#00fff2', '#ffd93d', '#ff6b6b'];
                 star.style.background = colors[Math.floor(Math.random() * colors.length)];
                 
                 starsContainer.appendChild(star);
             }
 
-            // Aggiungi stelle cadenti
-            for (let i = 0; i < 12; i++) {
+            // Solo 3 stelle cadenti
+            for (let i = 0; i < 3; i++) {
                 setTimeout(() => {
                     createShootingStar();
-                }, Math.random() * 8000);
+                }, Math.random() * 10000);
             }
-
-            // Aggiungi nebulose
-            createNebulae();
-
-            // Aggiungi particelle fluttuanti
-            createFloatingParticles();
         }
 
         function createShootingStar() {
@@ -1484,75 +923,26 @@
             star.style.left = Math.random() * 100 + '%';
             star.style.top = Math.random() * 50 + '%';
             
-            // Colori diversi per le stelle cadenti
-            const colors = ['#ffd93d', '#00fff2', '#ff6b6b', '#39ff14'];
-            const color = colors[Math.floor(Math.random() * colors.length)];
-            star.style.background = color;
-            star.style.boxShadow = `0 0 15px ${color}`;
-            
             document.getElementById('stars').appendChild(star);
 
             setTimeout(() => {
                 star.remove();
-                setTimeout(createShootingStar, Math.random() * 12000 + 8000);
-            }, 4000);
-        }
-
-        function createNebulae() {
-            const starsContainer = document.getElementById('stars');
-            const numNebulae = 5;
-
-            for (let i = 0; i < numNebulae; i++) {
-                const nebula = document.createElement('div');
-                nebula.className = 'nebula';
-                nebula.style.left = Math.random() * 100 + '%';
-                nebula.style.top = Math.random() * 100 + '%';
-                nebula.style.width = Math.random() * 200 + 100 + 'px';
-                nebula.style.height = nebula.style.width;
-                
-                const colors = ['#00fff2', '#ff6b6b', '#bf00ff', '#39ff14'];
-                nebula.style.background = colors[Math.floor(Math.random() * colors.length)];
-                nebula.style.animationDelay = Math.random() * 20 + 's';
-                
-                starsContainer.appendChild(nebula);
-            }
-        }
-
-        function createFloatingParticles() {
-            const starsContainer = document.getElementById('stars');
-            
-            setInterval(() => {
-                const particle = document.createElement('div');
-                particle.className = 'floating-particle';
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.animationDuration = (Math.random() * 5 + 8) + 's';
-                particle.style.animationDelay = Math.random() * 2 + 's';
-                
-                const colors = ['#ffd93d', '#00fff2', '#ff6b6b', '#bf00ff'];
-                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
-                
-                starsContainer.appendChild(particle);
-                
-                setTimeout(() => {
-                    particle.remove();
-                }, 10000);
-            }, 2000);
+                setTimeout(createShootingStar, Math.random() * 15000 + 10000);
+            }, 6000);
         }
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             createStars();
             
-            // Carica difficoltà selezionata
             selectedDifficulty = localStorage.getItem('selectedDifficulty') || 'normal';
             updateDifficultyDisplay();
             
             setupEventListeners();
             connectToServer();
             
-            // Effetti di caricamento
             setTimeout(() => {
-                showNotification('🌌 Benvenuto nell\'Arena Galattica Epica Migliorata!', 'success');
+                showNotification('🌌 Benvenuto nell\'Arena Galattica!', 'success');
             }, 1000);
         });
 
@@ -1560,7 +950,6 @@
             selectedDifficulty = difficulty;
             localStorage.setItem('selectedDifficulty', difficulty);
             
-            // Aggiorna UI
             document.querySelectorAll('.difficulty-badge').forEach(badge => {
                 badge.classList.remove('active');
             });
@@ -1575,7 +964,7 @@
                 expert: '💀 Modalità Leggenda'
             };
             
-            showNotification(`Difficoltà selezionata: ${difficultyNames[difficulty]}`, 'info');
+            showNotification(`Difficoltà: ${difficultyNames[difficulty]}`, 'info');
         }
 
         function updateDifficultyDisplay() {
@@ -1611,143 +1000,19 @@
         }
 
         function connectToServer() {
-            try {
-                // Simulazione connessione server per demo
-                console.log('🔗 Simulando connessione server...');
-                
-                setTimeout(() => {
-                    console.log('✅ Connessione simulata stabilita!');
-                    connectionStatus = 'online';
-                    updateConnectionStatus();
-                    showNotification('🌐 Connesso alla rete galattica!', 'success');
-                }, 2000);
-                
-            } catch (error) {
-                console.error('❌ Errore connessione:', error);
-                connectionStatus = 'offline';
-                updateConnectionStatus();
-            }
-        }
-
-        function handleServerMessage(data) {
-            switch (data.type) {
-                case 'connected':
-                    console.log('✅ Server confermato connessione');
-                    break;
-                    
-                case 'roomCreated':
-                    console.log('🏠 Stanza creata:', data.gameData.roomCode);
-                    gameData = data.gameData;
-                    showGameScreen();
-                    showNotification('🚀 Stazione galattica creata con successo!', 'success');
-                    break;
-                    
-                case 'roomJoined':
-                    console.log('🚪 Entrato nella stanza:', data.gameData.roomCode);
-                    gameData = data.gameData;
-                    showGameScreen();
-                    showNotification('🚪 Entrato nella battaglia galattica!', 'success');
-                    break;
-                    
-                case 'gameUpdate':
-                    console.log('🔄 Aggiornamento gioco ricevuto');
-                    gameData = data.gameData;
-                    updateGameDisplay();
-                    
-                    // Controlla vittoria
-                    if (gameData.gameEnded && gameData.winner) {
-                        showVictoryScreen();
-                    }
-                    break;
-                    
-                case 'guessResult':
-                    console.log('🎯 Risultato tentativo:', data.result);
-                    showNotification(data.result.hint, data.result.correct ? 'success' : 'info');
-                    
-                    if (data.result.correct) {
-                        // Effetto confetti per risposta corretta
-                        confetti({
-                            particleCount: 150,
-                            spread: 80,
-                            origin: { y: 0.6 },
-                            colors: ['#00fff2', '#ffd93d', '#ff6b6b', '#bf00ff', '#39ff14']
-                        });
-                    }
-                    break;
-                    
-                case 'error':
-                    console.log('❌ Errore server:', data.message);
-                    showNotification(data.message, 'error');
-                    break;
-                    
-                default:
-                    console.log('❓ Messaggio sconosciuto:', data.type);
-            }
-        }
-
-        function sendMessage(message) {
-            // Simulazione invio messaggio per demo
-            console.log('📤 Simulando invio:', message.type, message);
-            
-            // Simula risposta server per demo
             setTimeout(() => {
-                if (message.type === 'createRoom') {
-                    const roomCode = 'DEMO' + Math.random().toString(36).substr(2, 4).toUpperCase();
-                    gameData = {
-                        roomCode: roomCode,
-                        players: [{
-                            id: playerId,
-                            name: playerName,
-                            score: 0,
-                            isHost: true
-                        }],
-                        gameStarted: false,
-                        gameEnded: false,
-                        currentLevel: 1,
-                        currentPlayerIndex: 0,
-                        currentRound: 0,
-                        currentAttempts: 0,
-                        chat: [],
-                        config: getDifficultyConfig(selectedDifficulty)
-                    };
-                    showGameScreen();
-                    showNotification('🚀 Stazione galattica demo creata!', 'success');
-                }
-            }, 1000);
-            
-            return true;
+                connectionStatus = 'online';
+                updateConnectionStatus();
+                showNotification('🌐 Connesso!', 'success');
+            }, 2000);
         }
 
         function getDifficultyConfig(difficulty) {
             const configs = {
-                easy: {
-                    name: '🌟 Modalità Principiante',
-                    maxNumber: 50,
-                    maxAttempts: 8,
-                    timeLimit: 60,
-                    levelMultiplier: 10
-                },
-                normal: {
-                    name: '⚡ Modalità Guerriero',
-                    maxNumber: 100,
-                    maxAttempts: 6,
-                    timeLimit: 45,
-                    levelMultiplier: 20
-                },
-                hard: {
-                    name: '🔥 Modalità Comandante',
-                    maxNumber: 200,
-                    maxAttempts: 4,
-                    timeLimit: 35,
-                    levelMultiplier: 30
-                },
-                expert: {
-                    name: '💀 Modalità Leggenda',
-                    maxNumber: 500,
-                    maxAttempts: 3,
-                    timeLimit: 25,
-                    levelMultiplier: 50
-                }
+                easy: { name: '🌟 Modalità Principiante', maxNumber: 50, maxAttempts: 8, levelMultiplier: 10 },
+                normal: { name: '⚡ Modalità Guerriero', maxNumber: 100, maxAttempts: 6, levelMultiplier: 20 },
+                hard: { name: '🔥 Modalità Comandante', maxNumber: 200, maxAttempts: 4, levelMultiplier: 30 },
+                expert: { name: '💀 Modalità Leggenda', maxNumber: 500, maxAttempts: 3, levelMultiplier: 50 }
             };
             return configs[difficulty] || configs.normal;
         }
@@ -1758,15 +1023,15 @@
             switch (connectionStatus) {
                 case 'online':
                     statusEl.className = 'status status-online';
-                    statusEl.textContent = '🟢 Connesso alla rete galattica - Pronto per la battaglia!';
+                    statusEl.textContent = '🟢 Connesso - Pronto per la battaglia!';
                     break;
                 case 'offline':
                     statusEl.className = 'status status-offline';
-                    statusEl.textContent = '🔴 Disconnesso dalla rete galattica - Modalità demo attiva';
+                    statusEl.textContent = '🔴 Disconnesso - Modalità demo attiva';
                     break;
                 case 'connecting':
                     statusEl.className = 'status status-connecting';
-                    statusEl.textContent = '🟡 Connessione alla rete galattica in corso...';
+                    statusEl.textContent = '🟡 Connessione in corso...';
                     break;
             }
         }
@@ -1774,17 +1039,30 @@
         function createRoom() {
             playerName = document.getElementById('player-name').value.trim();
             if (!playerName) {
-                showNotification('Inserisci il nome del comandante galattico!', 'error');
+                showNotification('Inserisci il nome!', 'error');
                 return;
             }
 
-            console.log(`🏠 Creando stanza per: ${playerName} con difficoltà: ${selectedDifficulty}`);
-            sendMessage({
-                type: 'createRoom',
-                playerId: playerId,
-                playerName: playerName,
-                difficulty: selectedDifficulty
-            });
+            const roomCode = 'DEMO' + Math.random().toString(36).substr(2, 4).toUpperCase();
+            gameData = {
+                roomCode: roomCode,
+                players: [{
+                    id: playerId,
+                    name: playerName,
+                    score: 0,
+                    isHost: true
+                }],
+                gameStarted: false,
+                gameEnded: false,
+                currentLevel: 1,
+                currentPlayerIndex: 0,
+                currentRound: 0,
+                currentAttempts: 0,
+                chat: [],
+                config: getDifficultyConfig(selectedDifficulty)
+            };
+            showGameScreen();
+            showNotification('🚀 Stazione creata!', 'success');
         }
 
         function joinRoom() {
@@ -1792,14 +1070,11 @@
             const roomCode = document.getElementById('room-code').value.trim().toUpperCase();
             
             if (!playerName || !roomCode) {
-                showNotification('Inserisci nome comandante e codice stazione galattica!', 'error');
+                showNotification('Inserisci nome e codice stanza!', 'error');
                 return;
             }
 
-            console.log(`🚪 Entrando nella stanza: ${roomCode} come ${playerName}`);
-            showNotification('🚪 Modalità demo - Creando stanza automaticamente...', 'info');
-            
-            // In modalità demo, crea automaticamente una stanza
+            showNotification('🚪 Modalità demo - Creando stanza...', 'info');
             setTimeout(() => {
                 createRoom();
             }, 1000);
@@ -1807,11 +1082,9 @@
 
         function startGame() {
             if (!gameData) {
-                showNotification('Errore: nessun dato battaglia galattica', 'error');
+                showNotification('Errore: nessun dato gioco', 'error');
                 return;
             }
-            
-            console.log(`🎮 Iniziando battaglia epica galattica per stanza: ${gameData.roomCode}`);
             
             gameData.gameStarted = true;
             gameData.currentRound = 1;
@@ -1819,7 +1092,7 @@
             gameData.currentAttempts = 0;
             
             updateGameDisplay();
-            showNotification('🎯 Battaglia galattica iniziata! Indovina il numero segreto!', 'success');
+            showNotification('🎯 Battaglia iniziata!', 'success');
         }
 
         function submitGuess() {
@@ -1842,35 +1115,29 @@
             
             if (guess === gameData.secretNumber) {
                 correct = true;
-                hint = '🎉 PERFETTO! Hai indovinato il numero segreto!';
+                hint = '🎉 PERFETTO! Hai indovinato!';
                 
-                // Calcola punteggio
                 const baseScore = gameData.currentLevel * 100;
                 const attemptsBonus = (gameData.config.maxAttempts - gameData.currentAttempts + 1) * 50;
-                const speedBonus = 200;
-                const totalScore = baseScore + attemptsBonus + speedBonus;
+                const totalScore = baseScore + attemptsBonus + 200;
                 
                 gameData.players[0].score += totalScore;
                 
-                // Avanza al livello successivo
                 if (gameData.currentLevel < 10) {
                     gameData.currentLevel++;
                     gameData.secretNumber = Math.floor(Math.random() * getCurrentMaxNumber()) + 1;
                     gameData.currentAttempts = 0;
-                    showNotification(`🚀 Livello ${gameData.currentLevel}! Nuovo numero segreto generato!`, 'info');
+                    showNotification(`🚀 Livello ${gameData.currentLevel}!`, 'info');
                 } else {
-                    // Gioco completato
                     gameData.gameEnded = true;
                     gameData.winner = gameData.players[0];
                     showVictoryScreen();
                 }
                 
-                // Effetto confetti
                 confetti({
-                    particleCount: 200,
-                    spread: 100,
-                    origin: { y: 0.4 },
-                    colors: ['#00fff2', '#ffd93d', '#ff6b6b', '#bf00ff', '#39ff14']
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
                 });
                 
             } else if (guess < gameData.secretNumber) {
@@ -1879,16 +1146,14 @@
                 hint = `📉 Troppo alto! Il numero è più piccolo di ${guess}`;
             }
             
-            // Controlla se ha finito i tentativi
             if (!correct && gameData.currentAttempts >= gameData.config.maxAttempts) {
                 hint += ` | 💀 Tentativi esauriti! Il numero era ${gameData.secretNumber}`;
                 
-                // Avanza comunque al livello successivo ma con penalità
                 if (gameData.currentLevel < 10) {
                     gameData.currentLevel++;
                     gameData.secretNumber = Math.floor(Math.random() * getCurrentMaxNumber()) + 1;
                     gameData.currentAttempts = 0;
-                    showNotification(`⚠️ Livello ${gameData.currentLevel} - Nuovo tentativo!`, 'info');
+                    showNotification(`⚠️ Livello ${gameData.currentLevel}!`, 'info');
                 } else {
                     gameData.gameEnded = true;
                     gameData.winner = gameData.players[0];
@@ -1926,7 +1191,7 @@
         function leaveRoom() {
             showLobbyScreen();
             gameData = null;
-            showNotification('🚪 Hai abbandonato la battaglia galattica', 'info');
+            showNotification('🚪 Hai abbandonato la battaglia', 'info');
         }
 
         function showLobbyScreen() {
@@ -1947,37 +1212,17 @@
             const victoryText = document.getElementById('victory-text');
             
             victoryText.innerHTML = `
-                <div style="font-size: 2.5rem; margin-bottom: 2rem; color: var(--dark-bg);">🎉 HAI CONQUISTATO LA GALASSIA! 🎉</div>
-                <div style="font-size: 1.5rem; color: var(--dark-bg);">Sei il COMANDANTE SUPREMO GALATTICO!</div>
-                <div style="margin-top: 2rem; font-size: 2rem; color: var(--dark-bg); font-weight: bold;">Punteggio Finale: ${gameData.winner.score} punti</div>
-                <div style="margin-top: 1rem; font-size: 1.2rem; color: var(--dark-bg);">Livelli Completati: ${gameData.currentLevel}/10</div>
+                <div style="font-size: 2rem; margin-bottom: 1.5rem; color: var(--dark-bg);">🎉 HAI VINTO! 🎉</div>
+                <div style="font-size: 1.2rem; color: var(--dark-bg);">Sei il Comandante Supremo!</div>
+                <div style="margin-top: 1.5rem; font-size: 1.8rem; color: var(--dark-bg); font-weight: bold;">Punteggio: ${gameData.winner.score}</div>
+                <div style="margin-top: 0.5rem; font-size: 1rem; color: var(--dark-bg);">Livelli: ${gameData.currentLevel}/10</div>
             `;
             
-            // Effetto confetti epico per il vincitore
             confetti({
-                particleCount: 300,
-                spread: 120,
-                origin: { y: 0.3 },
-                colors: ['#00fff2', '#ffd93d', '#ff6b6b', '#bf00ff', '#39ff14']
+                particleCount: 200,
+                spread: 100,
+                origin: { y: 0.3 }
             });
-            
-            setTimeout(() => {
-                confetti({
-                    particleCount: 200,
-                    spread: 100,
-                    origin: { y: 0.7 },
-                    colors: ['#00fff2', '#ffd93d', '#ff6b6b', '#bf00ff', '#39ff14']
-                });
-            }, 500);
-            
-            setTimeout(() => {
-                confetti({
-                    particleCount: 150,
-                    spread: 80,
-                    origin: { y: 0.5 },
-                    colors: ['#00fff2', '#ffd93d', '#ff6b6b', '#bf00ff', '#39ff14']
-                });
-            }, 1000);
             
             victoryScreen.classList.remove('hidden');
         }
@@ -1989,35 +1234,25 @@
         function updateGameDisplay() {
             if (!gameData) return;
 
-            console.log('🔄 Aggiornando display per stanza:', gameData.roomCode);
-
-            // Update room code
             document.getElementById('room-display').textContent = gameData.roomCode;
 
-            // Update difficulty info
             if (gameData.config) {
                 const difficultyInfo = document.getElementById('difficulty-info');
                 difficultyInfo.textContent = gameData.config.name;
             }
 
-            // Update level progress
             const currentLevel = gameData.currentLevel || 1;
             const levelProgress = (currentLevel / 10) * 100;
             document.getElementById('current-level').textContent = currentLevel;
             document.getElementById('level-fill').style.width = levelProgress + '%';
             
-            // Update level info
             const maxNumber = getCurrentMaxNumber();
             document.getElementById('level-info').textContent = `Range: 1-${maxNumber}`;
 
-            // Update game stats
             document.getElementById('players-count').textContent = gameData.players.length;
             document.getElementById('current-round').textContent = gameData.currentRound || 0;
 
-            // Update controls
             const isHost = gameData.players.find(p => p.id === playerId)?.isHost;
-            const currentPlayer = gameData.players[gameData.currentPlayerIndex];
-            const isMyTurn = true; // In modalità demo è sempre il tuo turno
 
             if (gameData.gameStarted && !gameData.gameEnded) {
                 document.getElementById('start-controls').classList.add('hidden');
@@ -2027,16 +1262,14 @@
                 document.getElementById('guess-input').disabled = false;
                 document.getElementById('submit-guess').disabled = false;
                 
-                // Update input placeholder
                 const guessInput = document.getElementById('guess-input');
-                guessInput.placeholder = `Il tuo numero strategico galattico (1-${maxNumber})`;
+                guessInput.placeholder = `Il tuo numero (1-${maxNumber})`;
                 guessInput.max = maxNumber;
                 
-                // Update attempts info
                 const attemptsInfo = document.getElementById('attempts-info');
                 const attemptsLeft = document.getElementById('attempts-left');
                 const remaining = (gameData.config?.maxAttempts || 6) - gameData.currentAttempts;
-                attemptsInfo.textContent = `⚡ Tentativi rimasti: ${remaining}/${gameData.config?.maxAttempts || 6}`;
+                attemptsInfo.textContent = `⚡ Tentativi: ${remaining}/${gameData.config?.maxAttempts || 6}`;
                 attemptsLeft.textContent = remaining;
                 
                 updateTurnIndicator();
@@ -2047,19 +1280,15 @@
                 document.getElementById('game-controls').classList.add('hidden');
                 document.getElementById('turn-indicator').classList.add('hidden');
                 
-                if (isHost && gameData.players.length >= 1) { // In demo mode, 1 player is enough
+                if (isHost && gameData.players.length >= 1) {
                     document.getElementById('start-controls').classList.remove('hidden');
                     document.getElementById('start-game').disabled = false;
-                    document.getElementById('start-game').textContent = '🎯 Inizia Battaglia Epica Galattica';
                 } else {
                     document.getElementById('start-controls').classList.add('hidden');
                 }
             }
 
-            // Update leaderboard
             updateLeaderboard();
-
-            // Update chat
             updateChat();
         }
 
@@ -2070,10 +1299,7 @@
             const turnText = document.getElementById('turn-text');
             
             turnIndicator.className = 'turn-indicator turn-active';
-            turnText.innerHTML = `
-                🎯 È il tuo turno, Comandante Galattico! 
-                <br><small>Livello ${gameData.currentLevel} - Indovina il numero segreto!</small>
-            `;
+            turnText.innerHTML = `🎯 È il tuo turno!<br><small>Livello ${gameData.currentLevel}</small>`;
         }
 
         function updateLeaderboard() {
@@ -2081,7 +1307,7 @@
             leaderboard.innerHTML = '';
 
             if (!gameData.players.length) {
-                leaderboard.innerHTML = '<p style="text-align: center; opacity: 0.6; font-style: italic;">Nessun comandante galattico</p>';
+                leaderboard.innerHTML = '<p style="text-align: center; opacity: 0.6;">Nessun giocatore</p>';
                 return;
             }
 
@@ -2098,13 +1324,12 @@
                     const icon = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '👤';
                     const hostIcon = player.isHost ? ' 👑' : '';
                     const isCurrentPlayer = player.id === playerId ? ' (Tu)' : '';
-                    const turnIcon = gameData.gameStarted ? ' 🎯' : '';
                     
                     playerEl.innerHTML = `
-                        <span style="font-weight: bold; font-size: 1.1rem;">
-                            ${icon} ${player.name}${hostIcon}${isCurrentPlayer}${turnIcon}
+                        <span style="font-weight: bold;">
+                            ${icon} ${player.name}${hostIcon}${isCurrentPlayer}
                         </span>
-                        <span style="color: var(--accent-gold); font-weight: bold; font-size: 1.4rem; text-shadow: 0 0 10px var(--accent-gold);">
+                        <span style="color: var(--accent-gold); font-weight: bold; font-size: 1.2rem;">
                             ${player.score || 0}
                         </span>
                     `;
@@ -2118,11 +1343,11 @@
             chatContainer.innerHTML = '';
 
             if (!gameData.chat || !gameData.chat.length) {
-                chatContainer.innerHTML = '<p style="text-align: center; opacity: 0.6; font-style: italic;">Nessun messaggio galattico</p>';
+                chatContainer.innerHTML = '<p style="text-align: center; opacity: 0.6;">Nessun messaggio</p>';
                 return;
             }
 
-            gameData.chat.slice(-20).forEach(msg => {
+            gameData.chat.slice(-15).forEach(msg => {
                 const msgEl = document.createElement('div');
                 msgEl.className = 'chat-message';
                 
@@ -2136,11 +1361,11 @@
                 });
                 
                 msgEl.innerHTML = `
-                    <div style="font-weight: bold; margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+                    <div style="font-weight: bold; margin-bottom: 0.5rem; display: flex; justify-content: space-between;">
                         <span style="color: var(--primary-neon);">${msg.playerName}</span>
-                        <span style="opacity: 0.6; font-size: 0.8rem; font-weight: normal;">${time}</span>
+                        <span style="opacity: 0.6; font-size: 0.8rem;">${time}</span>
                     </div>
-                    <div style="line-height: 1.4;">${msg.message}</div>
+                    <div>${msg.message}</div>
                 `;
                 
                 chatContainer.appendChild(msgEl);
@@ -2156,31 +1381,25 @@
             notification.classList.remove('hidden');
             
             setTimeout(() => {
-                notification.style.animation = 'notificationSlide 0.5s ease reverse';
-                setTimeout(() => {
-                    notification.classList.add('hidden');
-                    notification.style.animation = '';
-                }, 500);
-            }, 5000);
+                notification.classList.add('hidden');
+            }, 4000);
         }
 
-        // Fullscreen toggle
         function toggleFullscreen() {
             if (!document.fullscreenElement) {
                 document.documentElement.requestFullscreen().then(() => {
-                    showNotification('🖥️ Modalità fullscreen attivata!', 'success');
+                    showNotification('🖥️ Fullscreen attivato!', 'success');
                 }).catch(() => {
                     showNotification('❌ Fullscreen non supportato', 'error');
                 });
             } else {
                 document.exitFullscreen().then(() => {
-                    showNotification('🖥️ Modalità fullscreen disattivata', 'info');
+                    showNotification('🖥️ Fullscreen disattivato', 'info');
                 });
             }
         }
 
-        console.log('🎮 Battaglia Galattica Arena Multiplayer Epica Migliorata caricata!');
-        console.log('🌌 Pronto per conquistare la galassia con più tentativi!');
+        console.log('🎮 Battaglia Galattica Ottimizzata caricata!');
     </script>
 </body>
 </html>
