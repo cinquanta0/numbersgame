@@ -1037,7 +1037,10 @@ backgroundImage.src = 'space-background.png';
 const enemyImage = new Image();
 enemyImage.src = 'alien-enemy2.png';
 
-let backgroundY = 0; // posizione verticale dello sfondo
+const playerImage = new Image();
+playerImage.src = 'player-ship.png';
+
+        let backgroundY = 0; // posizione verticale dello sfondo
 
         function initGame() {
             canvas = document.getElementById('gameCanvas');
@@ -2543,72 +2546,23 @@ ctx.drawImage(backgroundImage, 0, backgroundY - canvas.height, canvas.width, can
         }
 
         function renderPlayer() {
-            const player = gameState.player;
-            
-            ctx.save();
-            ctx.translate(player.x, player.y);
-            ctx.rotate(player.angle);
-            
-            if (player.invulnerabilityFrames > 0 && Math.floor(player.invulnerabilityFrames / 8) % 2) {
-                ctx.globalAlpha = 0.5;
-            }
-            
-            const scale = gameState.isMobile ? 1.4 : 1.2;
-            ctx.scale(scale, scale);
-            
-            // Main ship body
-            ctx.fillStyle = player.precisionMode ? '#ffd700' : '#00bcd4';
-            ctx.strokeStyle = '#ffffff';
-            ctx.lineWidth = 2;
-            
-            ctx.beginPath();
-            ctx.moveTo(0, -25);
-            ctx.lineTo(-15, 15);
-            ctx.lineTo(-8, 12);
-            ctx.lineTo(0, 8);
-            ctx.lineTo(8, 12);
-            ctx.lineTo(15, 15);
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
-            
-            // Cockpit
-            ctx.fillStyle = '#2196f3';
-            ctx.beginPath();
-            ctx.ellipse(0, -8, 6, 10, 0, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Engine trails
-            ctx.fillStyle = '#4caf50';
-            ctx.globalAlpha = 0.8;
-            for (let i = 0; i < 3; i++) {
-                ctx.beginPath();
-                ctx.ellipse(-6 + i * 6, 18, 3, 8 + Math.random() * 4, 0, 0, Math.PI * 2);
-                ctx.fill();
-            }
-            
-            // Shield effect
-            if (player.invulnerabilityFrames > 0) {
-                ctx.globalAlpha = 0.3;
-                ctx.strokeStyle = '#00bcd4';
-                ctx.lineWidth = 4;
-                ctx.beginPath();
-                ctx.arc(0, 0, 35, 0, Math.PI * 2);
-                ctx.stroke();
-            }
-            
-            // Precision mode indicator
-            if (player.precisionMode) {
-                ctx.globalAlpha = 0.5;
-                ctx.strokeStyle = '#ffd700';
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.arc(0, 0, 22, 0, Math.PI * 2);
-                ctx.stroke();
-            }
-            
-            ctx.restore();
-        }
+    const player = gameState.player;
+
+    if (!playerImage.complete) return;
+
+    ctx.save();
+    ctx.translate(player.x, player.y);
+    ctx.rotate(player.angle);
+
+    const scale = gameState.isMobile ? 1.4 : 1.2;
+    ctx.scale(scale, scale);
+
+    const size = 80; // puoi cambiare dimensione della nave qui
+    ctx.drawImage(playerImage, -size / 2, -size / 2, size, size);
+
+    ctx.restore();
+}
+
 
         function renderEnemy() {
     const enemy = gameState.enemy;
