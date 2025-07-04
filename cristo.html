@@ -860,7 +860,32 @@
 
         // Number Quest Functions (selectDifficulty, startNumberQuest, ecc.) - invariate
         function selectDifficulty(diff) { gameState.numberQuest.difficulty = diff; document.querySelectorAll('.difficulty-btn').forEach(b => b.classList.remove('active')); document.querySelector(`.difficulty-btn[data-difficulty="${diff}"]`)?.classList.add('active'); }
-        function startNumberQuest() { const nq = gameState.numberQuest; const config = numberQuestDifficulties[nq.difficulty]; const levelConf = config.levels[nq.currentLevel - 1]; nq.secretNumber = Math.floor(Math.random() * (levelConf.max - levelConf.min + 1)) + levelConf.min; nq.attemptsLeft = config.attempts; nq.maxAttempts = config.attempts; nq.levelScore = 0; nq.gameStarted = true; nq.history = []; const timerDisp = document.getElementById('timerDisplay'); if (config.hasTimer) { nq.timeLeft = config.timeLimit; startNumberQuestTimer(); timerDisp?.classList.remove('hidden'); } else { timerDisp?.classList.add('hidden'); } updateNumberQuestDisplay(); document.getElementById('levelProgress')?.classList.remove('hidden'); document.getElementById('numberGameArea')?.classList.remove('hidden'); setTimeout(() => document.getElementById('guessInput')?.focus(), 100); console.log('Numero Arcano:', nq.secretNumber); }
+        function startNumberQuest() {
+    const nq = gameState.numberQuest;
+    const config = numberQuestDifficulties[nq.difficulty];
+    const levelConf = config.levels[nq.currentLevel - 1];
+
+    nq.secretNumber = Math.floor(Math.random() * (levelConf.max - levelConf.min + 1)) + levelConf.min;
+    nq.attemptsLeft = config.attempts;
+    nq.maxAttempts = config.attempts;
+    nq.levelScore = 0;
+    nq.gameStarted = true;
+    nq.history = [];
+
+    ['submitGuess', 'guessInput'].forEach(id => document.getElementById(id).disabled = false); // 🔧 Questa linea è fondamentale
+
+    const timerDisp = document.getElementById('timerDisplay');
+    if (config.hasTimer) {
+        nq.timeLeft = config.timeLimit;
+        startNumberQuestTimer();
+    }
+
+    updateNumberQuestDisplay();
+    document.getElementById('numberGameArea')?.classList.remove('hidden');
+    document.getElementById('guessInput').value = '';
+    setTimeout(() => document.getElementById('guessInput')?.focus(), 100);
+}
+
         function startNumberQuestTimer() { const nq = gameState.numberQuest; if(nq.timer) clearInterval(nq.timer); nq.timer = setInterval(() => { nq.timeLeft--; const timerDisp = document.getElementById('timerDisplay'); if(timerDisp) timerDisp.textContent = nq.timeLeft; if (nq.timeLeft <= 10) timerDisp?.classList.add('timer-warning'); if (nq.timeLeft <= 0) { clearInterval(nq.timer); endNumberQuestLevel(false); } }, 1000); }
         function makeGuess() { const nq = gameState.numberQuest; if (!nq.gameStarted) return; const guessInput = document.getElementById('guessInput'); const guess = parseInt(guessInput.value); const config = numberQuestDifficulties[nq.difficulty]; const levelConf = config.levels[nq.currentLevel - 1]; if (isNaN(guess) || guess < levelConf.min || guess > levelConf.max) { return showHint(`❌ Sussurra un numero tra ${levelConf.min} e ${levelConf.max}!`); } nq.attemptsLeft--; let hintText = '', correct = false; if (guess === nq.secretNumber) { hintText = '🎉 Allineamento Perfetto! Sfera Conquistata!'; correct = true; const base = levelConf.max, attBonus = nq.attemptsLeft * 25, timeBonus = config.hasTimer ? nq.timeLeft * 10 : 0; nq.levelScore = base + attBonus + timeBonus; nq.score += nq.levelScore; if (typeof confetti !== 'undefined' && !settings.reduceAnimations) { const themeConfettiColors = (THEME_DETAILS[settings.theme] || THEME_DETAILS['starlight-oracle']).colors; confetti({ particleCount: 150, spread: 90, origin: { y: 0.5 }, angle: Math.random()*120+30, drift: Math.random()*2-1, colors: [themeConfettiColors.primary, themeConfettiColors.secondary, themeConfettiColors.accent, '#FFFFFF', '#DDDDDD'] }); } endNumberQuestLevel(true); } else { const diff = Math.abs(nq.secretNumber - guess); const rangePerc = (val) => (levelConf.max - levelConf.min) * val; if (guess < nq.secretNumber) { if (diff <= rangePerc(0.05)) hintText = '🔥 Calore Stellare! PIÙ ALTO!'; else if (diff <= rangePerc(0.15)) hintText = '📈 Ascendi! PIÙ ALTO!'; else if (diff <= rangePerc(0.40)) hintText = '⬆️ Verso le vette! MOLTO PIÙ ALTO!'; else hintText = '🚀 Oltre le nebulose! DECISAMENTE PIÙ ALTO!'; } else { if (diff <= rangePerc(0.05)) hintText = '🔥 Vicinissimo! PIÙ BASSO!'; else if (diff <= rangePerc(0.15)) hintText = '📉 Discendi! PIÙ BASSO!'; else if (diff <= rangePerc(0.40)) hintText = '⬇️ Nelle profondità! MOLTO PIÙ BASSO!'; else hintText = '🕳️ Nel vuoto! DECISAMENTE PIÙ BASSO!'; } } nq.history.unshift({ guess, hint: hintText, attemptsLeft: nq.attemptsLeft }); showHint(hintText); updateNumberQuestDisplay(); updateNumberQuestHistory(); if (nq.attemptsLeft <= 0 && !correct) endNumberQuestLevel(false); guessInput.value = ''; setTimeout(() => guessInput.focus(), 50); }
         function endNumberQuestLevel(won) { const nq = gameState.numberQuest; nq.gameStarted = false; if(nq.timer) clearInterval(nq.timer); ['submitGuess', 'guessInput'].forEach(id => document.getElementById(id).disabled = true); if (won) { if (nq.currentLevel < 10) { showHint(`🎊 Sfera ${nq.currentLevel} conquistata! Armonia: +${nq.levelScore}. Prossima sfera...`); setTimeout(() => { nq.currentLevel++; startNumberQuest(); }, 2800); } else { showHint(`🏆 RITUALE COMPLETATO! Armonia Totale: ${nq.score}`); saveStats(true, nq.score); showNotification('🏆 Numerologia Astrale Padronizzata!', 'success'); setTimeout(() => { resetNumberQuest(); showMainMenu(); }, 3800); } } else { showHint(`💀 Dissonanza! Il Numero Arcano era ${nq.secretNumber}. Armonia Totale: ${nq.score}`); saveStats(false, nq.score); showNotification('💀 Le stelle non erano allineate...', 'error'); setTimeout(resetNumberQuest, 3200); } }
