@@ -287,7 +287,6 @@
         .stat-box.lives { border-color: #00bcd4; box-shadow: 0 0 15px rgba(0, 188, 212, 0.6); }
         .stat-box.energy { border-color: #4caf50; box-shadow: 0 0 15px rgba(76, 175, 80, 0.4); }
         .stat-box.score { border-color: #9c27b0; box-shadow: 0 0 15px rgba(156, 39, 176, 0.4); }
-        .stat-box.combo { border-color: #ff9800; box-shadow: 0 0 15px rgba(255, 152, 0, 0.4); }
 
         .stat-label {
             font-size: clamp(0.6rem, 1.8vw, 0.8rem);
@@ -427,76 +426,6 @@
             margin-bottom: 0.3rem;
         }
 
-        .orientation-toggle {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: linear-gradient(45deg, #00bcd4, #2196f3);
-            color: white;
-            padding: clamp(0.6rem, 1.5vw, 0.8rem);
-            border-radius: 15px;
-            border: 2px solid #00bcd4;
-            font-size: clamp(0.8rem, 2vw, 1rem);
-            z-index: 2000;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .combo-indicator {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: clamp(2rem, 8vw, 4rem);
-            font-weight: 900;
-            color: #ff9800;
-            text-shadow: 0 0 20px #ff9800;
-            opacity: 0;
-            transition: all 0.3s ease;
-            z-index: 1000;
-            pointer-events: none;
-        }
-
-        .combo-indicator.active {
-            animation: comboPopup 1s ease;
-        }
-
-        @keyframes comboPopup {
-            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
-            20% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
-            80% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-            100% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
-        }
-
-        .combo-timer {
-            position: absolute;
-            bottom: 100px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: clamp(150px, 40vw, 300px);
-            height: 6px;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid #ff9800;
-            border-radius: 3px;
-            overflow: hidden;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .combo-timer.active {
-            opacity: 1;
-        }
-
-        .combo-timer-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #ff9800, #ff5722);
-            width: 100%;
-            transition: width 0.1s linear;
-        }
-
         @media (max-width: 768px) {
             .hud {
                 height: 90px;
@@ -525,26 +454,6 @@
                 width: clamp(100px, 30vw, 140px);
                 height: 14px;
             }
-            
-            .mobile-controls {
-                height: 220px;
-            }
-            
-            .mobile-joystick {
-                width: 120px;
-                height: 120px;
-                bottom: 30px;
-            }
-            
-            .mobile-action-buttons {
-                bottom: 30px;
-                gap: 15px;
-            }
-            
-            .mobile-action-btn {
-                width: 65px;
-                height: 65px;
-            }
         }
 
         @media (max-width: 480px) {
@@ -567,45 +476,16 @@
                 gap: 0.8rem;
                 padding: 1rem;
             }
-        }
 
-        @media (orientation: portrait) {
-            .portrait-optimized #gameCanvas {
-                height: 70vh;
-                width: auto;
-                margin: 0 auto;
+            .mobile-joystick {
+                width: 90px;
+                height: 90px;
             }
-            
-            .portrait-optimized .mobile-controls {
-                height: 30vh;
-            }
-            
-            .portrait-optimized .mobile-joystick {
-                bottom: 15vh;
-                left: 15vw;
-                transform: translateX(-50%);
-            }
-            
-            .portrait-optimized .mobile-action-buttons {
-                bottom: 15vh;
-                right: 15vw;
-                transform: translateX(50%);
-                flex-direction: row;
-            }
-            
-            .portrait-optimized .hud {
-                height: auto;
-                flex-direction: column;
-                padding-top: 10px;
-                padding-bottom: 10px;
-            }
-            
-            .portrait-optimized .hud-section {
-                margin: 5px 0;
-            }
-            
-            .portrait-optimized .combo-timer {
-                bottom: 32vh;
+
+            .mobile-action-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 1rem;
             }
         }
 
@@ -887,10 +767,6 @@
                         <div class="stat-value" id="statAchievements">0</div>
                         <div>Achievements Unlocked</div>
                     </div>
-                    <div class="stat-item">
-                        <div class="stat-value" id="statMaxCombo">0</div>
-                        <div>Highest Combo</div>
-                    </div>
                 </div>
                 
                 <div class="menu-buttons" style="margin-top: 2rem;">
@@ -929,25 +805,12 @@
                         <p><strong>Tap Screen</strong> - Aim and fire</p>
                         <p><strong>Action Buttons</strong> - Special abilities</p>
                         <p><strong>Double Tap</strong> - Emergency actions</p>
-                        <p><strong>Orientation Button</strong> - Switch between portrait/landscape</p>
-                    </div>
-                    
-                    <div style="margin-bottom: 2rem; padding: 1.5rem; background: rgba(0,0,0,0.5); border-radius: 15px;">
-                        <h3 style="color: #ff9800; margin-bottom: 1rem;">Combo System</h3>
-                        <p><strong>Hit enemies quickly</strong> - Build combo multiplier</p>
-                        <p><strong>Higher combos</strong> - More score and energy</p>
-                        <p><strong>Combo timer</strong> - Visible when combo is active</p>
-                        <p><strong>Don't miss</strong> - Missing shots breaks combo</p>
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="screen" id="gameScreen">
-            <div class="orientation-toggle" id="orientationToggle">
-                <span id="orientationIcon">📱</span> <span id="orientationText">Portrait</span>
-            </div>
-            
             <div class="speedrun-timer" id="speedrunTimer" style="display: none;">
                 <div>TIME: <span id="speedrunTime">00:00</span></div>
             </div>
@@ -970,10 +833,6 @@
                     <div class="stat-box energy">
                         <div class="stat-label">ENERGY</div>
                         <div class="stat-value" id="playerEnergy">100</div>
-                    </div>
-                    <div class="stat-box combo">
-                        <div class="stat-label">COMBO</div>
-                        <div class="stat-value" id="playerCombo">0x</div>
                     </div>
                 </div>
                 
@@ -1010,11 +869,6 @@
                 <div class="energy-fill" id="energyFill"></div>
             </div>
             
-            <div class="combo-indicator" id="comboIndicator">COMBO x5!</div>
-            <div class="combo-timer" id="comboTimer">
-                <div class="combo-timer-fill" id="comboTimerFill"></div>
-            </div>
-            
             <div class="difficulty-warning" id="difficultyWarning" style="display: none;">
                 ⚠️ ADAPTIVE DIFFICULTY ENGAGED ⚠️
             </div>
@@ -1031,7 +885,6 @@
                     <div style="font-size: clamp(1.2rem, 4vw, 1.5rem); margin-bottom: 1rem;">Score: <span id="finalScore" style="color: #ffd700;">0</span></div>
                     <div style="font-size: clamp(1rem, 3vw, 1.2rem); margin-bottom: 1rem;">Level Reached: <span id="finalLevel" style="color: #00bcd4;">1</span></div>
                     <div style="font-size: clamp(1rem, 3vw, 1.2rem); margin-bottom: 1rem;">Survival Time: <span id="finalTime" style="color: #4caf50;">0s</span></div>
-                    <div style="font-size: clamp(1rem, 3vw, 1.2rem); margin-bottom: 1rem;">Highest Combo: <span id="finalCombo" style="color: #ff9800;">0x</span></div>
                     <div style="font-size: clamp(1rem, 3vw, 1.2rem);">Upgrade Points Earned: <span id="earnedSkillPoints" style="color: #9c27b0;">0</span></div>
                 </div>
                 
@@ -1075,7 +928,6 @@
             endlessWave: 1,
             speedrunStartTime: 0,
             isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
-            portraitMode: window.innerHeight > window.innerWidth,
             touchControls: {
                 joystick: { 
                     active: false, 
@@ -1102,11 +954,7 @@
                 slowTimeEnergy: 100,
                 precisionMode: false,
                 invulnerabilityFrames: 0,
-                angle: 0,
-                combo: 0,
-                comboTimer: 0,
-                maxCombo: 0,
-                comboMultiplier: 1
+                angle: 0
             },
             enemy: null,
             bullets: [],
@@ -1125,8 +973,7 @@
             slowTimeActive: false,
             timeScale: 1,
             screenShake: 0,
-            transformationActive: false,
-            missedShots: 0
+            transformationActive: false
         };
 
         const LEVEL_DATA = [
@@ -1163,8 +1010,7 @@
             'weapon_overdrive': {name: 'Weapon Overdrive', icon: '⚔️', cost: 40, description: '+100% damage to final phases', maxLevel: 1},
             'temporal_master': {name: 'Temporal Master', icon: '🌀', cost: 50, description: 'Auto slow-time when near death', maxLevel: 1},
             'galaxy_buster': {name: 'Galaxy Buster', icon: '💥', cost: 100, description: 'Instant kill enemies below 10% health', maxLevel: 1},
-            'mobile_optimizer': {name: 'Mobile Optimizer', icon: '📱', cost: 30, description: 'Enhanced mobile controls and UI', maxLevel: 1},
-            'combo_master': {name: 'Combo Master', icon: '🔥', cost: 20, description: 'Combo timer lasts 50% longer', maxLevel: 2}
+            'mobile_optimizer': {name: 'Mobile Optimizer', icon: '📱', cost: 30, description: 'Enhanced mobile controls and UI', maxLevel: 1}
         };
 
         const GAME_ACHIEVEMENTS = {
@@ -1179,14 +1025,22 @@
             'ultimate_guardian': {name: 'Ultimate Guardian', description: 'Complete all 20 levels', icon: '🏆', unlocked: false},
             'endless_warrior': {name: 'Endless Warrior', description: 'Survive 50 waves in endless mode', icon: '♾️', unlocked: false},
             'time_trial_master': {name: 'Time Trial Master', description: 'Complete campaign in under 10 minutes', icon: '⏱️', unlocked: false},
-            'mobile_pilot': {name: 'Mobile Pilot', description: 'Complete 10 levels on mobile', icon: '📱', unlocked: false},
-            'combo_king': {name: 'Combo King', description: 'Achieve a 50x combo', icon: '🔥', unlocked: false},
-            'combo_master': {name: 'Combo Master', description: 'Achieve a 100x combo', icon: '💥', unlocked: false}
+            'mobile_pilot': {name: 'Mobile Pilot', description: 'Complete 10 levels on mobile', icon: '📱', unlocked: false}
         };
 
         let canvas, ctx;
         let animationId;
-        let backgroundY = 0;
+        // IMMAGINI
+const backgroundImage = new Image();
+backgroundImage.src = 'space-background.png';
+
+const enemyImage = new Image();
+enemyImage.src = 'alien-enemy2.png';
+
+const playerImage = new Image();
+playerImage.src = 'player-ship.png';
+
+        let backgroundY = 0; // posizione verticale dello sfondo
 
         function initGame() {
             canvas = document.getElementById('gameCanvas');
@@ -1194,7 +1048,6 @@
             
             resizeCanvas();
             window.addEventListener('resize', resizeCanvas);
-            window.addEventListener('orientationchange', handleOrientationChange);
             
             loadGameData();
             updateUI();
@@ -1204,11 +1057,9 @@
             createStellarParticles();
             setupEventListeners();
             setupMobileControls();
-            setupOrientationToggle();
 
             if (gameState.isMobile) {
                 showNotification('Mobile controls detected! Touch to play.', 'info');
-                updateOrientationUI();
             }
         }
 
@@ -1217,47 +1068,6 @@
             const rect = container.getBoundingClientRect();
             canvas.width = rect.width;
             canvas.height = rect.height;
-        }
-
-        function handleOrientationChange() {
-            setTimeout(() => {
-                gameState.portraitMode = window.innerHeight > window.innerWidth;
-                updateOrientationUI();
-                resizeCanvas();
-            }, 100);
-        }
-
-        function setupOrientationToggle() {
-            const orientationToggle = document.getElementById('orientationToggle');
-            orientationToggle.addEventListener('click', toggleOrientation);
-        }
-
-        function toggleOrientation() {
-            gameState.portraitMode = !gameState.portraitMode;
-            updateOrientationUI();
-            
-            if (gameState.portraitMode) {
-                document.body.classList.add('portrait-optimized');
-                showNotification('Portrait mode enabled', 'info');
-            } else {
-                document.body.classList.remove('portrait-optimized');
-                showNotification('Landscape mode enabled', 'info');
-            }
-        }
-
-        function updateOrientationUI() {
-            const orientationIcon = document.getElementById('orientationIcon');
-            const orientationText = document.getElementById('orientationText');
-            
-            if (gameState.portraitMode) {
-                orientationIcon.textContent = '📱';
-                orientationText.textContent = 'Portrait';
-                document.body.classList.add('portrait-optimized');
-            } else {
-                orientationIcon.textContent = '💻';
-                orientationText.textContent = 'Landscape';
-                document.body.classList.remove('portrait-optimized');
-            }
         }
 
         function setupMobileControls() {
@@ -1406,7 +1216,7 @@
                 gameState.keys[e.key.toLowerCase()] = true;
                 gameState.keys[e.code] = true;
                 
-                if (gameState.currentScreen === 'gameScreen' && gameState.gameRunning) {
+                if (gameState.currentScreen === 'gameScreen'&& gameState.gameRunning) {
                     switch(e.key.toLowerCase()) {
                         case 'escape':
                             forfeitMission();
@@ -1708,7 +1518,6 @@
             gameState.adaptiveDifficulty = 1.0;
             gameState.screenShake = 0;
             gameState.transformationActive = false;
-            gameState.missedShots = 0;
             
             const savedData = JSON.parse(localStorage.getItem('stellarGuardianSave') || '{}');
             const skills = savedData.skills || {};
@@ -1724,9 +1533,6 @@
             gameState.player.skills = skills;
             gameState.player.invulnerabilityFrames = 0;
             gameState.player.angle = 0;
-            gameState.player.combo = 0;
-            gameState.player.comboTimer = 0;
-            gameState.player.comboMultiplier = 1;
             
             if (gameState.gameMode === 'endless') {
                 generateEndlessEnemy();
@@ -1812,7 +1618,6 @@
             updateSlowTime();
             updateAdaptiveDifficulty();
             updateScreenShake();
-            updateComboSystem();
             checkCollisions();
             
             if (gameState.gameMode === 'endless') {
@@ -1828,79 +1633,6 @@
             } else if (gameState.player.health <= 0 && gameState.player.invulnerabilityFrames <= 0) {
                 gameOver();
             }
-        }
-
-        function updateComboSystem() {
-            const player = gameState.player;
-            const skills = gameState.player.skills;
-            
-            if (player.comboTimer > 0) {
-                const comboDecay = skills.combo_master ? 0.8 : 1.2;
-                player.comboTimer -= comboDecay;
-                
-                const comboTimerElement = document.getElementById('comboTimer');
-                const comboTimerFill = document.getElementById('comboTimerFill');
-                
-                if (player.combo > 0) {
-                    comboTimerElement.classList.add('active');
-                    const percentage = (player.comboTimer / 300) * 100;
-                    comboTimerFill.style.width = Math.max(0, percentage) + '%';
-                } else {
-                    comboTimerElement.classList.remove('active');
-                }
-                
-                if (player.comboTimer <= 0) {
-                    player.combo = 0;
-                    player.comboMultiplier = 1;
-                    comboTimerElement.classList.remove('active');
-                }
-            }
-        }
-
-        function addCombo() {
-            const player = gameState.player;
-            const skills = gameState.player.skills;
-            
-            player.combo++;
-            player.comboTimer = skills.combo_master ? 450 : 300;
-            player.comboMultiplier = 1 + (player.combo * 0.1);
-            
-            if (player.combo > player.maxCombo) {
-                player.maxCombo = player.combo;
-            }
-            
-            if (player.combo % 10 === 0) {
-                showComboIndicator(player.combo);
-            }
-            
-            if (player.combo >= 50 && player.combo < 100) {
-                unlockAchievement('combo_king');
-            } else if (player.combo >= 100) {
-                unlockAchievement('combo_master');
-            }
-            
-            updateUI();
-        }
-
-        function showComboIndicator(combo) {
-            const indicator = document.getElementById('comboIndicator');
-            indicator.textContent = `COMBO x${combo}!`;
-            indicator.classList.add('active');
-            
-            setTimeout(() => {
-                indicator.classList.remove('active');
-            }, 1000);
-        }
-
-        function breakCombo() {
-            gameState.player.combo = 0;
-            gameState.player.comboTimer = 0;
-            gameState.player.comboMultiplier = 1;
-            
-            const comboTimerElement = document.getElementById('comboTimer');
-            comboTimerElement.classList.remove('active');
-            
-            updateUI();
         }
 
         function updatePlayer(deltaTime) {
@@ -2176,8 +1908,6 @@
                 damage *= 1.5;
             }
             
-            damage *= player.comboMultiplier;
-            
             let targetX = gameState.mouse.x;
             let targetY = gameState.mouse.y;
             
@@ -2215,8 +1945,6 @@
             if (skills.targeting_system) {
                 damage *= 2;
             }
-            
-            damage *= player.comboMultiplier;
             
             gameState.bullets.push({
                 x: player.x,
@@ -2407,7 +2135,7 @@
 
         function specialAttack() {
             if (gameState.player.health < gameState.player.maxHealth * 0.4) {
-                const damage = 120 * gameState.player.comboMultiplier;
+                const damage = 120;
                 
                 for (let i = 0; i < 12; i++) {
                     const angle = (i / 12) * Math.PI * 2;
@@ -2526,24 +2254,12 @@
                         damage *= 2;
                     }
                     
-                    const scoreGain = Math.floor(damage * gameState.player.comboMultiplier);
-                    gameState.player.score += scoreGain;
+                    gameState.player.score += Math.floor(damage);
                     enemy.health -= damage;
                     gameState.bullets.splice(bulletIndex, 1);
                     
-                    addCombo();
-                    
                     createHitParticles(bullet.x, bullet.y, bullet.color);
                     updateUI();
-                }
-            });
-            
-            gameState.bullets.forEach((bullet, bulletIndex) => {
-                if (bullet.y < -50 || bullet.x < -50 || bullet.x > canvas.width + 50) {
-                    gameState.missedShots++;
-                    if (gameState.missedShots % 5 === 0) {
-                        breakCombo();
-                    }
                 }
             });
             
@@ -2580,7 +2296,6 @@
                     player.invulnerabilityFrames = 60;
                     
                     gameState.screenShake = 4;
-                    breakCombo();
                     
                     createHitParticles(bullet.x, bullet.y, '#f44336');
                     updateUI();
@@ -2617,12 +2332,10 @@
             const timeBonus = Math.max(0, 12000 - (survivalTime * 60));
             const healthBonus = gameState.player.health * 50;
             const phaseBonus = gameState.enemy.phases * 1000;
-            const comboBonus = gameState.player.maxCombo * 100;
             
-            gameState.player.score += timeBonus + healthBonus + phaseBonus + comboBonus;
+            gameState.player.score += timeBonus + healthBonus + phaseBonus;
             
             let upgradePointsEarned = Math.floor(gameState.currentLevel * 1.2) + 5;
-            upgradePointsEarned += Math.floor(gameState.player.maxCombo / 10);
             
             if (gameState.gameMode === 'endless') {
                 upgradePointsEarned = Math.floor(gameState.endlessWave * 0.5);
@@ -2634,7 +2347,6 @@
             
             const savedData = JSON.parse(localStorage.getItem('stellarGuardianSave') || '{}');
             savedData.totalEnemiesDefeated = (savedData.totalEnemiesDefeated || 0) + 1;
-            savedData.maxCombo = Math.max(savedData.maxCombo || 0, gameState.player.maxCombo);
             
             if (gameState.gameMode === 'campaign') {
                 savedData.highestLevel = Math.max(savedData.highestLevel || 1, gameState.currentLevel + 1);
@@ -2720,7 +2432,6 @@
             const survivalTime = (Date.now() - gameState.levelStartTime) / 1000;
             
             let upgradePointsEarned = Math.floor(gameState.currentLevel * 0.6) + Math.floor(survivalTime / 20);
-            upgradePointsEarned += Math.floor(gameState.player.maxCombo / 20);
             
             if (gameState.gameMode === 'endless') {
                 upgradePointsEarned = Math.floor(gameState.endlessWave * 0.4);
@@ -2732,7 +2443,6 @@
             savedData.totalDeaths = (savedData.totalDeaths || 0) + 1;
             savedData.skillPoints = (savedData.skillPoints || 0) + upgradePointsEarned;
             savedData.longestSurvival = Math.max(savedData.longestSurvival || 0, survivalTime);
-            savedData.maxCombo = Math.max(savedData.maxCombo || 0, gameState.player.maxCombo);
             
             if (gameState.gameMode === 'endless') {
                 savedData.endlessBestWave = Math.max(savedData.endlessBestWave || 0, gameState.endlessWave);
@@ -2745,7 +2455,6 @@
             document.getElementById('finalLevel').textContent = gameState.gameMode === 'endless' ? 
                 `Wave ${gameState.endlessWave}` : gameState.currentLevel;
             document.getElementById('finalTime').textContent = Math.floor(survivalTime);
-            document.getElementById('finalCombo').textContent = gameState.player.maxCombo;
             document.getElementById('earnedSkillPoints').textContent = upgradePointsEarned;
             
             showScreen('gameOver');
@@ -2767,7 +2476,7 @@
             if (animationId) {
                 cancelAnimationFrame(animationId);
             }
-            showScreen('gameScreen');
+            startGame();
         }
 
         function restartCurrentLevel() {
@@ -2784,11 +2493,14 @@
         }
 
         function render() {
-            backgroundY += 1;
-            if (backgroundY >= canvas.height) backgroundY = 0;
-            
-            ctx.fillStyle = 'rgba(10, 10, 46, 1)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+         // SFONDO ANIMATO
+backgroundY += 1;
+if (backgroundY >= canvas.height) backgroundY = 0;
+
+ctx.drawImage(backgroundImage, 0, backgroundY, canvas.width, canvas.height);
+ctx.drawImage(backgroundImage, 0, backgroundY - canvas.height, canvas.width, canvas.height);
+   
+           
             
             if (gameState.screenShake > 0) {
                 ctx.save();
@@ -2834,81 +2546,41 @@
         }
 
         function renderPlayer() {
-            const player = gameState.player;
-            
-            ctx.save();
-            ctx.translate(player.x, player.y);
-            ctx.rotate(player.angle);
-            
-            if (player.invulnerabilityFrames > 0 && Math.floor(player.invulnerabilityFrames / 5) % 2) {
-                ctx.globalAlpha = 0.5;
-            }
-            
-            const scale = gameState.isMobile ? 1.4 : 1.2;
-            ctx.scale(scale, scale);
-            
-            ctx.fillStyle = '#00bcd4';
-            ctx.beginPath();
-            ctx.moveTo(0, -20);
-            ctx.lineTo(-15, 15);
-            ctx.lineTo(0, 10);
-            ctx.lineTo(15, 15);
-            ctx.closePath();
-            ctx.fill();
-            
-            ctx.strokeStyle = '#ffffff';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-            
-            if (player.precisionMode) {
-                ctx.strokeStyle = '#ffd700';
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.arc(0, 0, 30, 0, Math.PI * 2);
-                ctx.stroke();
-            }
-            
-            ctx.restore();
-        }
+    const player = gameState.player;
+
+    if (!playerImage.complete) return;
+
+    ctx.save();
+    ctx.translate(player.x, player.y);
+    ctx.rotate(player.angle);
+
+    const scale = gameState.isMobile ? 1.4 : 1.2;
+    ctx.scale(scale, scale);
+
+    const size = 80; // puoi cambiare dimensione della nave qui
+    ctx.drawImage(playerImage, -size / 2, -size / 2, size, size);
+
+    ctx.restore();
+}
+
 
         function renderEnemy() {
-            const enemy = gameState.enemy;
-            
-            if (!enemy) return;
-            
-            ctx.save();
-            ctx.translate(enemy.x, enemy.y);
-            ctx.rotate(enemy.angle);
-            
-            const size = 40 + (enemy.currentPhase * 5);
-            const scale = 1 + (enemy.currentPhase * 0.05);
-            ctx.scale(scale, scale);
-            
-            ctx.fillStyle = '#f44336';
-            ctx.beginPath();
-            ctx.moveTo(0, -size);
-            ctx.lineTo(-size * 0.8, size * 0.5);
-            ctx.lineTo(-size * 0.3, size * 0.2);
-            ctx.lineTo(0, size);
-            ctx.lineTo(size * 0.3, size * 0.2);
-            ctx.lineTo(size * 0.8, size * 0.5);
-            ctx.closePath();
-            ctx.fill();
-            
-            ctx.strokeStyle = '#ffffff';
-            ctx.lineWidth = 3;
-            ctx.stroke();
-            
-            if (enemy.phaseTransition) {
-                ctx.shadowColor = '#00bcd4';
-                ctx.shadowBlur = 20;
-                ctx.strokeStyle = '#00bcd4';
-                ctx.lineWidth = 5;
-                ctx.stroke();
-            }
-            
-            ctx.restore();
-        }
+    const enemy = gameState.enemy;
+
+    if (!enemy || !enemyImage.complete) return;
+
+    ctx.save();
+    ctx.translate(enemy.x, enemy.y);
+    ctx.rotate(enemy.angle);
+
+    const size = 100 + (enemy.currentPhase * 10); // puoi regolare questa dimensione
+    const scale = 1 + (enemy.currentPhase * 0.05);
+    ctx.scale(scale, scale);
+
+    ctx.drawImage(enemyImage, -size / 2, -size / 2, size, size);
+
+    ctx.restore();
+}
 
         function renderBullets() {
             gameState.bullets.forEach(bullet => {
@@ -2924,6 +2596,7 @@
                 ctx.arc(bullet.x, bullet.y, bullet.size, 0, Math.PI * 2);
                 ctx.fill();
                 
+                // Trail effect
                 ctx.globalAlpha = 0.5;
                 ctx.fillStyle = bullet.color;
                 ctx.beginPath();
@@ -3015,7 +2688,6 @@
             document.getElementById('playerLives').textContent = gameState.player.lives;
             document.getElementById('playerEnergy').textContent = Math.floor(gameState.player.energy);
             document.getElementById('playerScore').textContent = gameState.player.score.toLocaleString();
-            document.getElementById('playerCombo').textContent = gameState.player.combo + 'x';
             
             const playerHealthPercent = (gameState.player.health / gameState.player.maxHealth) * 100;
             document.getElementById('playerHealthFill').style.width = Math.max(0, playerHealthPercent) + '%';
@@ -3044,7 +2716,6 @@
             document.getElementById('statTotalDeaths').textContent = savedData.totalDeaths || 0;
             document.getElementById('statSurvivalTime').textContent = Math.floor(savedData.longestSurvival || 0);
             document.getElementById('statAchievements').textContent = (savedData.achievements || []).length;
-            document.getElementById('statMaxCombo').textContent = savedData.maxCombo || 0;
             
             gameState.skillPoints = savedData.skillPoints || 0;
         }
