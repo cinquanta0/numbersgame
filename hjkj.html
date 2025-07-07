@@ -2065,10 +2065,11 @@ const enemy = {
 
         // Game Mode Starters
         function startLevel(level) {
-            gameState.gameMode = 'campaign';
-            gameState.currentLevel = level;
-            showScreen('gameScreen');
-        }
+    gameState.currentLevel = level;
+    gameState.gameMode = 'campaign';
+    gameState.levelData = LEVEL_DATA.find(l => l.level === level);
+    showScreen('gameScreen'); // questo fa partire il canvas e chiama startGame() da solo
+}
 
         function startEndlessMode() {
             gameState.gameMode = 'endless';
