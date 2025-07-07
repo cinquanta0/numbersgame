@@ -40,35 +40,140 @@
             position: relative;
         }
 
-        /* Orientation Selector */
-        .orientation-selector {
+        /* Tutorial Overlay */
+        .tutorial-overlay {
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             background: rgba(0, 0, 0, 0.95);
-            border-radius: 20px;
-            border: 3px solid #00bcd4;
-            padding: 2rem;
-            text-align: center;
-            z-index: 5000;
+            z-index: 6000;
             display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: clamp(1rem, 4vw, 2rem);
         }
 
-        .orientation-selector.active {
-            display: block;
+        .tutorial-overlay.active {
+            display: flex;
         }
 
-        .orientation-buttons {
+        .tutorial-content {
+            background: linear-gradient(135deg, rgba(0, 188, 212, 0.1), rgba(33, 150, 243, 0.1));
+            border: 3px solid #00bcd4;
+            border-radius: 25px;
+            padding: clamp(2rem, 6vw, 3rem);
+            text-align: center;
+            max-width: min(500px, 90vw);
+            max-height: 85vh;
+            overflow-y: auto;
+            backdrop-filter: blur(15px);
+        }
+
+        .tutorial-title {
+            font-size: clamp(1.8rem, 6vw, 2.5rem);
+            color: #00bcd4;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 0 20px #00bcd4;
+        }
+
+        .tutorial-step {
+            margin: 2rem 0;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s ease;
+        }
+
+        .tutorial-step.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .control-demo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .control-visual {
+            width: clamp(80px, 20vw, 120px);
+            height: clamp(80px, 20vw, 120px);
+            border: 3px solid #00bcd4;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(2rem, 8vw, 3rem);
+            background: rgba(0, 188, 212, 0.2);
+            animation: controlPulse 2s ease infinite;
+            position: relative;
+        }
+
+        .control-visual.joystick {
+            border-radius: 50%;
+            background: rgba(0, 188, 212, 0.1);
+        }
+
+        .control-visual.joystick::after {
+            content: '';
+            position: absolute;
+            width: 40%;
+            height: 40%;
+            background: #00bcd4;
+            border-radius: 50%;
+            animation: joystickMove 3s ease infinite;
+        }
+
+        .control-visual.button {
+            border-radius: 50%;
+            background: rgba(244, 67, 54, 0.2);
+            border-color: #f44336;
+        }
+
+        .control-visual.special {
+            background: rgba(255, 215, 0, 0.2);
+            border-color: #ffd700;
+        }
+
+        @keyframes controlPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(0, 188, 212, 0.4); }
+            50% { transform: scale(1.1); box-shadow: 0 0 30px rgba(0, 188, 212, 0.8); }
+        }
+
+        @keyframes joystickMove {
+            0%, 100% { transform: translate(0, 0); }
+            25% { transform: translate(20%, -20%); }
+            50% { transform: translate(-20%, 20%); }
+            75% { transform: translate(20%, 20%); }
+        }
+
+        .control-description {
+            font-size: clamp(1rem, 3vw, 1.3rem);
+            color: #ffffff;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .control-hint {
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            color: #00bcd4;
+            opacity: 0.9;
+        }
+
+        .tutorial-navigation {
             display: flex;
             gap: 1rem;
-            margin-top: 1rem;
+            margin-top: 2rem;
             flex-wrap: wrap;
             justify-content: center;
         }
 
-        .orientation-btn {
-            padding: 1rem 2rem;
+        .tutorial-btn {
+            padding: clamp(0.8rem, 3vw, 1.2rem) clamp(1.5rem, 4vw, 2rem);
             background: linear-gradient(45deg, #00bcd4, #2196f3);
             border: none;
             border-radius: 15px;
@@ -77,7 +182,151 @@
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
-            min-width: 120px;
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            min-width: 100px;
+        }
+
+        .tutorial-btn:hover,
+        .tutorial-btn:active {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(0, 188, 212, 0.6);
+        }
+
+        .tutorial-btn.skip {
+            background: linear-gradient(45deg, #666, #888);
+        }
+
+        /* Enhanced Mobile Controls */
+        .mobile-controls {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: clamp(180px, 28vh, 220px);
+            background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.9));
+            display: none;
+            z-index: 1000;
+            pointer-events: none;
+            padding: clamp(15px, 3vw, 25px);
+        }
+
+        .mobile-controls.active {
+            display: block;
+        }
+
+        .mobile-joystick {
+            position: absolute;
+            bottom: clamp(20px, 4vw, 30px);
+            left: clamp(20px, 4vw, 30px);
+            width: clamp(100px, 18vw, 140px);
+            height: clamp(100px, 18vw, 140px);
+            background: rgba(0, 188, 212, 0.15);
+            border: 3px solid rgba(0, 188, 212, 0.6);
+            border-radius: 50%;
+            pointer-events: all;
+            touch-action: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mobile-joystick-knob {
+            width: clamp(35px, 7vw, 50px);
+            height: clamp(35px, 7vw, 50px);
+            background: rgba(0, 188, 212, 0.9);
+            border: 2px solid #fff;
+            border-radius: 50%;
+            transition: all 0.1s ease;
+            pointer-events: none;
+            box-shadow: 0 0 15px rgba(0, 188, 212, 0.5);
+        }
+
+        .mobile-action-buttons {
+            position: absolute;
+            bottom: clamp(20px, 4vw, 30px);
+            right: clamp(20px, 4vw, 30px);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: clamp(12px, 3vw, 18px);
+            pointer-events: all;
+        }
+
+        .mobile-action-btn {
+            width: clamp(60px, 12vw, 80px);
+            height: clamp(60px, 12vw, 80px);
+            background: rgba(0, 188, 212, 0.9);
+            border: 3px solid #fff;
+            border-radius: 50%;
+            color: white;
+            font-size: clamp(1.2rem, 3vw, 1.6rem);
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: manipulation;
+            user-select: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(0, 188, 212, 0.4);
+        }
+
+        .mobile-action-btn:active {
+            background: rgba(0, 188, 212, 1);
+            transform: scale(0.9);
+            box-shadow: 0 0 20px rgba(0, 188, 212, 0.8);
+        }
+
+        .mobile-action-btn.special {
+            background: rgba(255, 215, 0, 0.9);
+            border-color: #ffd700;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .mobile-action-btn.special:active {
+            background: rgba(255, 215, 0, 1);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+        }
+
+        /* Orientation Selector - Enhanced */
+        .orientation-selector {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            border-radius: 25px;
+            border: 3px solid #00bcd4;
+            padding: clamp(2rem, 6vw, 3rem);
+            text-align: center;
+            z-index: 5000;
+            display: none;
+            max-width: 90vw;
+            backdrop-filter: blur(15px);
+        }
+
+        .orientation-selector.active {
+            display: block;
+        }
+
+        .orientation-buttons {
+            display: flex;
+            gap: clamp(1rem, 3vw, 1.5rem);
+            margin-top: clamp(1.5rem, 4vw, 2rem);
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .orientation-btn {
+            padding: clamp(1rem, 3vw, 1.5rem) clamp(1.5rem, 4vw, 2rem);
+            background: linear-gradient(45deg, #00bcd4, #2196f3);
+            border: none;
+            border-radius: 15px;
+            color: white;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: clamp(140px, 25vw, 180px);
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
         }
 
         .orientation-btn:hover,
@@ -86,39 +335,32 @@
             box-shadow: 0 0 20px rgba(0, 188, 212, 0.6);
         }
 
-        /* Orientation-specific styles */
-        .portrait-mode {
-            /* Portrait optimizations */
-        }
-
-        .landscape-mode {
-            /* Landscape optimizations */
-        }
-
+        /* Enhanced Responsive Styles */
         .portrait-mode .mobile-controls {
-            height: clamp(160px, 25vh, 200px);
+            height: clamp(200px, 30vh, 250px);
         }
 
         .landscape-mode .mobile-controls {
-            height: clamp(120px, 20vh, 160px);
+            height: clamp(140px, 22vh, 180px);
         }
 
         .landscape-mode .mobile-joystick {
-            width: clamp(80px, 12vw, 100px);
-            height: clamp(80px, 12vw, 100px);
+            width: clamp(90px, 15vw, 120px);
+            height: clamp(90px, 15vw, 120px);
         }
 
         .landscape-mode .mobile-action-buttons {
-            flex-direction: row;
-            gap: 8px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: clamp(8px, 2vw, 12px);
         }
 
         .landscape-mode .mobile-action-btn {
-            width: clamp(45px, 8vw, 55px);
-            height: clamp(45px, 8vw, 55px);
-            font-size: clamp(0.9rem, 2vw, 1.1rem);
+            width: clamp(50px, 10vw, 65px);
+            height: clamp(50px, 10vw, 65px);
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
         }
 
+        /* Screen Management */
         .screen {
             position: absolute;
             top: 0;
@@ -130,6 +372,7 @@
             justify-content: center;
             flex-direction: column;
             overflow-y: auto;
+            padding: clamp(1rem, 3vw, 2rem);
         }
 
         .screen.active {
@@ -139,18 +382,18 @@
         .menu-content {
             text-align: center;
             max-width: min(1200px, 95vw);
-            padding: min(3rem, 5vw);
+            padding: clamp(2rem, 6vw, 3rem);
             background: rgba(0, 0, 0, 0.9);
             border-radius: 25px;
             border: 4px solid;
             border-image: linear-gradient(45deg, #00bcd4, #2196f3, #3f51b5, #9c27b0, #e91e63) 1;
             box-shadow: 0 0 80px rgba(0, 188, 212, 0.4);
             backdrop-filter: blur(15px);
-            margin: 1rem;
+            margin: clamp(1rem, 3vw, 2rem);
         }
 
         .game-title {
-            font-size: clamp(2rem, 8vw, 4.5rem);
+            font-size: clamp(2.5rem, 10vw, 5rem);
             font-weight: 900;
             background: linear-gradient(45deg, #00bcd4, #2196f3, #3f51b5, #9c27b0, #e91e63, #ff9800);
             background-size: 400% 400%;
@@ -158,15 +401,15 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             animation: stellarText 4s ease infinite;
-            margin-bottom: 0.5rem;
+            margin-bottom: clamp(1rem, 3vw, 1.5rem);
             text-shadow: 0 0 40px rgba(0, 188, 212, 0.6);
-            letter-spacing: 2px;
+            letter-spacing: clamp(1px, 0.5vw, 3px);
         }
 
         .game-subtitle {
-            font-size: clamp(1rem, 4vw, 1.6rem);
+            font-size: clamp(1.2rem, 4vw, 2rem);
             color: #00bcd4;
-            margin-bottom: 2rem;
+            margin-bottom: clamp(2rem, 5vw, 3rem);
             text-shadow: 0 0 25px #00bcd4;
             animation: stellarPulse 3s ease infinite;
             font-family: 'Rajdhani', sans-serif;
@@ -184,14 +427,14 @@
 
         .menu-buttons {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(min(280px, 80vw), 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(min(300px, 85vw), 1fr));
+            gap: clamp(1.5rem, 4vw, 2rem);
+            margin-bottom: clamp(2rem, 5vw, 3rem);
         }
 
         .menu-btn {
-            padding: clamp(1rem, 3vw, 1.8rem) clamp(1.5rem, 4vw, 2.5rem);
-            font-size: clamp(0.9rem, 3vw, 1.3rem);
+            padding: clamp(1.2rem, 4vw, 2rem) clamp(2rem, 5vw, 3rem);
+            font-size: clamp(1rem, 3.5vw, 1.4rem);
             font-family: 'Orbitron', monospace;
             font-weight: 700;
             border: none;
@@ -205,6 +448,7 @@
             overflow: hidden;
             text-transform: uppercase;
             touch-action: manipulation;
+            min-height: clamp(60px, 12vw, 80px);
         }
 
         .menu-btn::before {
@@ -234,15 +478,16 @@
             background: linear-gradient(45deg, #00bcd4, #2196f3, #3f51b5, #9c27b0);
             background-size: 300% 300%;
             animation: stellarGradient 3s ease infinite;
-            font-size: clamp(1rem, 3.5vw, 1.6rem);
+            font-size: clamp(1.2rem, 4vw, 1.8rem);
+            padding: clamp(1.5rem, 5vw, 2.5rem) clamp(2.5rem, 6vw, 3.5rem);
         }
 
         .menu-btn.home-btn {
             position: absolute;
-            top: 20px;
-            left: 20px;
-            padding: clamp(0.8rem, 2vw, 1rem) clamp(1.2rem, 3vw, 2rem);
-            font-size: clamp(0.8rem, 2.5vw, 1.1rem);
+            top: clamp(20px, 4vw, 30px);
+            left: clamp(20px, 4vw, 30px);
+            padding: clamp(1rem, 3vw, 1.5rem) clamp(1.5rem, 4vw, 2.5rem);
+            font-size: clamp(0.9rem, 3vw, 1.2rem);
             background: linear-gradient(45deg, #00bcd4, #2196f3);
             border: 2px solid #00bcd4;
             border-radius: 15px;
@@ -254,112 +499,37 @@
             50% { background-position: 100% 50%; }
         }
 
-        /* Enhanced Mobile Controls */
-        .mobile-controls {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 180px;
-            background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.9));
-            display: none;
-            z-index: 1000;
-            pointer-events: none;
-        }
-
-        .mobile-controls.active {
-            display: block;
-        }
-
-        .mobile-joystick {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            width: clamp(90px, 15vw, 120px);
-            height: clamp(90px, 15vw, 120px);
-            background: rgba(0, 188, 212, 0.2);
-            border: 3px solid rgba(0, 188, 212, 0.6);
-            border-radius: 50%;
-            pointer-events: all;
-            touch-action: none;
-        }
-
-        .mobile-joystick-knob {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: clamp(30px, 6vw, 40px);
-            height: clamp(30px, 6vw, 40px);
-            background: rgba(0, 188, 212, 0.9);
-            border: 2px solid #fff;
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: all 0.1s ease;
-            pointer-events: none;
-        }
-
-        .mobile-action-buttons {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: clamp(10px, 2vw, 15px);
-            pointer-events: all;
-        }
-
-        .mobile-action-btn {
-            width: clamp(50px, 10vw, 65px);
-            height: clamp(50px, 10vw, 65px);
-            background: rgba(0, 188, 212, 0.9);
-            border: 3px solid #fff;
-            border-radius: 50%;
-            color: white;
-            font-size: clamp(1rem, 2.5vw, 1.2rem);
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            touch-action: manipulation;
-            user-select: none;
-            transition: all 0.2s ease;
-        }
-
-        .mobile-action-btn:active {
-            background: rgba(0, 188, 212, 1);
-            transform: scale(0.9);
-            box-shadow: 0 0 15px rgba(0, 188, 212, 0.8);
-        }
-
+        /* HUD Enhancements */
         .hud {
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
-            height: clamp(100px, 18vh, 140px);
+            height: clamp(120px, 20vh, 160px);
             background: linear-gradient(180deg, rgba(0, 0, 0, 0.95), transparent);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 clamp(1rem, 3vw, 2rem);
+            padding: 0 clamp(1rem, 4vw, 2rem);
             z-index: 10;
             flex-wrap: wrap;
+            gap: clamp(0.5rem, 2vw, 1rem);
         }
 
         .hud-section {
             display: flex;
-            gap: clamp(0.5rem, 2vw, 1.5rem);
+            gap: clamp(0.8rem, 3vw, 1.5rem);
             align-items: center;
             flex-wrap: wrap;
         }
 
         .stat-box {
             background: rgba(0, 0, 0, 0.9);
-            padding: clamp(0.4rem, 1.5vw, 0.8rem);
-            border-radius: 12px;
+            padding: clamp(0.6rem, 2vw, 1rem);
+            border-radius: 15px;
             border: 2px solid;
             text-align: center;
-            min-width: clamp(70px, 12vw, 100px);
+            min-width: clamp(80px, 15vw, 120px);
             backdrop-filter: blur(5px);
         }
 
@@ -369,20 +539,21 @@
         .stat-box.score { border-color: #9c27b0; box-shadow: 0 0 15px rgba(156, 39, 176, 0.4); }
 
         .stat-label {
-            font-size: clamp(0.6rem, 1.8vw, 0.8rem);
+            font-size: clamp(0.7rem, 2vw, 0.9rem);
             opacity: 0.9;
             margin-bottom: 0.2rem;
             font-family: 'Rajdhani', sans-serif;
+            font-weight: 600;
         }
 
         .stat-value {
-            font-size: clamp(0.9rem, 2.5vw, 1.2rem);
+            font-size: clamp(1rem, 3vw, 1.4rem);
             font-weight: 900;
         }
 
         .health-container {
             display: flex;
-            gap: 1rem;
+            gap: clamp(1rem, 3vw, 1.5rem);
             align-items: center;
             flex-wrap: wrap;
             justify-content: center;
@@ -393,10 +564,10 @@
         }
 
         .health-bar {
-            width: clamp(120px, 25vw, 180px);
-            height: 16px;
+            width: clamp(140px, 30vw, 200px);
+            height: clamp(16px, 3vh, 20px);
             background: #333;
-            border-radius: 8px;
+            border-radius: 10px;
             border: 2px solid;
             overflow: hidden;
         }
@@ -407,8 +578,9 @@
         }
 
         .health-text {
-            font-size: clamp(0.6rem, 1.5vw, 0.8rem);
-            margin-top: 0.2rem;
+            font-size: clamp(0.7rem, 2vw, 0.9rem);
+            margin-top: 0.3rem;
+            font-weight: 600;
         }
 
         #gameCanvas {
@@ -421,58 +593,68 @@
             touch-action: none;
         }
 
+        /* Enhanced Stats Display */
         .stats-display {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(clamp(140px, 28vw, 180px), 1fr));
-            gap: clamp(1rem, 3vw, 1.5rem);
-            padding: clamp(1rem, 3vw, 2rem);
+            grid-template-columns: repeat(auto-fit, minmax(clamp(160px, 35vw, 200px), 1fr));
+            gap: clamp(1.5rem, 4vw, 2rem);
+            padding: clamp(1.5rem, 4vw, 2.5rem);
             background: rgba(0, 188, 212, 0.1);
             border-radius: 20px;
             border: 3px solid #00bcd4;
             box-shadow: 0 0 30px rgba(0, 188, 212, 0.4);
-            margin: 1rem 0;
+            margin: clamp(1rem, 3vw, 2rem) 0;
         }
 
         .stat-item {
             text-align: center;
-            padding: clamp(0.8rem, 2vw, 1rem);
+            padding: clamp(1rem, 3vw, 1.5rem);
             background: rgba(0, 0, 0, 0.5);
             border-radius: 15px;
             border: 2px solid rgba(0, 188, 212, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .stat-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 188, 212, 0.3);
         }
 
         .stat-item .stat-value {
-            font-size: clamp(1.3rem, 3.5vw, 1.8rem);
+            font-size: clamp(1.5rem, 4vw, 2rem);
             font-weight: 900;
             color: #ffd700;
             text-shadow: 0 0 15px #ffd700;
+            margin-bottom: 0.5rem;
         }
 
+        /* Level Grid Enhancements */
         .level-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(clamp(180px, 35vw, 220px), 1fr));
-            gap: clamp(1rem, 3vw, 1.5rem);
-            margin: 2rem 0;
-            max-height: 60vh;
+            grid-template-columns: repeat(auto-fit, minmax(clamp(200px, 40vw, 250px), 1fr));
+            gap: clamp(1.5rem, 4vw, 2rem);
+            margin: clamp(2rem, 5vw, 3rem) 0;
+            max-height: 65vh;
             overflow-y: auto;
-            padding: 1rem;
+            padding: clamp(1rem, 3vw, 1.5rem);
         }
 
         .level-card {
-            padding: clamp(1rem, 3vw, 1.5rem);
+            padding: clamp(1.5rem, 4vw, 2rem);
             background: rgba(0, 0, 0, 0.8);
-            border-radius: 15px;
+            border-radius: 20px;
             border: 3px solid #00bcd4;
             cursor: pointer;
             transition: all 0.4s ease;
             text-align: center;
             position: relative;
+            min-height: clamp(160px, 25vh, 200px);
         }
 
         .level-card:hover,
         .level-card:active {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 8px 25px rgba(0, 188, 212, 0.6);
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 10px 30px rgba(0, 188, 212, 0.6);
         }
 
         .level-card.locked {
@@ -482,141 +664,144 @@
         }
 
         .level-number {
-            font-size: clamp(1.5rem, 4vw, 2rem);
+            font-size: clamp(2rem, 6vw, 2.5rem);
             font-weight: 900;
             color: #ffd700;
-            margin-bottom: 0.5rem;
+            margin-bottom: clamp(0.5rem, 2vw, 1rem);
+            text-shadow: 0 0 20px #ffd700;
         }
 
         .level-boss {
-            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            font-size: clamp(1.1rem, 3vw, 1.4rem);
             font-weight: 700;
             color: #00bcd4;
-            margin-bottom: 0.5rem;
+            margin-bottom: clamp(0.5rem, 2vw, 1rem);
         }
 
         .level-difficulty {
-            font-size: clamp(0.9rem, 2vw, 1rem);
-            margin-bottom: 0.5rem;
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            margin-bottom: clamp(0.5rem, 2vw, 1rem);
+            font-weight: 600;
         }
 
         .level-phases, .level-warning {
-            font-size: clamp(0.8rem, 1.8vw, 0.9rem);
+            font-size: clamp(0.9rem, 2vw, 1rem);
             opacity: 0.8;
-            margin-bottom: 0.3rem;
+            margin-bottom: 0.4rem;
         }
 
         /* Mobile-specific optimizations */
         @media (max-width: 768px) {
             .hud {
-                height: 90px;
-                padding: 0 0.5rem;
+                height: clamp(100px, 18vh, 130px);
+                padding: 0 clamp(0.5rem, 2vw, 1rem);
             }
             
             .hud-section {
-                gap: 0.4rem;
+                gap: clamp(0.5rem, 2vw, 1rem);
             }
             
             .stat-box {
-                min-width: 60px;
-                padding: 0.4rem;
+                min-width: clamp(70px, 12vw, 90px);
+                padding: clamp(0.5rem, 2vw, 0.8rem);
             }
 
             .menu-content {
-                padding: 1.5rem;
-                margin: 0.5rem;
+                padding: clamp(1.5rem, 5vw, 2rem);
+                margin: clamp(0.5rem, 2vw, 1rem);
             }
 
             .health-container {
-                gap: 0.5rem;
+                gap: clamp(0.5rem, 2vw, 1rem);
             }
 
             .health-bar {
-                width: clamp(100px, 30vw, 140px);
-                height: 14px;
+                width: clamp(120px, 25vw, 160px);
+                height: clamp(14px, 2.5vh, 18px);
             }
         }
 
         @media (max-width: 480px) {
             .game-title {
-                font-size: 1.8rem;
+                font-size: clamp(2rem, 8vw, 3rem);
                 letter-spacing: 1px;
             }
             
             .game-subtitle {
-                font-size: 0.9rem;
+                font-size: clamp(1rem, 3vw, 1.3rem);
             }
             
             .menu-btn {
-                padding: 0.8rem 1.2rem;
-                font-size: 0.8rem;
+                padding: clamp(1rem, 3vw, 1.5rem) clamp(1.5rem, 4vw, 2rem);
+                font-size: clamp(0.9rem, 3vw, 1.1rem);
             }
 
             .stats-display {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 0.8rem;
-                padding: 1rem;
+                gap: clamp(1rem, 3vw, 1.5rem);
+                padding: clamp(1rem, 3vw, 1.5rem);
             }
 
             .mobile-joystick {
-                width: 90px;
-                height: 90px;
+                width: clamp(90px, 16vw, 110px);
+                height: clamp(90px, 16vw, 110px);
             }
 
             .mobile-action-btn {
-                width: 50px;
-                height: 50px;
-                font-size: 1rem;
+                width: clamp(55px, 11vw, 70px);
+                height: clamp(55px, 11vw, 70px);
+                font-size: clamp(1.1rem, 2.8vw, 1.4rem);
             }
         }
 
         /* Landscape orientation optimizations */
         @media (orientation: landscape) and (max-height: 500px) {
             .hud {
-                height: 70px;
-                padding: 0 0.5rem;
+                height: clamp(80px, 16vh, 100px);
+                padding: 0 clamp(0.5rem, 2vw, 1rem);
             }
 
             .menu-content {
-                padding: 1rem;
-                max-height: 90vh;
+                padding: clamp(1rem, 3vw, 1.5rem);
+                max-height: 85vh;
                 overflow-y: auto;
             }
 
             .game-title {
-                font-size: clamp(1.5rem, 4vh, 2.5rem);
+                font-size: clamp(2rem, 6vh, 3rem);
             }
 
             .game-subtitle {
-                font-size: clamp(0.9rem, 2.5vh, 1.2rem);
-                margin-bottom: 1rem;
+                font-size: clamp(1rem, 3vh, 1.5rem);
+                margin-bottom: clamp(1rem, 3vh, 1.5rem);
             }
 
             .mobile-controls {
-                height: 120px;
+                height: clamp(130px, 25vh, 160px);
             }
 
             .mobile-joystick {
-                width: 80px;
-                height: 80px;
-                bottom: 15px;
-                left: 15px;
+                width: clamp(80px, 14vw, 100px);
+                height: clamp(80px, 14vw, 100px);
+                bottom: clamp(15px, 3vh, 25px);
+                left: clamp(15px, 3vh, 25px);
             }
 
             .mobile-action-buttons {
-                bottom: 15px;
-                right: 15px;
-                flex-direction: row;
-                gap: 8px;
+                bottom: clamp(15px, 3vh, 25px);
+                right: clamp(15px, 3vh, 25px);
+                grid-template-columns: repeat(4, 1fr);
+                gap: clamp(8px, 2vw, 12px);
             }
 
             .mobile-action-btn {
-                width: 45px;
-                height: 45px;
-                font-size: 0.9rem;
+                width: clamp(45px, 9vw, 60px);
+                height: clamp(45px, 9vw, 60px);
+                font-size: clamp(0.9rem, 2.2vw, 1.2rem);
             }
         }
 
+        /* Touch-specific improvements */
         @media (hover: none) and (pointer: coarse) {
             .menu-btn:hover {
                 transform: none;
@@ -638,22 +823,29 @@
                 transform: scale(0.98);
                 box-shadow: 0 4px 15px rgba(0, 188, 212, 0.4);
             }
+
+            .stat-item:hover {
+                transform: none;
+                box-shadow: none;
+            }
         }
 
+        /* Notification System */
         .notification {
             position: fixed;
-            top: 20px;
-            right: 20px;
+            top: clamp(20px, 4vw, 30px);
+            right: clamp(20px, 4vw, 30px);
             background: linear-gradient(45deg, #00bcd4, #2196f3);
             color: white;
-            padding: clamp(0.8rem, 2vw, 1rem) clamp(1.2rem, 3vw, 2rem);
+            padding: clamp(1rem, 3vw, 1.5rem) clamp(1.5rem, 4vw, 2rem);
             border-radius: 15px;
             border: 2px solid #00bcd4;
             box-shadow: 0 0 20px rgba(0, 188, 212, 0.6);
             z-index: 3000;
             animation: slideInRight 0.5s ease, fadeOut 0.5s ease 4.5s forwards;
-            font-size: clamp(0.9rem, 2.5vw, 1rem);
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
             max-width: 80vw;
+            font-weight: 600;
         }
 
         @keyframes slideInRight {
@@ -665,6 +857,7 @@
             to { opacity: 0; transform: translateX(100%); }
         }
 
+        /* Particle System */
         .particles {
             position: absolute;
             top: 0;
@@ -702,6 +895,7 @@
             }
         }
 
+        /* Additional Effects */
         .transformation-overlay {
             position: absolute;
             top: 0;
@@ -732,9 +926,9 @@
             transform: translate(-50%, -50%);
             background: rgba(0, 188, 212, 0.95);
             color: white;
-            padding: clamp(1rem, 4vw, 2rem) clamp(1.5rem, 5vw, 3rem);
+            padding: clamp(1.5rem, 5vw, 2.5rem) clamp(2rem, 6vw, 3rem);
             border-radius: 20px;
-            font-size: clamp(1.2rem, 4vw, 2rem);
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
             font-weight: 900;
             text-align: center;
             opacity: 0;
@@ -748,28 +942,30 @@
             100% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
         }
 
+        /* HUD Elements */
         .endless-hud, .speedrun-timer, .phase-indicator {
-            font-size: clamp(0.8rem, 2vw, 1rem);
-            padding: clamp(0.5rem, 2vw, 1rem);
+            font-size: clamp(0.9rem, 2.5vw, 1.2rem);
+            padding: clamp(0.8rem, 3vw, 1.2rem);
             background: rgba(0, 0, 0, 0.8);
-            border-radius: 10px;
+            border-radius: 12px;
             border: 2px solid #00bcd4;
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: clamp(20px, 4vw, 30px);
+            right: clamp(20px, 4vw, 30px);
             z-index: 100;
+            font-weight: 600;
         }
 
         .energy-meter {
             position: absolute;
-            bottom: 20px;
+            bottom: clamp(20px, 4vw, 30px);
             left: 50%;
             transform: translateX(-50%);
-            width: clamp(150px, 40vw, 300px);
-            height: clamp(12px, 2.5vh, 16px);
+            width: clamp(180px, 45vw, 320px);
+            height: clamp(14px, 3vh, 18px);
             background: rgba(0, 0, 0, 0.8);
             border: 2px solid #00bcd4;
-            border-radius: 8px;
+            border-radius: 10px;
             overflow: hidden;
         }
 
@@ -785,10 +981,73 @@
     
     <div id="notificationContainer"></div>
     
+    <!-- Enhanced Tutorial Overlay -->
+    <div class="tutorial-overlay" id="tutorialOverlay">
+        <div class="tutorial-content">
+            <h2 class="tutorial-title">🚀 STELLAR GUARDIAN TRAINING 🚀</h2>
+            
+            <div class="tutorial-step active" id="tutorialStep1">
+                <div class="control-demo">
+                    <div class="control-visual joystick">
+                        <span>🕹️</span>
+                    </div>
+                    <div class="control-description">Movement Control</div>
+                    <div class="control-hint">Use the virtual joystick to navigate your ship through space</div>
+                </div>
+            </div>
+
+            <div class="tutorial-step" id="tutorialStep2">
+                <div class="control-demo">
+                    <div class="control-visual button">
+                        <span>🚀</span>
+                    </div>
+                    <div class="control-description">Primary Weapons</div>
+                    <div class="control-hint">Tap anywhere on screen or use the fire button to shoot</div>
+                </div>
+            </div>
+
+            <div class="tutorial-step" id="tutorialStep3">
+                <div class="control-demo">
+                    <div class="control-visual special">
+                        <span>⏰</span>
+                    </div>
+                    <div class="control-description">Slow Time</div>
+                    <div class="control-hint">Activate time dilation to dodge bullet patterns</div>
+                </div>
+            </div>
+
+            <div class="tutorial-step" id="tutorialStep4">
+                <div class="control-demo">
+                    <div class="control-visual special">
+                        <span>🛡️</span>
+                    </div>
+                    <div class="control-description">Emergency Shield</div>
+                    <div class="control-hint">Use when overwhelmed - clears nearby bullets</div>
+                </div>
+            </div>
+
+            <div class="tutorial-step" id="tutorialStep5">
+                <div class="control-demo">
+                    <div class="control-visual special">
+                        <span>⚡</span>
+                    </div>
+                    <div class="control-description">Special Attack</div>
+                    <div class="control-hint">Desperate measure - costs health but deals massive damage</div>
+                </div>
+            </div>
+
+            <div class="tutorial-navigation">
+                <button class="tutorial-btn" id="tutorialPrev" onclick="previousTutorialStep()">← Previous</button>
+                <button class="tutorial-btn" id="tutorialNext" onclick="nextTutorialStep()">Next →</button>
+                <button class="tutorial-btn skip" onclick="closeTutorial()">Skip Tutorial</button>
+            </div>
+        </div>
+    </div>
+    
     <!-- Orientation Selector -->
     <div class="orientation-selector" id="orientationSelector">
-        <h2 style="color: #00bcd4; margin-bottom: 1rem;">Choose Your Battle Orientation</h2>
-        <p style="margin-bottom: 1rem;">Select how you want to play:</p>
+        <h2 style="color: #00bcd4; margin-bottom: 1rem; font-size: clamp(1.5rem, 5vw, 2rem);">Choose Your Battle Orientation</h2>
+        <p style="margin-bottom: 1rem; font-size: clamp(1rem, 3vw, 1.2rem);">Select how you want to play:</p>
         <div class="orientation-buttons">
             <button class="orientation-btn" onclick="setOrientation('portrait')">
                 📱 Portrait<br><small>Vertical Gameplay</small>
@@ -802,33 +1061,36 @@
         </div>
     </div>
     
+    <!-- Enhanced Mobile Controls -->
     <div class="mobile-controls" id="mobileControls">
         <div class="mobile-joystick" id="mobileJoystick">
             <div class="mobile-joystick-knob" id="mobileJoystickKnob"></div>
         </div>
         <div class="mobile-action-buttons">
             <div class="mobile-action-btn" id="mobileShoot">🚀</div>
-            <div class="mobile-action-btn" id="mobileSlowTime">⏰</div>
+            <div class="mobile-action-btn special" id="mobileSlowTime">⏰</div>
             <div class="mobile-action-btn" id="mobileShield">🛡️</div>
-            <div class="mobile-action-btn" id="mobileSpecial">⚡</div>
+            <div class="mobile-action-btn special" id="mobileSpecial">⚡</div>
         </div>
     </div>
     
     <div id="gameContainer">
+        <!-- Main Menu Screen -->
         <div class="screen active" id="mainMenu">
             <div class="menu-content">
                 <h1 class="game-title">STELLAR GUARDIAN</h1>
                 <p class="game-subtitle">COSMIC DEFENSE FORCE - Protect the Galaxy</p>
                 
                 <div class="menu-buttons">
-                    <button class="menu-btn primary" onclick="showScreen('levelSelect')">🚀 START MISSION</button>
-                    <button class="menu-btn" onclick="startEndlessMode()">♾️ ENDLESS DEFENSE</button>
-                    <button class="menu-btn" onclick="startSpeedrun()">⚡ TIME TRIAL</button>
-                    <button class="menu-btn" onclick="showScreen('skillTree')">⭐ UPGRADES</button>
-                    <button class="menu-btn" onclick="showScreen('achievements')">🏆 ACHIEVEMENTS</button>
-                    <button class="menu-btn" onclick="showScreen('stats')">📊 STATISTICS</button>
-                    <button class="menu-btn" onclick="showScreen('controls')">🎮 CONTROLS</button>
-                    <button class="menu-btn" onclick="showOrientationSelector()">📱 ORIENTATION</button>
+<button class="menu-btn primary" onclick="showTutorial()">🎓 TUTORIAL & PLAY</button>
+<button class="menu-btn" onclick="generateLevelGrid(); showScreen('levelSelect')">🚀 START MISSION</button>
+<button class="menu-btn" onclick="startEndlessMode()">♾️ ENDLESS DEFENSE</button>
+<button class="menu-btn" onclick="startSpeedrun()">⚡ TIME TRIAL</button>
+<button class="menu-btn" onclick="showScreen('skillTree')">⭐ UPGRADES</button>
+<button class="menu-btn" onclick="showScreen('achievements')">🏆 ACHIEVEMENTS</button>
+<button class="menu-btn" onclick="showScreen('stats')">📊 STATISTICS</button>
+<button class="menu-btn" onclick="showScreen('controls')">🎮 CONTROLS</button>
+<button class="menu-btn" onclick="showOrientationSelector()">📱 ORIENTATION</button>
                 </div>
                 
                 <div class="stats-display">
@@ -852,17 +1114,19 @@
             </div>
         </div>
 
+        <!-- Skill Tree Screen -->
         <div class="screen" id="skillTree">
             <button class="menu-btn home-btn" onclick="showScreen('mainMenu')">🏠 HOME</button>
             <div class="menu-content">
                 <h2 class="game-subtitle">Ship Upgrades</h2>
-                <p style="margin-bottom: 2rem; color: #00bcd4;">Upgrade Points Available: <span id="availableSkillPoints">0</span></p>
+                <p style="margin-bottom: 2rem; color: #00bcd4; font-size: clamp(1.1rem, 3vw, 1.4rem);">Upgrade Points Available: <span id="availableSkillPoints">0</span></p>
                 
                 <div class="stats-display" id="skillTreeGrid">
                 </div>
             </div>
         </div>
 
+        <!-- Achievements Screen -->
         <div class="screen" id="achievements">
             <button class="menu-btn home-btn" onclick="showScreen('mainMenu')">🏠 HOME</button>
             <div class="menu-content">
@@ -873,6 +1137,7 @@
             </div>
         </div>
 
+        <!-- Level Select Screen -->
         <div class="screen" id="levelSelect">
             <button class="menu-btn home-btn" onclick="showScreen('mainMenu')">🏠 HOME</button>
             <div class="menu-content">
@@ -883,6 +1148,7 @@
             </div>
         </div>
 
+        <!-- Statistics Screen -->
         <div class="screen" id="stats">
             <button class="menu-btn home-btn" onclick="showScreen('mainMenu')">🏠 HOME</button>
             <div class="menu-content">
@@ -923,6 +1189,7 @@
             </div>
         </div>
 
+        <!-- Controls Screen -->
         <div class="screen" id="controls">
             <button class="menu-btn home-btn" onclick="showScreen('mainMenu')">🏠 HOME</button>
             <div class="menu-content">
@@ -930,39 +1197,40 @@
                 
                 <div style="text-align: left; max-width: 700px; margin: 0 auto;">
                     <div style="margin-bottom: 2rem; padding: 1.5rem; background: rgba(0,0,0,0.5); border-radius: 15px;">
-                        <h3 style="color: #00bcd4; margin-bottom: 1rem;">Basic Controls</h3>
-                        <p><strong>W A S D</strong> or <strong>Arrow Keys</strong> - Move ship</p>
-                        <p><strong>Mouse</strong> or <strong>Touch</strong> - Aim and fire</p>
-                        <p><strong>Space</strong> or <strong>Click</strong> - Fire weapons</p>
-                        <p><strong>Right Click</strong> or <strong>Hold</strong> - Charged shot</p>
+                        <h3 style="color: #00bcd4; margin-bottom: 1rem; font-size: clamp(1.2rem, 3vw, 1.5rem);">Basic Controls</h3>
+                        <p style="margin-bottom: 0.5rem; font-size: clamp(0.9rem, 2.5vw, 1.1rem);"><strong>W A S D</strong> or <strong>Arrow Keys</strong> - Move ship</p>
+                        <p style="margin-bottom: 0.5rem; font-size: clamp(0.9rem, 2.5vw, 1.1rem);"><strong>Mouse</strong> or <strong>Touch</strong> - Aim and fire</p>
+                        <p style="margin-bottom: 0.5rem; font-size: clamp(0.9rem, 2.5vw, 1.1rem);"><strong>Space</strong> or <strong>Click</strong> - Fire weapons</p>
+                        <p style="font-size: clamp(0.9rem, 2.5vw, 1.1rem);"><strong>Right Click</strong> or <strong>Hold</strong> - Charged shot</p>
                     </div>
                     
                     <div style="margin-bottom: 2rem; padding: 1.5rem; background: rgba(0,0,0,0.5); border-radius: 15px;">
-                        <h3 style="color: #2196f3; margin-bottom: 1rem;">Special Abilities</h3>
-                        <p><strong>E</strong> or <strong>🛡️ Button</strong> - Energy shield</p>
-                        <p><strong>F</strong> or <strong>⏰ Button</strong> - Slow time</p>
-                        <p><strong>C</strong> or <strong>⚡ Button</strong> - Special attack</p>
-                        <p><strong>Shift</strong> - Precision mode</p>
+                        <h3 style="color: #2196f3; margin-bottom: 1rem; font-size: clamp(1.2rem, 3vw, 1.5rem);">Special Abilities</h3>
+                        <p style="margin-bottom: 0.5rem; font-size: clamp(0.9rem, 2.5vw, 1.1rem);"><strong>E</strong> or <strong>🛡️ Button</strong> - Energy shield</p>
+                        <p style="margin-bottom: 0.5rem; font-size: clamp(0.9rem, 2.5vw, 1.1rem);"><strong>F</strong> or <strong>⏰ Button</strong> - Slow time</p>
+                        <p style="margin-bottom: 0.5rem; font-size: clamp(0.9rem, 2.5vw, 1.1rem);"><strong>C</strong> or <strong>⚡ Button</strong> - Special attack</p>
+                        <p style="font-size: clamp(0.9rem, 2.5vw, 1.1rem);"><strong>Shift</strong> - Precision mode</p>
                     </div>
                     
                     <div style="margin-bottom: 2rem; padding: 1.5rem; background: rgba(0,0,0,0.5); border-radius: 15px;">
-                        <h3 style="color: #4caf50; margin-bottom: 1rem;">Mobile Controls</h3>
-                        <p><strong>Virtual Joystick</strong> - Move ship</p>
-                        <p><strong>Tap Screen</strong> - Aim and fire</p>
-                        <p><strong>Action Buttons</strong> - Special abilities</p>
-                        <p><strong>Double Tap</strong> - Emergency actions</p>
+                        <h3 style="color: #4caf50; margin-bottom: 1rem; font-size: clamp(1.2rem, 3vw, 1.5rem);">Mobile Controls</h3>
+                        <p style="margin-bottom: 0.5rem; font-size: clamp(0.9rem, 2.5vw, 1.1rem);"><strong>Virtual Joystick</strong> - Move ship</p>
+                        <p style="margin-bottom: 0.5rem; font-size: clamp(0.9rem, 2.5vw, 1.1rem);"><strong>Tap Screen</strong> - Aim and fire</p>
+                        <p style="margin-bottom: 0.5rem; font-size: clamp(0.9rem, 2.5vw, 1.1rem);"><strong>Action Buttons</strong> - Special abilities</p>
+                        <p style="font-size: clamp(0.9rem, 2.5vw, 1.1rem);"><strong>Double Tap</strong> - Emergency actions</p>
                     </div>
                     
                     <div style="margin-bottom: 2rem; padding: 1.5rem; background: rgba(0,0,0,0.5); border-radius: 15px;">
-                        <h3 style="color: #ff9800; margin-bottom: 1rem;">Orientation Modes</h3>
-                        <p><strong>Portrait</strong> - Vertical gameplay, optimized for phones</p>
-                        <p><strong>Landscape</strong> - Horizontal gameplay, optimized for tablets</p>
-                        <p><strong>Auto</strong> - Adapts to device rotation</p>
+                        <h3 style="color: #ff9800; margin-bottom: 1rem; font-size: clamp(1.2rem, 3vw, 1.5rem);">Orientation Modes</h3>
+                        <p style="margin-bottom: 0.5rem; font-size: clamp(0.9rem, 2.5vw, 1.1rem);"><strong>Portrait</strong> - Vertical gameplay, optimized for phones</p>
+                        <p style="margin-bottom: 0.5rem; font-size: clamp(0.9rem, 2.5vw, 1.1rem);"><strong>Landscape</strong> - Horizontal gameplay, optimized for tablets</p>
+                        <p style="font-size: clamp(0.9rem, 2.5vw, 1.1rem);"><strong>Auto</strong> - Adapts to device rotation</p>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- Game Screen -->
         <div class="screen" id="gameScreen">
             <div class="speedrun-timer" id="speedrunTimer" style="display: none;">
                 <div>TIME: <span id="speedrunTime">00:00</span></div>
@@ -991,7 +1259,7 @@
                 
                 <div class="health-container">
                     <div class="health-bar-wrapper">
-                        <div style="font-size: clamp(0.7rem, 2vw, 0.9rem); margin-bottom: 0.3rem;">GUARDIAN</div>
+                        <div style="font-size: clamp(0.8rem, 2.5vw, 1rem); margin-bottom: 0.3rem; font-weight: 600;">GUARDIAN</div>
                         <div class="health-bar" style="border-color: #00bcd4;">
                             <div id="playerHealthFill" class="health-fill" style="background: linear-gradient(90deg, #4caf50, #8bc34a, #cddc39); width: 100%;"></div>
                         </div>
@@ -999,7 +1267,7 @@
                     </div>
                     
                     <div class="health-bar-wrapper">
-                        <div style="font-size: clamp(0.7rem, 2vw, 0.9rem); margin-bottom: 0.3rem;">ENEMY</div>
+                        <div style="font-size: clamp(0.8rem, 2.5vw, 1rem); margin-bottom: 0.3rem; font-weight: 600;">ENEMY</div>
                         <div class="health-bar" style="border-color: #f44336;">
                             <div id="enemyHealthFill" class="health-fill" style="background: linear-gradient(90deg, #f44336, #e91e63, #9c27b0); width: 100%;"></div>
                         </div>
@@ -1012,7 +1280,7 @@
                         <div class="stat-label">SCORE</div>
                         <div class="stat-value" id="playerScore">0</div>
                     </div>
-                    <button class="menu-btn home-btn" onclick="forfeitMission()" style="position: relative; top: 0; left: 0; background: linear-gradient(45deg, #f44336, #e91e63); padding: clamp(0.5rem, 2vw, 1rem);">
+                    <button class="menu-btn home-btn" onclick="forfeitMission()" style="position: relative; top: 0; left: 0; background: linear-gradient(45deg, #f44336, #e91e63); padding: clamp(0.8rem, 3vw, 1.2rem);">
                         🏠 RETREAT
                     </button>
                 </div>
@@ -1031,34 +1299,36 @@
             <canvas id="gameCanvas" width="1920" height="1080"></canvas>
         </div>
 
+        <!-- Game Over Screen -->
         <div class="screen" id="gameOver">
-            <div style="text-align: center; padding: clamp(2rem, 5vw, 3rem); background: rgba(0, 0, 0, 0.95); border-radius: 25px; border: 4px solid #f44336; box-shadow: 0 0 60px rgba(244, 67, 54, 0.8); margin: 1rem; max-width: 90vw;">
-                <h2 style="font-size: clamp(2rem, 8vw, 4rem); color: #f44336; margin-bottom: 2rem; text-shadow: 0 0 30px #f44336;">MISSION FAILED</h2>
+            <div style="text-align: center; padding: clamp(2rem, 6vw, 3rem); background: rgba(0, 0, 0, 0.95); border-radius: 25px; border: 4px solid #f44336; box-shadow: 0 0 60px rgba(244, 67, 54, 0.8); margin: 1rem; max-width: 90vw;">
+                <h2 style="font-size: clamp(2.5rem, 10vw, 4.5rem); color: #f44336; margin-bottom: 2rem; text-shadow: 0 0 30px #f44336;">MISSION FAILED</h2>
                 <div style="margin: 2rem 0;">
-                    <div style="font-size: clamp(1.2rem, 4vw, 1.5rem); margin-bottom: 1rem;">Score: <span id="finalScore" style="color: #ffd700;">0</span></div>
-                    <div style="font-size: clamp(1rem, 3vw, 1.2rem); margin-bottom: 1rem;">Level Reached: <span id="finalLevel" style="color: #00bcd4;">1</span></div>
-                    <div style="font-size: clamp(1rem, 3vw, 1.2rem); margin-bottom: 1rem;">Survival Time: <span id="finalTime" style="color: #4caf50;">0s</span></div>
-                    <div style="font-size: clamp(1rem, 3vw, 1.2rem);">Upgrade Points Earned: <span id="earnedSkillPoints" style="color: #9c27b0;">0</span></div>
+                    <div style="font-size: clamp(1.3rem, 5vw, 1.8rem); margin-bottom: 1rem;">Score: <span id="finalScore" style="color: #ffd700;">0</span></div>
+                    <div style="font-size: clamp(1.1rem, 4vw, 1.4rem); margin-bottom: 1rem;">Level Reached: <span id="finalLevel" style="color: #00bcd4;">1</span></div>
+                    <div style="font-size: clamp(1.1rem, 4vw, 1.4rem); margin-bottom: 1rem;">Survival Time: <span id="finalTime" style="color: #4caf50;">0s</span></div>
+                    <div style="font-size: clamp(1.1rem, 4vw, 1.4rem);">Upgrade Points Earned: <span id="earnedSkillPoints" style="color: #9c27b0;">0</span></div>
                 </div>
                 
                 <div class="menu-buttons">
                     <button class="menu-btn primary" onclick="restartGame()">🔄 RETRY MISSION</button>
-                    <button class="menu-btn" onclick="showScreen('skillTree')">⭐ UPGRADE SHIP</button>
+                    <button class="menu-btn" onclick="show Screen('skillTree')">⭐ UPGRADE SHIP</button>
                     <button class="menu-btn" onclick="showScreen('levelSelect')">📋 SELECT MISSION</button>
                     <button class="menu-btn" onclick="showScreen('mainMenu')">🏠 MAIN MENU</button>
                 </div>
             </div>
         </div>
 
+        <!-- Victory Screen -->
         <div class="screen" id="victory">
-            <div style="text-align: center; padding: clamp(2rem, 5vw, 3rem); background: rgba(0, 0, 0, 0.95); border-radius: 25px; border: 4px solid #ffd700; box-shadow: 0 0 60px rgba(255, 215, 0, 0.8); margin: 1rem; max-width: 90vw;">
-                <h2 style="font-size: clamp(2rem, 8vw, 4rem); color: #ffd700; margin-bottom: 2rem; text-shadow: 0 0 30px #ffd700;">GALAXY SAVED!</h2>
+            <div style="text-align: center; padding: clamp(2rem, 6vw, 3rem); background: rgba(0, 0, 0, 0.95); border-radius: 25px; border: 4px solid #ffd700; box-shadow: 0 0 60px rgba(255, 215, 0, 0.8); margin: 1rem; max-width: 90vw;">
+                <h2 style="font-size: clamp(2.5rem, 10vw, 4.5rem); color: #ffd700; margin-bottom: 2rem; text-shadow: 0 0 30px #ffd700;">GALAXY SAVED!</h2>
                 <div style="margin: 2rem 0;">
-                    <div style="font-size: clamp(1.5rem, 5vw, 2rem); margin-bottom: 1rem; color: #ffd700;">👑 STELLAR GUARDIAN SUPREME! 👑</div>
-                    <div style="font-size: clamp(1.2rem, 4vw, 1.5rem); margin-bottom: 1rem;">Final Score: <span id="victoryScore" style="color: #ffd700;">0</span></div>
-                    <div style="font-size: clamp(1rem, 3vw, 1.2rem); margin-bottom: 1rem;">All 20 Levels Completed!</div>
-                    <div style="font-size: clamp(1rem, 3vw, 1.2rem); margin-bottom: 1rem;">Total Time: <span id="victoryTime" style="color: #4caf50;">0s</span></div>
-                    <div style="font-size: clamp(1rem, 3vw, 1.2rem);">You are the ultimate space defender!</div>
+                    <div style="font-size: clamp(1.8rem, 6vw, 2.5rem); margin-bottom: 1rem; color: #ffd700;">👑 STELLAR GUARDIAN SUPREME! 👑</div>
+                    <div style="font-size: clamp(1.3rem, 5vw, 1.8rem); margin-bottom: 1rem;">Final Score: <span id="victoryScore" style="color: #ffd700;">0</span></div>
+                    <div style="font-size: clamp(1.1rem, 4vw, 1.4rem); margin-bottom: 1rem;">All 20 Levels Completed!</div>
+                    <div style="font-size: clamp(1.1rem, 4vw, 1.4rem); margin-bottom: 1rem;">Total Time: <span id="victoryTime" style="color: #4caf50;">0s</span></div>
+                    <div style="font-size: clamp(1.1rem, 4vw, 1.4rem);">You are the ultimate space defender!</div>
                 </div>
                 
                 <div class="menu-buttons">
@@ -1072,6 +1342,7 @@
     </div>
 
     <script>
+        // Game State Management
         let gameState = {
             currentScreen: 'mainMenu',
             currentLevel: 1,
@@ -1081,7 +1352,9 @@
             endlessWave: 1,
             speedrunStartTime: 0,
             isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
-            orientation: 'auto', // 'portrait', 'landscape', 'auto'
+            orientation: 'auto',
+            tutorialStep: 1,
+            tutorialActive: false,
             touchControls: {
                 joystick: { 
                     active: false, 
@@ -1130,6 +1403,7 @@
             transformationActive: false
         };
 
+        // Level Data Configuration
         const LEVEL_DATA = [
             {level: 1, enemy: "Scout Drone", difficulty: "Easy", health: 800, phases: 1, speed: 2, attackPatterns: ['basic'], bulletSpeed: 3, bulletCount: 1},
             {level: 2, enemy: "Fighter Ship", difficulty: "Easy", health: 1200, phases: 2, speed: 2.5, attackPatterns: ['basic', 'spread'], bulletSpeed: 3.5, bulletCount: 1.2},
@@ -1153,6 +1427,7 @@
             {level: 20, enemy: "The Final Guardian", difficulty: "LEGENDARY", health: 35000, phases: 10, speed: 7.5, attackPatterns: ['basic', 'spread', 'tracking', 'wave', 'laser', 'swarm', 'spiral', 'chaos', 'ultimate'], bulletSpeed: 8.5, bulletCount: 5}
         ];
 
+        // Upgrade Skills Configuration
         const UPGRADE_SKILLS = {
             'hull_armor': {name: 'Hull Armor', icon: '🛡️', cost: 10, description: '+50 max health, +25% damage resistance', maxLevel: 3},
             'energy_core': {name: 'Energy Core', icon: '⚡', cost: 8, description: '+25% energy regen, +20 max energy', maxLevel: 4},
@@ -1167,6 +1442,7 @@
             'mobile_optimizer': {name: 'Mobile Optimizer', icon: '📱', cost: 30, description: 'Enhanced mobile controls and UI', maxLevel: 1}
         };
 
+        // Achievements Configuration
         const GAME_ACHIEVEMENTS = {
             'first_victory': {name: 'First Victory', description: 'Complete your first mission', icon: '🎯', unlocked: false},
             'energy_master': {name: 'Energy Master', description: 'Maintain full energy for 60 seconds', icon: '⚡', unlocked: false},
@@ -1180,7 +1456,8 @@
             'endless_warrior': {name: 'Endless Warrior', description: 'Survive 50 waves in endless mode', icon: '♾️', unlocked: false},
             'time_trial_master': {name: 'Time Trial Master', description: 'Complete campaign in under 10 minutes', icon: '⏱️', unlocked: false},
             'mobile_pilot': {name: 'Mobile Pilot', description: 'Complete 10 levels on mobile', icon: '📱', unlocked: false},
-            'orientation_master': {name: 'Orientation Master', description: 'Play in all orientation modes', icon: '🔄', unlocked: false}
+            'orientation_master': {name: 'Orientation Master', description: 'Play in all orientation modes', icon: '🔄', unlocked: false},
+            'tutorial_graduate': {name: 'Tutorial Graduate', description: 'Complete the tutorial', icon: '🎓', unlocked: false}
         };
 
         let canvas, ctx;
@@ -1197,7 +1474,66 @@
         playerImage.src = 'player-ship.png';
 
         let backgroundY = 0; // posizione verticale dello sfondo
+        const player = {
+    x: canvas.width / 2,
+    y: canvas.height - 100,
+    width: 60,
+    height: 60
+};
 
+const enemy = {
+    x: canvas.width / 2,
+    y: 100,
+    width: 60,
+    height: 60
+};
+
+        // Tutorial System
+        function showTutorial() {
+            gameState.tutorialActive = true;
+            gameState.tutorialStep = 1;
+            document.getElementById('tutorialOverlay').classList.add('active');
+            updateTutorialStep();
+        }
+
+        function nextTutorialStep() {
+            if (gameState.tutorialStep < 5) {
+                gameState.tutorialStep++;
+                updateTutorialStep();
+            } else {
+                closeTutorial();
+                showScreen('levelSelect');
+            }
+        }
+
+        function previousTutorialStep() {
+            if (gameState.tutorialStep > 1) {
+                gameState.tutorialStep--;
+                updateTutorialStep();
+            }
+        }
+
+        function updateTutorialStep() {
+            // Hide all steps
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById(`tutorialStep${i}`).classList.remove('active');
+            }
+            
+            // Show current step
+            document.getElementById(`tutorialStep${gameState.tutorialStep}`).classList.add('active');
+            
+            // Update navigation buttons
+            document.getElementById('tutorialPrev').style.display = gameState.tutorialStep === 1 ? 'none' : 'inline-block';
+            document.getElementById('tutorialNext').textContent = gameState.tutorialStep === 5 ? 'Start Playing!' : 'Next →';
+        }
+
+        function closeTutorial() {
+            gameState.tutorialActive = false;
+            document.getElementById('tutorialOverlay').classList.remove('active');
+            unlockAchievement('tutorial_graduate');
+        }
+
+        // Game Initialization
         function initGame() {
             canvas = document.getElementById('gameCanvas');
             ctx = canvas.getContext('2d');
@@ -1221,6 +1557,7 @@
             }
         }
 
+        // Orientation Management
         function showOrientationSelector() {
             document.getElementById('orientationSelector').classList.add('active');
         }
@@ -1229,7 +1566,6 @@
             gameState.orientation = orientation;
             document.getElementById('orientationSelector').classList.remove('active');
             
-            // Apply orientation classes
             document.body.classList.remove('portrait-mode', 'landscape-mode');
             
             if (orientation === 'portrait') {
@@ -1242,12 +1578,10 @@
                 screen.orientation?.unlock?.().catch(() => {});
             }
             
-            // Save preference
             const savedData = JSON.parse(localStorage.getItem('stellarGuardianSave') || '{}');
             savedData.orientation = orientation;
             localStorage.setItem('stellarGuardianSave', JSON.stringify(savedData));
             
-            // Check achievement
             const orientations = savedData.orientationsUsed || [];
             if (!orientations.includes(orientation)) {
                 orientations.push(orientation);
@@ -1280,7 +1614,6 @@
             canvas.width = rect.width;
             canvas.height = rect.height;
             
-            // Adjust player and enemy positions if game is running
             if (gameState.gameRunning) {
                 gameState.player.x = Math.min(gameState.player.x, canvas.width - 50);
                 gameState.player.y = Math.min(gameState.player.y, canvas.height - 50);
@@ -1291,6 +1624,7 @@
             }
         }
 
+        // Enhanced Mobile Controls Setup
         function setupMobileControls() {
             if (!gameState.isMobile) return;
 
@@ -1314,7 +1648,6 @@
                 gameState.touchControls.joystick.startY = centerY;
                 gameState.touchControls.joystick.touchId = touch.identifier;
                 
-                // Haptic feedback if available
                 if (navigator.vibrate) {
                     navigator.vibrate(10);
                 }
@@ -1341,7 +1674,7 @@
                 const deltaX = relevantTouch.clientX - centerX;
                 const deltaY = relevantTouch.clientY - centerY;
                 const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-                const maxDistance = 45;
+                const maxDistance = 50;
                 
                 if (distance <= maxDistance) {
                     gameState.touchControls.joystick.currentX = deltaX;
@@ -1352,7 +1685,7 @@
                     gameState.touchControls.joystick.currentY = Math.sin(angle) * maxDistance;
                 }
 
-                joystickKnob.style.transform = `translate(-50%, -50%) translate(${gameState.touchControls.joystick.currentX}px, ${gameState.touchControls.joystick.currentY}px)`;
+                joystickKnob.style.transform = `translate(${gameState.touchControls.joystick.currentX}px, ${gameState.touchControls.joystick.currentY}px)`;
             }, { passive: false });
 
             document.addEventListener('touchend', (e) => {
@@ -1369,11 +1702,11 @@
                     gameState.touchControls.joystick.currentX = 0;
                     gameState.touchControls.joystick.currentY = 0;
                     gameState.touchControls.joystick.touchId = null;
-                    joystickKnob.style.transform = 'translate(-50%, -50%)';
+                    joystickKnob.style.transform = 'translate(0, 0)';
                 }
             }, { passive: false });
 
-            // Enhanced action buttons with better feedback
+            // Enhanced action buttons
             const setupActionButton = (button, action, hapticStrength = 20) => {
                 button.addEventListener('touchstart', (e) => {
                     e.preventDefault();
@@ -1411,7 +1744,6 @@
                 gameState.keys['shoot'] = true;
                 gameState.touchControls.lastTouchTime = Date.now();
                 
-                // Multi-touch detection
                 if (e.touches.length > 1) {
                     useEmergencyShield();
                 }
@@ -1430,7 +1762,6 @@
                 gameState.touchControls.shooting = false;
                 gameState.keys['shoot'] = false;
                 
-                // Double tap detection for special actions
                 const now = Date.now();
                 if (now - gameState.touchControls.lastTouchTime < 300) {
                     toggleSlowTime();
@@ -1443,12 +1774,13 @@
             document.addEventListener('gestureend', (e) => e.preventDefault());
         }
 
+        // Event Listeners Setup
         function setupEventListeners() {
             document.addEventListener('keydown', (e) => {
                 gameState.keys[e.key.toLowerCase()] = true;
                 gameState.keys[e.code] = true;
                 
-                if (gameState.currentScreen === 'gameScreen'&& gameState.gameRunning) {
+                if (gameState.currentScreen === 'gameScreen' && gameState.gameRunning) {
                     switch(e.key.toLowerCase()) {
                         case 'escape':
                             forfeitMission();
@@ -1508,6 +1840,7 @@
             }
         }
 
+        // Screen Management
         function showScreen(screenId) {
             document.querySelectorAll('.screen').forEach(screen => {
                 screen.classList.remove('active');
@@ -1536,6 +1869,7 @@
             }
         }
 
+        // Level Grid Generation
         function generateLevelGrid() {
             const levelGrid = document.getElementById('levelGrid');
             levelGrid.innerHTML = '';
@@ -1589,6 +1923,7 @@
             return colors[difficulty] || '#00bcd4';
         }
 
+        // Skill Tree Generation
         function generateSkillTree() {
             const skillTreeGrid = document.getElementById('skillTreeGrid');
             skillTreeGrid.innerHTML = '';
@@ -1615,11 +1950,11 @@
                 }
                 
                 skillNode.innerHTML = `
-                    <div style="font-size: clamp(1.5rem, 4vw, 2rem); margin-bottom: 0.5rem;">${skillData.icon}</div>
-                    <div style="font-size: clamp(0.9rem, 2.5vw, 1.1rem); font-weight: 700; color: ${currentLevel > 0 ? '#4caf50' : '#00bcd4'};">${skillData.name}</div>
-                    <div style="font-size: clamp(0.8rem, 2vw, 0.9rem); margin-bottom: 0.5rem;">${skillData.description}</div>
-                    <div style="font-size: clamp(0.7rem, 1.8vw, 0.8rem); color: #888;">Level: ${currentLevel}/${skillData.maxLevel}</div>
-                    <div style="font-size: clamp(0.8rem, 2vw, 0.9rem); color: #ffd700;">Cost: ${skillData.cost} UP</div>
+                    <div style="font-size: clamp(2rem, 5vw, 2.5rem); margin-bottom: 0.8rem;">${skillData.icon}</div>
+                    <div style="font-size: clamp(1rem, 3vw, 1.3rem); font-weight: 700; color: ${currentLevel > 0 ? '#4caf50' : '#00bcd4'}; margin-bottom: 0.5rem;">${skillData.name}</div>
+                    <div style="font-size: clamp(0.9rem, 2.5vw, 1rem); margin-bottom: 0.8rem; line-height: 1.4;">${skillData.description}</div>
+                    <div style="font-size: clamp(0.8rem, 2vw, 0.9rem); color: #888; margin-bottom: 0.5rem;">Level: ${currentLevel}/${skillData.maxLevel}</div>
+                    <div style="font-size: clamp(0.9rem, 2.5vw, 1rem); color: #ffd700; font-weight: 600;">Cost: ${skillData.cost} UP</div>
                 `;
                 
                 skillTreeGrid.appendChild(skillNode);
@@ -1650,7 +1985,6 @@
                 
                 showNotification(`${skillData.name} upgraded!`, 'achievement');
                 
-                // Haptic feedback
                 if (navigator.vibrate) {
                     navigator.vibrate([50, 50, 50]);
                 }
@@ -1672,6 +2006,7 @@
             }
         }
 
+        // Achievements Generation
         function generateAchievements() {
             const achievementsList = document.getElementById('achievementsList');
             achievementsList.innerHTML = '';
@@ -1694,10 +2029,10 @@
                 }
                 
                 achievementItem.innerHTML = `
-                    <div style="font-size: clamp(1.5rem, 4vw, 2rem); margin-bottom: 0.5rem;">${achievementData.icon}</div>
-                    <div style="font-size: clamp(0.9rem, 2.5vw, 1.1rem); font-weight: 700; color: ${isUnlocked ? '#4caf50' : '#666'};">${achievementData.name}</div>
-                    <div style="font-size: clamp(0.8rem, 2vw, 0.9rem); color: ${isUnlocked ? '#ffffff' : '#888'};">${achievementData.description}</div>
-                    ${isUnlocked ? '<div style="font-size: clamp(0.7rem, 1.8vw, 0.8rem); color: #ffd700; margin-top: 0.5rem;">✓ UNLOCKED</div>' : '<div style="font-size: clamp(0.7rem, 1.8vw, 0.8rem); color: #666; margin-top: 0.5rem;">🔒 LOCKED</div>'}
+                    <div style="font-size: clamp(2rem, 5vw, 2.5rem); margin-bottom: 0.8rem;">${achievementData.icon}</div>
+                    <div style="font-size: clamp(1rem, 3vw, 1.3rem); font-weight: 700; color: ${isUnlocked ? '#4caf50' : '#666'}; margin-bottom: 0.5rem;">${achievementData.name}</div>
+                    <div style="font-size: clamp(0.9rem, 2.5vw, 1rem); color: ${isUnlocked ? '#ffffff' : '#888'}; line-height: 1.4; margin-bottom: 0.8rem;">${achievementData.description}</div>
+                    ${isUnlocked ? '<div style="font-size: clamp(0.8rem, 2vw, 0.9rem); color: #ffd700; font-weight: 600;">✓ UNLOCKED</div>' : '<div style="font-size: clamp(0.8rem, 2vw, 0.9rem); color: #666;">🔒 LOCKED</div>'}
                 `;
                 
                 achievementsList.appendChild(achievementItem);
@@ -1722,13 +2057,13 @@
                 const achievement = GAME_ACHIEVEMENTS[achievementId];
                 showNotification(`🏆 ${achievement.name} Unlocked! +15 Upgrade Points`, 'achievement');
                 
-                // Celebration haptic feedback
                 if (navigator.vibrate) {
                     navigator.vibrate([100, 50, 100, 50, 200]);
                 }
             }
         }
 
+        // Game Mode Starters
         function startLevel(level) {
             gameState.gameMode = 'campaign';
             gameState.currentLevel = level;
@@ -1749,6 +2084,7 @@
             showScreen('gameScreen');
         }
 
+        // Game Core Functions
         function startGame() {
             gameState.gameRunning = true;
             gameState.gamePaused = false;
@@ -1841,13 +2177,21 @@
         }
 
         function gameLoop() {
-            if (!gameState.gameRunning || gameState.gamePaused) return;
-            
-            update();
-            render();
-            
-            animationId = requestAnimationFrame(gameLoop);
-        }
+    // Disegna lo sfondo
+    ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+
+    // Disegna il giocatore
+    ctx.drawImage(playerImage, player.x - player.width / 2, player.y - player.height / 2, player.width, player.height);
+
+    // Disegna il nemico
+    ctx.drawImage(enemyImage, enemy.x - enemy.width / 2, enemy.y - enemy.height / 2, enemy.width, enemy.height);
+
+    // Richiama il loop al prossimo frame
+    requestAnimationFrame(gameLoop);
+}
+playerImage.onload = () => {
+    gameLoop(); // Avvia il gioco solo dopo che l’immagine del player è caricata
+};
 
         function update() {
             const deltaTime = gameState.timeScale;
@@ -1886,7 +2230,6 @@
                 speed *= 0.7;
             }
             
-            // Mobile optimizer skill effect
             if (skills.mobile_optimizer && gameState.isMobile) {
                 speed *= 1.2;
             }
@@ -1894,7 +2237,7 @@
             speed *= deltaTime;
             
             if (gameState.isMobile && gameState.touchControls.joystick.active) {
-                const joystickStrength = 0.25;
+                const joystickStrength = 0.3;
                 const moveX = gameState.touchControls.joystick.currentX * joystickStrength;
                 const moveY = gameState.touchControls.joystick.currentY * joystickStrength;
                 
@@ -2520,7 +2863,6 @@
                     hitboxSize = 10;
                 }
                 
-                // Mobile optimizer reduces hitbox slightly
                 if (player.skills.mobile_optimizer && gameState.isMobile) {
                     hitboxSize *= 0.9;
                 }
@@ -2552,7 +2894,6 @@
                     createHitParticles(bullet.x, bullet.y, '#f44336');
                     updateUI();
                     
-                    // Damage haptic feedback
                     if (navigator.vibrate && gameState.isMobile) {
                         navigator.vibrate(100);
                     }
@@ -2712,7 +3053,7 @@
             document.getElementById('finalLevel').textContent = gameState.gameMode === 'endless' ? 
                 `Wave ${gameState.endlessWave}` : gameState.currentLevel;
             document.getElementById('finalTime').textContent = Math.floor(survivalTime);
-            document.getElementById('earnedSkillPoints').textContent = upgradePointsE
+            document.getElementById('earnedSkillPoints').textContent = upgradePointsEarned;
 
             showScreen('gameOver');
             updateUI();
@@ -2749,13 +3090,13 @@
             gameLoop();
         }
 
+        // Rendering Functions
         function render() {
-            // SFONDO ANIMATO
             backgroundY += 1;
             if (backgroundY >= canvas.height) backgroundY = 0;
 
-            ctx.drawImage(backgroundImage, 0, backgroundY, canvas.width, canvas.height);
-            ctx.drawImage(backgroundImage, 0, backgroundY - canvas.height, canvas.width, canvas.height);
+            ctx.fillStyle = '#0a0a2e';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
             
             if (gameState.screenShake > 0) {
                 ctx.save();
@@ -2803,35 +3144,94 @@
         function renderPlayer() {
             const player = gameState.player;
 
-            if (!playerImage.complete) return;
-
             ctx.save();
             ctx.translate(player.x, player.y);
             ctx.rotate(player.angle);
 
-            const scale = gameState.isMobile ? 1.4 : 1.2;
+            const scale = gameState.isMobile ? 1.6 : 1.4;
             ctx.scale(scale, scale);
 
-            const size = 80; // puoi cambiare dimensione della nave qui
-            ctx.drawImage(playerImage, -size / 2, -size / 2, size, size);
+            // Enhanced player ship rendering
+            ctx.fillStyle = '#00bcd4';
+            ctx.beginPath();
+            ctx.moveTo(0, -20);
+            ctx.lineTo(-15, 15);
+            ctx.lineTo(-8, 10);
+            ctx.lineTo(0, 12);
+            ctx.lineTo(8, 10);
+            ctx.lineTo(15, 15);
+            ctx.closePath();
+            ctx.fill();
+
+            // Ship details
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(0, 0, 4, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Engine glow
+            if (gameState.keys['w'] || gameState.keys['ArrowUp'] || gameState.touchControls.joystick.active) {
+                ctx.fillStyle = '#ff9800';
+                ctx.beginPath();
+                ctx.moveTo(-6, 15);
+                ctx.lineTo(0, 25);
+                ctx.lineTo(6, 15);
+                ctx.closePath();
+                ctx.fill();
+            }
 
             ctx.restore();
+
+            // Invulnerability effect
+            if (player.invulnerabilityFrames > 0) {
+                ctx.save();
+                ctx.globalAlpha = 0.5;
+                ctx.strokeStyle = '#00bcd4';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(player.x, player.y, 30, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.restore();
+            }
         }
 
         function renderEnemy() {
             const enemy = gameState.enemy;
 
-            if (!enemy || !enemyImage.complete) return;
+            if (!enemy) return;
 
             ctx.save();
             ctx.translate(enemy.x, enemy.y);
             ctx.rotate(enemy.angle);
 
-            const size = 100 + (enemy.currentPhase * 10); // puoi regolare questa dimensione
-            const scale = 1 + (enemy.currentPhase * 0.05);
+            const size = 50 + (enemy.currentPhase * 8);
+            const scale = 1 + (enemy.currentPhase * 0.08);
             ctx.scale(scale, scale);
 
-            ctx.drawImage(enemyImage, -size / 2, -size / 2, size, size);
+            // Enhanced enemy rendering
+            ctx.fillStyle = '#f44336';
+            ctx.beginPath();
+            ctx.moveTo(0, -size/2);
+            ctx.lineTo(-size/2, size/2);
+            ctx.lineTo(0, size/3);
+            ctx.lineTo(size/2, size/2);
+            ctx.closePath();
+            ctx.fill();
+
+            // Enemy details
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(0, 0, size/6, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Phase indicators
+            for (let i = 0; i < enemy.currentPhase; i++) {
+                ctx.strokeStyle = '#ffd700';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(0, 0, size/2 + i * 5, 0, Math.PI * 2);
+                ctx.stroke();
+            }
 
             ctx.restore();
         }
@@ -2850,7 +3250,7 @@
                 ctx.arc(bullet.x, bullet.y, bullet.size, 0, Math.PI * 2);
                 ctx.fill();
                 
-                // Trail effect
+                // Enhanced trail effect
                 ctx.globalAlpha = 0.5;
                 ctx.fillStyle = bullet.color;
                 ctx.beginPath();
@@ -2936,6 +3336,7 @@
             ctx.restore();
         }
 
+        // UI Update Function
         function updateUI() {
             document.getElementById('currentLevel').textContent = gameState.gameMode === 'endless' ? 
                 `W${gameState.endlessWave}` : gameState.currentLevel;
@@ -2974,6 +3375,7 @@
             gameState.skillPoints = savedData.skillPoints || 0;
         }
 
+        // Data Management
         function saveGameData() {
             const savedData = JSON.parse(localStorage.getItem('stellarGuardianSave') || '{}');
             localStorage.setItem('stellarGuardianSave', JSON.stringify(savedData));
@@ -2985,7 +3387,6 @@
             gameState.player.skills = savedData.skills || {};
             gameState.orientation = savedData.orientation || 'auto';
             
-            // Apply saved orientation
             if (gameState.orientation !== 'auto') {
                 setOrientation(gameState.orientation);
             }
@@ -3006,6 +3407,7 @@
             }
         }
 
+        // Notification System
         function showNotification(message, type = 'info') {
             const notification = document.createElement('div');
             notification.className = 'notification';
@@ -3014,6 +3416,7 @@
             if (type === 'achievement') {
                 notification.style.background = 'linear-gradient(45deg, #ffd700, #ffeb3b)';
                 notification.style.color = '#000';
+                notification.style.fontWeight = '700';
             }
             
             document.getElementById('notificationContainer').appendChild(notification);
@@ -3023,6 +3426,7 @@
             }, 5000);
         }
 
+        // Particle System
         function createStellarParticles() {
             const particlesContainer = document.getElementById('particles');
             
@@ -3040,6 +3444,7 @@
             }
         }
 
+        // Initialize Game
         window.addEventListener('load', initGame);
     </script>
 </body>
