@@ -242,14 +242,15 @@
         }
 
         .mobile-action-buttons {
-            position: absolute;
-            bottom: clamp(20px, 4vw, 30px);
-            right: clamp(20px, 4vw, 30px);
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: clamp(12px, 3vw, 18px);
-            pointer-events: all;
-        }
+    position: absolute;
+    bottom: clamp(20px, 4vw, 30px);
+    right: clamp(20px, 4vw, 30px);
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    row-gap: clamp(16px, 4vw, 24px);
+    column-gap: clamp(16px, 4vw, 24px);
+    pointer-events: all;
+}
 
         .mobile-action-btn {
             width: clamp(60px, 12vw, 80px);
@@ -974,7 +975,18 @@
             background: linear-gradient(90deg, #4caf50, #8bc34a, #cddc39, #ffeb3b);
             transition: width 0.3s ease;
         }
-    </style>
+    body.portrait-mode #gameCanvas {
+    width: 100vw;
+    height: 80vh;
+}
+
+body.landscape-mode #gameCanvas {
+    width: 100vw;
+    height: 100vh;
+}
+
+
+     </style>
 </head>
 <body>
     <div class="particles" id="particles"></div>
@@ -2229,23 +2241,18 @@
                 }
             }
             
-            // Keyboard movement
-            if ((gameState.keys['w'] || gameState.keys['ArrowUp']) && player.y > 50) {
-                player.y -= speed;
-                player.angle = 0;
-            }
-            if ((gameState.keys['s'] || gameState.keys['ArrowDown']) && player.y < canvas.height - 50) {
-                player.y += speed;
-                player.angle = Math.PI;
-            }
-            if ((gameState.keys['a'] || gameState.keys['ArrowLeft']) && player.x > 50) {
-                player.x -= speed;
-                player.angle = -Math.PI / 2;
-            }
-            if ((gameState.keys['d'] || gameState.keys['ArrowRight']) && player.x < canvas.width - 50) {
-                player.x += speed;
-                player.angle = Math.PI / 2;
-            }
+            // Keyboard movement (solo sinistra/destra — navicella bloccata in basso)
+if ((gameState.keys['a'] || gameState.keys['ArrowLeft']) && player.x > 50) {
+    player.x -= speed;
+    player.angle = -Math.PI / 2;
+}
+if ((gameState.keys['d'] || gameState.keys['ArrowRight']) && player.x < canvas.width - 50) {
+    player.x += speed;
+    player.angle = Math.PI / 2;
+}
+
+// Navicella fissa in basso (85% dell’altezza)
+player.y = canvas.height * 0.85;
             
             // Keep player in bounds
             player.x = Math.max(50, Math.min(canvas.width - 50, player.x));
