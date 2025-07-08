@@ -1,4 +1,4 @@
-
+A
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1309,7 +1309,7 @@ body.landscape-mode #gameCanvas {
             
             <div class="transformation-overlay" id="transformationOverlay"></div>
             
-            <canvas id="gameCanvas" width="1920" height="1080"></canvas>
+            <canvas id="gameCanvas" style="width: 100%; height: 100%;"></canvas>
         </div>
 
         <!-- Game Over Screen -->
@@ -3387,7 +3387,22 @@ player.y = canvas.height * 0.85;
                 particlesContainer.appendChild(particle);
             }
         }
+        function fixCanvasSize() {
+  const canvas = document.getElementById('gameCanvas');
+  const width = window.innerWidth;
+  const height = window.innerHeight;
 
+  // imposta dimensioni visive
+  canvas.style.width = "100%";
+  canvas.style.height = "100%";
+
+  // imposta dimensioni interne del canvas per il rendering
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+}
+
+window.addEventListener("load", fixCanvasSize);
+window.addEventListener("resize", fixCanvasSize);
         // Initialize Game
         window.addEventListener('load', initGame);
     </script>
