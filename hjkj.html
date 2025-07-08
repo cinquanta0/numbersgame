@@ -976,8 +976,13 @@
             transition: width 0.3s ease;
         }
     body.portrait-mode #gameCanvas {
-    width: 100vw;
-    height: 80vh;
+    position: absolute;
+    top: 130px; /* o l’altezza dell’HUD */
+    bottom: 180px; /* spazio per i controlli */
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: auto;
 }
 
 body.landscape-mode #gameCanvas {
