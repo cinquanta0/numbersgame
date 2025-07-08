@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -54,7 +53,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: clamp(1rem, 4vw, 2rem);
+            padding: clamp(0.5rem, 2vw, 1rem);
         }
 
         .tutorial-overlay.active {
@@ -63,28 +62,28 @@
 
         .tutorial-content {
             background: linear-gradient(135deg, rgba(0, 188, 212, 0.1), rgba(33, 150, 243, 0.1));
-            border: 3px solid #00bcd4;
-            border-radius: 25px;
-            padding: clamp(2rem, 6vw, 3rem);
+            border: 2px solid #00bcd4;
+            border-radius: 15px;
+            padding: clamp(1rem, 3vw, 2rem);
             text-align: center;
-            max-width: min(500px, 90vw);
-            max-height: 85vh;
+            max-width: min(400px, 95vw);
+            max-height: 90vh;
             overflow-y: auto;
-            backdrop-filter: blur(15px);
+            backdrop-filter: blur(10px);
         }
 
         .tutorial-title {
-            font-size: clamp(1.8rem, 6vw, 2.5rem);
+            font-size: clamp(1.2rem, 4vw, 1.8rem);
             color: #00bcd4;
-            margin-bottom: 1.5rem;
-            text-shadow: 0 0 20px #00bcd4;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 15px #00bcd4;
         }
 
         .tutorial-step {
-            margin: 2rem 0;
+            margin: 1rem 0;
             opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.6s ease;
+            transform: translateY(15px);
+            transition: all 0.5s ease;
         }
 
         .tutorial-step.active {
@@ -96,19 +95,19 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 1rem;
-            margin: 1.5rem 0;
+            gap: 0.8rem;
+            margin: 1rem 0;
         }
 
         .control-visual {
-            width: clamp(80px, 20vw, 120px);
-            height: clamp(80px, 20vw, 120px);
-            border: 3px solid #00bcd4;
+            width: clamp(60px, 15vw, 80px);
+            height: clamp(60px, 15vw, 80px);
+            border: 2px solid #00bcd4;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: clamp(2rem, 8vw, 3rem);
+            font-size: clamp(1.5rem, 6vw, 2rem);
             background: rgba(0, 188, 212, 0.2);
             animation: controlPulse 2s ease infinite;
             position: relative;
@@ -122,8 +121,8 @@
         .control-visual.joystick::after {
             content: '';
             position: absolute;
-            width: 40%;
-            height: 40%;
+            width: 35%;
+            height: 35%;
             background: #00bcd4;
             border-radius: 50%;
             animation: joystickMove 3s ease infinite;
@@ -141,56 +140,56 @@
         }
 
         @keyframes controlPulse {
-            0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(0, 188, 212, 0.4); }
-            50% { transform: scale(1.1); box-shadow: 0 0 30px rgba(0, 188, 212, 0.8); }
+            0%, 100% { transform: scale(1); box-shadow: 0 0 15px rgba(0, 188, 212, 0.4); }
+            50% { transform: scale(1.05); box-shadow: 0 0 25px rgba(0, 188, 212, 0.6); }
         }
 
         @keyframes joystickMove {
             0%, 100% { transform: translate(0, 0); }
-            25% { transform: translate(20%, -20%); }
-            50% { transform: translate(-20%, 20%); }
-            75% { transform: translate(20%, 20%); }
+            25% { transform: translate(15%, -15%); }
+            50% { transform: translate(-15%, 15%); }
+            75% { transform: translate(15%, 15%); }
         }
 
         .control-description {
-            font-size: clamp(1rem, 3vw, 1.3rem);
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
             color: #ffffff;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.3rem;
             font-weight: 600;
         }
 
         .control-hint {
-            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            font-size: clamp(0.8rem, 2vw, 0.9rem);
             color: #00bcd4;
             opacity: 0.9;
         }
 
         .tutorial-navigation {
             display: flex;
-            gap: 1rem;
-            margin-top: 2rem;
+            gap: 0.8rem;
+            margin-top: 1.5rem;
             flex-wrap: wrap;
             justify-content: center;
         }
 
         .tutorial-btn {
-            padding: clamp(0.8rem, 3vw, 1.2rem) clamp(1.5rem, 4vw, 2rem);
+            padding: clamp(0.6rem, 2vw, 0.8rem) clamp(1rem, 3vw, 1.5rem);
             background: linear-gradient(45deg, #00bcd4, #2196f3);
             border: none;
-            border-radius: 15px;
+            border-radius: 10px;
             color: white;
             font-family: 'Orbitron', monospace;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
-            min-width: 100px;
+            font-size: clamp(0.8rem, 2vw, 0.9rem);
+            min-width: 80px;
         }
 
         .tutorial-btn:hover,
         .tutorial-btn:active {
             transform: scale(1.05);
-            box-shadow: 0 0 20px rgba(0, 188, 212, 0.6);
+            box-shadow: 0 0 15px rgba(0, 188, 212, 0.5);
         }
 
         .tutorial-btn.skip {
@@ -203,12 +202,12 @@
             bottom: 0;
             left: 0;
             right: 0;
-            height: clamp(180px, 28vh, 220px);
-            background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.9));
+            height: clamp(140px, 22vh, 180px);
+            background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.85));
             display: none;
             z-index: 1000;
             pointer-events: none;
-            padding: clamp(15px, 3vw, 25px);
+            padding: clamp(10px, 2vw, 15px);
         }
 
         .mobile-controls.active {
@@ -217,12 +216,12 @@
 
         .mobile-joystick {
             position: absolute;
-            bottom: clamp(20px, 4vw, 30px);
-            left: clamp(20px, 4vw, 30px);
-            width: clamp(100px, 18vw, 140px);
-            height: clamp(100px, 18vw, 140px);
-            background: rgba(0, 188, 212, 0.15);
-            border: 3px solid rgba(0, 188, 212, 0.6);
+            bottom: clamp(15px, 3vw, 20px);
+            left: clamp(15px, 3vw, 20px);
+            width: clamp(80px, 16vw, 110px);
+            height: clamp(80px, 16vw, 110px);
+            background: rgba(0, 188, 212, 0.12);
+            border: 2px solid rgba(0, 188, 212, 0.5);
             border-radius: 50%;
             pointer-events: all;
             touch-action: none;
@@ -232,35 +231,35 @@
         }
 
         .mobile-joystick-knob {
-            width: clamp(35px, 7vw, 50px);
-            height: clamp(35px, 7vw, 50px);
+            width: clamp(28px, 6vw, 40px);
+            height: clamp(28px, 6vw, 40px);
             background: rgba(0, 188, 212, 0.9);
             border: 2px solid #fff;
             border-radius: 50%;
             transition: all 0.1s ease;
             pointer-events: none;
-            box-shadow: 0 0 15px rgba(0, 188, 212, 0.5);
+            box-shadow: 0 0 10px rgba(0, 188, 212, 0.4);
         }
 
         .mobile-action-buttons {
-    position: absolute;
-    bottom: clamp(20px, 4vw, 30px);
-    right: clamp(20px, 4vw, 30px);
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    row-gap: clamp(16px, 4vw, 24px);
-    column-gap: clamp(16px, 4vw, 24px);
-    pointer-events: all;
-}
+            position: absolute;
+            bottom: clamp(15px, 3vw, 20px);
+            right: clamp(15px, 3vw, 20px);
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            row-gap: clamp(10px, 2.5vw, 15px);
+            column-gap: clamp(10px, 2.5vw, 15px);
+            pointer-events: all;
+        }
 
         .mobile-action-btn {
-            width: clamp(60px, 12vw, 80px);
-            height: clamp(60px, 12vw, 80px);
+            width: clamp(50px, 10vw, 65px);
+            height: clamp(50px, 10vw, 65px);
             background: rgba(0, 188, 212, 0.9);
-            border: 3px solid #fff;
+            border: 2px solid #fff;
             border-radius: 50%;
             color: white;
-            font-size: clamp(1.2rem, 3vw, 1.6rem);
+            font-size: clamp(1rem, 2.5vw, 1.3rem);
             font-weight: bold;
             display: flex;
             align-items: center;
@@ -268,24 +267,24 @@
             touch-action: manipulation;
             user-select: none;
             transition: all 0.2s ease;
-            box-shadow: 0 4px 15px rgba(0, 188, 212, 0.4);
+            box-shadow: 0 3px 10px rgba(0, 188, 212, 0.3);
         }
 
         .mobile-action-btn:active {
             background: rgba(0, 188, 212, 1);
-            transform: scale(0.9);
-            box-shadow: 0 0 20px rgba(0, 188, 212, 0.8);
+            transform: scale(0.95);
+            box-shadow: 0 0 15px rgba(0, 188, 212, 0.7);
         }
 
         .mobile-action-btn.special {
             background: rgba(255, 215, 0, 0.9);
             border-color: #ffd700;
-            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+            box-shadow: 0 3px 10px rgba(255, 215, 0, 0.3);
         }
 
         .mobile-action-btn.special:active {
             background: rgba(255, 215, 0, 1);
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
         }
 
         /* Orientation Selector - Enhanced */
@@ -295,14 +294,14 @@
             left: 50%;
             transform: translate(-50%, -50%);
             background: rgba(0, 0, 0, 0.95);
-            border-radius: 25px;
-            border: 3px solid #00bcd4;
-            padding: clamp(2rem, 6vw, 3rem);
+            border-radius: 20px;
+            border: 2px solid #00bcd4;
+            padding: clamp(1.5rem, 4vw, 2rem);
             text-align: center;
             z-index: 5000;
             display: none;
-            max-width: 90vw;
-            backdrop-filter: blur(15px);
+            max-width: 95vw;
+            backdrop-filter: blur(10px);
         }
 
         .orientation-selector.active {
@@ -311,55 +310,55 @@
 
         .orientation-buttons {
             display: flex;
-            gap: clamp(1rem, 3vw, 1.5rem);
-            margin-top: clamp(1.5rem, 4vw, 2rem);
+            gap: clamp(0.8rem, 2vw, 1rem);
+            margin-top: clamp(1rem, 3vw, 1.5rem);
             flex-wrap: wrap;
             justify-content: center;
         }
 
         .orientation-btn {
-            padding: clamp(1rem, 3vw, 1.5rem) clamp(1.5rem, 4vw, 2rem);
+            padding: clamp(0.8rem, 2.5vw, 1rem) clamp(1rem, 3vw, 1.5rem);
             background: linear-gradient(45deg, #00bcd4, #2196f3);
             border: none;
-            border-radius: 15px;
+            border-radius: 12px;
             color: white;
             font-family: 'Orbitron', monospace;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
-            min-width: clamp(140px, 25vw, 180px);
-            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            min-width: clamp(100px, 20vw, 140px);
+            font-size: clamp(0.8rem, 2vw, 0.9rem);
         }
 
         .orientation-btn:hover,
         .orientation-btn:active {
             transform: scale(1.05);
-            box-shadow: 0 0 20px rgba(0, 188, 212, 0.6);
+            box-shadow: 0 0 15px rgba(0, 188, 212, 0.5);
         }
 
         /* Enhanced Responsive Styles */
         .portrait-mode .mobile-controls {
-            height: clamp(200px, 30vh, 250px);
+            height: clamp(160px, 25vh, 200px);
         }
 
         .landscape-mode .mobile-controls {
-            height: clamp(140px, 22vh, 180px);
+            height: clamp(120px, 20vh, 150px);
         }
 
         .landscape-mode .mobile-joystick {
-            width: clamp(90px, 15vw, 120px);
-            height: clamp(90px, 15vw, 120px);
+            width: clamp(70px, 14vw, 90px);
+            height: clamp(70px, 14vw, 90px);
         }
 
         .landscape-mode .mobile-action-buttons {
             grid-template-columns: repeat(4, 1fr);
-            gap: clamp(8px, 2vw, 12px);
+            gap: clamp(6px, 1.5vw, 10px);
         }
 
         .landscape-mode .mobile-action-btn {
-            width: clamp(50px, 10vw, 65px);
-            height: clamp(50px, 10vw, 65px);
-            font-size: clamp(1rem, 2.5vw, 1.3rem);
+            width: clamp(40px, 8vw, 55px);
+            height: clamp(40px, 8vw, 55px);
+            font-size: clamp(0.9rem, 2vw, 1.1rem);
         }
 
         /* Screen Management */
@@ -374,7 +373,7 @@
             justify-content: center;
             flex-direction: column;
             overflow-y: auto;
-            padding: clamp(1rem, 3vw, 2rem);
+            padding: clamp(0.5rem, 2vw, 1rem);
         }
 
         .screen.active {
@@ -383,19 +382,19 @@
 
         .menu-content {
             text-align: center;
-            max-width: min(1200px, 95vw);
-            padding: clamp(2rem, 6vw, 3rem);
+            max-width: min(1000px, 98vw);
+            padding: clamp(1.5rem, 4vw, 2.5rem);
             background: rgba(0, 0, 0, 0.9);
-            border-radius: 25px;
-            border: 4px solid;
+            border-radius: 20px;
+            border: 3px solid;
             border-image: linear-gradient(45deg, #00bcd4, #2196f3, #3f51b5, #9c27b0, #e91e63) 1;
-            box-shadow: 0 0 80px rgba(0, 188, 212, 0.4);
-            backdrop-filter: blur(15px);
-            margin: clamp(1rem, 3vw, 2rem);
+            box-shadow: 0 0 60px rgba(0, 188, 212, 0.3);
+            backdrop-filter: blur(10px);
+            margin: clamp(0.5rem, 2vw, 1rem);
         }
 
         .game-title {
-            font-size: clamp(2.5rem, 10vw, 5rem);
+            font-size: clamp(2rem, 8vw, 3.5rem);
             font-weight: 900;
             background: linear-gradient(45deg, #00bcd4, #2196f3, #3f51b5, #9c27b0, #e91e63, #ff9800);
             background-size: 400% 400%;
@@ -403,16 +402,16 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             animation: stellarText 4s ease infinite;
-            margin-bottom: clamp(1rem, 3vw, 1.5rem);
-            text-shadow: 0 0 40px rgba(0, 188, 212, 0.6);
-            letter-spacing: clamp(1px, 0.5vw, 3px);
+            margin-bottom: clamp(0.8rem, 2vw, 1rem);
+            text-shadow: 0 0 30px rgba(0, 188, 212, 0.5);
+            letter-spacing: clamp(1px, 0.3vw, 2px);
         }
 
         .game-subtitle {
-            font-size: clamp(1.2rem, 4vw, 2rem);
+            font-size: clamp(1rem, 3vw, 1.5rem);
             color: #00bcd4;
-            margin-bottom: clamp(2rem, 5vw, 3rem);
-            text-shadow: 0 0 25px #00bcd4;
+            margin-bottom: clamp(1.5rem, 4vw, 2rem);
+            text-shadow: 0 0 20px #00bcd4;
             animation: stellarPulse 3s ease infinite;
             font-family: 'Rajdhani', sans-serif;
         }
@@ -423,34 +422,34 @@
         }
 
         @keyframes stellarPulse {
-            0%, 100% { opacity: 1; transform: scale(1); text-shadow: 0 0 25px #00bcd4; }
-            50% { opacity: 0.8; transform: scale(1.05); text-shadow: 0 0 40px #00bcd4, 0 0 60px #2196f3; }
+            0%, 100% { opacity: 1; transform: scale(1); text-shadow: 0 0 20px #00bcd4; }
+            50% { opacity: 0.8; transform: scale(1.02); text-shadow: 0 0 30px #00bcd4, 0 0 40px #2196f3; }
         }
 
         .menu-buttons {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(min(300px, 85vw), 1fr));
-            gap: clamp(1.5rem, 4vw, 2rem);
-            margin-bottom: clamp(2rem, 5vw, 3rem);
+            grid-template-columns: repeat(auto-fit, minmax(min(250px, 80vw), 1fr));
+            gap: clamp(1rem, 3vw, 1.5rem);
+            margin-bottom: clamp(1.5rem, 4vw, 2rem);
         }
 
         .menu-btn {
-            padding: clamp(1.2rem, 4vw, 2rem) clamp(2rem, 5vw, 3rem);
-            font-size: clamp(1rem, 3.5vw, 1.4rem);
+            padding: clamp(0.8rem, 2.5vw, 1.2rem) clamp(1.5rem, 4vw, 2rem);
+            font-size: clamp(0.8rem, 2.5vw, 1rem);
             font-family: 'Orbitron', monospace;
             font-weight: 700;
             border: none;
-            border-radius: 20px;
+            border-radius: 15px;
             cursor: pointer;
             transition: all 0.4s ease;
             background: linear-gradient(45deg, rgba(0, 188, 212, 0.2), rgba(33, 150, 243, 0.2));
             color: white;
-            border: 3px solid transparent;
+            border: 2px solid transparent;
             position: relative;
             overflow: hidden;
             text-transform: uppercase;
             touch-action: manipulation;
-            min-height: clamp(60px, 12vw, 80px);
+            min-height: clamp(50px, 10vw, 65px);
         }
 
         .menu-btn::before {
@@ -471,8 +470,8 @@
 
         .menu-btn:hover,
         .menu-btn:active {
-            transform: translateY(-4px) scale(1.02);
-            box-shadow: 0 8px 25px rgba(0, 188, 212, 0.4);
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 6px 20px rgba(0, 188, 212, 0.3);
             border-color: #00bcd4;
         }
 
@@ -480,19 +479,19 @@
             background: linear-gradient(45deg, #00bcd4, #2196f3, #3f51b5, #9c27b0);
             background-size: 300% 300%;
             animation: stellarGradient 3s ease infinite;
-            font-size: clamp(1.2rem, 4vw, 1.8rem);
-            padding: clamp(1.5rem, 5vw, 2.5rem) clamp(2.5rem, 6vw, 3.5rem);
+            font-size: clamp(1rem, 3vw, 1.3rem);
+            padding: clamp(1rem, 3vw, 1.5rem) clamp(2rem, 5vw, 2.5rem);
         }
 
         .menu-btn.home-btn {
             position: absolute;
-            top: clamp(20px, 4vw, 30px);
-            left: clamp(20px, 4vw, 30px);
-            padding: clamp(1rem, 3vw, 1.5rem) clamp(1.5rem, 4vw, 2.5rem);
-            font-size: clamp(0.9rem, 3vw, 1.2rem);
+            top: clamp(15px, 3vw, 20px);
+            left: clamp(15px, 3vw, 20px);
+            padding: clamp(0.6rem, 2vw, 0.8rem) clamp(1rem, 3vw, 1.5rem);
+            font-size: clamp(0.7rem, 2vw, 0.9rem);
             background: linear-gradient(45deg, #00bcd4, #2196f3);
             border: 2px solid #00bcd4;
-            border-radius: 15px;
+            border-radius: 12px;
             z-index: 1000;
         }
 
@@ -507,55 +506,55 @@
             top: 0;
             left: 0;
             right: 0;
-            height: clamp(120px, 20vh, 160px);
-            background: linear-gradient(180deg, rgba(0, 0, 0, 0.95), transparent);
+            height: clamp(100px, 18vh, 130px);
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0.9), transparent);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 clamp(1rem, 4vw, 2rem);
+            padding: 0 clamp(0.8rem, 3vw, 1.5rem);
             z-index: 10;
             flex-wrap: wrap;
-            gap: clamp(0.5rem, 2vw, 1rem);
+            gap: clamp(0.3rem, 1.5vw, 0.8rem);
         }
 
         .hud-section {
             display: flex;
-            gap: clamp(0.8rem, 3vw, 1.5rem);
+            gap: clamp(0.5rem, 2vw, 1rem);
             align-items: center;
             flex-wrap: wrap;
         }
 
         .stat-box {
             background: rgba(0, 0, 0, 0.9);
-            padding: clamp(0.6rem, 2vw, 1rem);
-            border-radius: 15px;
+            padding: clamp(0.4rem, 1.5vw, 0.8rem);
+            border-radius: 12px;
             border: 2px solid;
             text-align: center;
-            min-width: clamp(80px, 15vw, 120px);
+            min-width: clamp(60px, 12vw, 90px);
             backdrop-filter: blur(5px);
         }
 
-        .stat-box.level { border-color: #ffd700; box-shadow: 0 0 15px rgba(255, 215, 0, 0.4); }
-        .stat-box.lives { border-color: #00bcd4; box-shadow: 0 0 15px rgba(0, 188, 212, 0.6); }
-        .stat-box.energy { border-color: #4caf50; box-shadow: 0 0 15px rgba(76, 175, 80, 0.4); }
-        .stat-box.score { border-color: #9c27b0; box-shadow: 0 0 15px rgba(156, 39, 176, 0.4); }
+        .stat-box.level { border-color: #ffd700; box-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
+        .stat-box.lives { border-color: #00bcd4; box-shadow: 0 0 10px rgba(0, 188, 212, 0.5); }
+        .stat-box.energy { border-color: #4caf50; box-shadow: 0 0 10px rgba(76, 175, 80, 0.3); }
+        .stat-box.score { border-color: #9c27b0; box-shadow: 0 0 10px rgba(156, 39, 176, 0.3); }
 
         .stat-label {
-            font-size: clamp(0.7rem, 2vw, 0.9rem);
+            font-size: clamp(0.6rem, 1.5vw, 0.7rem);
             opacity: 0.9;
-            margin-bottom: 0.2rem;
+            margin-bottom: 0.1rem;
             font-family: 'Rajdhani', sans-serif;
             font-weight: 600;
         }
 
         .stat-value {
-            font-size: clamp(1rem, 3vw, 1.4rem);
+            font-size: clamp(0.8rem, 2.5vw, 1.1rem);
             font-weight: 900;
         }
 
         .health-container {
             display: flex;
-            gap: clamp(1rem, 3vw, 1.5rem);
+            gap: clamp(0.8rem, 2.5vw, 1rem);
             align-items: center;
             flex-wrap: wrap;
             justify-content: center;
@@ -566,10 +565,10 @@
         }
 
         .health-bar {
-            width: clamp(140px, 30vw, 200px);
-            height: clamp(16px, 3vh, 20px);
+            width: clamp(100px, 25vw, 160px);
+            height: clamp(12px, 2.5vh, 16px);
             background: #333;
-            border-radius: 10px;
+            border-radius: 8px;
             border: 2px solid;
             overflow: hidden;
         }
@@ -580,15 +579,15 @@
         }
 
         .health-text {
-            font-size: clamp(0.7rem, 2vw, 0.9rem);
-            margin-top: 0.3rem;
+            font-size: clamp(0.6rem, 1.5vw, 0.7rem);
+            margin-top: 0.2rem;
             font-weight: 600;
         }
 
         #gameCanvas {
             display: block;
             background: radial-gradient(circle at center, #1a237e, #0a0a2e);
-            border: 3px solid;
+            border: 2px solid;
             border-image: linear-gradient(45deg, #00bcd4, #2196f3, #3f51b5, #9c27b0) 1;
             max-width: 100%;
             max-height: 100%;
@@ -598,65 +597,65 @@
         /* Enhanced Stats Display */
         .stats-display {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(clamp(160px, 35vw, 200px), 1fr));
-            gap: clamp(1.5rem, 4vw, 2rem);
-            padding: clamp(1.5rem, 4vw, 2.5rem);
+            grid-template-columns: repeat(auto-fit, minmax(clamp(120px, 30vw, 160px), 1fr));
+            gap: clamp(1rem, 3vw, 1.5rem);
+            padding: clamp(1rem, 3vw, 1.5rem);
             background: rgba(0, 188, 212, 0.1);
-            border-radius: 20px;
-            border: 3px solid #00bcd4;
-            box-shadow: 0 0 30px rgba(0, 188, 212, 0.4);
-            margin: clamp(1rem, 3vw, 2rem) 0;
+            border-radius: 15px;
+            border: 2px solid #00bcd4;
+            box-shadow: 0 0 25px rgba(0, 188, 212, 0.3);
+            margin: clamp(0.8rem, 2vw, 1.5rem) 0;
         }
 
         .stat-item {
             text-align: center;
-            padding: clamp(1rem, 3vw, 1.5rem);
+            padding: clamp(0.8rem, 2.5vw, 1rem);
             background: rgba(0, 0, 0, 0.5);
-            border-radius: 15px;
+            border-radius: 12px;
             border: 2px solid rgba(0, 188, 212, 0.3);
             transition: all 0.3s ease;
         }
 
         .stat-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(0, 188, 212, 0.3);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(0, 188, 212, 0.2);
         }
 
         .stat-item .stat-value {
-            font-size: clamp(1.5rem, 4vw, 2rem);
+            font-size: clamp(1.2rem, 3vw, 1.6rem);
             font-weight: 900;
             color: #ffd700;
-            text-shadow: 0 0 15px #ffd700;
-            margin-bottom: 0.5rem;
+            text-shadow: 0 0 10px #ffd700;
+            margin-bottom: 0.3rem;
         }
 
         /* Level Grid Enhancements */
         .level-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(clamp(200px, 40vw, 250px), 1fr));
-            gap: clamp(1.5rem, 4vw, 2rem);
-            margin: clamp(2rem, 5vw, 3rem) 0;
-            max-height: 65vh;
+            grid-template-columns: repeat(auto-fit, minmax(clamp(160px, 35vw, 200px), 1fr));
+            gap: clamp(1rem, 3vw, 1.5rem);
+            margin: clamp(1.5rem, 4vw, 2rem) 0;
+            max-height: 70vh;
             overflow-y: auto;
-            padding: clamp(1rem, 3vw, 1.5rem);
+            padding: clamp(0.8rem, 2vw, 1rem);
         }
 
         .level-card {
-            padding: clamp(1.5rem, 4vw, 2rem);
+            padding: clamp(1rem, 3vw, 1.5rem);
             background: rgba(0, 0, 0, 0.8);
-            border-radius: 20px;
-            border: 3px solid #00bcd4;
+            border-radius: 15px;
+            border: 2px solid #00bcd4;
             cursor: pointer;
             transition: all 0.4s ease;
             text-align: center;
             position: relative;
-            min-height: clamp(160px, 25vh, 200px);
+            min-height: clamp(120px, 20vh, 160px);
         }
 
         .level-card:hover,
         .level-card:active {
-            transform: translateY(-5px) scale(1.02);
-            box-shadow: 0 10px 30px rgba(0, 188, 212, 0.6);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(0, 188, 212, 0.5);
         }
 
         .level-card.locked {
@@ -666,140 +665,140 @@
         }
 
         .level-number {
-            font-size: clamp(2rem, 6vw, 2.5rem);
+            font-size: clamp(1.5rem, 5vw, 2rem);
             font-weight: 900;
             color: #ffd700;
-            margin-bottom: clamp(0.5rem, 2vw, 1rem);
-            text-shadow: 0 0 20px #ffd700;
+            margin-bottom: clamp(0.3rem, 1.5vw, 0.8rem);
+            text-shadow: 0 0 15px #ffd700;
         }
 
         .level-boss {
-            font-size: clamp(1.1rem, 3vw, 1.4rem);
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
             font-weight: 700;
             color: #00bcd4;
-            margin-bottom: clamp(0.5rem, 2vw, 1rem);
+            margin-bottom: clamp(0.3rem, 1.5vw, 0.8rem);
         }
 
         .level-difficulty {
-            font-size: clamp(1rem, 2.5vw, 1.2rem);
-            margin-bottom: clamp(0.5rem, 2vw, 1rem);
+            font-size: clamp(0.8rem, 2vw, 1rem);
+            margin-bottom: clamp(0.3rem, 1.5vw, 0.8rem);
             font-weight: 600;
         }
 
         .level-phases, .level-warning {
-            font-size: clamp(0.9rem, 2vw, 1rem);
+            font-size: clamp(0.7rem, 1.8vw, 0.8rem);
             opacity: 0.8;
-            margin-bottom: 0.4rem;
+            margin-bottom: 0.3rem;
         }
 
         /* Mobile-specific optimizations */
         @media (max-width: 768px) {
             .hud {
-                height: clamp(100px, 18vh, 130px);
-                padding: 0 clamp(0.5rem, 2vw, 1rem);
+                height: clamp(80px, 15vh, 110px);
+                padding: 0 clamp(0.5rem, 1.5vw, 0.8rem);
             }
             
             .hud-section {
-                gap: clamp(0.5rem, 2vw, 1rem);
+                gap: clamp(0.3rem, 1.5vw, 0.8rem);
             }
             
             .stat-box {
-                min-width: clamp(70px, 12vw, 90px);
-                padding: clamp(0.5rem, 2vw, 0.8rem);
+                min-width: clamp(50px, 10vw, 70px);
+                padding: clamp(0.3rem, 1.5vw, 0.6rem);
             }
 
             .menu-content {
-                padding: clamp(1.5rem, 5vw, 2rem);
-                margin: clamp(0.5rem, 2vw, 1rem);
+                padding: clamp(1rem, 3vw, 1.5rem);
+                margin: clamp(0.3rem, 1vw, 0.8rem);
             }
 
             .health-container {
-                gap: clamp(0.5rem, 2vw, 1rem);
+                gap: clamp(0.5rem, 1.5vw, 0.8rem);
             }
 
             .health-bar {
-                width: clamp(120px, 25vw, 160px);
-                height: clamp(14px, 2.5vh, 18px);
+                width: clamp(80px, 20vw, 120px);
+                height: clamp(10px, 2vh, 14px);
             }
         }
 
         @media (max-width: 480px) {
             .game-title {
-                font-size: clamp(2rem, 8vw, 3rem);
-                letter-spacing: 1px;
+                font-size: clamp(1.5rem, 6vw, 2.5rem);
+                letter-spacing: 0.5px;
             }
             
             .game-subtitle {
-                font-size: clamp(1rem, 3vw, 1.3rem);
+                font-size: clamp(0.8rem, 2.5vw, 1.1rem);
             }
             
             .menu-btn {
-                padding: clamp(1rem, 3vw, 1.5rem) clamp(1.5rem, 4vw, 2rem);
-                font-size: clamp(0.9rem, 3vw, 1.1rem);
+                padding: clamp(0.6rem, 2vw, 1rem) clamp(1rem, 3vw, 1.5rem);
+                font-size: clamp(0.7rem, 2vw, 0.9rem);
             }
 
             .stats-display {
                 grid-template-columns: repeat(2, 1fr);
-                gap: clamp(1rem, 3vw, 1.5rem);
-                padding: clamp(1rem, 3vw, 1.5rem);
+                gap: clamp(0.8rem, 2vw, 1rem);
+                padding: clamp(0.8rem, 2vw, 1rem);
             }
 
             .mobile-joystick {
-                width: clamp(90px, 16vw, 110px);
-                height: clamp(90px, 16vw, 110px);
-            }
-
-            .mobile-action-btn {
-                width: clamp(55px, 11vw, 70px);
-                height: clamp(55px, 11vw, 70px);
-                font-size: clamp(1.1rem, 2.8vw, 1.4rem);
-            }
-        }
-
-        /* Landscape orientation optimizations */
-        @media (orientation: landscape) and (max-height: 500px) {
-            .hud {
-                height: clamp(80px, 16vh, 100px);
-                padding: 0 clamp(0.5rem, 2vw, 1rem);
-            }
-
-            .menu-content {
-                padding: clamp(1rem, 3vw, 1.5rem);
-                max-height: 85vh;
-                overflow-y: auto;
-            }
-
-            .game-title {
-                font-size: clamp(2rem, 6vh, 3rem);
-            }
-
-            .game-subtitle {
-                font-size: clamp(1rem, 3vh, 1.5rem);
-                margin-bottom: clamp(1rem, 3vh, 1.5rem);
-            }
-
-            .mobile-controls {
-                height: clamp(130px, 25vh, 160px);
-            }
-
-            .mobile-joystick {
-                width: clamp(80px, 14vw, 100px);
-                height: clamp(80px, 14vw, 100px);
-                bottom: clamp(15px, 3vh, 25px);
-                left: clamp(15px, 3vh, 25px);
-            }
-
-            .mobile-action-buttons {
-                bottom: clamp(15px, 3vh, 25px);
-                right: clamp(15px, 3vh, 25px);
-                grid-template-columns: repeat(4, 1fr);
-                gap: clamp(8px, 2vw, 12px);
+                width: clamp(70px, 14vw, 90px);
+                height: clamp(70px, 14vw, 90px);
             }
 
             .mobile-action-btn {
                 width: clamp(45px, 9vw, 60px);
                 height: clamp(45px, 9vw, 60px);
                 font-size: clamp(0.9rem, 2.2vw, 1.2rem);
+            }
+        }
+
+        /* Landscape orientation optimizations */
+        @media (orientation: landscape) and (max-height: 500px) {
+            .hud {
+                height: clamp(60px, 12vh, 80px);
+                padding: 0 clamp(0.5rem, 1.5vw, 1rem);
+            }
+
+            .menu-content {
+                padding: clamp(0.8rem, 2vw, 1.2rem);
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+
+            .game-title {
+                font-size: clamp(1.5rem, 4vh, 2.5rem);
+            }
+
+            .game-subtitle {
+                font-size: clamp(0.8rem, 2.5vh, 1.2rem);
+                margin-bottom: clamp(0.8rem, 2vh, 1.2rem);
+            }
+
+            .mobile-controls {
+                height: clamp(100px, 20vh, 130px);
+            }
+
+            .mobile-joystick {
+                width: clamp(60px, 12vw, 80px);
+                height: clamp(60px, 12vw, 80px);
+                bottom: clamp(10px, 2vh, 15px);
+                left: clamp(10px, 2vh, 15px);
+            }
+
+            .mobile-action-buttons {
+                bottom: clamp(10px, 2vh, 15px);
+                right: clamp(10px, 2vh, 15px);
+                grid-template-columns: repeat(4, 1fr);
+                gap: clamp(6px, 1.5vw, 10px);
+            }
+
+            .mobile-action-btn {
+                width: clamp(35px, 7vw, 50px);
+                height: clamp(35px, 7vw, 50px);
+                font-size: clamp(0.8rem, 1.8vw, 1rem);
             }
         }
 
@@ -813,7 +812,7 @@
             
             .menu-btn:active {
                 transform: scale(0.98);
-                box-shadow: 0 4px 15px rgba(0, 188, 212, 0.4);
+                box-shadow: 0 3px 12px rgba(0, 188, 212, 0.3);
             }
 
             .level-card:hover {
@@ -823,7 +822,7 @@
 
             .level-card:active {
                 transform: scale(0.98);
-                box-shadow: 0 4px 15px rgba(0, 188, 212, 0.4);
+                box-shadow: 0 3px 12px rgba(0, 188, 212, 0.3);
             }
 
             .stat-item:hover {
@@ -835,18 +834,18 @@
         /* Notification System */
         .notification {
             position: fixed;
-            top: clamp(20px, 4vw, 30px);
-            right: clamp(20px, 4vw, 30px);
+            top: clamp(15px, 3vw, 20px);
+            right: clamp(15px, 3vw, 20px);
             background: linear-gradient(45deg, #00bcd4, #2196f3);
             color: white;
-            padding: clamp(1rem, 3vw, 1.5rem) clamp(1.5rem, 4vw, 2rem);
-            border-radius: 15px;
+            padding: clamp(0.8rem, 2.5vw, 1rem) clamp(1rem, 3vw, 1.5rem);
+            border-radius: 12px;
             border: 2px solid #00bcd4;
-            box-shadow: 0 0 20px rgba(0, 188, 212, 0.6);
+            box-shadow: 0 0 15px rgba(0, 188, 212, 0.5);
             z-index: 3000;
             animation: slideInRight 0.5s ease, fadeOut 0.5s ease 4.5s forwards;
-            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
-            max-width: 80vw;
+            font-size: clamp(0.7rem, 2vw, 0.9rem);
+            max-width: 85vw;
             font-weight: 600;
         }
 
@@ -872,8 +871,8 @@
 
         .particle {
             position: absolute;
-            width: 4px;
-            height: 4px;
+            width: 3px;
+            height: 3px;
             background: #00bcd4;
             border-radius: 50%;
             opacity: 0.8;
@@ -928,46 +927,46 @@
             transform: translate(-50%, -50%);
             background: rgba(0, 188, 212, 0.95);
             color: white;
-            padding: clamp(1.5rem, 5vw, 2.5rem) clamp(2rem, 6vw, 3rem);
-            border-radius: 20px;
-            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            padding: clamp(1rem, 4vw, 2rem) clamp(1.5rem, 5vw, 2.5rem);
+            border-radius: 15px;
+            font-size: clamp(1.2rem, 4vw, 2rem);
             font-weight: 900;
             text-align: center;
             opacity: 0;
             animation: warningFlash 0.3s ease infinite alternate;
             z-index: 2000;
-            max-width: 90vw;
+            max-width: 95vw;
         }
 
         @keyframes warningFlash {
             0% { opacity: 0.8; transform: translate(-50%, -50%) scale(1); }
-            100% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+            100% { opacity: 1; transform: translate(-50%, -50%) scale(1.02); }
         }
 
         /* HUD Elements */
         .endless-hud, .speedrun-timer, .phase-indicator {
-            font-size: clamp(0.9rem, 2.5vw, 1.2rem);
-            padding: clamp(0.8rem, 3vw, 1.2rem);
+            font-size: clamp(0.7rem, 2vw, 1rem);
+            padding: clamp(0.6rem, 2.5vw, 1rem);
             background: rgba(0, 0, 0, 0.8);
-            border-radius: 12px;
+            border-radius: 10px;
             border: 2px solid #00bcd4;
             position: absolute;
-            top: clamp(20px, 4vw, 30px);
-            right: clamp(20px, 4vw, 30px);
+            top: clamp(15px, 3vw, 20px);
+            right: clamp(15px, 3vw, 20px);
             z-index: 100;
             font-weight: 600;
         }
 
         .energy-meter {
             position: absolute;
-            bottom: clamp(20px, 4vw, 30px);
+            bottom: clamp(15px, 3vw, 20px);
             left: 50%;
             transform: translateX(-50%);
-            width: clamp(180px, 45vw, 320px);
-            height: clamp(14px, 3vh, 18px);
+            width: clamp(140px, 35vw, 250px);
+            height: clamp(10px, 2.5vh, 14px);
             background: rgba(0, 0, 0, 0.8);
             border: 2px solid #00bcd4;
-            border-radius: 10px;
+            border-radius: 8px;
             overflow: hidden;
         }
 
@@ -976,18 +975,31 @@
             background: linear-gradient(90deg, #4caf50, #8bc34a, #cddc39, #ffeb3b);
             transition: width 0.3s ease;
         }
-    body.portrait-mode #gameCanvas {
-    width: 100vw;
-    height: 80vh;
-}
 
-body.landscape-mode #gameCanvas {
-    width: 100vw;
-    height: 100vh;
-}
+        /* Canvas responsive sizing */
+        body.portrait-mode #gameCanvas {
+            width: 100vw;
+            height: calc(100vh - clamp(160px, 25vh, 200px));
+        }
 
+        body.landscape-mode #gameCanvas {
+            width: 100vw;
+            height: calc(100vh - clamp(120px, 20vh, 150px));
+        }
 
-     </style>
+        /* Auto-orientation detection improvements */
+        @media (orientation: portrait) {
+            body:not(.landscape-mode) {
+                --mobile-controls-height: clamp(160px, 25vh, 200px);
+            }
+        }
+
+        @media (orientation: landscape) {
+            body:not(.portrait-mode) {
+                --mobile-controls-height: clamp(120px, 20vh, 150px);
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="particles" id="particles"></div>
@@ -1059,8 +1071,8 @@ body.landscape-mode #gameCanvas {
     
     <!-- Orientation Selector -->
     <div class="orientation-selector" id="orientationSelector">
-        <h2 style="color: #00bcd4; margin-bottom: 1rem; font-size: clamp(1.5rem, 5vw, 2rem);">Choose Your Battle Orientation</h2>
-        <p style="margin-bottom: 1rem; font-size: clamp(1rem, 3vw, 1.2rem);">Select how you want to play:</p>
+        <h2 style="color: #00bcd4; margin-bottom: 1rem; font-size: clamp(1.2rem, 4vw, 1.6rem);">Choose Your Battle Orientation</h2>
+        <p style="margin-bottom: 1rem; font-size: clamp(0.8rem, 2.5vw, 1rem);">Select how you want to play:</p>
         <div class="orientation-buttons">
             <button class="orientation-btn" onclick="setOrientation('portrait')">
                 📱 Portrait<br><small>Vertical Gameplay</small>
@@ -1132,7 +1144,7 @@ body.landscape-mode #gameCanvas {
             <button class="menu-btn home-btn" onclick="showScreen('mainMenu')">🏠 HOME</button>
             <div class="menu-content">
                 <h2 class="game-subtitle">Ship Upgrades</h2>
-                <p style="margin-bottom: 2rem; color: #00bcd4; font-size: clamp(1.1rem, 3vw, 1.4rem);">Upgrade Points Available: <span id="availableSkillPoints">0</span></p>
+                <p style="margin-bottom: 2rem; color: #00bcd4; font-size: clamp(0.9rem, 2.5vw, 1.2rem);">Upgrade Points Available: <span id="availableSkillPoints">0</span></p>
                 
                 <div class="stats-display" id="skillTreeGrid">
                 </div>
@@ -1210,34 +1222,34 @@ body.landscape-mode #gameCanvas {
                 
                 <div style="text-align: left; max-width: 700px; margin: 0 auto;">
                     <div style="margin-bottom: 2rem; padding: 1.5rem; background: rgba(0,0,0,0.5); border-radius: 15px;">
-                        <h3 style="color: #00bcd4; margin-bottom: 1rem; font-size: clamp(1.2rem, 3vw, 1.5rem);">Basic Controls</h3>
-                        <p style="margin-bottom: 0.5rem; font-size: clamp(0.9rem, 2.5vw, 1.1rem);"><strong>W A S D</strong> or <strong>Arrow Keys</strong> - Move ship</p>
-                        <p style="margin-bottom: 0.5rem; font-size: clamp(0.9rem, 2.5vw, 1.1rem);"><strong>Mouse</strong> or <strong>Touch</strong> - Aim and fire</p>
-                        <p style="margin-bottom: 0.5rem; font-size: clamp(0.9rem, 2.5vw, 1.1rem);"><strong>Space</strong> or <strong>Click</strong> - Fire weapons</p>
-                        <p style="font-size: clamp(0.9rem, 2.5vw, 1.1rem);"><strong>Right Click</strong> or <strong>Hold</strong> - Charged shot</p>
+                        <h3 style="color: #00bcd4; margin-bottom: 1rem; font-size: clamp(1rem, 2.5vw, 1.3rem);">Basic Controls</h3>
+                        <p style="margin-bottom: 0.5rem; font-size: clamp(0.8rem, 2vw, 0.9rem);"><strong>W A S D</strong> or <strong>Arrow Keys</strong> - Move ship</p>
+                        <p style="margin-bottom: 0.5rem; font-size: clamp(0.8rem, 2vw, 0.9rem);"><strong>Mouse</strong> or <strong>Touch</strong> - Aim and fire</p>
+                        <p style="margin-bottom: 0.5rem; font-size: clamp(0.8rem, 2vw, 0.9rem);"><strong>Space</strong> or <strong>Click</strong> - Fire weapons</p>
+                        <p style="font-size: clamp(0.8rem, 2vw, 0.9rem);"><strong>Right Click</strong> or <strong>Hold</strong> - Charged shot</p>
                     </div>
                     
                     <div style="margin-bottom: 2rem; padding: 1.5rem; background: rgba(0,0,0,0.5); border-radius: 15px;">
-                        <h3 style="color: #2196f3; margin-bottom: 1rem; font-size: clamp(1.2rem, 3vw, 1.5rem);">Special Abilities</h3>
-                        <p style="margin-bottom: 0.5rem; font-size: clamp(0.9rem, 2.5vw, 1.1rem);"><strong>E</strong> or <strong>🛡️ Button</strong> - Energy shield</p>
-                        <p style="margin-bottom: 0.5rem; font-size: clamp(0.9rem, 2.5vw, 1.1rem);"><strong>F</strong> or <strong>⏰ Button</strong> - Slow time</p>
-                        <p style="margin-bottom: 0.5rem; font-size: clamp(0.9rem, 2.5vw, 1.1rem);"><strong>C</strong> or <strong>⚡ Button</strong> - Special attack</p>
-                        <p style="font-size: clamp(0.9rem, 2.5vw, 1.1rem);"><strong>Shift</strong> - Precision mode</p>
+                        <h3 style="color: #2196f3; margin-bottom: 1rem; font-size: clamp(1rem, 2.5vw, 1.3rem);">Special Abilities</h3>
+                        <p style="margin-bottom: 0.5rem; font-size: clamp(0.8rem, 2vw, 0.9rem);"><strong>E</strong> or <strong>🛡️ Button</strong> - Energy shield</p>
+                        <p style="margin-bottom: 0.5rem; font-size: clamp(0.8rem, 2vw, 0.9rem);"><strong>F</strong> or <strong>⏰ Button</strong> - Slow time</p>
+                        <p style="margin-bottom: 0.5rem; font-size: clamp(0.8rem, 2vw, 0.9rem);"><strong>C</strong> or <strong>⚡ Button</strong> - Special attack</p>
+                        <p style="font-size: clamp(0.8rem, 2vw, 0.9rem);"><strong>Shift</strong> - Precision mode</p>
                     </div>
                     
                     <div style="margin-bottom: 2rem; padding: 1.5rem; background: rgba(0,0,0,0.5); border-radius: 15px;">
-                        <h3 style="color: #4caf50; margin-bottom: 1rem; font-size: clamp(1.2rem, 3vw, 1.5rem);">Mobile Controls</h3>
-                        <p style="margin-bottom: 0.5rem; font-size: clamp(0.9rem, 2.5vw, 1.1rem);"><strong>Virtual Joystick</strong> - Move ship</p>
-                        <p style="margin-bottom: 0.5rem; font-size: clamp(0.9rem, 2.5vw, 1.1rem);"><strong>Tap Screen</strong> - Aim and fire</p>
-                        <p style="margin-bottom: 0.5rem; font-size: clamp(0.9rem, 2.5vw, 1.1rem);"><strong>Action Buttons</strong> - Special abilities</p>
-                        <p style="font-size: clamp(0.9rem, 2.5vw, 1.1rem);"><strong>Double Tap</strong> - Emergency actions</p>
+                        <h3 style="color: #4caf50; margin-bottom: 1rem; font-size: clamp(1rem, 2.5vw, 1.3rem);">Mobile Controls</h3>
+                        <p style="margin-bottom: 0.5rem; font-size: clamp(0.8rem, 2vw, 0.9rem);"><strong>Virtual Joystick</strong> - Move ship</p>
+                        <p style="margin-bottom: 0.5rem; font-size: clamp(0.8rem, 2vw, 0.9rem);"><strong>Tap Screen</strong> - Aim and fire</p>
+                        <p style="margin-bottom: 0.5rem; font-size: clamp(0.8rem, 2vw, 0.9rem);"><strong>Action Buttons</strong> - Special abilities</p>
+                        <p style="font-size: clamp(0.8rem, 2vw, 0.9rem);"><strong>Double Tap</strong> - Emergency actions</p>
                     </div>
                     
                     <div style="margin-bottom: 2rem; padding: 1.5rem; background: rgba(0,0,0,0.5); border-radius: 15px;">
-                        <h3 style="color: #ff9800; margin-bottom: 1rem; font-size: clamp(1.2rem, 3vw, 1.5rem);">Orientation Modes</h3>
-                        <p style="margin-bottom: 0.5rem; font-size: clamp(0.9rem, 2.5vw, 1.1rem);"><strong>Portrait</strong> - Vertical gameplay, optimized for phones</p>
-                        <p style="margin-bottom: 0.5rem; font-size: clamp(0.9rem, 2.5vw, 1.1rem);"><strong>Landscape</strong> - Horizontal gameplay, optimized for tablets</p>
-                        <p style="font-size: clamp(0.9rem, 2.5vw, 1.1rem);"><strong>Auto</strong> - Adapts to device rotation</p>
+                        <h3 style="color: #ff9800; margin-bottom: 1rem; font-size: clamp(1rem, 2.5vw, 1.3rem);">Orientation Modes</h3>
+                        <p style="margin-bottom: 0.5rem; font-size: clamp(0.8rem, 2vw, 0.9rem);"><strong>Portrait</strong> - Vertical gameplay, optimized for phones</p>
+                        <p style="margin-bottom: 0.5rem; font-size: clamp(0.8rem, 2vw, 0.9rem);"><strong>Landscape</strong> - Horizontal gameplay, optimized for tablets</p>
+                        <p style="font-size: clamp(0.8rem, 2vw, 0.9rem);"><strong>Auto</strong> - Adapts to device rotation</p>
                     </div>
                 </div>
             </div>
@@ -1272,7 +1284,7 @@ body.landscape-mode #gameCanvas {
                 
                 <div class="health-container">
                     <div class="health-bar-wrapper">
-                        <div style="font-size: clamp(0.8rem, 2.5vw, 1rem); margin-bottom: 0.3rem; font-weight: 600;">GUARDIAN</div>
+                        <div style="font-size: clamp(0.6rem, 2vw, 0.8rem); margin-bottom: 0.2rem; font-weight: 600;">GUARDIAN</div>
                         <div class="health-bar" style="border-color: #00bcd4;">
                             <div id="playerHealthFill" class="health-fill" style="background: linear-gradient(90deg, #4caf50, #8bc34a, #cddc39); width: 100%;"></div>
                         </div>
@@ -1280,7 +1292,7 @@ body.landscape-mode #gameCanvas {
                     </div>
                     
                     <div class="health-bar-wrapper">
-                        <div style="font-size: clamp(0.8rem, 2.5vw, 1rem); margin-bottom: 0.3rem; font-weight: 600;">ENEMY</div>
+                        <div style="font-size: clamp(0.6rem, 2vw, 0.8rem); margin-bottom: 0.2rem; font-weight: 600;">ENEMY</div>
                         <div class="health-bar" style="border-color: #f44336;">
                             <div id="enemyHealthFill" class="health-fill" style="background: linear-gradient(90deg, #f44336, #e91e63, #9c27b0); width: 100%;"></div>
                         </div>
@@ -1293,7 +1305,7 @@ body.landscape-mode #gameCanvas {
                         <div class="stat-label">SCORE</div>
                         <div class="stat-value" id="playerScore">0</div>
                     </div>
-                    <button class="menu-btn home-btn" onclick="forfeitMission()" style="position: relative; top: 0; left: 0; background: linear-gradient(45deg, #f44336, #e91e63); padding: clamp(0.8rem, 3vw, 1.2rem);">
+                    <button class="menu-btn home-btn" onclick="forfeitMission()" style="position: relative; top: 0; left: 0; background: linear-gradient(45deg, #f44336, #e91e63); padding: clamp(0.6rem, 2.5vw, 1rem);">
                         🏠 RETREAT
                     </button>
                 </div>
@@ -1309,18 +1321,18 @@ body.landscape-mode #gameCanvas {
             
             <div class="transformation-overlay" id="transformationOverlay"></div>
             
-            <canvas id="gameCanvas" width="1920" height="1080"></canvas>
+            <canvas id="gameCanvas" style="width: 100%; height: 100%;"></canvas>
         </div>
 
         <!-- Game Over Screen -->
         <div class="screen" id="gameOver">
-            <div style="text-align: center; padding: clamp(2rem, 6vw, 3rem); background: rgba(0, 0, 0, 0.95); border-radius: 25px; border: 4px solid #f44336; box-shadow: 0 0 60px rgba(244, 67, 54, 0.8); margin: 1rem; max-width: 90vw;">
-                <h2 style="font-size: clamp(2.5rem, 10vw, 4.5rem); color: #f44336; margin-bottom: 2rem; text-shadow: 0 0 30px #f44336;">MISSION FAILED</h2>
+            <div style="text-align: center; padding: clamp(1.5rem, 4vw, 2.5rem); background: rgba(0, 0, 0, 0.95); border-radius: 20px; border: 3px solid #f44336; box-shadow: 0 0 50px rgba(244, 67, 54, 0.7); margin: 1rem; max-width: 95vw;">
+                <h2 style="font-size: clamp(2rem, 8vw, 3.5rem); color: #f44336; margin-bottom: 2rem; text-shadow: 0 0 25px #f44336;">MISSION FAILED</h2>
                 <div style="margin: 2rem 0;">
-                    <div style="font-size: clamp(1.3rem, 5vw, 1.8rem); margin-bottom: 1rem;">Score: <span id="finalScore" style="color: #ffd700;">0</span></div>
-                    <div style="font-size: clamp(1.1rem, 4vw, 1.4rem); margin-bottom: 1rem;">Level Reached: <span id="finalLevel" style="color: #00bcd4;">1</span></div>
-                    <div style="font-size: clamp(1.1rem, 4v w, 1.4rem); margin-bottom: 1rem;">Survival Time: <span id="finalTime" style="color: #4caf50;">0s</span></div>
-                    <div style="font-size: clamp(1.1rem, 4vw, 1.4rem);">Upgrade Points Earned: <span id="earnedSkillPoints" style="color: #9c27b0;">0</span></div>
+                    <div style="font-size: clamp(1.1rem, 4vw, 1.5rem); margin-bottom: 1rem;">Score: <span id="finalScore" style="color: #ffd700;">0</span></div>
+                    <div style="font-size: clamp(0.9rem, 3vw, 1.2rem); margin-bottom: 1rem;">Level Reached: <span id="finalLevel" style="color: #00bcd4;">1</span></div>
+                    <div style="font-size: clamp(0.9rem, 3vw, 1.2rem); margin-bottom: 1rem;">Survival Time: <span id="finalTime" style="color: #4caf50;">0s</span></div>
+                    <div style="font-size: clamp(0.9rem, 3vw, 1.2rem);">Upgrade Points Earned: <span id="earnedSkillPoints" style="color: #9c27b0;">0</span></div>
                 </div>
                 
                 <div class="menu-buttons">
@@ -1334,14 +1346,14 @@ body.landscape-mode #gameCanvas {
 
         <!-- Victory Screen -->
         <div class="screen" id="victory">
-            <div style="text-align: center; padding: clamp(2rem, 6vw, 3rem); background: rgba(0, 0, 0, 0.95); border-radius: 25px; border: 4px solid #ffd700; box-shadow: 0 0 60px rgba(255, 215, 0, 0.8); margin: 1rem; max-width: 90vw;">
-                <h2 style="font-size: clamp(2.5rem, 10vw, 4.5rem); color: #ffd700; margin-bottom: 2rem; text-shadow: 0 0 30px #ffd700;">GALAXY SAVED!</h2>
+            <div style="text-align: center; padding: clamp(1.5rem, 4vw, 2.5rem); background: rgba(0, 0, 0, 0.95); border-radius: 20px; border: 3px solid #ffd700; box-shadow: 0 0 50px rgba(255, 215, 0, 0.7); margin: 1rem; max-width: 95vw;">
+                <h2 style="font-size: clamp(2rem, 8vw, 3.5rem); color: #ffd700; margin-bottom: 2rem; text-shadow: 0 0 25px #ffd700;">GALAXY SAVED!</h2>
                 <div style="margin: 2rem 0;">
-                    <div style="font-size: clamp(1.8rem, 6vw, 2.5rem); margin-bottom: 1rem; color: #ffd700;">👑 STELLAR GUARDIAN SUPREME! 👑</div>
-                    <div style="font-size: clamp(1.3rem, 5vw, 1.8rem); margin-bottom: 1rem;">Final Score: <span id="victoryScore" style="color: #ffd700;">0</span></div>
-                    <div style="font-size: clamp(1.1rem, 4vw, 1.4rem); margin-bottom: 1rem;">All 20 Levels Completed!</div>
-                    <div style="font-size: clamp(1.1rem, 4vw, 1.4rem); margin-bottom: 1rem;">Total Time: <span id="victoryTime" style="color: #4caf50;">0s</span></div>
-                    <div style="font-size: clamp(1.1rem, 4vw, 1.4rem);">You are the ultimate space defender!</div>
+                    <div style="font-size: clamp(1.5rem, 5vw, 2rem); margin-bottom: 1rem; color: #ffd700;">👑 STELLAR GUARDIAN SUPREME! 👑</div>
+                    <div style="font-size: clamp(1.1rem, 4vw, 1.5rem); margin-bottom: 1rem;">Final Score: <span id="victoryScore" style="color: #ffd700;">0</span></div>
+                    <div style="font-size: clamp(0.9rem, 3vw, 1.2rem); margin-bottom: 1rem;">All 20 Levels Completed!</div>
+                    <div style="font-size: clamp(0.9rem, 3vw, 1.2rem); margin-bottom: 1rem;">Total Time: <span id="victoryTime" style="color: #4caf50;">0s</span></div>
+                    <div style="font-size: clamp(0.9rem, 3vw, 1.2rem);">You are the ultimate space defender!</div>
                 </div>
                 
                 <div class="menu-buttons">
@@ -1476,7 +1488,7 @@ body.landscape-mode #gameCanvas {
         let canvas, ctx;
         let animationId;
         
-         // IMMAGINI
+        // IMMAGINI
         const backgroundImage = new Image();
         backgroundImage.src = 'space-background.png';
 
@@ -1487,7 +1499,6 @@ body.landscape-mode #gameCanvas {
         playerImage.src = 'player-ship.png';
 
         let backgroundY = 0; // posizione verticale dello sfondo
-
 
         // Tutorial System
         function showTutorial() {
@@ -1577,6 +1588,9 @@ body.landscape-mode #gameCanvas {
                 screen.orientation?.lock?.('landscape').catch(() => {});
             } else {
                 screen.orientation?.unlock?.().catch(() => {});
+                // Auto-detect current orientation
+                const isLandscape = window.innerWidth > window.innerHeight;
+                document.body.classList.add(isLandscape ? 'landscape-mode' : 'portrait-mode');
             }
             
             const savedData = JSON.parse(localStorage.getItem('stellarGuardianSave') || '{}');
@@ -1612,8 +1626,22 @@ body.landscape-mode #gameCanvas {
         function resizeCanvas() {
             const container = document.getElementById('gameContainer');
             const rect = container.getBoundingClientRect();
-            canvas.width = rect.width;
-            canvas.height = rect.height;
+            
+            // Improved canvas sizing for mobile
+            let canvasWidth = rect.width;
+            let canvasHeight = rect.height;
+            
+            // Adjust for mobile controls
+            if (gameState.isMobile && gameState.currentScreen === 'gameScreen') {
+                const isPortrait = document.body.classList.contains('portrait-mode');
+                const controlsHeight = isPortrait ? 
+                    Math.min(200, window.innerHeight * 0.25) : 
+                    Math.min(150, window.innerHeight * 0.2);
+                canvasHeight -= controlsHeight;
+            }
+            
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
             
             if (gameState.gameRunning) {
                 gameState.player.x = Math.min(gameState.player.x, canvas.width - 50);
@@ -1675,7 +1703,7 @@ body.landscape-mode #gameCanvas {
                 const deltaX = relevantTouch.clientX - centerX;
                 const deltaY = relevantTouch.clientY - centerY;
                 const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-                const maxDistance = 50;
+                const maxDistance = 40; // Reduced for better mobile control
                 
                 if (distance <= maxDistance) {
                     gameState.touchControls.joystick.currentX = deltaX;
@@ -1712,7 +1740,7 @@ body.landscape-mode #gameCanvas {
                 button.addEventListener('touchstart', (e) => {
                     e.preventDefault();
                     action();
-                    button.style.transform = 'scale(0.9)';
+                    button.style.transform = 'scale(0.95)';
                     if (navigator.vibrate) {
                         navigator.vibrate(hapticStrength);
                     }
@@ -1951,11 +1979,11 @@ body.landscape-mode #gameCanvas {
                 }
                 
                 skillNode.innerHTML = `
-                    <div style="font-size: clamp(2rem, 5vw, 2.5rem); margin-bottom: 0.8rem;">${skillData.icon}</div>
-                    <div style="font-size: clamp(1rem, 3vw, 1.3rem); font-weight: 700; color: ${currentLevel > 0 ? '#4caf50' : '#00bcd4'}; margin-bottom: 0.5rem;">${skillData.name}</div>
-                    <div style="font-size: clamp(0.9rem, 2.5vw, 1rem); margin-bottom: 0.8rem; line-height: 1.4;">${skillData.description}</div>
-                    <div style="font-size: clamp(0.8rem, 2vw, 0.9rem); color: #888; margin-bottom: 0.5rem;">Level: ${currentLevel}/${skillData.maxLevel}</div>
-                    <div style="font-size: clamp(0.9rem, 2.5vw, 1rem); color: #ffd700; font-weight: 600;">Cost: ${skillData.cost} UP</div>
+                    <div style="font-size: clamp(1.5rem, 4vw, 2rem); margin-bottom: 0.6rem;">${skillData.icon}</div>
+                    <div style="font-size: clamp(0.8rem, 2.5vw, 1.1rem); font-weight: 700; color: ${currentLevel > 0 ? '#4caf50' : '#00bcd4'}; margin-bottom: 0.4rem;">${skillData.name}</div>
+                    <div style="font-size: clamp(0.7rem, 2vw, 0.9rem); margin-bottom: 0.6rem; line-height: 1.3;">${skillData.description}</div>
+                    <div style="font-size: clamp(0.6rem, 1.8vw, 0.8rem); color: #888; margin-bottom: 0.4rem;">Level: ${currentLevel}/${skillData.maxLevel}</div>
+                    <div style="font-size: clamp(0.7rem, 2vw, 0.9rem); color: #ffd700; font-weight: 600;">Cost: ${skillData.cost} UP</div>
                 `;
                 
                 skillTreeGrid.appendChild(skillNode);
@@ -2030,10 +2058,10 @@ body.landscape-mode #gameCanvas {
                 }
                 
                 achievementItem.innerHTML = `
-                    <div style="font-size: clamp(2rem, 5vw, 2.5rem); margin-bottom: 0.8rem;">${achievementData.icon}</div>
-                    <div style="font-size: clamp(1rem, 3vw, 1.3rem); font-weight: 700; color: ${isUnlocked ? '#4caf50' : '#666'}; margin-bottom: 0.5rem;">${achievementData.name}</div>
-                    <div style="font-size: clamp(0.9rem, 2.5vw, 1rem); color: ${isUnlocked ? '#ffffff' : '#888'}; line-height: 1.4; margin-bottom: 0.8rem;">${achievementData.description}</div>
-                    ${isUnlocked ? '<div style="font-size: clamp(0.8rem, 2vw, 0.9rem); color: #ffd700; font-weight: 600;">✓ UNLOCKED</div>' : '<div style="font-size: clamp(0.8rem, 2vw, 0.9rem); color: #666;">🔒 LOCKED</div>'}
+                    <div style="font-size: clamp(1.5rem, 4vw, 2rem); margin-bottom: 0.6rem;">${achievementData.icon}</div>
+                    <div style="font-size: clamp(0.8rem, 2.5vw, 1.1rem); font-weight: 700; color: ${isUnlocked ? '#4caf50' : '#666'}; margin-bottom: 0.4rem;">${achievementData.name}</div>
+                    <div style="font-size: clamp(0.7rem, 2vw, 0.9rem); color: ${isUnlocked ? '#ffffff' : '#888'}; line-height: 1.3; margin-bottom: 0.6rem;">${achievementData.description}</div>
+                    ${isUnlocked ? '<div style="font-size: clamp(0.6rem, 1.8vw, 0.8rem); color: #ffd700; font-weight: 600;">✓ UNLOCKED</div>' : '<div style="font-size: clamp(0.6rem, 1.8vw, 0.8rem); color: #666;">🔒 LOCKED</div>'}
                 `;
                 
                 achievementsList.appendChild(achievementItem);
@@ -2230,7 +2258,7 @@ body.landscape-mode #gameCanvas {
             
             // Mobile joystick movement
             if (gameState.isMobile && gameState.touchControls.joystick.active) {
-                const joystickStrength = 0.3;
+                const joystickStrength = 0.25; // Reduced for better control
                 const moveX = gameState.touchControls.joystick.currentX * joystickStrength;
                 const moveY = gameState.touchControls.joystick.currentY * joystickStrength;
                 
@@ -2243,17 +2271,17 @@ body.landscape-mode #gameCanvas {
             }
             
             // Keyboard movement (solo sinistra/destra — navicella bloccata in basso)
-if ((gameState.keys['a'] || gameState.keys['ArrowLeft']) && player.x > 50) {
-    player.x -= speed;
-    player.angle = -Math.PI / 2;
-}
-if ((gameState.keys['d'] || gameState.keys['ArrowRight']) && player.x < canvas.width - 50) {
-    player.x += speed;
-    player.angle = Math.PI / 2;
-}
+            if ((gameState.keys['a'] || gameState.keys['ArrowLeft']) && player.x > 50) {
+                player.x -= speed;
+                player.angle = -Math.PI / 2;
+            }
+            if ((gameState.keys['d'] || gameState.keys['ArrowRight']) && player.x < canvas.width - 50) {
+                player.x += speed;
+                player.angle = Math.PI / 2;
+            }
 
-// Navicella fissa in basso (85% dell’altezza)
-player.y = canvas.height * 0.85;
+            // Navicella fissa in basso (85% dell'altezza)
+            player.y = canvas.height * 0.85;
             
             // Keep player in bounds
             player.x = Math.max(50, Math.min(canvas.width - 50, player.x));
@@ -2554,7 +2582,7 @@ player.y = canvas.height * 0.85;
                 gameState.particles.push({
                     x: x,
                     y: y,
-                    vx: (Math.random() - 0.5) * 8,
+                    vx: (Math.random() - 0.5) *8,
                     vy: (Math.random() - 0.5) * 8 - 5,
                     color: color,
                     size: Math.random() * 4 + 2,
@@ -3126,59 +3154,58 @@ player.y = canvas.height * 0.85;
         }
 
         function renderSpaceBackground() {
-    if (backgroundImage.complete) {
-        ctx.drawImage(backgroundImage, 0, backgroundY, canvas.width, canvas.height);
-        ctx.drawImage(backgroundImage, 0, backgroundY - canvas.height, canvas.width, canvas.height);
+            if (backgroundImage.complete) {
+                ctx.drawImage(backgroundImage, 0, backgroundY, canvas.width, canvas.height);
+                ctx.drawImage(backgroundImage, 0, backgroundY - canvas.height, canvas.width, canvas.height);
 
-        backgroundY += 1;
-        if (backgroundY >= canvas.height) backgroundY = 0;
-    } else {
-        // fallback: stelle animate
-        // (puoi lasciare il codice che hai già)
-    }
-}
+                backgroundY += 1;
+                if (backgroundY >= canvas.height) backgroundY = 0;
+            } else {
+                // fallback: stelle animate
+                // (puoi lasciare il codice che hai già)
+            }
+        }
 
-              function renderPlayer() {
-    const player = gameState.player;
+        function renderPlayer() {
+            const player = gameState.player;
 
-    ctx.save();
-    ctx.translate(player.x, player.y);
-    ctx.rotate(player.angle);
+            ctx.save();
+            ctx.translate(player.x, player.y);
+            ctx.rotate(player.angle);
 
-    // ✅ NIENTE scale qui
+            // ✅ NIENTE scale qui
 
-    if (playerImage.complete) {
-        ctx.drawImage(playerImage, -32, -32, 64, 64); // ⬅️ Dimensioni ridotte
-    }
+            if (playerImage.complete) {
+                ctx.drawImage(playerImage, -32, -32, 64, 64); // ⬅️ Dimensioni ridotte
+            }
 
-    ctx.restore();
-}
+            ctx.restore();
+        }
 
         function renderEnemy() {
-    const enemy = gameState.enemy;
-    if (!enemy || enemy.health <= 0) return;
+            const enemy = gameState.enemy;
+            if (!enemy || enemy.health <= 0) return;
 
-    ctx.save();
-    ctx.translate(enemy.x, enemy.y);
-    ctx.rotate(enemy.angle || 0);
+            ctx.save();
+            ctx.translate(enemy.x, enemy.y);
+            ctx.rotate(enemy.angle || 0);
 
-    // ✅ Disegna immagine se disponibile
-    if (enemyImage.complete && enemyImage.naturalWidth !== 0) {
-    ctx.drawImage(enemyImage, -40, -40, 80, 80); // 80x80 pixel
-    } else {
-        // ❌ Fallback: triangolo
-        ctx.fillStyle = '#f44336';
-        ctx.beginPath();
-        ctx.moveTo(0, -20);
-        ctx.lineTo(-15, 15);
-        ctx.lineTo(15, 15);
-        ctx.closePath();
-        ctx.fill();
-    }
+            // ✅ Disegna immagine se disponibile
+            if (enemyImage.complete && enemyImage.naturalWidth !== 0) {
+                ctx.drawImage(enemyImage, -40, -40, 80, 80); // 80x80 pixel
+            } else {
+                // ❌ Fallback: triangolo
+                ctx.fillStyle = '#f44336';
+                ctx.beginPath();
+                ctx.moveTo(0, -20);
+                ctx.lineTo(-15, 15);
+                ctx.lineTo(15, 15);
+                ctx.closePath();
+                ctx.fill();
+            }
 
-    ctx.restore();
-}
-
+            ctx.restore();
+        }
 
         function renderBullets() {
             gameState.bullets.forEach(bullet => {
@@ -3388,6 +3415,23 @@ player.y = canvas.height * 0.85;
             }
         }
 
+        function fixCanvasSize() {
+            const canvas = document.getElementById('gameCanvas');
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+
+            // imposta dimensioni visive
+            canvas.style.width = "100%";
+            canvas.style.height = "100%";
+
+            // imposta dimensioni interne del canvas per il rendering
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+        }
+
+        window.addEventListener("load", fixCanvasSize);
+        window.addEventListener("resize", fixCanvasSize);
+        
         // Initialize Game
         window.addEventListener('load', initGame);
     </script>
