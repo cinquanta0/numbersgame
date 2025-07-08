@@ -1,8 +1,9 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>🌟 STELLAR GUARDIAN - COSMIC DEFENSE FORCE 🌟</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
@@ -976,13 +977,8 @@
             transition: width 0.3s ease;
         }
     body.portrait-mode #gameCanvas {
-    position: absolute;
-    top: 130px; /* o l’altezza dell’HUD */
-    bottom: 180px; /* spazio per i controlli */
-    left: 0;
-    right: 0;
-    width: 100%;
-    height: auto;
+    width: 100vw;
+    height: 80vh;
 }
 
 body.landscape-mode #gameCanvas {
@@ -3392,27 +3388,8 @@ player.y = canvas.height * 0.85;
             }
         }
 
-        // Rileva se siamo in portrait o landscape e assegna la classe al body
-function updateOrientationMode() {
-    const isPortrait = window.innerHeight > window.innerWidth;
-
-    if (isPortrait) {
-        document.body.classList.add('portrait-mode');
-        document.body.classList.remove('landscape-mode');
-    } else {
-        document.body.classList.add('landscape-mode');
-        document.body.classList.remove('portrait-mode');
-    }
-}
-
-// Avvia quando la pagina è pronta e quando ruoti il telefono
-document.addEventListener('DOMContentLoaded', updateOrientationMode);
-window.addEventListener('resize', updateOrientationMode);
-window.addEventListener('orientationchange', updateOrientationMode);
-
         // Initialize Game
         window.addEventListener('load', initGame);
-    
     </script>
 </body>
 </html>
