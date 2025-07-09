@@ -8,47 +8,20 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <style>
     
-  /* ✅ Resize completo per iframe 800x450 e fullscreen */
-  html, body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-  }
+    html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
 
-  #gameWrapper, .main-container {
-    width: 100%;
-    height: 100%;
-  }
+canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
 
-  canvas {
-    width: 100% !important;
-    height: 100% !important;
-    display: block;
-  }
-
-  .iframe-wrapper {
-    position: relative;
-    width: 100%;
-    padding-top: 56.25%; /* 16:9 ratio */
-  }
-
-  .iframe-wrapper iframe {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border: none;
-  }
-</style>
-
-<div id="gameWrapper" class="main-container">
-  <div class="iframe-wrapper">
-    <iframe src="pagina.html" allowfullscreen></iframe>
-  </div>
-</div>
 
 
 
@@ -963,6 +936,15 @@
   window.addEventListener('resize', resizeGameArea);
   window.addEventListener('load', resizeGameArea);
 </script>
+const canvas = document.getElementById("gameCanvas");
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+
+window.addEventListener("load", resizeCanvas);
+window.addEventListener("resize", resizeCanvas);
 
 </body>
 </html>
