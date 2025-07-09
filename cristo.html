@@ -1,37 +1,16 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>✨ ASTRA MYSTERIUM - Oracoli Celesti</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Rajdhani:wght@300;400;600&family=Cinzel:wght@400;700&display=swap" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-    }
-    canvas {
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
-  </style>
-</head>
-<body>
-  <canvas id="gameCanvas"></canvas>
-
-
-
-    :root {
-        --font-primary: 'Orbitron', sans-serif;
-        --font-secondary: 'Rajdhani', sans-serif;
-        --font-display: 'Cinzel', serif;
-        /* ... il resto rimane invariato ... */
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✨ ASTRA MYSTERIUM - Oracoli Celesti</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Rajdhani:wght@300;400;600&family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --font-primary: 'Orbitron', sans-serif;
+            --font-secondary: 'Rajdhani', sans-serif;
+            --font-display: 'Cinzel', serif;
 
             --primary: #7DF9FF; --rgb-primary: 125, 249, 255;
             --secondary: #B57EDC; --rgb-secondary: 181, 126, 220;
@@ -871,6 +850,7 @@
         function saveStats(gameWon = false, score = 0) { if (!isLoggedIn || !currentUser) return; const key = `astramysterium-${currentUser.email}`; const statsToUpdate = { 'totalGames': (parseInt(localStorage.getItem(`${key}-totalGames`) || 0)) + 1, 'totalWins': (parseInt(localStorage.getItem(`${key}-totalWins`) || 0)) + (gameWon ? 1 : 0), 'bestScore': Math.max(parseInt(localStorage.getItem(`${key}-bestScore`) || 0), score) }; for (const stat in statsToUpdate) { localStorage.setItem(`${key}-${stat}`, statsToUpdate[stat]); } loadStats(); }
         function resetAllStats() { if (confirm('Sei sicuro di voler cancellare le tue Cronache Celesti? Questo atto è definitivo!')) { if (isLoggedIn && currentUser) { const key = `astramysterium-${currentUser.email}`; ['totalGames', 'totalWins', 'bestScore'].forEach(stat => localStorage.removeItem(`${key}-${stat}`)); } loadStats(); showNotification('🗑️ Cronache Celesti azzerate.', 'success'); } }
         function exportStats() { if (!isLoggedIn || !currentUser) return showNotification('❌ Devi essere connesso al flusso astrale per trascrivere!', 'error'); const key = `astramysterium-${currentUser.email}`; const data = { user: currentUser, settings, totalGames: localStorage.getItem(`${key}-totalGames`) || 0, totalWins: localStorage.getItem(`${key}-totalWins`) || 0, bestScore: localStorage.getItem(`${key}-totalWins`) || 0, }; const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `astramysterium-echi-${currentUser.name.replace(/\s+/g, '_')}.json`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(a.href); showNotification('📤 Echi Trascitti con successo!', 'success'); }
+        function showCredits() { alert(`✨ ASTRA MYSTERIUM - Oracoli Celesti ✨\n\n📜 Custodi del Sapere (Crediti):\n• Concetto e Sviluppo: Ispirato dalle Stelle (e da te!)\n• Tecnologie: HTML, CSS, JavaScript, Canvas Confetti\n\n🗝️ Portali Cosmici (Funzionalità):\n• Autenticazione Astrale (Simulata)\n• Modalità Spettro (Ospite)\n• Cronache Celesti Personalizzate (Statistiche)\n• Salvataggio Echi nel Local Storage\n\n🔮 Giochi Oracolari:\n• Numerologia Astrale (Indovina Numero)\n• Memoria Stellare (Memory Game)\n• Sequenza Astrale (Pattern - In Sviluppo)\n• Enigma delle Rune (Logica - In Sviluppo)\n• Cometa Fulminea, Armonia Cromatica (Placeholder)\n\n🎨 Visioni Astrali (Caratteristiche):\n• Molteplici Temi Celesti Dinamici\n• Grafica Immersiva con Effetti Cosmici\n• UI "Cristallo Divinatorio" e "Bagliore Celestiale"\n• Melodie Celesti (Musica di Sottofondo)\n• Design Adattivo per Viaggi Interdimensionali (Responsivo)\n• Configurazione Flusso Energetico (Prestazioni)\n\n🌌 Arena Eterea (Multiplayer):\n• Accesso tramite portale 'index.html' (Simulato)\n\n🎵 Armonie Celesti (Audio):\n• Supporto per musica.mp3\n• Controllo Volume e Attivazione/Disattivazione\n\nVersione Ω.1 (Omega Potenziata) - L'Universo è in Continua Espansione\nCreato con Polvere di Stelle e Codice Arcano!`); }
         
         // Navigation Functions (showMainMenu, showGameMode, showSettings, hideAllScreens) - invariate
         function showMainMenu() { hideAllScreens(); document.getElementById('mainMenu').classList.remove('hidden'); loadStats(); }
@@ -923,29 +903,5 @@
         function updateMemoryDisplay() { const mg = gameState.memoryGame; document.getElementById('memoryLevel').textContent = mg.level; document.getElementById('memoryPairs').textContent = mg.matchedPairs; document.getElementById('memoryMoves').textContent = mg.moves; }
 
     </script>
-    <script>
-  function resizeGameArea() {
-    const canvas = document.querySelector('canvas');
-    if (canvas) {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      canvas.style.width = '100%';
-      canvas.style.height = '100%';
-    }
-  }
-
-  window.addEventListener('resize', resizeGameArea);
-  window.addEventListener('load', resizeGameArea);
-<script>
-const canvas = document.getElementById("gameCanvas");
-
-function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
-
-window.addEventListener("load", resizeCanvas);
-window.addEventListener("resize", resizeCanvas);
-</script>
 </body>
 </html>
