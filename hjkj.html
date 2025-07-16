@@ -6,6 +6,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <style>
+        
+       #gameContainer {
+    width: 100vw;
+    height: calc(var(--vh, 1vh) * 100);
+    position: relative;
+}
+ 
+        
         #fullscreenBtn {
   position: absolute;
   top: 10px;
@@ -39,7 +47,7 @@
             background-size: 500% 500%;
             animation: cosmicGradient 15s ease infinite;
             color: #ffffff;
-            overflow: hidden;
+            overflow: auto;
             touch-action: manipulation;
         }
 
@@ -50,11 +58,6 @@
             75% { background-position: 0% 100%; }
         }
 
-        #gameContainer {
-            width: 100vw;
-            height: 100vh;
-            position: relative;
-        }
 
         /* Tutorial Overlay */
         .tutorial-overlay {
@@ -1043,7 +1046,12 @@
     <div class="particles" id="particles"></div>
     
     <div id="notificationContainer"></div>
-    <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶ FULLSCREEN</button>
+    <button id="fullscreenBtn">Fullscreen</button>
+
+<script>
+   document.getElementById('fullscreenBtn').addEventListener('click', enterFullscreen);
+</script>
+
 
     <!-- Orientation Selector -->
     <div class="orientation-selector" id="orientationSelector">
@@ -3666,16 +3674,17 @@ function restartGame() {
     showScreen("gameScreen");  // Torna alla schermata di gioco
     startLevel(gameState.currentLevel);  // Ricomincia il livello
 }
-function toggleFullscreen() {
-    const elem = document.documentElement;
-    if (!document.fullscreenElement) {
-      if (elem.requestFullscreen) elem.requestFullscreen();
-      else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
-      else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
-    } else {
-      if (document.exitFullscreen) document.exitFullscreen();
-    }
+function enterFullscreen() {
+  const elem = document.documentElement;
+  if (elem.requestFullscreen) {
+    elem.requestFullscreen();
+  } else if (elem.webkitRequestFullscreen) { // Safari
+    elem.webkitRequestFullscreen();
+  } else if (elem.msRequestFullscreen) {
+    elem.msRequestFullscreen();
   }
+}
+
 
   function resizeGame() {
     const screens = document.querySelectorAll('.screen');
@@ -3688,6 +3697,16 @@ function toggleFullscreen() {
   window.addEventListener("resize", resizeGame);
   window.addEventListener("orientationchange", resizeGame);
   window.addEventListener("load", resizeGame);
+    
+    // JS (inserisci appena dopo window.onload o subito all'inizio di uno script)
+function adjustHeight() {
+  const vh = window.innerHeight * 0.01;
+  document.documentElement.style.setProperty('--vh', `${vh}px`);
+}
+window.addEventListener('resize', adjustHeight);
+adjustHeight();
+
+    
     </script>
 
 </body>
