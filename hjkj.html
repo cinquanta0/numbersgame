@@ -40,9 +40,11 @@
             background-size: 500% 500%;
             animation: cosmicGradient 15s ease infinite;
             color: #ffffff;
-            overflow: auto;
-            touch-action: manipulation;
-        }
+            overflow: auto !important;
+            height: auto !important;
+            touch-action: auto !important;
+}
+        
 
         @keyframes cosmicGradient {
             0%, 100% { background-position: 0% 50%; }
@@ -383,8 +385,8 @@
     position: absolute;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
+    min-height: 100dvh;
+    height: auto; 
     display: none;
     flex-direction: column;
     justify-content: center;
