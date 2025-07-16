@@ -3724,17 +3724,6 @@ function toggleFullscreen() {
     }
   }
 
-  function resizeGame() {
-    const screens = document.querySelectorAll('.screen');
-    screens.forEach(screen => {
-      screen.style.width = window.innerWidth + "px";
-      screen.style.height = window.innerHeight + "px";
-    });
-  }
-
-  window.addEventListener("resize", resizeGame);
-  window.addEventListener("orientationchange", resizeGame);
-  window.addEventListener("load", resizeGame);
    
    // Aspetta che il DOM sia caricato
   document.addEventListener('DOMContentLoaded', () => {
