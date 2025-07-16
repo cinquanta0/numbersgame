@@ -33,15 +33,17 @@
             user-select: none;
         }
 
-        body {
-            font-family: 'Orbitron', monospace;
-            background: linear-gradient(45deg, #0a0a2e, #16213e, #1a237e, #3f51b5, #0a0a2e);
-            background-size: 500% 500%;
-            animation: cosmicGradient 15s ease infinite;
-            color: #ffffff;
-            overflow-y: auto;
-            touch-action: manipulation;
-        }
+         body {
+      background: #161a2e;
+      color: #fff;
+      font-family: 'Orbitron', Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
 
         @keyframes cosmicGradient {
             0%, 100% { background-position: 0% 50%; }
@@ -399,13 +401,18 @@
 }
 
 .menu-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    /* height: 80vh;  <-- RIMUOVI QUESTA RIGA */
-    max-height: 90vh; /* facoltativo, se vuoi un limite */
-    overflow-y: auto; /* facoltativo, solo se vuoi scroll del menu intero */
-}
+      width: 96vw;
+      max-width: 440px;
+      background: rgba(0,0,0,0.85);
+      border-radius: 18px;
+      box-shadow: 0 0 36px #00bcd4aa;
+      padding: 22px 10px 22px 10px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      /* NON mettere height qui! */
+    }
 
 /* Title and subtitle */
 .game-title {
@@ -656,59 +663,53 @@
         }
 
         .level-grid {
-  width: 100%;
-  max-height: 55vh;
-  overflow-y: auto;
-  box-sizing: border-box;
-  background: rgba(255,255,255,0.07);
-  border-radius: 11px;
-  border: 1px solid #15bcd4;
-  padding: 12px;
-  margin-top: 6px;
-  -webkit-overflow-scrolling: touch;
-}
-.level-card {
-  background: rgba(0, 0, 0, 0.82);
-  border-radius: 10px;
-  border: 2px solid #00bcd4;
-  margin-bottom: 10px;
-  padding: 16px 10px;
-  color: #fff;
-  font-size: 1rem;
-  box-shadow: 0 2px 6px #00bcd44a;
-  cursor: pointer;
-  transition: transform 0.18s;
-}
+      width: 100%;
+      max-height: 54vh;
+      overflow-y: auto;
+      box-sizing: border-box;
+      background: rgba(255,255,255,0.07);
+      border-radius: 11px;
+      border: 1px solid #15bcd4;
+      padding: 12px;
+      margin-top: 6px;
+      -webkit-overflow-scrolling: touch; /* iOS smooth scroll */
+    }
+ .level-card {
+      background: rgba(0, 0, 0, 0.82);
+      border-radius: 10px;
+      border: 2px solid #00bcd4;
+      margin-bottom: 10px;
+      padding: 16px 10px;
+      color: #fff;
+      font-size: 1rem;
+      box-shadow: 0 2px 6px #00bcd44a;
+      cursor: pointer;
+      transition: transform 0.18s;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
 .level-card:last-child { margin-bottom: 0; }
-.level-card.locked {
-  opacity: 0.6;
-  border-color: #666;
-  cursor: not-allowed;
-}
+    .level-card.locked {
+      opacity: 0.6;
+      border-color: #666;
+      cursor: not-allowed;
+    }
 .level-card:hover { transform: scale(1.04); }
-.level-title {
-  font-size: 1.2rem;
-  color: #ffd700;
-  font-weight: bold;
-  margin-bottom: 6px;
-}
-@media (max-width: 480px) {
-  .level-grid { max-height: 53vh; padding: 5px; }
-  .level-card { padding: 12px 7px; font-size: 0.93rem; }
-  .level-title { font-size: 1rem; }
-}
+    .level-title {
+      font-size: 1.2rem;
+      color: #ffd700;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+    @media (max-width: 480px) {
+      .menu-content { padding: 8px 2px; max-width: 98vw; }
+      .level-grid { max-height: 49vh; padding: 6px; }
+      .level-card { padding: 11px 7px; font-size: 0.98rem; }
+      .level-title { font-size: 1.07rem; }
+    }
        
-        .level-card {
-            padding: clamp(1rem, 3vw, 1.5rem);
-            background: rgba(0, 0, 0, 0.8);
-            border-radius: 15px;
-            border: 2px solid #00bcd4;
-            cursor: pointer;
-            transition: all 0.4s ease;
-            text-align: center;
-            position: relative;
-            min-height: clamp(120px, 20vh, 160px);
-        }
+        
 
         .level-card:hover,
         .level-card:active {
@@ -813,17 +814,23 @@
             }
         }
 
-        /* Landscape orientation optimizations */
         @media (orientation: landscape) and (max-height: 500px) {
-            .hud {
-                height: clamp(60px, 12vh, 80px);
-                padding: 0 clamp(0.5rem, 1.5vw, 1rem);
-            }
+    .hud {
+        height: clamp(60px, 12vh, 80px);
+        padding: 0 clamp(0.5rem, 1.5vw, 1rem);
+    }
+    .menu-content {
+        padding: clamp(0.8rem, 2vw, 1.2rem);
+        max-height: 90vh; /* opzionale, solo se vuoi limitare l'altezza */
+        /* NON mettere overflow-y: auto qui! */
+    }
+    /* ...altro... */
+
 
             .menu-content {
                 padding: clamp(0.8rem, 2vw, 1.2rem);
                 max-height: 90vh;
-                overflow-y: auto;
+        
             }
 
             .game-title {
