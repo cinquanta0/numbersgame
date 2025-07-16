@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script src="https://integration.gamepix.com/sdk/v3/gamepix.sdk.js"></script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <style>
@@ -1218,22 +1220,42 @@
                 </div>
                 
                 <div class="health-container">
-                    <div class="health-bar-wrapper">
-                        <div style="font-size: clamp(0.6rem, 2vw, 0.8rem); margin-bottom: 0.2rem; font-weight: 600;">GUARDIAN</div>
-                        <div class="health-bar" style="border-color: #00bcd4;">
-                            <div id="playerHealthFill" class="health-fill" style="background: linear-gradient(90deg, #4caf50, #8bc34a, #cddc39); width: 100%;"></div>
-                        </div>
-                        <div id="playerHealthText" class="health-text">100 / 100</div>
-                    </div>
-                    
-                    <div class="health-bar-wrapper">
-                        <div style="font-size: clamp(0.6rem, 2vw, 0.8rem); margin-bottom: 0.2rem; font-weight: 600;">ENEMY</div>
-                        <div class="health-bar" style="border-color: #f44336;">
-                            <div id="enemyHealthFill" class="health-fill" style="background: linear-gradient(90deg, #f44336, #e91e63, #9c27b0); width: 100%;"></div>
-                        </div>
-                        <div id="enemyHealthText" class="health-text">1000 / 1000</div>
-                    </div>
-                </div>
+
+  <!-- Player 1 - GUARDIAN -->
+  <div class="health-bar-wrapper">
+    <div style="font-size: clamp(0.6rem, 2vw, 0.8rem); margin-bottom: 0.2rem; font-weight: 600;">
+      GUARDIAN
+    </div>
+    <div class="health-bar" style="border-color: #00bcd4;">
+      <div id="playerHealthFill" class="health-fill" style="background: linear-gradient(90deg, #4caf50, #8bc34a, #cddc39); width: 100%;"></div>
+    </div>
+    <div id="playerHealthText" class="health-text">100 / 100</div>
+  </div>
+
+  <!-- Enemy -->
+  <div class="health-bar-wrapper">
+    <div style="font-size: clamp(0.6rem, 2vw, 0.8rem); margin-bottom: 0.2rem; font-weight: 600;">
+      ENEMY
+    </div>
+    <div class="health-bar" style="border-color: #f44336;">
+      <div id="enemyHealthFill" class="health-fill" style="background: linear-gradient(90deg, #f44336, #e91e63, #9c27b0); width: 100%;"></div>
+    </div>
+    <div id="enemyHealthText" class="health-text">1000 / 1000</div>
+  </div>
+
+  <!-- Player 2 - ALLY -->
+  <div class="health-bar-wrapper">
+    <div style="font-size: clamp(0.6rem, 2vw, 0.8rem); margin-bottom: 0.2rem; font-weight: 600;">
+      ALLY
+    </div>
+    <div class="health-bar" style="border-color: #4caf50;">
+      <div id="player2HealthFill" class="health-fill" style="background: linear-gradient(90deg, #81c784, #66bb6a, #388e3c); width: 100%;"></div>
+    </div>
+    <div id="player2HealthText" class="health-text">100 / 100</div>
+  </div>
+
+</div>
+
                 
                 <div class="hud-section">
                     <div class="stat-box score">
@@ -1343,6 +1365,18 @@
                 invulnerabilityFrames: 0,
                 angle: 0
             },
+            player2: {
+  x: 0,
+  y: 0,
+  health: 100,
+  maxHealth: 100,
+  angle: 0,
+  score: 0,
+  speed: 3,
+  // puoi aggiungere altre proprietà se servono
+},
+
+            
             enemy: null,
             bullets: [],
             enemyBullets: [],
@@ -1738,71 +1772,92 @@
             document.addEventListener('gestureend', (e) => e.preventDefault());
         }
 
-        // Event Listeners Setup
         function setupEventListeners() {
-            document.addEventListener('keydown', (e) => {
-                gameState.keys[e.key.toLowerCase()] = true;
-                gameState.keys[e.code] = true;
-                
-                if (gameState.currentScreen === 'gameScreen' && gameState.gameRunning) {
-                    switch(e.key.toLowerCase()) {
-                        case 'escape':
-                            forfeitMission();
-                            break;
-                        case 'r':
-                            restartCurrentLevel();
-                            break;
-                        case 'f':
-                            toggleSlowTime();
-                            break;
-                        case 'e':
-                            useEmergencyShield();
-                            break;
-                        case 'c':
-                            specialAttack();
-                            break;
-                        case 'shift':
-                            gameState.player.precisionMode = true;
-                            break;
-                    }
-                }
-            });
-            
-            document.addEventListener('keyup', (e) => {
-                gameState.keys[e.key.toLowerCase()] = false;
-                gameState.keys[e.code] = false;
-                
-                if (e.key.toLowerCase() === 'shift') {
-                    gameState.player.precisionMode = false;
-                }
-            });
-            
-            if (!gameState.isMobile) {
-                canvas.addEventListener('mousemove', (e) => {
-                    const rect = canvas.getBoundingClientRect();
-                    gameState.mouse.x = e.clientX - rect.left;
-                    gameState.mouse.y = e.clientY - rect.top;
-                });
-                
-                canvas.addEventListener('mousedown', (e) => {
-                    if (e.button === 0) {
-                        gameState.keys['shoot'] = true;
-                    } else if (e.button === 2) {
-                        gameState.keys['charged_shot'] = true;
-                    }
-                });
-                
-                canvas.addEventListener('mouseup', (e) => {
-                    if (e.button === 0) {
-                        gameState.keys['shoot'] = false;
-                    } else if (e.button === 2) {
-                        gameState.keys['charged_shot'] = false;
-                    }
-                });
-                
-                canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+    // Player 2 keys state
+    gameState.keys2 = {};
+
+    document.addEventListener('keydown', (e) => {
+        gameState.keys[e.key.toLowerCase()] = true;
+        gameState.keys[e.code] = true;
+
+        // Player 2 controls (IJKL = movimento, M = spara)
+        switch (e.key.toLowerCase()) {
+            case 'i': gameState.keys2['up'] = true; break;
+            case 'k': gameState.keys2['down'] = true; break;
+            case 'j': gameState.keys2['left'] = true; break;
+            case 'l': gameState.keys2['right'] = true; break;
+            case 'm': gameState.keys2['shoot'] = true; break;
+        }
+
+        if (gameState.currentScreen === 'gameScreen' && gameState.gameRunning) {
+            switch(e.key.toLowerCase()) {
+                case 'escape':
+                    forfeitMission();
+                    break;
+                case 'r':
+                    restartCurrentLevel();
+                    break;
+                case 'f':
+                    toggleSlowTime();
+                    break;
+                case 'e':
+                    useEmergencyShield();
+                    break;
+                case 'c':
+                    specialAttack();
+                    break;
+                case 'shift':
+                    gameState.player.precisionMode = true;
+                    break;
             }
         }
+    });
+
+    document.addEventListener('keyup', (e) => {
+        gameState.keys[e.key.toLowerCase()] = false;
+        gameState.keys[e.code] = false;
+
+        // Player 2 controls (rilascio tasti)
+        switch (e.key.toLowerCase()) {
+            case 'i': gameState.keys2['up'] = false; break;
+            case 'k': gameState.keys2['down'] = false; break;
+            case 'j': gameState.keys2['left'] = false; break;
+            case 'l': gameState.keys2['right'] = false; break;
+            case 'm': gameState.keys2['shoot'] = false; break;
+        }
+
+        if (e.key.toLowerCase() === 'shift') {
+            gameState.player.precisionMode = false;
+        }
+    });
+
+    // Il resto dei listener (mouse, touch, ecc) rimane invariato!
+    if (!gameState.isMobile) {
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            gameState.mouse.x = e.clientX - rect.left;
+            gameState.mouse.y = e.clientY - rect.top;
+        });
+
+        canvas.addEventListener('mousedown', (e) => {
+            if (e.button === 0) {
+                gameState.keys['shoot'] = true;
+            } else if (e.button === 2) {
+                gameState.keys['charged_shot'] = true;
+            }
+        });
+
+        canvas.addEventListener('mouseup', (e) => {
+            if (e.button === 0) {
+                gameState.keys['shoot'] = false;
+            } else if (e.button === 2) {
+                gameState.keys['charged_shot'] = false;
+            }
+        });
+
+        canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+    }
+}
 
         // Screen Management
         function showScreen(screenId) {
@@ -2047,48 +2102,66 @@
             showScreen('gameScreen');
         }
 
-        // Game Core Functions
         function startGame() {
-            gameState.gameRunning = true;
-            gameState.gamePaused = false;
-            gameState.levelStartTime = Date.now();
-            gameState.slowTimeActive = false;
-            gameState.timeScale = 1;
-            gameState.currentPhase = 0;
-            gameState.bulletHellIntensity = 0;
-            gameState.adaptiveDifficulty = 1.0;
-            gameState.screenShake = 0;
-            gameState.transformationActive = false;
-            
-            const savedData = JSON.parse(localStorage.getItem('stellarGuardianSave') || '{}');
-            const skills = savedData.skills || {};
-            
-            gameState.player.x = canvas.width / 2;
-            gameState.player.y = canvas.height - 100;
-            gameState.player.health = 100 + (skills.hull_armor || 0) * 50;
-            gameState.player.maxHealth = 100 + (skills.hull_armor || 0) * 50;
-            gameState.player.energy = 100 + (skills.energy_core || 0) * 20;
-            gameState.player.maxEnergy = 100 + (skills.energy_core || 0) * 20;
-            gameState.player.emergencyShields = 1 + (skills.shield_generator || 0);
-            gameState.player.slowTimeEnergy = 100;
-            gameState.player.skills = skills;
-            gameState.player.invulnerabilityFrames = 0;
-            gameState.player.angle = 0;
-            
-            if (gameState.gameMode === 'endless') {
-                generateEndlessEnemy();
-            } else {
-                initializeCampaignEnemy();
-            }
-            
-            gameState.bullets = [];
-            gameState.enemyBullets = [];
-            gameState.particles = [];
-            gameState.powerUpItems = [];
-            
-            updateUI();
-            gameLoop();
-        }
+    gameState.gameRunning = true;
+    gameState.gamePaused = false;
+    gameState.levelStartTime = Date.now();
+    gameState.slowTimeActive = false;
+    gameState.timeScale = 1;
+    gameState.currentPhase = 0;
+    gameState.bulletHellIntensity = 0;
+    gameState.adaptiveDifficulty = 1.0;
+    gameState.screenShake = 0;
+    gameState.transformationActive = false;
+
+    const savedData = JSON.parse(localStorage.getItem('stellarGuardianSave') || '{}');
+    const skills = savedData.skills || {};
+
+    // Player 1
+    gameState.player.x = canvas.width / 2;
+    gameState.player.y = canvas.height - 100;
+    gameState.player.health = 100 + (skills.hull_armor || 0) * 50;
+    gameState.player.maxHealth = 100 + (skills.hull_armor || 0) * 50;
+    gameState.player.energy = 100 + (skills.energy_core || 0) * 20;
+    gameState.player.maxEnergy = 100 + (skills.energy_core || 0) * 20;
+    gameState.player.emergencyShields = 1 + (skills.shield_generator || 0);
+    gameState.player.slowTimeEnergy = 100;
+    gameState.player.skills = skills;
+    gameState.player.invulnerabilityFrames = 0;
+    gameState.player.angle = 0;
+
+    // Player 2 (sempre presente, valori base)
+    gameState.player2 = {
+        x: canvas.width / 2 + 100,
+        y: canvas.height - 100,
+        health: 100,
+        maxHealth: 100,
+        lives: 1,
+        score: 0,
+        energy: 100,
+        maxEnergy: 100,
+        skills: {},
+        emergencyShields: 1,
+        slowTimeEnergy: 100,
+        precisionMode: false,
+        invulnerabilityFrames: 0,
+        angle: 0
+    };
+
+    if (gameState.gameMode === 'endless') {
+        generateEndlessEnemy();
+    } else {
+        initializeCampaignEnemy();
+    }
+
+    gameState.bullets = [];
+    gameState.enemyBullets = [];
+    gameState.particles = [];
+    gameState.powerUpItems = [];
+
+    updateUI();
+    gameLoop();
+}
 
         function initializeCampaignEnemy() {
             const levelData = LEVEL_DATA[gameState.currentLevel - 1];
@@ -2152,6 +2225,7 @@
             const deltaTime = gameState.timeScale;
             
             updatePlayer(deltaTime);
+            updatePlayer2(deltaTime);
             updateEnemy(deltaTime);
             updateBullets(deltaTime);
             updateEnemyBullets(deltaTime);
@@ -2249,7 +2323,64 @@
             updateUI();
         }
 
-        function updateEnemy(deltaTime) {
+        function updatePlayer2(deltaTime) {
+    const player2 = gameState.player2;
+    if (!player2) return;
+
+    let speed = player2.precisionMode ? 4 : 8;
+    speed *= deltaTime;
+
+    // Movimento (IJKL)
+    if (gameState.keys2['up'] && player2.y > 50) {
+        player2.y -= speed;
+    }
+    if (gameState.keys2['down'] && player2.y < canvas.height - 50) {
+        player2.y += speed;
+    }
+    if (gameState.keys2['left'] && player2.x > 50) {
+        player2.x -= speed;
+    }
+    if (gameState.keys2['right'] && player2.x < canvas.width - 50) {
+        player2.x += speed;
+    }
+
+    // Limiti schermo
+    player2.x = Math.max(50, Math.min(canvas.width - 50, player2.x));
+    player2.y = Math.max(50, Math.min(canvas.height - 50, player2.y));
+
+    // Sparo (M)
+    if (gameState.keys2['shoot'] && player2.energy > 0) {
+        if (!player2.shooting) {
+            shootPlayer2();
+            player2.energy = Math.max(0, player2.energy - 1);
+            player2.shooting = true;
+        }
+    } else {
+        player2.shooting = false;
+    }
+
+    // Energia
+    if (player2.energy < player2.maxEnergy)
+        player2.energy = Math.min(player2.maxEnergy, player2.energy + 0.8);
+
+    if (player2.invulnerabilityFrames > 0)
+        player2.invulnerabilityFrames--;
+}
+        
+function shootPlayer2() {
+    gameState.bullets.push({
+        x: gameState.player2.x,
+        y: gameState.player2.y - 20,
+        vx: 0,
+        vy: -12,
+        color: 'orange',
+        size: 6,
+        damage: 25,
+        owner: 'player2'
+    });
+}
+
+function updateEnemy(deltaTime) {
             const enemy = gameState.enemy;
             if (!enemy) return;
             
@@ -2788,88 +2919,124 @@
         }
 
         function checkCollisions() {
-            // Player bullets hitting enemy
-            gameState.bullets.forEach((bullet, bulletIndex) => {
-                const enemy = gameState.enemy;
-                if (!enemy) return;
-                
-                const dist = Math.sqrt(
-                    Math.pow(bullet.x - enemy.x, 2) + 
-                    Math.pow(bullet.y - enemy.y, 2)
-                );
-                
-                if (dist < 60) {
-                    let damage = bullet.damage;
-                    
-                    if (gameState.player.skills.galaxy_buster && enemy.health < enemy.maxHealth * 0.1) {
-                        damage = enemy.health;
-                    }
-                    
-                    if (gameState.player.skills.weapon_overdrive && enemy.currentPhase >= enemy.phases - 1) {
-                        damage *= 2;
-                    }
-                    
-                    gameState.player.score += Math.floor(damage);
-                    enemy.health -= damage;
-                    gameState.bullets.splice(bulletIndex, 1);
-                    
-                    createHitParticles(bullet.x, bullet.y, bullet.color);
-                    updateUI();
-                }
-            });
-            
-            // Enemy bullets hitting player
-            gameState.enemyBullets.forEach((bullet, bulletIndex) => {
-                const player = gameState.player;
-                
-                if (player.invulnerabilityFrames > 0) return;
-                
-                let hitboxSize = player.precisionMode ? 15 : 25;
-                if (player.skills.targeting_system && player.precisionMode) {
-                    hitboxSize = 10;
-                }
-                
-                if (player.skills.mobile_optimizer && gameState.isMobile) {
-                    hitboxSize *= 0.9;
-                }
-                
-                const dist = Math.sqrt(
-                    Math.pow(bullet.x - player.x, 2) + 
-                    Math.pow(bullet.y - player.y, 2)
-                );
-                
-                if (dist < hitboxSize) {
-                    let damage = bullet.damage || 15;
-                    
-                    if (gameState.currentLevel <= 5) {
-                        damage *= 0.8;
-                    } else if (gameState.currentLevel <= 10) {
-                        damage *= 0.9;
-                    }
-                    
-                    if (gameState.player.skills.hull_armor) {
-                        damage *= (1 - gameState.player.skills.hull_armor * 0.2);
-                    }
-                    
-                    player.health -= damage;
-                    gameState.enemyBullets.splice(bulletIndex, 1);
-                    player.invulnerabilityFrames = 60;
-                    
-                    gameState.screenShake = 4;
-                    
-                    createHitParticles(bullet.x, bullet.y, '#f44336');
-                    updateUI();
-                    
-                    if (navigator.vibrate && gameState.isMobile) {
-                        navigator.vibrate(100);
-                    }
-                }
-            });
-            
-            if (gameState.enemyBullets.length >= 500) {
-                unlockAchievement('bullet_dancer');
+    // Player bullets hitting enemy
+    gameState.bullets.forEach((bullet, bulletIndex) => {
+        const enemy = gameState.enemy;
+        if (!enemy) return;
+
+        const dist = Math.sqrt(
+            Math.pow(bullet.x - enemy.x, 2) + 
+            Math.pow(bullet.y - enemy.y, 2)
+        );
+
+        if (dist < 60) {
+            let damage = bullet.damage;
+
+            if (gameState.player.skills.galaxy_buster && enemy.health < enemy.maxHealth * 0.1) {
+                damage = enemy.health;
+            }
+
+            if (gameState.player.skills.weapon_overdrive && enemy.currentPhase >= enemy.phases - 1) {
+                damage *= 2;
+            }
+
+            gameState.player.score += Math.floor(damage);
+            enemy.health -= damage;
+            gameState.bullets.splice(bulletIndex, 1);
+
+            createHitParticles(bullet.x, bullet.y, bullet.color);
+            updateUI();
+        }
+    });
+
+    // Enemy bullets hitting player 1 (GUARDIAN)
+    gameState.enemyBullets.forEach((bullet, bulletIndex) => {
+        const player = gameState.player;
+        if (player.invulnerabilityFrames > 0) return;
+
+        let hitboxSize = player.precisionMode ? 15 : 25;
+        if (player.skills.targeting_system && player.precisionMode) hitboxSize = 10;
+        if (player.skills.mobile_optimizer && gameState.isMobile) hitboxSize *= 0.9;
+
+        const dist = Math.sqrt(
+            Math.pow(bullet.x - player.x, 2) + 
+            Math.pow(bullet.y - player.y, 2)
+        );
+
+        if (dist < hitboxSize) {
+            let damage = bullet.damage || 15;
+
+            if (gameState.currentLevel <= 5) damage *= 0.8;
+            else if (gameState.currentLevel <= 10) damage *= 0.9;
+
+            if (gameState.player.skills.hull_armor) {
+                damage *= (1 - gameState.player.skills.hull_armor * 0.2);
+            }
+
+            player.health -= damage;
+            gameState.enemyBullets.splice(bulletIndex, 1);
+            player.invulnerabilityFrames = 60;
+
+            gameState.screenShake = 4;
+
+            createHitParticles(bullet.x, bullet.y, '#f44336');
+            updateUI();
+
+            if (navigator.vibrate && gameState.isMobile) {
+                navigator.vibrate(100);
             }
         }
+    });
+
+    // Enemy bullets hitting player 2 (ALLY)
+    gameState.enemyBullets.forEach((bullet, bulletIndex) => {
+        const player2 = gameState.player2;
+        if (!player2 || player2.invulnerabilityFrames > 0) return;
+
+        let hitboxSize2 = player2.precisionMode ? 15 : 25;
+
+        const dist2 = Math.sqrt(
+            Math.pow(bullet.x - player2.x, 2) + 
+            Math.pow(bullet.y - player2.y, 2)
+        );
+
+        if (dist2 < hitboxSize2) {
+            let damage2 = bullet.damage || 15;
+
+            // Se vuoi logica difficoltà per player2, aggiungila qui
+
+            player2.health -= damage2;
+            if (player2.health < 0) player2.health = 0;
+            gameState.enemyBullets.splice(bulletIndex, 1);
+            player2.invulnerabilityFrames = 60;
+
+            gameState.screenShake = 4;
+
+            createHitParticles(bullet.x, bullet.y, '#ffd700'); // colore per player2
+
+            updateHealthBars(); // 🔧 AGGIUNTA: aggiorna la UI di ALLY
+            if (player2.health <= 0) {
+    player2.active = false; // disattiva player2 logicamente
+    player2.visible = false; // opzionale: se hai un flag di visibilità
+}
+
+            // Vibrazione su mobile (opzionale)
+            // if (navigator.vibrate && gameState.isMobile) {
+            //     navigator.vibrate(80);
+            // }
+
+            // Gestione opzionale morte ALLY:
+            // if (player2.health <= 0) {
+            //     // Gestisci disattivazione o effetti
+            // }
+        }
+    });
+
+    if (gameState.enemyBullets.length >= 500) {
+        unlockAchievement('bullet_dancer');
+    }
+}
+
 
         function createHitParticles(x, y, color) {
             for (let i = 0; i < 12; i++) {
@@ -3026,14 +3193,13 @@
         }
 
         function forfeitMission() {
-            if (confirm('Are you sure you want to retreat and return to the menu?')) {
-                gameState.gameRunning = false;
-                if (animationId) {
-                    cancelAnimationFrame(animationId);
-                }
-                showScreen('mainMenu');
-            }
-        }
+    gameState.gameRunning = false;
+    if (animationId) {
+        cancelAnimationFrame(animationId);
+    }
+    showScreen('mainMenu');
+}
+
 
         function restartGame() {
             gameState.gameRunning = false;
@@ -3056,37 +3222,37 @@
             gameLoop();
         }
 
-        // Rendering Functions
         function render() {
-            backgroundY += 1;
-            if (backgroundY >= canvas.height) backgroundY = 0;
+    backgroundY += 1;
+    if (backgroundY >= canvas.height) backgroundY = 0;
 
-            ctx.fillStyle = '#0a0a2e';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            if (gameState.screenShake > 0) {
-                ctx.save();
-                ctx.translate(
-                    (Math.random() - 0.5) * gameState.screenShake,
-                    (Math.random() - 0.5) * gameState.screenShake
-                );
-            }
-            
-            renderSpaceBackground();
-            renderPlayer();
-            renderEnemy();
-            renderBullets();
-            renderEnemyBullets();
-            renderParticles();
-            
-            if (gameState.slowTimeActive) {
-                renderSlowTimeOverlay();
-            }
-            
-            if (gameState.screenShake > 0) {
-                ctx.restore();
-            }
-        }
+    ctx.fillStyle = '#0a0a2e';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    if (gameState.screenShake > 0) {
+        ctx.save();
+        ctx.translate(
+            (Math.random() - 0.5) * gameState.screenShake,
+            (Math.random() - 0.5) * gameState.screenShake
+        );
+    }
+    
+    renderSpaceBackground();
+    renderPlayer();
+    renderPlayer2();   // <--- AGGIUNGI QUESTA RIGA QUI!
+    renderEnemy();
+    renderBullets();
+    renderEnemyBullets();
+    renderParticles();
+    
+    if (gameState.slowTimeActive) {
+        renderSlowTimeOverlay();
+    }
+    
+    if (gameState.screenShake > 0) {
+        ctx.restore();
+    }
+}
 
         function renderSpaceBackground() {
             if (backgroundImage.complete) {
@@ -3117,6 +3283,41 @@
             ctx.restore();
         }
 
+    function renderPlayer2() {
+    const player2 = gameState.player2;
+
+    // Se player2 non esiste o ha 0 vita, non disegnare nulla
+    if (!player2 || player2.health <= 0) return;
+
+    if (typeof ctx === 'undefined') {
+        console.warn("ctx non definito in renderPlayer2");
+        return;
+    }
+
+    ctx.save();
+    ctx.translate(player2.x, player2.y);
+    ctx.rotate(player2.angle);
+
+    ctx.shadowColor = '#ffd700';
+    ctx.shadowBlur = 20;
+
+    if (typeof playerImage !== 'undefined' && playerImage.complete) {
+        ctx.drawImage(playerImage, -32, -32, 64, 64);
+    } else {
+        ctx.globalAlpha = 0.95;
+        ctx.beginPath();
+        ctx.arc(0, 0, 28, 0, Math.PI * 2);
+        ctx.fillStyle = 'orange';
+        ctx.fill();
+        ctx.globalAlpha = 1;
+    }
+
+    ctx.restore();
+}
+
+
+
+        
         function renderEnemy() {
             const enemy = gameState.enemy;
             if (!enemy || enemy.health <= 0) return;
@@ -3143,29 +3344,31 @@
         }
 
         function renderBullets() {
-            gameState.bullets.forEach(bullet => {
-                ctx.save();
-                
-                if (bullet.charged || bullet.special) {
-                    ctx.shadowColor = bullet.color;
-                    ctx.shadowBlur = 15;
-                }
-                
-                ctx.fillStyle = bullet.color;
-                ctx.beginPath();
-                ctx.arc(bullet.x, bullet.y, bullet.size, 0, Math.PI * 2);
-                ctx.fill();
-                
-                // Enhanced trail effect
-                ctx.globalAlpha = 0.5;
-                ctx.fillStyle = bullet.color;
-                ctx.beginPath();
-                ctx.arc(bullet.x, bullet.y + 10, bullet.size * 0.6, 0, Math.PI * 2);
-                ctx.fill();
-                
-                ctx.restore();
-            });
+    gameState.bullets.forEach(bullet => {
+        ctx.save();
+
+        // Cambia colore se il proiettile è di Player 2
+        if (bullet.owner === 'player2') {
+            ctx.fillStyle = 'orange';
+            ctx.shadowColor = '#ffd700';
+            ctx.shadowBlur = 12;
+        } else {
+            ctx.fillStyle = bullet.color;
         }
+
+        ctx.beginPath();
+        ctx.arc(bullet.x, bullet.y, bullet.size, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.globalAlpha = 0.5;
+        ctx.fillStyle = bullet.owner === 'player2' ? 'orange' : bullet.color;
+        ctx.beginPath();
+        ctx.arc(bullet.x, bullet.y + 10, bullet.size * 0.6, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+    });
+}
 
         function renderEnemyBullets() {
             gameState.enemyBullets.forEach(bullet => {
@@ -3299,19 +3502,18 @@
         }
 
         function resetStats() {
-            if (confirm('Are you sure you want to reset all data? This will delete all progress, upgrades, and achievements!')) {
-                localStorage.removeItem('stellarGuardianSave');
-                gameState.currentLevel = 1;
-                gameState.skillPoints = 0;
-                gameState.player.skills = {};
-                gameState.orientation = 'auto';
-                updateUI();
-                generateLevelGrid();
-                generateSkillTree();
-                generateAchievements();
-                showNotification('All data reset! Starting fresh.', 'achievement');
-            }
-        }
+    localStorage.removeItem('stellarGuardianSave');
+    gameState.currentLevel = 1;
+    gameState.skillPoints = 0;
+    gameState.player.skills = {};
+    gameState.orientation = 'auto';
+    updateUI();
+    generateLevelGrid();
+    generateSkillTree();
+    generateAchievements();
+    showNotification('All data reset! Starting fresh.', 'achievement');
+}
+
 
         // Notification System
         function showNotification(message, type = 'info') {
@@ -3369,6 +3571,61 @@
         
         // Initialize Game
         window.addEventListener('load', initGame);
+    
+    if (typeof gamepix !== 'undefined') {
+  gamepix.init({ gameId: '7NT4AA' });
+} else {
+  console.log('GamePix SDK non disponibile in locale');
+}
+    
+    
+    function updateHealthBars() {
+      // Player 1
+      if (gameState.player) {
+          const p1 = gameState.player;
+          const p1Pct = (p1.health / p1.maxHealth) * 100;
+          document.getElementById('playerHealthFill').style.width = `${p1Pct}%`;
+          document.getElementById('playerHealthText').textContent = `${Math.max(0, Math.floor(p1.health))} / ${p1.maxHealth}`;
+      }
+
+      // Enemy
+      if (gameState.enemy) {
+          const e = gameState.enemy;
+          const ePct = (e.health / e.maxHealth) * 100;
+          document.getElementById('enemyHealthFill').style.width = `${ePct}%`;
+          document.getElementById('enemyHealthText').textContent = `${Math.max(0, Math.floor(e.health))} / ${e.maxHealth}`;
+      }
+
+      // Player 2
+      if (gameState.player2) {
+          const p2 = gameState.player2;
+          const p2Pct = (p2.health / p2.maxHealth) * 100;
+          document.getElementById('player2HealthFill').style.width = `${p2Pct}%`;
+          document.getElementById('player2HealthText').textContent = `${Math.max(0, Math.floor(p2.health))} / ${p2.maxHealth}`;
+      }
+  }
+ function damagePlayer2(amount) {
+  if (gameState.player2) {
+    gameState.player2.health -= amount;
+    if (gameState.player2.health < 0) gameState.player2.health = 0;
+    updateHealthBars();
+  }
+}
+function restartGame() {
+    // Esempio di cosa potresti voler fare
+    // Puoi adattarlo alla tua logica di gioco
+    gameState.gameRunning = false;
+    gameState.player.health = 100;
+    gameState.enemy = null;
+    gameState.bullets = [];
+    gameState.enemyBullets = [];
+    gameState.player.score = 0;
+
+    showScreen("gameScreen");  // Torna alla schermata di gioco
+    startLevel(gameState.currentLevel);  // Ricomincia il livello
+}
+    
     </script>
+
 </body>
 </html>
