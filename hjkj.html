@@ -34,23 +34,27 @@
         }
 
         body {
-    font-family: 'Orbitron', monospace;
-    background: linear-gradient(45deg, #0a0a2e, #16213e, #1a237e, #3f51b5, #0a0a2e);
-    background-size: 500% 500%;
-    animation: cosmicGradient 15s ease infinite;
-    color: #ffffff;
-    overflow-y: auto !important;
-    height: auto !important;
-    touch-action: auto !important;
-}
-#gameContainer {
-    width: 100%;
-    min-height: 100dvh;
-    height: auto;
-    position: relative;
-    overflow-y: auto;
-}
+            font-family: 'Orbitron', monospace;
+            background: linear-gradient(45deg, #0a0a2e, #16213e, #1a237e, #3f51b5, #0a0a2e);
+            background-size: 500% 500%;
+            animation: cosmicGradient 15s ease infinite;
+            color: #ffffff;
+            overflow: hidden;
+            touch-action: manipulation;
+        }
 
+        @keyframes cosmicGradient {
+            0%, 100% { background-position: 0% 50%; }
+            25% { background-position: 100% 0%; }
+            50% { background-position: 100% 100%; }
+            75% { background-position: 0% 100%; }
+        }
+
+        #gameContainer {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
 
         /* Tutorial Overlay */
         .tutorial-overlay {
@@ -373,17 +377,22 @@
             font-size: clamp(0.9rem, 2vw, 1.1rem);
         }
 
-        .screen {
-    position: relative;
-    display: block;
-    width: 100%;
-    min-height: 100dvh;
-    height: auto;
+        /* Screen Management */
+.screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     overflow-y: auto;
     padding: clamp(0.5rem, 2vw, 1rem);
+    box-sizing: border-box;
     background-color: black;
 }
-
 
 .screen.active {
     display: flex;
