@@ -386,7 +386,7 @@
     top: 0;
     left: 0;
     width: 100vw;
-    height: 100vh;
+    height: calc(var(--vh, 1vh) * 100);
     display: none;
     flex-direction: column;
     justify-content: center;
@@ -1039,6 +1039,17 @@
             }
         }
     </style>
+
+<script>
+  function adjustViewportHeight() {
+    const vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', `${vh}px`);
+  }
+  window.addEventListener('resize', adjustViewportHeight);
+  window.addEventListener('orientationchange', adjustViewportHeight);
+  adjustViewportHeight();
+</script>
+
 </head>
 <body>
     
