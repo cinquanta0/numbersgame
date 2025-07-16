@@ -665,16 +665,13 @@
             margin-bottom: 0.3rem;
         }
 
-        /* Level Grid Enhancements */
         .level-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(clamp(160px, 35vw, 200px), 1fr));
-            gap: clamp(1rem, 3vw, 1.5rem);
-            margin: clamp(1.5rem, 4vw, 2rem) 0;
-            max-height: 70vh;
-            overflow-y: auto;
-            padding: clamp(0.8rem, 2vw, 1rem);
-        }
+    max-height: 60vh;      /* limita l’altezza della griglia */
+    overflow-y: auto;      /* abilita lo scroll verticale */
+    flex-shrink: 1;        /* permette a flexbox di ridurre la dimensione */
+    min-height: 0;         /* importantissimo per scroll funzionante dentro flexbox */
+    border: 1px solid blue; /* per vedere i bordi durante il test */
+}
 
         .level-card {
             padding: clamp(1rem, 3vw, 1.5rem);
