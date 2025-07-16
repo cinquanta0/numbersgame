@@ -379,17 +379,16 @@
             font-size: clamp(0.9rem, 2vw, 1.1rem);
         }
 
-        .screen {
-    position: absolute;
+       .screen {
+    /* position: absolute;  <-- puoi anche togliere */
     top: 0;
     left: 0;
     width: 100vw;
-    /* height: 100vh; <-- togli per test! */
+    min-height: 100vh;       /* <-- AGGIUNGI QUESTA */
     display: none;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    /* overflow-y: auto; <-- TOGLI! */
+    align-items: stretch;    /* <-- CAMBIA QUESTO */
+    justify-content: flex-start; /* <-- CAMBIA QUESTO */
     padding: clamp(0.5rem, 2vw, 1rem);
     box-sizing: border-box;
     background-color: black;
