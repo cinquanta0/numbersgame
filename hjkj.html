@@ -4,16 +4,8 @@
     <script src="https://integration.gamepix.com/sdk/v3/gamepix.sdk.js"></script>
 
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        
-       #gameContainer {
-    width: 100vw;
-    height: calc(var(--vh, 1vh) * 100);
-    position: relative;
-}
- 
-        
         #fullscreenBtn {
   position: absolute;
   top: 10px;
@@ -47,7 +39,7 @@
             background-size: 500% 500%;
             animation: cosmicGradient 15s ease infinite;
             color: #ffffff;
-            overflow: auto;
+            overflow-y: auto;
             touch-action: manipulation;
         }
 
@@ -58,6 +50,11 @@
             75% { background-position: 0% 100%; }
         }
 
+        #gameContainer {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
 
         /* Tutorial Overlay */
         .tutorial-overlay {
@@ -386,7 +383,7 @@
     top: 0;
     left: 0;
     width: 100vw;
-    height: calc(var(--vh, 1vh) * 100);
+    height: 100vh;
     display: none;
     flex-direction: column;
     justify-content: center;
@@ -485,7 +482,7 @@
     color: white;
     border: 2px solid transparent;
     position: relative;
-    overflow: hidden;
+    overflow-y: auto;
     text-transform: uppercase;
     touch-action: manipulation;
     min-height: clamp(50px, 10vw, 65px);
@@ -609,7 +606,7 @@
             background: #333;
             border-radius: 8px;
             border: 2px solid;
-            overflow: hidden;
+            overflow-y: auto;
         }
 
         .health-fill {
@@ -905,7 +902,7 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
-            overflow: hidden;
+            overflow-y: auto;
         }
 
         .particle {
@@ -1006,7 +1003,7 @@
             background: rgba(0, 0, 0, 0.8);
             border: 2px solid #00bcd4;
             border-radius: 8px;
-            overflow: hidden;
+            overflow-y: auto;
         }
 
         .energy-fill {
@@ -1041,14 +1038,18 @@
     </style>
 
 <script>
-  function adjustViewportHeight() {
-    const vh = window.innerHeight * 0.01;
-    document.documentElement.style.setProperty('--vh', `${vh}px`);
-  }
-  window.addEventListener('resize', adjustViewportHeight);
-  window.addEventListener('orientationchange', adjustViewportHeight);
-  adjustViewportHeight();
+    function setVh() {
+        let vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+    }
+    window.addEventListener('resize', setVh);
+    window.addEventListener('load', setVh);
 </script>
+<style>
+    #gameContainer {
+        height: calc(var(--vh, 1vh) * 100);
+    }
+</style>
 
 </head>
 <body>
@@ -1057,12 +1058,7 @@
     <div class="particles" id="particles"></div>
     
     <div id="notificationContainer"></div>
-    <button id="fullscreenBtn">Fullscreen</button>
-
-<script>
-   document.getElementById('fullscreenBtn').addEventListener('click', enterFullscreen);
-</script>
-
+    <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶ FULLSCREEN</button>
 
     <!-- Orientation Selector -->
     <div class="orientation-selector" id="orientationSelector">
@@ -3685,17 +3681,16 @@ function restartGame() {
     showScreen("gameScreen");  // Torna alla schermata di gioco
     startLevel(gameState.currentLevel);  // Ricomincia il livello
 }
-function enterFullscreen() {
-  const elem = document.documentElement;
-  if (elem.requestFullscreen) {
-    elem.requestFullscreen();
-  } else if (elem.webkitRequestFullscreen) { // Safari
-    elem.webkitRequestFullscreen();
-  } else if (elem.msRequestFullscreen) {
-    elem.msRequestFullscreen();
+function toggleFullscreen() {
+    const elem = document.documentElement;
+    if (!document.fullscreenElement) {
+      if (elem.requestFullscreen) elem.requestFullscreen();
+      else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+      else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
+    } else {
+      if (document.exitFullscreen) document.exitFullscreen();
+    }
   }
-}
-
 
   function resizeGame() {
     const screens = document.querySelectorAll('.screen');
@@ -3708,16 +3703,6 @@ function enterFullscreen() {
   window.addEventListener("resize", resizeGame);
   window.addEventListener("orientationchange", resizeGame);
   window.addEventListener("load", resizeGame);
-    
-    // JS (inserisci appena dopo window.onload o subito all'inizio di uno script)
-function adjustHeight() {
-  const vh = window.innerHeight * 0.01;
-  document.documentElement.style.setProperty('--vh', `${vh}px`);
-}
-window.addEventListener('resize', adjustHeight);
-adjustHeight();
-
-    
     </script>
 
 </body>
