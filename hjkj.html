@@ -664,18 +664,23 @@
         }
 
        .level-grid {
-    flex-grow: 1;       /* permette di espandersi e occupare spazio disponibile */
-    flex-shrink: 1;     /* permette di ridursi se serve */
-    min-height: 0;      /* importante per scroll nei flex container */
-    overflow-y: auto;   /* scroll verticale */
     width: 100%;
+    max-height: 70vh;               /* Limita l'altezza per il mobile */
+    overflow-y: auto;               /* Abilita lo scroll verticale */
     margin-top: 1rem;
     padding: 1rem;
     background: rgba(255,255,255,0.1);
     border-radius: 10px;
     border: 1px solid #ccc;
+    box-sizing: border-box;
+    -webkit-overflow-scrolling: touch; /* scroll fluido su iOS */
 }
-
+@media (max-width: 600px) {
+  .level-grid {
+    max-height: 55vh;
+    padding: 0.5rem;
+  }
+}
         .level-card {
             padding: clamp(1rem, 3vw, 1.5rem);
             background: rgba(0, 0, 0, 0.8);
