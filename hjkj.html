@@ -379,27 +379,24 @@
             font-size: clamp(0.9rem, 2vw, 1.1rem);
         }
 
-        /* Screen Management */
-.screen {
+        .screen {
     position: absolute;
     top: 0;
     left: 0;
     width: 100vw;
-    height: 100vh;
+    /* height: 100vh; <-- togli per test! */
     display: none;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    overflow-y: auto;
+    /* overflow-y: auto; <-- TOGLI! */
     padding: clamp(0.5rem, 2vw, 1rem);
     box-sizing: border-box;
     background-color: black;
 }
-
 .screen.active {
     display: flex;
 }
-
 .menu-content {
       width: 96vw;
       max-width: 440px;
@@ -662,18 +659,24 @@
             margin-bottom: 0.3rem;
         }
 
-        .level-grid {
-      width: 100%;
-      max-height: 54vh;
-      overflow-y: auto;
-      box-sizing: border-box;
-      background: rgba(255,255,255,0.07);
-      border-radius: 11px;
-      border: 1px solid #15bcd4;
-      padding: 12px;
-      margin-top: 6px;
-      -webkit-overflow-scrolling: touch; /* iOS smooth scroll */
-    }
+       .level-grid {
+  width: 100%;
+  max-height: 54vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: rgba(255,255,255,0.07);
+  border-radius: 11px;
+  border: 1px solid #15bcd4;
+  padding: 12px;
+  margin-top: 6px;
+  box-sizing: border-box;
+}
+@media (max-width: 480px) {
+  .level-grid {
+    max-height: 49vh;
+    padding: 6px;
+  }
+}
  .level-card {
       background: rgba(0, 0, 0, 0.82);
       border-radius: 10px;
