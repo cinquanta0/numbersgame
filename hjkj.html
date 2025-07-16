@@ -380,22 +380,22 @@
             font-size: clamp(0.9rem, 2vw, 1.1rem);
         }
 
-        /* Screen Management */
-.screen {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: calc(var(--vh, 1vh) * 100);
-    display: none;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    overflow-y: auto;
-    padding: clamp(0.5rem, 2vw, 1rem);
-    box-sizing: border-box;
-    background-color: black;
+       .screen {
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: calc(var(--vh, 1vh) * 100);
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow-y: auto;
+  padding: clamp(0.5rem, 2vw, 1rem);
+  box-sizing: border-box;
+  background-color: black;
 }
+
 
 .screen.active {
     display: flex;
@@ -1039,17 +1039,6 @@
             }
         }
     </style>
-
-<script>
-  function adjustViewportHeight() {
-    const vh = window.innerHeight * 0.01;
-    document.documentElement.style.setProperty('--vh', `${vh}px`);
-  }
-  window.addEventListener('resize', adjustViewportHeight);
-  window.addEventListener('orientationchange', adjustViewportHeight);
-  adjustViewportHeight();
-</script>
-
 </head>
 <body>
     
@@ -3709,13 +3698,14 @@ function enterFullscreen() {
   window.addEventListener("orientationchange", resizeGame);
   window.addEventListener("load", resizeGame);
     
-    // JS (inserisci appena dopo window.onload o subito all'inizio di uno script)
-function adjustHeight() {
-  const vh = window.innerHeight * 0.01;
-  document.documentElement.style.setProperty('--vh', `${vh}px`);
-}
-window.addEventListener('resize', adjustHeight);
-adjustHeight();
+    function adjustViewportHeight() {
+    const vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', `${vh}px`);
+  }
+  window.addEventListener('resize', adjustViewportHeight);
+  window.addEventListener('orientationchange', adjustViewportHeight);
+  adjustViewportHeight();
+
 
     
     </script>
