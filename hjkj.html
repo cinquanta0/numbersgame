@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <script src="https://integration.gamepix.com/sdk/v3/gamepix.sdk.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -377,13 +378,9 @@
             font-size: clamp(0.9rem, 2vw, 1.1rem);
         }
 
-        /* Screen Management */
-.screen {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
+        .screen {
+    position: fixed; /* invece di absolute */
+    inset: 0; /* sostituisce top, left, width, height */
     display: none;
     flex-direction: column;
     justify-content: center;
@@ -393,6 +390,7 @@
     box-sizing: border-box;
     background-color: black;
 }
+
 
 .screen.active {
     display: flex;
