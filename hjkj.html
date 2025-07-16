@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script src="https://integration.gamepix.com/sdk/v3/gamepix.sdk.js"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <script src="https://integration.gamepix.com/sdk/v3/gamepix.sdk.js"></script>
+   
     <style>
         #fullscreenBtn {
   position: absolute;
@@ -378,23 +377,29 @@
             font-size: clamp(0.9rem, 2vw, 1.1rem);
         }
 
-        .screen {
-    position: fixed; /* invece di absolute */
-    inset: 0; /* sostituisce top, left, width, height */
+        /* Schermate del gioco: fullscreen e scrollabili su mobile */
+.screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     display: none;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     overflow-y: auto;
-    padding: clamp(0.5rem, 2vw, 1rem);
+    -webkit-overflow-scrolling: touch;
+    padding: clamp(1rem, 3vh, 2rem);
     box-sizing: border-box;
     background-color: black;
+    z-index: 1;
 }
-
 
 .screen.active {
     display: flex;
 }
+
 
 /* Responsive content block */
 .menu-content {
@@ -3666,26 +3671,41 @@ function restartGame() {
 }
 function toggleFullscreen() {
     const elem = document.documentElement;
-    if (!document.fullscreenElement) {
-      if (elem.requestFullscreen) elem.requestFullscreen();
-      else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
-      else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
+
+    if (!document.fullscreenElement &&
+        !document.webkitFullscreenElement &&
+        !document.msFullscreenElement) {
+      if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+      } else if (elem.webkitRequestFullscreen) {
+        elem.webkitRequestFullscreen();
+      } else if (elem.msRequestFullscreen) {
+        elem.msRequestFullscreen();
+      }
     } else {
-      if (document.exitFullscreen) document.exitFullscreen();
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+      }
     }
   }
 
+  // Ridimensiona correttamente gli elementi a ogni cambio
   function resizeGame() {
     const screens = document.querySelectorAll('.screen');
     screens.forEach(screen => {
-      screen.style.width = window.innerWidth + "px";
-      screen.style.height = window.innerHeight + "px";
+      screen.style.height = window.innerHeight + 'px';
+      screen.style.width = window.innerWidth + 'px';
     });
   }
 
-  window.addEventListener("resize", resizeGame);
-  window.addEventListener("orientationchange", resizeGame);
-  window.addEventListener("load", resizeGame);
+  // Applica il resize all'avvio e quando cambia orientamento o finestra
+  window.addEventListener('load', resizeGame);
+  window.addEventListener('resize', resizeGame);
+  window.addEventListener('orientationchange', resizeGame);
     </script>
 
 </body>
