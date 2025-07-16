@@ -3703,6 +3703,22 @@ function toggleFullscreen() {
   window.addEventListener("resize", resizeGame);
   window.addEventListener("orientationchange", resizeGame);
   window.addEventListener("load", resizeGame);
+   
+   // Aspetta che il DOM sia caricato
+  document.addEventListener('DOMContentLoaded', () => {
+    const levelGrid = document.getElementById('levelGrid');
+    for(let i = 1; i <= 20; i++) {
+      const level = document.createElement('div');
+      level.textContent = `Livello ${i}`;
+      level.style.padding = '10px';
+      level.style.marginBottom = '8px';
+      level.style.backgroundColor = '#444';
+      level.style.borderRadius = '8px';
+      level.style.color = 'white';
+      levelGrid.appendChild(level);
+    }
+  });
+   
     </script>
 
 </body>
