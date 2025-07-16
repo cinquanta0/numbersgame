@@ -384,22 +384,17 @@
             font-size: clamp(0.9rem, 2vw, 1.1rem);
         }
 
-        /* Screen Management */
-.screen {
-    position: absolute;
-    top: 0;
-    left: 0;
+        .screen {
+    position: relative;
+    display: block;
+    width: 100%;
     min-height: 100dvh;
-    height: auto; 
-    display: none;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    height: auto;
     overflow-y: auto;
     padding: clamp(0.5rem, 2vw, 1rem);
-    box-sizing: border-box;
     background-color: black;
 }
+
 
 .screen.active {
     display: flex;
