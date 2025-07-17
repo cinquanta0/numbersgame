@@ -4,7 +4,8 @@
     <script src="https://integration.gamepix.com/sdk/v3/gamepix.sdk.js"></script>
 
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <style>
         #fullscreenBtn {
   position: absolute;
@@ -34,13 +35,16 @@
         }
 
         body {
-            font-family: 'Orbitron', monospace;
-            background: linear-gradient(45deg, #0a0a2e, #16213e, #1a237e, #3f51b5, #0a0a2e);
-            background-size: 500% 500%;
-            animation: cosmicGradient 15s ease infinite;
-            color: #ffffff;
-            touch-action: manipulation;
-        }
+    font-family: 'Orbitron', monospace;
+    background: linear-gradient(45deg, #0a0a2e, #16213e, #1a237e, #3f51b5, #0a0a2e);
+    background-size: 500% 500%;
+    animation: cosmicGradient 15s ease infinite;
+    color: #ffffff;
+    overflow-y: auto; /* ✅ Abilita scroll */
+    touch-action: manipulation;
+    -webkit-overflow-scrolling: touch; /* ✅ per iOS */
+}
+
 
         @keyframes cosmicGradient {
             0%, 100% { background-position: 0% 50%; }
@@ -51,7 +55,7 @@
 
         #gameContainer {
             width: 100vw;
-            height: 100vh;
+            height: 100dvh;
             position: relative;
         }
 
@@ -376,17 +380,17 @@
             font-size: clamp(0.9rem, 2vw, 1.1rem);
         }
 
-        .screen {
-    /* position: absolute; */  /* TOGLI! */
+    /* Screen Management */
+.screen {
+    position: absolute;
     top: 0;
     left: 0;
     width: 100vw;
-    /* height: 100vh; */      /* TOGLI! */
-    min-height: 100vh;        /* AGGIUNGI! */
+    height: 100dvh;
     display: none;
     flex-direction: column;
-    justify-content: flex-start; /* AGGIUSTA! */
-    align-items: stretch;        /* AGGIUSTA! */
+    justify-content: center;
+    align-items: center;
     overflow-y: auto;
     padding: clamp(0.5rem, 2vw, 1rem);
     box-sizing: border-box;
@@ -670,6 +674,7 @@
             grid-template-columns: repeat(auto-fit, minmax(clamp(160px, 35vw, 200px), 1fr));
             gap: clamp(1rem, 3vw, 1.5rem);
             margin: clamp(1.5rem, 4vw, 2rem) 0;
+            max-height: 70vh;
             overflow-y: auto;
             padding: clamp(0.8rem, 2vw, 1rem);
         }
