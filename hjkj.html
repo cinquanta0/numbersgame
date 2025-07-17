@@ -31,27 +31,17 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Disabilita la selezione SOLO su elementi interattivi */
-button,
-.menu-btn,
-.level-card,
-.mobile-action-btn {
-  -webkit-user-select: none;
-  user-select: none;
-  -webkit-touch-callout: none;
-}
 
 
-        body {
+
+      html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: auto; /* blocca scroll globale */
     font-family: 'Orbitron', monospace;
-    background: linear-gradient(45deg, #0a0a2e, #16213e, #1a237e, #3f51b5, #0a0a2e);
-    background-size: 500% 500%;
-    animation: cosmicGradient 15s ease infinite;
-    color: #ffffff;
-    overflow-y: auto; /* ✅ Abilita scroll */
-    touch-action: manipulation;
-    -webkit-overflow-scrolling: touch; /* ✅ per iOS */
 }
+
 
 
         @keyframes cosmicGradient {
@@ -388,24 +378,28 @@ button,
             font-size: clamp(0.9rem, 2vw, 1.1rem);
         }
 
- .screen {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    background-color: black;
+.screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
 
-    overflow-y: auto; /* ✅ solo verticale */
-    -webkit-overflow-scrolling: touch; /* ✅ scroll fluido su iOS */
+  display: none; /* attivo con .active */
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+
+  background: linear-gradient(45deg, #0a0a2e, #16213e, #1a237e, #3f51b5, #0a0a2e);
+  background-size: 500% 500%;
+  animation: cosmicGradient 15s ease infinite;
+
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .screen.active {
-    display: flex;
+  display: flex;
 }
 
 
@@ -676,23 +670,25 @@ button,
             margin-bottom: 0.3rem;
         }
 
-       .level-grid {
-    max-height: 90vh;
-    overflow-y: auto;
+      .level-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 15px;
+  padding: 20px;
+  width: 100%;
+  max-width: 600px;
+  box-sizing: border-box;
 }
 
 
         .level-card {
-            padding: clamp(1rem, 3vw, 1.5rem);
-            background: rgba(0, 0, 0, 0.8);
-            border-radius: 15px;
-            border: 2px solid #00bcd4;
-            cursor: pointer;
-            transition: all 0.4s ease;
-            text-align: center;
-            position: relative;
-            min-height: clamp(120px, 20vh, 160px);
-        }
+  background-color: #444;
+  color: white;
+  font-size: 18px;
+  padding: 15px;
+  border: none;
+  border-radius: 10px;
+}
 
         .level-card:hover,
         .level-card:active {
@@ -3708,5 +3704,4 @@ function toggleFullscreen() {
 
 </body>
 </html>
-
 
