@@ -380,7 +380,6 @@
             font-size: clamp(0.9rem, 2vw, 1.1rem);
         }
 
-    /* Screen Management */
 .screen {
     position: absolute;
     top: 0;
@@ -392,16 +391,12 @@
     justify-content: center;
     align-items: center;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;   /* ✅ aggiungi */
+    touch-action: pan-y;                 /* ✅ aggiungi */
     padding: clamp(0.5rem, 2vw, 1rem);
     box-sizing: border-box;
     background-color: black;
 }
-
-.screen.active {
-    display: flex;
-}
-
-/* Responsive content block */
 .menu-content {
     text-align: center;
     width: 100%;
@@ -418,6 +413,11 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+
+    /* ✅ Aggiungi anche qui */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
 }
 
 /* Title and subtitle */
