@@ -399,6 +399,7 @@
     display: flex;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    
     display: flex;
 }
 
@@ -669,6 +670,7 @@
             margin-bottom: 0.3rem;
         }
 
+        /* Level Grid Enhancements */
         .level-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(clamp(160px, 35vw, 200px), 1fr));
@@ -677,13 +679,8 @@
     max-height: 70vh;
     overflow-y: auto;
     padding: clamp(0.8rem, 2vw, 1rem);
-
-    -webkit-overflow-scrolling: touch; /* ✅ per iOS scroll fluido */
-    /* RIMUOVI queste due: */
-    /* touch-action: pan-y; */
-    /* overscroll-behavior: contain; */
+    -webkit-overflow-scrolling: touch;
 }
-
 
         .level-card {
             padding: clamp(1rem, 3vw, 1.5rem);
