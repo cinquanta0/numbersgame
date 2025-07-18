@@ -885,57 +885,91 @@
           position: relative; /* oppure absolute se preferisci */
         }
    
-  @media (pointer: coarse), (max-width: 700px) {
+   /* PATCH: Migliora spazio di gioco e controlli su mobile */
+@media (pointer: coarse), (max-width: 700px) {
+  /* Pulsanti più piccoli */
   .mobile-controls {
-    height: clamp(110px, 18vh, 140px) !important;
-    padding: clamp(6px, 2vw, 12px) !important;
-    background: linear-gradient(180deg, transparent, rgba(0,0,0,0.7)) !important;
+    height: clamp(84px, 15vh, 110px) !important;
+    padding: clamp(5px, 2vw, 12px) !important;
+    background: linear-gradient(180deg, transparent, rgba(0,0,0,0.6)) !important;
   }
   .mobile-joystick {
-    width: clamp(60px, 11vw, 80px) !important;
-    height: clamp(60px, 11vw, 80px) !important;
-    left: clamp(6px, 2vw, 14px) !important;
-    bottom: clamp(10px, 2vw, 14px) !important;
+    width: clamp(44px, 10vw, 60px) !important;
+    height: clamp(44px, 10vw, 60px) !important;
+    left: clamp(7px, 2vw, 14px) !important;
+    bottom: clamp(8px, 2vw, 12px) !important;
+    border-width: 2px !important;
   }
   .mobile-joystick-knob {
-    width: clamp(22px, 4vw, 28px) !important;
-    height: clamp(22px, 4vw, 28px) !important;
+    width: clamp(17px, 3.5vw, 23px) !important;
+    height: clamp(17px, 3.5vw, 23px) !important;
+    border-width: 1.5px !important;
   }
   .mobile-action-buttons {
-    bottom: clamp(10px, 2vw, 14px) !important;
-    right: clamp(6px, 2vw, 14px) !important;
+    bottom: clamp(8px, 2vw, 12px) !important;
+    right: clamp(7px, 2vw, 14px) !important;
     row-gap: clamp(6px, 2vw, 10px) !important;
     column-gap: clamp(6px, 2vw, 10px) !important;
   }
   .mobile-action-btn {
-    width: clamp(36px, 8vw, 44px) !important;
-    height: clamp(36px, 8vw, 44px) !important;
+    width: clamp(28px, 7vw, 36px) !important;
+    height: clamp(28px, 7vw, 36px) !important;
     font-size: clamp(0.9rem, 2vw, 1.1rem) !important;
     border-width: 2px !important;
+    box-shadow: 0 2px 8px #00bcd444;
   }
+  .mobile-action-btn.special {
+    font-size: clamp(0.9rem, 2vw, 1.1rem) !important;
+  }
+
+  /* HUD e barra superiore più compatte */
   .hud {
-    height: clamp(60px, 11vh, 75px) !important;
-    padding: 0 clamp(0.2rem, 1vw, 0.6rem) !important;
+    height: clamp(50px, 9vh, 65px) !important;
+    padding: 0 clamp(0.2rem, 1vw, 0.5rem) !important;
+    gap: 0.3rem !important;
   }
   .stat-box {
-    min-width: 45px !important;
-    padding: 0.3rem 0.1rem !important;
-    font-size: 0.7rem !important;
+    min-width: 38px !important;
+    padding: 0.25rem 0.1rem !important;
+    font-size: 0.65rem !important;
   }
   .stat-value {
-    font-size: 1rem !important;
+    font-size: 0.92rem !important;
   }
   .health-bar {
-    height: 10px !important;
-    width: 58px !important;
+    height: 9px !important;
+    width: 45px !important;
   }
   .menu-btn.home-btn {
-    font-size: 0.8rem !important;
-    padding: 0.5rem 0.7rem !important;
-    min-width: 26px !important;
+    font-size: 0.75rem !important;
+    padding: 0.4rem 0.5rem !important;
+    min-width: 20px !important;
+  }
+
+  /* Game canvas più ampio e spazioso */
+  body.portrait-mode #gameCanvas {
+    width: 100vw !important;
+    height: 92vh !important;
+    max-height: 92vh !important;
+    margin-top: 0 !important;
+  }
+  body.landscape-mode #gameCanvas {
+    width: 100vw !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    margin-top: 0 !important;
+  }
+
+  /* Le barre e pulsanti fuori dal canvas coprono meno spazio */
+  .energy-meter {
+    height: 8px !important;
+    width: clamp(90px, 30vw, 140px) !important;
+    bottom: clamp(3px, 1vw, 6px) !important;
   }
 }
-  </style>
+   
+   
+   </style>
 </head>
 <body>
   <div class="particles" id="particles"></div>
@@ -3422,4 +3456,3 @@ window.addEventListener('pointerup', function(e) {
   </script>
 </body>
 </html>
-
