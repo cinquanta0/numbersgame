@@ -34,13 +34,17 @@
             user-select: none;
         }
 
+        html, body {
+            height: 100%; /* Assicura che html e body occupino l'intera altezza del viewport */
+            overflow: hidden; /* Impedisce lo scroll generale della pagina per un'esperienza a schermo intero */
+        }
+
         body {
             font-family: 'Orbitron', monospace;
             background: linear-gradient(45deg, #0a0a2e, #16213e, #1a237e, #3f51b5, #0a0a2e);
             background-size: 500% 500%;
             animation: cosmicGradient 15s ease infinite;
             color: #ffffff;
-            /* Rimosso overflow: hidden; per consentire lo scroll della pagina */
             touch-action: manipulation;
         }
 
@@ -72,6 +76,7 @@
             justify-content: center;
             align-items: center;
             padding: 2vh 2vw;
+            overflow-y: auto; /* Permette scroll se il tutorial è troppo lungo */
         }
 
         .tutorial-overlay.active {
@@ -220,22 +225,28 @@
             bottom: 0;
             left: 0;
             right: 0;
-            height: 20vh;
+            height: auto; /* Altezza automatica in base al contenuto */
+            min-height: 15vh; /* Altezza minima per i controlli */
+            max-height: 25vh; /* Altezza massima per i controlli */
             background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.85));
             display: none;
             z-index: 1000;
             pointer-events: none;
-            padding: 1vh 1vw;
+            padding: 1vh 2vw; /* Padding per dare spazio ai pulsanti */
+            box-sizing: border-box; /* Include padding nell'altezza */
+            flex-direction: row; /* Disposizione orizzontale */
+            justify-content: space-between; /* Spinge joystick a sinistra e pulsanti a destra */
+            align-items: flex-end; /* Allinea gli elementi al fondo del contenitore */
         }
 
         .mobile-controls.active {
-            display: block;
+            display: flex; /* Usa flex per la disposizione */
         }
 
         .mobile-joystick {
-            position: absolute;
-            bottom: 2vh;
-            left: 2vw;
+            position: static; /* Rimosso posizionamento assoluto */
+            margin-left: 0; /* Rimosso margin-left */
+            margin-bottom: 0; /* Rimosso margin-bottom */
             width: 12vh;
             height: 12vh;
             background: rgba(0, 188, 212, 0.12);
@@ -260,9 +271,9 @@
         }
 
         .mobile-action-buttons {
-            position: absolute;
-            bottom: 2vh;
-            right: 2vw;
+            position: static; /* Rimosso posizionamento assoluto */
+            margin-right: 0; /* Rimosso margin-right */
+            margin-bottom: 0; /* Rimosso margin-bottom */
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             row-gap: 1vh;
@@ -360,12 +371,12 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%;
+            height: 100%; /* Prende l'altezza completa del gameContainer */
             display: none;
             align-items: center;
             justify-content: center;
             flex-direction: column;
-            overflow-y: auto;
+            overflow-y: auto; /* Permette lo scroll della schermata se il contenuto è troppo grande */
             padding: clamp(1rem, 3vw, 2rem);
         }
 
@@ -377,7 +388,7 @@
         .menu-content {
             text-align: center;
             width: 90vw;
-            max-height: 90vh; /* MASSIMO 90% ALTEZZA SCHERMO */
+            /* Rimosso max-height e overflow-y: auto; per lasciare che il genitore .screen gestisca lo scroll */
             padding: 2vh 2vw;
             background: rgba(0, 0, 0, 0.9);
             border-radius: 2vh;
@@ -389,7 +400,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            overflow-y: auto; /* Permette scroll interno se il contenuto è troppo grande */
+            /* overflow-y: auto; Rimosso */
         }
 
         /* Titoli ridimensionati */
@@ -602,7 +613,7 @@
             border: 2px solid;
             border-image: linear-gradient(45deg, #00bcd4, #2196f3, #3f51b5, #9c27b0) 1;
             width: 100vw;
-            height: 100vh;
+            height: 100vh; /* Altezza iniziale, verrà regolata da JS */
             touch-action: none;
         }
 
@@ -750,7 +761,7 @@
             }
 
             .menu-content {
-                max-height: 85vh;
+                /* max-height: 85vh; Rimosso, gestito da .screen */
             }
 
             .game-title {
@@ -763,7 +774,8 @@
             }
 
             .mobile-controls {
-                height: 15vh;
+                min-height: 12vh; /* Altezza minima ridotta in landscape */
+                max-height: 20vh; /* Altezza massima ridotta in landscape */
             }
         }
 
@@ -1536,13 +1548,14 @@
             const container = document.getElementById('gameContainer');
             const rect = container.getBoundingClientRect();
             
-            // Improved canvas sizing for mobile
             let canvasWidth = rect.width;
             let canvasHeight = rect.height;
             
             // Adjust for mobile controls
             if (gameState.isMobile && gameState.currentScreen === 'gameScreen') {
-                const controlsHeight = window.innerHeight * 0.2; // 20vh
+                const mobileControls = document.getElementById('mobileControls');
+                // Get the actual rendered height of mobile controls
+                const controlsHeight = mobileControls.offsetHeight; 
                 canvasHeight -= controlsHeight;
             }
             
@@ -1823,6 +1836,7 @@
                     pauseGame();
                 }
             }
+            resizeCanvas(); // Richiama resizeCanvas dopo aver cambiato schermata
         }
 
         // Level Grid Generation
@@ -1856,8 +1870,8 @@
                     <div class="level-number">${levelData.level}</div>
                     <div class="level-boss">${levelData.enemy}</div>
                     <div class="level-difficulty" style="color: ${getDifficultyColor(levelData.difficulty)}">${levelData.difficulty}</div>
-                    <div class="level-phases">${phaseText}</div>
-                    <div class="level-warning">${warningText}</div>
+                    <div class="level-phases">${warningText}</div>
+                    <div class="level-warning">${phaseText}</div>
                     ${levelData.level > highestLevel ? '<div style="color: #666;">🔒 LOCKED</div>' : ''}
                 `;
                 
@@ -3572,4 +3586,3 @@
 
 </body>
 </html>
-
