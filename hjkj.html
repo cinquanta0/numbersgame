@@ -7,6 +7,23 @@
   <style>
       @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
       
+      .ship-image {
+  width: 100%;
+  max-width: 120px;
+  animation: float 3s ease-in-out infinite;
+  transition: transform 0.3s ease;
+}
+
+.ship-image:hover {
+  transform: scale(1.1) rotate(2deg);
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+      
       * {
           margin: 0;
           padding: 0;
@@ -968,7 +985,6 @@
   }
 }
    
-   
    </style>
 </head>
 <body>
@@ -1025,10 +1041,17 @@
           <div class="menu-content">
               <h1 class="game-title">STELLAR GUARDIAN</h1>
               <p class="game-subtitle">COSMIC DEFENSE FORCE - Protect the Galaxy</p>
+              <div class="stat-item">
+    <div class="stat-value" id="coinCount">0</div>
+    <div>Coins</div>
+</div>
               
-              <div class="menu-buttons">
-                  <button class="menu-btn primary" onclick="startLevel(1)">🚀 START NEW MISSION</button>
+    <audio id="musicaGioco" src="musica.mp3" loop></audio>        
+                  <div class="menu-buttons">
+                  <button class="menu-btn" onclick="showScreen('shop')">🛒 SHOP</button>
                   <button class="menu-btn" onclick="showScreen('levelSelect')">📋 SELECT MISSION</button>
+                  <button id="pulsanteMusica">🎵 Musica ON</button>
+                  <button class="menu-btn" onclick="showScreen('inventoryScreen')">🛸 SPACESHIP INVENTORY</button>
                   <button class="menu-btn" onclick="startEndlessMode()">♾️ ENDLESS DEFENSE</button>
                   <button class="menu-btn" onclick="startSpeedrun()">⚡ TIME TRIAL</button>
                   <button class="menu-btn" onclick="showScreen('skillTree')">⭐ UPGRADES</button>
@@ -1036,7 +1059,8 @@
                   <button class="menu-btn" onclick="showScreen('stats')">📊 STATISTICS</button>
                   <button class="menu-btn" onclick="showScreen('controls')">🎮 CONTROLS</button>
                   <button class="menu-btn" onclick="showOrientationSelector()">📱 ORIENTATION</button>
-              </div>
+                  
+                </div>
               
               <div class="stats-display">
                   <div class="stat-item">
@@ -1054,7 +1078,8 @@
                   <div class="stat-item">
                       <div class="stat-value" id="skillPoints">0</div>
                       <div>Upgrade Points</div>
-                  </div>
+                
+                    </div>
               </div>
           </div>
       </div>
@@ -1082,7 +1107,44 @@
           </div>
       </div>
 
-      <!-- Level Select Screen -->
+      <div class="screen" id="shop">
+  <button class="menu-btn home-btn" onclick="showScreen('mainMenu')">🏠 HOME</button>
+  <div class="menu-content">
+    <h2 class="game-subtitle">Galactic Shop</h2>
+    <div class="stats-display">
+      <div class="stat-item">
+        <div class="stat-value">+1 Ship</div>
+        <div>Cost: <span style="color:#ffd700;">20</span> Coins</div>
+        <button class="menu-btn" onclick="buyShip()">Buy</button>
+      </div>
+      <!-- Puoi aggiungere altri articoli qui -->
+    </div>
+  </div>
+</div>
+      
+   <!-- Ship Inventory Screen -->
+<div class="screen" id="inventoryScreen">
+  <button class="menu-btn home-btn" onclick="showScreen('mainMenu')">🏠 HOME</button>
+  <div class="menu-content">
+    <h2 class="game-subtitle">Select Your Spaceship</h2>
+    <div class="level-grid" id="shipInventory">
+      <div class="level-card" onclick="selectShip('ship1')">
+        <img src="navicella1.png" class="ship-image" />
+        <div class="level-boss">Falcon X</div>
+        <div class="level-difficulty">Agile & Fast</div>
+      </div>
+     <div class="level-card" onclick="selectShip('ship2')">
+  <img src="navicella2.png" class="ship-image" />
+  <div class="level-boss">Titan Omega</div>
+  <div class="level-difficulty">Heavy Armor</div>
+</div>
+
+    </div>
+  </div>
+</div>
+   
+
+<!-- Level Select Screen -->
       <div class="screen" id="levelSelect">
           <button class="menu-btn home-btn" onclick="showScreen('mainMenu')">🏠 HOME</button>
           <div class="menu-content">
@@ -1290,6 +1352,7 @@
   </div>
 
   <script>
+      
       // Game State Management
       let gameState = {
           currentScreen: 'mainMenu',
@@ -1313,6 +1376,7 @@
               shooting: false,
               lastTouchTime: 0
           },
+          coins: 0, // <--- AGGIUNGI QUI
           player: {
               x: 0,
               y: 0,
@@ -1328,6 +1392,7 @@
               precisionMode: false,
               invulnerabilityFrames: 0,
               angle: 0
+              
           },
           enemy: null,
           bullets: [],
@@ -1419,8 +1484,16 @@ backgroundImage.src = 'space-background.png'; // Senza /
 const enemyImage = new Image();
 enemyImage.src = 'alien-enemy2.png'; // Senza /
 
+const selectedShip = localStorage.getItem("selectedShip") || "ship1";
 const playerImage = new Image();
-playerImage.src = 'player-ship.png'; // Senza /
+
+if (selectedShip === "ship1") {
+    playerImage.src = "player-ship.png";
+} else if (selectedShip === "ship2") {
+    playerImage.src = "navicella2.png";
+} else {
+    playerImage.src = "player-ship.png"; // fallback
+}
 
       let backgroundY = 0; // posizione verticale dello sfondo
 
@@ -1962,12 +2035,21 @@ playerImage.src = 'player-ship.png'; // Senza /
           showScreen('gameScreen');
       }
 
-      function startEndlessMode() {
-          gameState.gameMode = 'endless';
-          gameState.endlessWave = 1;
-          gameState.adaptiveDifficulty = 1.0;
-          showScreen('gameScreen');
-      }
+     function startEndlessMode() {
+    gameState.gameMode = 'endless';
+    showScreen('gameScreen');
+
+    // 🔽 Carica la navicella selezionata
+    let selectedShip = getSelectedShip();
+    let shipSprite = new Image();
+    shipSprite.src = selectedShip === 'ship1' ? 'navicella1.png' : 'navicella2.png';
+    
+    // 🔄 Sovrascrivi lo sprite della navicella
+    assets.player.src = shipSprite.src;
+
+    initGame();
+}
+
 
       function startSpeedrun() {
           gameState.gameMode = 'speedrun';
@@ -1976,10 +2058,27 @@ playerImage.src = 'player-ship.png'; // Senza /
           showScreen('gameScreen');
       }
 
+    function setBackgroundForLevel(level) {
+    const levelData = LEVEL_DATA[level - 1] || LEVEL_DATA[0];
+    if (levelData.difficulty === "Extreme") {
+        backgroundImage.src = "space-background-extreme.png";
+    } else if (levelData.difficulty === "Very Hard") {
+        backgroundImage.src = "space-background-veryhard.png";
+    } else if (levelData.difficulty === "Hard") {
+        backgroundImage.src = "space-background-hard.png";
+    } else if (levelData.difficulty === "Medium") {
+        backgroundImage.src = "space-background-medium.png";
+    } else {
+        backgroundImage.src = "space-background.png"; // Default o altre difficoltà
+    }
+}
+      
       // Game Core Functions
       function startGame() {
+          gameState.obstacles = [];
           gameState.gameRunning = true;
           gameState.gamePaused = false;
+          setBackgroundForLevel(gameState.currentLevel);
           gameState.levelStartTime = Date.now();
           gameState.slowTimeActive = false;
           gameState.timeScale = 1;
@@ -2081,6 +2180,8 @@ playerImage.src = 'player-ship.png'; // Senza /
           const deltaTime = gameState.timeScale;
           
           updatePlayer(deltaTime);
+          updatePlayerTrail();
+          updateObstacles();
           updateEnemy(deltaTime);
           updateBullets(deltaTime);
           updateEnemyBullets(deltaTime);
@@ -2733,89 +2834,108 @@ playerImage.src = 'player-ship.png'; // Senza /
       }
 
       function checkCollisions() {
-          // Player bullets hitting enemy
-          gameState.bullets.forEach((bullet, bulletIndex) => {
-              const enemy = gameState.enemy;
-              if (!enemy) return;
-              
-              const dist = Math.sqrt(
-                  Math.pow(bullet.x - enemy.x, 2) + 
-                  Math.pow(bullet.y - enemy.y, 2)
-              );
-              
-              if (dist < 60) {
-                  let damage = bullet.damage;
-                  
-                  if (gameState.player.skills.galaxy_buster && enemy.health < enemy.maxHealth * 0.1) {
-                      damage = enemy.health;
-                  }
-                  
-                  if (gameState.player.skills.weapon_overdrive && enemy.currentPhase >= enemy.phases - 1) {
-                      damage *= 2;
-                  }
-                  
-                  gameState.player.score += Math.floor(damage);
-                  enemy.health -= damage;
-                  gameState.bullets.splice(bulletIndex, 1);
-                  
-                  createHitParticles(bullet.x, bullet.y, bullet.color);
-                  updateUI();
-              }
-          });
-          
-          // Enemy bullets hitting player
-          gameState.enemyBullets.forEach((bullet, bulletIndex) => {
-              const player = gameState.player;
-              
-              if (player.invulnerabilityFrames > 0) return;
-              
-              let hitboxSize = player.precisionMode ? 15 : 25;
-              if (player.skills.targeting_system && player.precisionMode) {
-                  hitboxSize = 10;
-              }
-              
-              if (player.skills.mobile_optimizer && gameState.isMobile) {
-                  hitboxSize *= 0.9;
-              }
-              
-              const dist = Math.sqrt(
-                  Math.pow(bullet.x - player.x, 2) + 
-                  Math.pow(bullet.y - player.y, 2)
-              );
-              
-              if (dist < hitboxSize) {
-                  let damage = bullet.damage || 15;
-                  
-                  if (gameState.currentLevel <= 5) {
-                      damage *= 0.8;
-                  } else if (gameState.currentLevel <= 10) {
-                      damage *= 0.9;
-                  }
-                  
-                  if (gameState.player.skills.hull_armor) {
-                      damage *= (1 - gameState.player.skills.hull_armor * 0.2);
-                  }
-                  
-                  player.health -= damage;
-                  gameState.enemyBullets.splice(bulletIndex, 1);
-                  player.invulnerabilityFrames = 60;
-                  
-                  gameState.screenShake = 4;
-                  
-                  createHitParticles(bullet.x, bullet.y, '#f44336');
-                  updateUI();
-                  
-                  if (navigator.vibrate && gameState.isMobile) {
-                      navigator.vibrate(100);
-                  }
-              }
-          });
-          
-          if (gameState.enemyBullets.length >= 500) {
-              unlockAchievement('bullet_dancer');
-          }
-      }
+    // Player bullets hitting enemy
+    gameState.bullets.forEach((bullet, bulletIndex) => {
+        const enemy = gameState.enemy;
+        if (!enemy) return;
+        
+        const dist = Math.sqrt(
+            Math.pow(bullet.x - enemy.x, 2) + 
+            Math.pow(bullet.y - enemy.y, 2)
+        );
+        
+        if (dist < 60) {
+            let damage = bullet.damage;
+            
+            if (gameState.player.skills.galaxy_buster && enemy.health < enemy.maxHealth * 0.1) {
+                damage = enemy.health;
+            }
+            
+            if (gameState.player.skills.weapon_overdrive && enemy.currentPhase >= enemy.phases - 1) {
+                damage *= 2;
+            }
+            
+            gameState.player.score += Math.floor(damage);
+            enemy.health -= damage;
+            gameState.bullets.splice(bulletIndex, 1);
+            
+            createHitParticles(bullet.x, bullet.y, bullet.color);
+            updateUI();
+        }
+    });
 
+    // Player bullets hitting mines (distruggibili)
+    gameState.bullets.forEach((bullet, bulletIndex) => {
+        gameState.obstacles.forEach((ob, obIndex) => {
+            if (ob.hit) return;
+            if (ob.type !== "mine") return; // Solo mine sono distruttibili
+            const dx = ob.x - bullet.x;
+            const dy = ob.y - bullet.y;
+            const dist = Math.sqrt(dx*dx + dy*dy);
+            const hitbox = ob.size / 2 + bullet.size;
+            if (dist < hitbox) {
+                ob.hit = true; // elimina la mina
+                spawnSuperExplosion(ob.x, ob.y, {colors:["#ffe700","#ff9800","#fff"],count:18});
+                startShake(10, 6);
+                gameState.bullets.splice(bulletIndex, 1); // elimina proiettile
+            }
+        });
+    });
+
+    // Enemy bullets hitting player
+    gameState.enemyBullets.forEach((bullet, bulletIndex) => {
+        const player = gameState.player;
+        
+        if (player.invulnerabilityFrames > 0) return;
+        
+        let hitboxSize = player.precisionMode ? 15 : 25;
+        if (player.skills.targeting_system && player.precisionMode) {
+            hitboxSize = 10;
+        }
+        
+        if (player.skills.mobile_optimizer && gameState.isMobile) {
+            hitboxSize *= 0.9;
+        }
+        
+        const dist = Math.sqrt(
+            Math.pow(bullet.x - player.x, 2) + 
+            Math.pow(bullet.y - player.y, 2)
+        );
+        
+        if (dist < hitboxSize) {
+            let damage = bullet.damage || 15;
+            
+            if (gameState.currentLevel <= 5) {
+                damage *= 0.8;
+            } else if (gameState.currentLevel <= 10) {
+                damage *= 0.9;
+            }
+            
+            if (gameState.player.skills.hull_armor) {
+                damage *= (1 - gameState.player.skills.hull_armor * 0.2);
+            }
+            
+            player.health -= damage;
+            gameState.enemyBullets.splice(bulletIndex, 1);
+            player.invulnerabilityFrames = 60;
+            
+            gameState.screenShake = 4;
+            
+            createHitParticles(bullet.x, bullet.y, '#f44336');
+            updateUI();
+            
+            if (navigator.vibrate && gameState.isMobile) {
+                navigator.vibrate(100);
+            }
+        }
+    });
+
+    if (gameState.enemyBullets.length >= 500) {
+        unlockAchievement('bullet_dancer');
+    }
+    checkObstacleCollisions();
+}
+      
       function createHitParticles(x, y, color) {
           for (let i = 0; i < 12; i++) {
               gameState.particles.push({
@@ -2833,107 +2953,117 @@ playerImage.src = 'player-ship.png'; // Senza /
       }
 
       function levelComplete() {
-          gameState.gameRunning = false;
-          
-          const survivalTime = (Date.now() - gameState.levelStartTime) / 1000;
-          gameState.totalSurvivalTime += survivalTime;
-          
-          const timeBonus = Math.max(0, 12000 - (survivalTime * 60));
-          const healthBonus = gameState.player.health * 50;
-          const phaseBonus = gameState.enemy.phases * 1000;
-          
-          gameState.player.score += timeBonus + healthBonus + phaseBonus;
-          
-          let upgradePointsEarned = Math.floor(gameState.currentLevel * 1.2) + 5;
-          
-          if (gameState.gameMode === 'endless') {
-              upgradePointsEarned = Math.floor(gameState.endlessWave * 0.5);
-          } else if (gameState.gameMode === 'speedrun') {
-              upgradePointsEarned = Math.floor(survivalTime < 30 ? 50 : 25);
-          }
-          
-          gameState.skillPoints += upgradePointsEarned;
-          
-          const savedData = JSON.parse(localStorage.getItem('stellarGuardianSave') || '{}');
-          savedData.totalEnemiesDefeated = (savedData.totalEnemiesDefeated || 0) + 1;
-          
-          if (gameState.gameMode === 'campaign') {
-              savedData.highestLevel = Math.max(savedData.highestLevel || 1, gameState.currentLevel + 1);
-          } else if (gameState.gameMode === 'endless') {
-              savedData.endlessBestWave = Math.max(savedData.endlessBestWave || 0, gameState.endlessWave);
-              savedData.endlessBestScore = Math.max(savedData.endlessBestScore || 0, gameState.player.score);
-          } else if (gameState.gameMode === 'speedrun') {
-              const currentTime = gameState.totalSurvivalTime;
-              if (!savedData.speedrunBestTime || currentTime < savedData.speedrunBestTime) {
-                  savedData.speedrunBestTime = currentTime;
-              }
-          }
-          
-          savedData.bestScore = Math.max(savedData.bestScore || 0, gameState.player.score);
-          savedData.skillPoints = (savedData.skillPoints || 0) + upgradePointsEarned;
-          savedData.longestSurvival = Math.max(savedData.longestSurvival || 0, survivalTime);
-          
-          if (!savedData.completedLevels) {
-              savedData.completedLevels = [];
-          }
-          if (gameState.gameMode === 'campaign' && !savedData.completedLevels.includes(gameState.currentLevel)) {
-              savedData.completedLevels.push(gameState.currentLevel);
-          }
-          
-          if (gameState.isMobile) {
-              const mobileCompletions = (savedData.mobileCompletions || 0) + 1;
-              savedData.mobileCompletions = mobileCompletions;
-              if (mobileCompletions >= 10) {
-                  unlockAchievement('mobile_pilot');
-              }
-          }
-          
-          if (gameState.currentLevel === 1) unlockAchievement('first_victory');
-          if (gameState.currentLevel === 10) unlockAchievement('space_ace');
-          if (gameState.currentLevel === 15) unlockAchievement('galaxy_defender');
-          if (gameState.currentLevel === 20) unlockAchievement('cosmic_guardian');
-          
-          if (survivalTime < 30) {
-              unlockAchievement('speed_runner');
-          }
-          
-          if (gameState.player.health === gameState.player.maxHealth) {
-              unlockAchievement('perfect_mission');
-          }
-          
-          if (gameState.gameMode === 'endless' && gameState.endlessWave >= 50) {
-              unlockAchievement('endless_warrior');
-          }
-          
-          if (gameState.gameMode === 'speedrun' && gameState.totalSurvivalTime < 600) {
-              unlockAchievement('time_trial_master');
-          }
-          
-          localStorage.setItem('stellarGuardianSave', JSON.stringify(savedData));
-          
-          if (gameState.gameMode === 'campaign' && gameState.currentLevel >= 20) {
-              unlockAchievement('ultimate_guardian');
-              document.getElementById('victoryScore').textContent = gameState.player.score.toLocaleString();
-              document.getElementById('victoryTime').textContent = Math.floor(gameState.totalSurvivalTime);
-              showScreen('victory');
-          } else if (gameState.gameMode === 'campaign') {
-              setTimeout(() => {
-                  gameState.currentLevel++;
-                  startGame();
-              }, 2000);
-          } else {
-              if (gameState.gameMode === 'endless') {
-                  setTimeout(() => {
-                      startGame();
-                  }, 1500);
-              } else {
-                  showScreen('mainMenu');
-              }
-          }
-          
-          updateUI();
-          generateLevelGrid();
-      }
+    gameState.gameRunning = false;
+
+    const survivalTime = (Date.now() - gameState.levelStartTime) / 1000;
+    gameState.totalSurvivalTime += survivalTime;
+
+    const timeBonus = Math.max(0, 12000 - (survivalTime * 60));
+    const healthBonus = gameState.player.health * 50;
+    const phaseBonus = gameState.enemy.phases * 1000;
+
+    gameState.player.score += timeBonus + healthBonus + phaseBonus;
+
+    let upgradePointsEarned = Math.floor(gameState.currentLevel * 1.2) + 5;
+
+    if (gameState.gameMode === 'endless') {
+        upgradePointsEarned = Math.floor(gameState.endlessWave * 0.5);
+    } else if (gameState.gameMode === 'speedrun') {
+        upgradePointsEarned = Math.floor(survivalTime < 30 ? 50 : 25);
+    }
+
+    gameState.skillPoints += upgradePointsEarned;
+
+    // --- COINS: Calcola e aggiungi coins guadagnate ---
+    let coinsEarned = Math.floor(Math.random() * 8) + 3; // tra 3 e 10 coins
+    gameState.coins += coinsEarned;
+
+    const savedData = JSON.parse(localStorage.getItem('stellarGuardianSave') || '{}');
+    savedData.totalEnemiesDefeated = (savedData.totalEnemiesDefeated || 0) + 1;
+
+    if (gameState.gameMode === 'campaign') {
+        savedData.highestLevel = Math.max(savedData.highestLevel || 1, gameState.currentLevel + 1);
+    } else if (gameState.gameMode === 'endless') {
+        savedData.endlessBestWave = Math.max(savedData.endlessBestWave || 0, gameState.endlessWave);
+        savedData.endlessBestScore = Math.max(savedData.endlessBestScore || 0, gameState.player.score);
+    } else if (gameState.gameMode === 'speedrun') {
+        const currentTime = gameState.totalSurvivalTime;
+        if (!savedData.speedrunBestTime || currentTime < savedData.speedrunBestTime) {
+            savedData.speedrunBestTime = currentTime;
+        }
+    }
+
+    savedData.bestScore = Math.max(savedData.bestScore || 0, gameState.player.score);
+    savedData.skillPoints = (savedData.skillPoints || 0) + upgradePointsEarned;
+    savedData.longestSurvival = Math.max(savedData.longestSurvival || 0, survivalTime);
+
+    // --- COINS: Salva le coins nello storage ---
+    savedData.coins = gameState.coins;
+
+    if (!savedData.completedLevels) {
+        savedData.completedLevels = [];
+    }
+    if (gameState.gameMode === 'campaign' && !savedData.completedLevels.includes(gameState.currentLevel)) {
+        savedData.completedLevels.push(gameState.currentLevel);
+    }
+
+    if (gameState.isMobile) {
+        const mobileCompletions = (savedData.mobileCompletions || 0) + 1;
+        savedData.mobileCompletions = mobileCompletions;
+        if (mobileCompletions >= 10) {
+            unlockAchievement('mobile_pilot');
+        }
+    }
+
+    if (gameState.currentLevel === 1) unlockAchievement('first_victory');
+    if (gameState.currentLevel === 10) unlockAchievement('space_ace');
+    if (gameState.currentLevel === 15) unlockAchievement('galaxy_defender');
+    if (gameState.currentLevel === 20) unlockAchievement('cosmic_guardian');
+
+    if (survivalTime < 30) {
+        unlockAchievement('speed_runner');
+    }
+
+    if (gameState.player.health === gameState.player.maxHealth) {
+        unlockAchievement('perfect_mission');
+    }
+
+    if (gameState.gameMode === 'endless' && gameState.endlessWave >= 50) {
+        unlockAchievement('endless_warrior');
+    }
+
+    if (gameState.gameMode === 'speedrun' && gameState.totalSurvivalTime < 600) {
+        unlockAchievement('time_trial_master');
+    }
+
+    localStorage.setItem('stellarGuardianSave', JSON.stringify(savedData));
+
+    // --- COINS: Notifica (+x coins) ---
+    showNotification(`+${coinsEarned} Coins!`, 'info');
+
+    if (gameState.gameMode === 'campaign' && gameState.currentLevel >= 20) {
+        unlockAchievement('ultimate_guardian');
+        document.getElementById('victoryScore').textContent = gameState.player.score.toLocaleString();
+        document.getElementById('victoryTime').textContent = Math.floor(gameState.totalSurvivalTime);
+        showScreen('victory');
+    } else if (gameState.gameMode === 'campaign') {
+        setTimeout(() => {
+            gameState.currentLevel++;
+            startGame();
+        }, 2000);
+    } else {
+        if (gameState.gameMode === 'endless') {
+            setTimeout(() => {
+                startGame();
+            }, 1500);
+        } else {
+            showScreen('mainMenu');
+        }
+    }
+
+    updateUI();
+    generateLevelGrid();
+}
 
       function gameOver() {
           gameState.gameRunning = false;
@@ -3019,6 +3149,7 @@ playerImage.src = 'player-ship.png'; // Senza /
           renderSpaceBackground();
           renderPlayer();
           renderEnemy();
+          renderObstacles();
           renderBullets();
           renderEnemyBullets();
           renderParticles();
@@ -3052,7 +3183,7 @@ playerImage.src = 'player-ship.png'; // Senza /
 
       function renderPlayer() {
           const player = gameState.player;
-
+          renderPlayerTrail(ctx);
           ctx.save();
           ctx.translate(player.x, player.y);
           ctx.rotate(player.angle);
@@ -3205,7 +3336,7 @@ playerImage.src = 'player-ship.png'; // Senza /
           document.getElementById('playerLives').textContent = gameState.player.lives;
           document.getElementById('playerEnergy').textContent = Math.floor(gameState.player.energy);
           document.getElementById('playerScore').textContent = gameState.player.score.toLocaleString();
-          
+          document.getElementById('coinCount').textContent = gameState.coins;
           const playerHealthPercent = (gameState.player.health / gameState.player.maxHealth) * 100;
           document.getElementById('playerHealthFill').style.width = Math.max(0, playerHealthPercent) + '%';
           document.getElementById('playerHealthText').textContent = 
@@ -3244,21 +3375,53 @@ playerImage.src = 'player-ship.png'; // Senza /
           localStorage.setItem('stellarGuardianSave', JSON.stringify(savedData));
       }
 
-      function loadGameData() {
-          const savedData = JSON.parse(localStorage.getItem('stellarGuardianSave') || '{}');
-          gameState.skillPoints = savedData.skillPoints || 0;
-          gameState.player.skills = savedData.skills || {};
-          gameState.orientation = savedData.orientation || 'auto';
-          
-          if (savedData.controlLayout) {
-              gameState.controlLayout = savedData.controlLayout;
-          }
+     function loadGameData() {
+    const savedData = JSON.parse(localStorage.getItem('stellarGuardianSave') || '{}');
+    gameState.skillPoints = savedData.skillPoints || 0;
+    gameState.player.skills = savedData.skills || {};
+    gameState.orientation = savedData.orientation || 'auto';
+    gameState.coins = Number(savedData.coins) || 0; // <--- AGGIUNGI QUI
+    
+    if (savedData.controlLayout) {
+        gameState.controlLayout = savedData.controlLayout;
+    }
 
-          if (gameState.orientation !== 'auto') {
-              setOrientation(gameState.orientation);
-          }
-      }
+    if (gameState.orientation !== 'auto') {
+        setOrientation(gameState.orientation);
+    }
+}
 
+    function spawnObstacle() {
+    if (!gameState.obstacles) gameState.obstacles = [];
+    const types = ["asteroid", "mine"];
+    const type = types[Math.floor(Math.random() * types.length)];
+    const x = Math.random() * canvas.width;
+    const size = 32 + Math.random() * 32;
+    gameState.obstacles.push({
+        x: x,
+        y: -size,
+        vx: (Math.random() - 0.5) * 1.5,
+        vy: 2 + Math.random() * 2,
+        size: size,
+        type: type,
+        angle: 0,
+        spin: (Math.random() - 0.5) * 0.07,
+        hit: false
+    });
+}
+    
+    function updateObstacles() {
+    if (Math.random() < 0.035) spawnObstacle();
+
+    gameState.obstacles = gameState.obstacles.filter(o => {
+        o.x += o.vx;
+        o.y += o.vy;
+        o.angle += o.spin;
+        // Rimuovi se esce dal canvas o se è colpito
+        return o.y < canvas.height + 60 && o.x > -80 && o.x < canvas.width + 80 && !o.hit;
+    });
+}
+      
       function resetStats() {
     // RESET DIRETTO senza conferma
     localStorage.removeItem('stellarGuardianSave');
@@ -3450,9 +3613,314 @@ window.addEventListener('pointerup', function(e) {
               buttons.style.left = 'auto';
           }
       }
+      function buyShip() {
+    const price = 20;
+    if (gameState.coins >= price) {
+        gameState.coins -= price;
+        gameState.player.lives += 1;
+        const savedData = JSON.parse(localStorage.getItem('stellarGuardianSave') || '{}');
+        savedData.coins = gameState.coins;
+        localStorage.setItem('stellarGuardianSave', JSON.stringify(savedData));
+        updateUI();
+        showNotification('Purchased +1 Ship!', 'info');
+    } else {
+        showNotification('Not enough coins!', 'info');
+    }
+}
 
+      
+      const musicaGioco = document.getElementById("musicaGioco");
+const pulsanteMusica = document.getElementById("pulsanteMusica");
+
+let musicaAttiva = false;
+
+// Funzione per attivare o disattivare la musica
+function toggleMusica() {
+    if (musicaAttiva) {
+        musicaGioco.pause();
+        pulsanteMusica.textContent = "🎵 Musica OFF";
+    } else {
+        musicaGioco.volume = 0.5; // Modifica volume se vuoi
+        musicaGioco.play();
+        pulsanteMusica.textContent = "🎵 Musica ON";
+    }
+    musicaAttiva = !musicaAttiva;
+}
+
+// Collega la funzione al click del pulsante
+pulsanteMusica.addEventListener("click", toggleMusica);
+    
       // Initialize Game
       window.addEventListener('load', initGame);
+      
+ // --- PARTICLE SUPER EXPLOSION + EFFETTI WOW ---
+
+let explosionParticles = [];
+let screenShakeTime = 0, screenShakeIntensity = 0;
+let flashAlpha = 0;
+let ripples = [];
+
+// ESPLOSIONE SUPER COLORATA
+function spawnSuperExplosion(x, y, opts = {}) {
+    const colors = opts.colors || ["#fff", "#ff0044", "#14fc56", "#00cfff", "#ffd700", "#ff7f00", "#e91e63"];
+    const count = opts.count || 70;
+    for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 3 + Math.random() * 8;
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        explosionParticles.push({
+            x, y,
+            dx: Math.cos(angle) * speed,
+            dy: Math.sin(angle) * speed,
+            gravity: 0.05 + Math.random() * 0.08,
+            size: 7 + Math.random() * 8,
+            alpha: 1,
+            life: 50 + Math.random() * 25,
+            maxLife: 50 + Math.random() * 25,
+            color,
+            rotation: Math.random() * Math.PI * 2,
+            rotationSpeed: (Math.random() - 0.5) * 0.4,
+            sparkle: opts.sparkle && Math.random() < 0.3,
+            trail: Math.random() < 0.4
+        });
+    }
+}
+
+// ONDA (RIPPLE) effetto shockwave
+function spawnRipple(x, y, color = "#fff") {
+    ripples.push({ x, y, radius: 0, alpha: 0.45, color });
+}
+
+// SHAKE DELLO SCHERMO
+function startShake(intensity = 20, duration = 18) {
+    screenShakeTime = duration;
+    screenShakeIntensity = intensity;
+}
+
+// FLASH DELLO SCHERMO
+function startFlash(strength = 1) {
+    flashAlpha = strength;
+}
+
+// UPDATE + DRAW PARTICELLE
+function updateAndDrawExplosions(ctx) {
+    for (let i = explosionParticles.length - 1; i >= 0; i--) {
+        let p = explosionParticles[i];
+        if (p.trail) {
+            ctx.save();
+            ctx.globalAlpha = p.alpha * 0.2;
+            ctx.strokeStyle = p.color;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size * 2, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.restore();
+        }
+        p.x += p.dx;
+        p.y += p.dy;
+        p.dy += p.gravity;
+        p.dx *= 0.96;
+        p.dy *= 0.96;
+        p.life--;
+        p.alpha = Math.max(p.life / p.maxLife, 0);
+
+        ctx.save();
+        ctx.globalAlpha = p.alpha;
+
+        let grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size);
+        grad.addColorStop(0, "#fff");
+        grad.addColorStop(0.25, p.color);
+        grad.addColorStop(1, "rgba(0,0,0,0)");
+        ctx.fillStyle = grad;
+
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rotation);
+        ctx.beginPath();
+        ctx.arc(0, 0, p.size, 0, Math.PI * 2);
+        ctx.fill();
+
+        if (p.sparkle) {
+            ctx.globalAlpha = p.alpha * 0.7;
+            ctx.strokeStyle = "#fff";
+            for (let k = 0; k < 6; k++) {
+                ctx.save();
+                ctx.rotate((Math.PI / 3) * k + (p.life / 10));
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(0, p.size * 1.8);
+                ctx.stroke();
+                ctx.restore();
+            }
+        }
+
+        ctx.restore();
+        p.rotation += p.rotationSpeed;
+
+        if (p.life <= 0) explosionParticles.splice(i, 1);
+    }
+}
+
+// UPDATE + DRAW RIPPLE
+function updateAndDrawRipples(ctx) {
+    for (let i = ripples.length - 1; i >= 0; i--) {
+        let r = ripples[i];
+        ctx.save();
+        ctx.globalAlpha = r.alpha;
+        ctx.strokeStyle = r.color;
+        ctx.lineWidth = 4 + r.radius * 0.07;
+        ctx.beginPath();
+        ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+        r.radius += 12;
+        r.alpha -= 0.018;
+        if (r.alpha <= 0) ripples.splice(i, 1);
+    }
+}
+
+// SHAKE LOGIC
+function applyShake(ctx) {
+    if (screenShakeTime > 0) {
+        ctx.save();
+        ctx.translate(
+            (Math.random() - 0.5) * screenShakeIntensity,
+            (Math.random() - 0.5) * screenShakeIntensity
+        );
+        screenShakeTime--;
+        if (screenShakeTime <= 0) screenShakeIntensity = 0;
+    }
+}
+function endShake(ctx) {
+    if (screenShakeTime > 0) ctx.restore();
+}
+
+// FLASH LOGIC
+function drawFlash(ctx, canvas) {
+    if (flashAlpha > 0.01) {
+        ctx.save();
+        ctx.globalAlpha = flashAlpha;
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.restore();
+        flashAlpha *= 0.84;
+    }
+}
+
+// FUNZIONI PRONTE DA USARE
+function esplodiGiocatore(player) {
+    spawnSuperExplosion(player.x, player.y, {
+        colors: ["#00bcd4", "#fff", "#2196f3", "#14fc56"],
+        count: 80,
+        sparkle: true
+    });
+    spawnRipple(player.x, player.y, "#00e6ff");
+    startShake(18, 22);
+    startFlash(0.30);
+}
+
+function esplodiBoss(boss) {
+    spawnSuperExplosion(boss.x, boss.y, {
+        colors: ["#f00", "#fff", "#ffd700", "#9c27b0", "#ff7f00"],
+        count: 140,
+        sparkle: true
+    });
+    spawnRipple(boss.x, boss.y, "#ffd700");
+    startShake(28, 32);
+    startFlash(0.5);
+}
+  
+  let playerTrail = [];
+
+function updatePlayerTrail() {
+    playerTrail.push({
+        x: gameState.player.x,
+        y: gameState.player.y,
+        alpha: 0.45
+    });
+    if (playerTrail.length > 7) playerTrail.shift();
+    for (let t of playerTrail) t.alpha *= 0.8;
+}
+
+function renderPlayerTrail(ctx) {
+    for (let t of playerTrail) {
+        ctx.save();
+        ctx.globalAlpha = t.alpha;
+        ctx.fillStyle = "#ffe700";
+        ctx.fillRect(t.x - 4, t.y - 2, 8, 4); // piccoli rettangoli gialli
+        ctx.restore();
+    }
+}
+   
+  function checkObstacleCollisions() {
+    const player = gameState.player;
+    gameState.obstacles.forEach(ob => {
+        if (ob.hit) return; // già colpito
+        const dx = ob.x - player.x;
+        const dy = ob.y - player.y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        const hitbox = 24 + ob.size / 2; // hitbox navicella + ostacolo
+        if (dist < hitbox) {
+            ob.hit = true; // segna come colpito
+            player.health -= (ob.type === "mine" ? 35 : 20); // mine fanno più danno
+            spawnSuperExplosion(ob.x, ob.y, {colors:["#ffe700","#ff9800","#fff"],count:18});
+            startShake(14, 10);
+        }
+    });
+}
+  
+  function renderObstacles() {
+    gameState.obstacles.forEach(ob => {
+        ctx.save();
+        ctx.translate(ob.x, ob.y);
+        ctx.rotate(ob.angle);
+        if (ob.type === "asteroid") {
+            ctx.fillStyle = "#bdbdbd";
+            ctx.beginPath();
+            ctx.arc(0, 0, ob.size / 2, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = "#888";
+            for (let i = 0; i < 3; i++) {
+                ctx.beginPath();
+                ctx.arc(
+                    Math.cos(i * 2 + ob.angle) * ob.size * 0.23,
+                    Math.sin(i * 2 + ob.angle) * ob.size * 0.23,
+                    ob.size / 8, 0, Math.PI * 2
+                );
+                ctx.fill();
+            }
+        } else if (ob.type === "mine") {
+            ctx.fillStyle = "#e91e63";
+            ctx.beginPath();
+            ctx.arc(0, 0, ob.size / 2, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = "#fff";
+            for (let i = 0; i < 8; i++) {
+                ctx.save();
+                ctx.rotate(Math.PI / 4 * i);
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(ob.size / 2, 0);
+                ctx.stroke();
+                ctx.restore();
+            }
+        }
+        ctx.restore();
+    });
+}
+  
+function selectShip(shipId) {
+    gameState.selectedShip = shipId;
+    localStorage.setItem("selectedShip", shipId); // opzionale ma utile
+    showNotification("Navicella selezionata: " + shipId);
+}
+
+
+
+function getSelectedShip() {
+  return localStorage.getItem('selectedShip') || 'ship1'; // Default
+}
+
+  
   </script>
+  
 </body>
 </html>
