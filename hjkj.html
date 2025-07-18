@@ -40,8 +40,8 @@
             background-size: 500% 500%;
             animation: cosmicGradient 15s ease infinite;
             color: #ffffff;
-            overflow: hidden;
-            touch-action: manipulation;
+            overflow: auto;
+            touch-action: auto;
         }
 
         @keyframes cosmicGradient {
@@ -55,7 +55,7 @@
             width: 100vw;
             height: 100vh;
             position: relative;
-            overflow: hidden;
+            overflow: auto;
         }
 
         /* Tutorial Overlay */
@@ -914,7 +914,11 @@
     </style>
 </head>
 <body>
-    
+    <div class="screen active" id="testScreen">
+  <div style="height: 2000px; background: linear-gradient(#111, #444); width: 100%;">
+    Scrolla per vedere se funziona!
+  </div>
+</div>
 
     <div class="particles" id="particles"></div>
     
