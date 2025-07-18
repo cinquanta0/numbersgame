@@ -881,8 +881,61 @@
           gap: 1rem;
           flex-wrap: wrap;
           justify-content: center;
-      }
-   </style>
+          z-index: 20; /* Assicurati che sia sopra i controlli drag */
+          position: relative; /* oppure absolute se preferisci */
+        }
+  
+  /* BOOST HUD VISIBILITY ON MOBILE */
+@media (pointer: coarse), (max-width: 700px) {
+  .hud {
+    height: 130px !important;
+    padding: 0 2vw !important;
+    gap: 0.6rem !important;
+    z-index: 2000;
+  }
+  .hud-section {
+    gap: 0.6rem !important;
+  }
+  .stat-box {
+    min-width: 90px !important;
+    padding: 0.7rem 0.5rem !important;
+    font-size: 1.1rem !important;
+    border-width: 3px !important;
+  }
+  .stat-label {
+    font-size: 0.9rem !important;
+  }
+  .stat-value {
+    font-size: 1.5rem !important;
+    font-weight: 900 !important;
+  }
+  .health-bar {
+    width: 120px !important;
+    height: 22px !important;
+    border-width: 3px !important;
+  }
+  .health-text {
+    font-size: 1rem !important;
+  }
+  .menu-btn.home-btn,
+  .hud .menu-btn.home-btn {
+    min-width: 64px !important;
+    min-height: 48px !important;
+    font-size: 1.15rem !important;
+    padding: 1rem 1.5rem !important;
+    border-radius: 16px !important;
+    z-index: 2100;
+    box-shadow: 0 2px 15px #00bcd488;
+    margin-left: 0.7rem;
+  }
+  /* Extra: Separate the exit button */
+  .hud-section:last-child {
+    margin-left: auto !important;
+    flex-shrink: 0;
+  }
+}
+  
+  </style>
 </head>
 <body>
   <div class="particles" id="particles"></div>
@@ -1086,7 +1139,7 @@
                   </div>
               </div>
               <div class="menu-buttons" style="margin-top: 2rem;">
-                  <button class="menu-btn primary" onclick="showControlAdjustment()">⚙️ ADJUST CONTROLS</button>
+                  
               </div>
           </div>
       </div>
@@ -2883,23 +2936,22 @@ playerImage.src = 'player-ship.png'; // Senza /
           updateUI();
       }
 
-      function forfeitMission() {
-          if (confirm('Are you sure you want to retreat and return to the menu?')) {
-              gameState.gameRunning = false;
-              if (animationId) {
-                  cancelAnimationFrame(animationId);
-              }
-              showScreen('mainMenu');
-          }
-      }
+     function forfeitMission() {
+    // USCITA DIRETTA senza conferma
+    gameState.gameRunning = false;
+    if (animationId) {
+        cancelAnimationFrame(animationId);
+    }
+    showScreen('mainMenu');
+}
 
-      function restartGame() {
-          gameState.gameRunning = false;
-          if (animationId) {
-              cancelAnimationFrame(animationId);
-          }
-          startGame();
-      }
+     function restartGame() {
+    gameState.gameRunning = false;
+    if (animationId) {
+        cancelAnimationFrame(animationId);
+    }
+    showScreen('gameScreen');
+}
 
       function restartCurrentLevel() {
           restartGame();
@@ -3174,24 +3226,23 @@ playerImage.src = 'player-ship.png'; // Senza /
       }
 
       function resetStats() {
-          if (confirm('Are you sure you want to reset all data? This will delete all progress, upgrades, and achievements!')) {
-              localStorage.removeItem('stellarGuardianSave');
-              gameState.currentLevel = 1;
-              gameState.skillPoints = 0;
-              gameState.player.skills = {};
-              gameState.orientation = 'auto';
-              gameState.controlLayout = { // Reset control layout to default
-                  joystick: { left: '20px', bottom: '30px' },
-                  buttons: { right: '20px', bottom: '30px' }
-              };
-              applyControlLayout(); // Apply default layout
-              updateUI();
-              generateLevelGrid();
-              generateSkillTree();
-              generateAchievements();
-              showNotification('All data reset! Starting fresh.', 'achievement');
-          }
-      }
+    // RESET DIRETTO senza conferma
+    localStorage.removeItem('stellarGuardianSave');
+    gameState.currentLevel = 1;
+    gameState.skillPoints = 0;
+    gameState.player.skills = {};
+    gameState.orientation = 'auto';
+    gameState.controlLayout = { // Reset control layout to default
+        joystick: { left: '20px', bottom: '30px' },
+        buttons: { right: '20px', bottom: '30px' }
+    };
+    applyControlLayout();
+    updateUI();
+    generateLevelGrid();
+    generateSkillTree();
+    generateAchievements();
+    showNotification('All data reset! Starting fresh.', 'achievement');
+}
 
       // Notification System
       function showNotification(message, type = 'info') {
@@ -3267,44 +3318,61 @@ playerImage.src = 'player-ship.png'; // Senza /
           setupDrag(actionButtons);
       }
 
-      function setupDrag(element) {
-          element.addEventListener('pointerdown', (e) => {
-              draggedElement = element;
-              draggedElement.classList.add('dragging');
-              const rect = draggedElement.getBoundingClientRect();
-              offsetX = e.clientX - rect.left;
-              offsetY = e.clientY - rect.top;
-              draggedElement.setPointerCapture(e.pointerId);
-          });
+     function setupDrag(element) {
+    element.addEventListener('pointerdown', (e) => {
+        draggedElement = element;
+        draggedElement.classList.add('dragging');
+        const rect = draggedElement.getBoundingClientRect();
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
+        draggedElement.setPointerCapture(e.pointerId);
+        // Attiva pointer events solo durante il drag
+        draggedElement.style.pointerEvents = "auto";
+    });
 
-          element.addEventListener('pointermove', (e) => {
-              if (draggedElement === element) {
-                  e.preventDefault();
-                  const adjustmentArea = document.getElementById('adjustmentArea');
-                  const areaRect = adjustmentArea.getBoundingClientRect();
+    element.addEventListener('pointermove', (e) => {
+        if (draggedElement === element) {
+            e.preventDefault();
+            const adjustmentArea = document.getElementById('adjustmentArea');
+            const areaRect = adjustmentArea.getBoundingClientRect();
 
-                  let newLeft = e.clientX - offsetX - areaRect.left;
-                  let newTop = e.clientY - offsetY - areaRect.top;
+            let newLeft = e.clientX - offsetX - areaRect.left;
+            let newTop = e.clientY - offsetY - areaRect.top;
 
-                  // Constrain movement within the adjustment area
-                  newLeft = Math.max(0, Math.min(newLeft, areaRect.width - draggedElement.offsetWidth));
-                  newTop = Math.max(0, Math.min(newTop, areaRect.height - draggedElement.offsetHeight));
+            newLeft = Math.max(0, Math.min(newLeft, areaRect.width - draggedElement.offsetWidth));
+            newTop = Math.max(0, Math.min(newTop, areaRect.height - draggedElement.offsetHeight));
 
-                  draggedElement.style.left = `${newLeft}px`;
-                  draggedElement.style.top = `${newTop}px`;
-                  draggedElement.style.right = 'auto'; // Clear right
-                  draggedElement.style.bottom = 'auto'; // Clear bottom
-              }
-          });
+            draggedElement.style.left = `${newLeft}px`;
+            draggedElement.style.top = `${newTop}px`;
+            draggedElement.style.right = 'auto';
+            draggedElement.style.bottom = 'auto';
+        }
+    });
 
-          element.addEventListener('pointerup', () => {
-              if (draggedElement === element) {
-                  draggedElement.classList.remove('dragging');
-                  draggedElement = null;
-              }
-          });
-      }
+    element.addEventListener('pointerup', (e) => {
+        endDrag(e);
+    });
+}
 
+// Listener globale: chiudi il drag anche se lasci fuori dal controllo (mobile fix)
+window.addEventListener('pointerup', function(e) {
+    if (draggedElement) {
+        endDrag(e);
+    }
+});
+
+    function endDrag(e) {
+    if (draggedElement) {
+        draggedElement.classList.remove('dragging');
+        try {
+            if (e && e.pointerId !== undefined) draggedElement.releasePointerCapture(e.pointerId);
+        } catch (err) {}
+        // Dopo il drag, pointer-events none così i bottoni sotto sono cliccabili!
+        draggedElement.style.pointerEvents = "none";
+        draggedElement = null;
+    }
+}  
+      
       function saveControlLayout() {
           const joystick = document.getElementById('draggableJoystick');
           const buttons = document.getElementById('draggableActionButtons');
