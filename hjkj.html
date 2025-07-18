@@ -1513,7 +1513,7 @@
             }
         }
 
-        function setupMobileControls() {
+       function setupMobileControls() {
     if (!gameState.isMobile) return;
 
     const joystick = document.getElementById('mobileJoystick');
@@ -1523,28 +1523,23 @@
     const shieldBtn = document.getElementById('mobileShield');
     const specialBtn = document.getElementById('mobileSpecial');
 
-    // Joystick: blocca solo su joystick
+    // --- SOLO EVENTI SUL JOYSTICK (NESSUN document.addEventListener globale!) ---
     joystick.addEventListener('touchstart', (e) => {
         e.preventDefault();
         const touch = e.touches[0];
         const rect = joystick.getBoundingClientRect();
         const centerX = rect.left + rect.width / 2;
         const centerY = rect.top + rect.height / 2;
-
         gameState.touchControls.joystick.active = true;
         gameState.touchControls.joystick.startX = centerX;
         gameState.touchControls.joystick.startY = centerY;
         gameState.touchControls.joystick.touchId = touch.identifier;
-
-        if (navigator.vibrate) {
-            navigator.vibrate(10);
-        }
+        if (navigator.vibrate) navigator.vibrate(10);
     }, { passive: false });
 
-    // Solo se joystick attivo, blocca il default (altrimenti il browser scrolla)
-    document.addEventListener('touchmove', (e) => {
+    joystick.addEventListener('touchmove', (e) => {
         if (!gameState.touchControls.joystick.active) return;
-
+        e.preventDefault();
         let relevantTouch = null;
         for (let touch of e.touches) {
             if (touch.identifier === gameState.touchControls.joystick.touchId) {
@@ -1553,17 +1548,12 @@
             }
         }
         if (!relevantTouch) return;
-
-        e.preventDefault();
-
         const centerX = gameState.touchControls.joystick.startX;
         const centerY = gameState.touchControls.joystick.startY;
-
         const deltaX = relevantTouch.clientX - centerX;
         const deltaY = relevantTouch.clientY - centerY;
         const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
         const maxDistance = 40;
-
         if (distance <= maxDistance) {
             gameState.touchControls.joystick.currentX = deltaX;
             gameState.touchControls.joystick.currentY = deltaY;
@@ -1572,36 +1562,24 @@
             gameState.touchControls.joystick.currentX = Math.cos(angle) * maxDistance;
             gameState.touchControls.joystick.currentY = Math.sin(angle) * maxDistance;
         }
-
         joystickKnob.style.transform = `translate(${gameState.touchControls.joystick.currentX}px, ${gameState.touchControls.joystick.currentY}px)`;
     }, { passive: false });
 
-    document.addEventListener('touchend', (e) => {
-        let touchEnded = true;
-        for (let touch of e.touches) {
-            if (touch.identifier === gameState.touchControls.joystick.touchId) {
-                touchEnded = false;
-                break;
-            }
-        }
-        if (touchEnded && gameState.touchControls.joystick.active) {
-            gameState.touchControls.joystick.active = false;
-            gameState.touchControls.joystick.currentX = 0;
-            gameState.touchControls.joystick.currentY = 0;
-            gameState.touchControls.joystick.touchId = null;
-            joystickKnob.style.transform = 'translate(0, 0)';
-        }
+    joystick.addEventListener('touchend', (e) => {
+        gameState.touchControls.joystick.active = false;
+        gameState.touchControls.joystick.currentX = 0;
+        gameState.touchControls.joystick.currentY = 0;
+        gameState.touchControls.joystick.touchId = null;
+        joystickKnob.style.transform = 'translate(0, 0)';
     }, { passive: false });
 
-    // Pulsanti azione: blocca qui (normale)
+    // --- Pulsanti azione: blocca solo su di loro ---
     const setupActionButton = (button, action, hapticStrength = 20) => {
         button.addEventListener('touchstart', (e) => {
             e.preventDefault();
             action();
             button.style.transform = 'scale(0.95)';
-            if (navigator.vibrate) {
-                navigator.vibrate(hapticStrength);
-            }
+            if (navigator.vibrate) navigator.vibrate(hapticStrength);
         }, { passive: false });
 
         button.addEventListener('touchend', (e) => {
@@ -1619,7 +1597,7 @@
     setupActionButton(shieldBtn, useEmergencyShield, 50);
     setupActionButton(specialBtn, specialAttack, 40);
 
-    // Canvas: blocca solo in gameScreen, altrimenti lascia scrollare overlay/menu!
+    // --- Canvas: blocca solo in gameScreen ---
     canvas.addEventListener('touchstart', (e) => {
         if (gameState.currentScreen === 'gameScreen') {
             e.preventDefault();
@@ -1627,11 +1605,9 @@
             const rect = canvas.getBoundingClientRect();
             gameState.mouse.x = touch.clientX - rect.left;
             gameState.mouse.y = touch.clientY - rect.top;
-
             gameState.touchControls.shooting = true;
             gameState.keys['shoot'] = true;
             gameState.touchControls.lastTouchTime = Date.now();
-
             if (e.touches.length > 1) {
                 useEmergencyShield();
             }
@@ -1653,7 +1629,6 @@
             e.preventDefault();
             gameState.touchControls.shooting = false;
             gameState.keys['shoot'] = false;
-
             const now = Date.now();
             if (now - gameState.touchControls.lastTouchTime < 300) {
                 toggleSlowTime();
@@ -1661,7 +1636,7 @@
         }
     }, { passive: false });
 
-    // Prevent zoom su mobile (opzionale, puoi tenerlo)
+    // Prevent zoom su mobile (opzionale)
     document.addEventListener('gesturestart', (e) => e.preventDefault());
     document.addEventListener('gesturechange', (e) => e.preventDefault());
     document.addEventListener('gestureend', (e) => e.preventDefault());
