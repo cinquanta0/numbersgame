@@ -1326,24 +1326,14 @@
       let canvas, ctx;
       let animationId;
       
-       // IMMAGINI
       const backgroundImage = new Image();
-      backgroundImage.src = 'https://blobs.vusercontent.net/blob/hjkj1-vxisvj9ZPLQ70yRaT0XvtROh91XjeQ.html'; // Placeholder, replace with actual image URL
-      // The user provided the HTML file as an attachment, not an image.
-      // I will use a generic space background placeholder.
-      // For actual image, the user would need to provide a blob URL for the image.
-      // For now, I'll use a generic placeholder or remove the image if it's not provided.
-      // Given the user provided an HTML file, I'll assume the image paths are relative or need to be provided.
-      // I'll use a placeholder for now.
-      backgroundImage.src = '/placeholder.svg?height=1080&width=1920'; 
+backgroundImage.src = 'space-background.png'; // Senza /
 
-      const enemyImage = new Image();
-      enemyImage.src = '/placeholder.svg?height=80&width=80'; // Placeholder
-      // enemyImage.src = 'alien-enemy2.png'; // Original path, assuming it's not available
+const enemyImage = new Image();
+enemyImage.src = 'alien-enemy2.png'; // Senza /
 
-      const playerImage = new Image();
-      playerImage.src = '/placeholder.svg?height=64&width=64'; // Placeholder
-      // playerImage.src = 'player-ship.png'; // Original path, assuming it's not available
+const playerImage = new Image();
+playerImage.src = 'player-ship.png'; // Senza /
 
       let backgroundY = 0; // posizione verticale dello sfondo
 
@@ -3364,4 +3354,3 @@
   </script>
 </body>
 </html>
-
