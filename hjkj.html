@@ -7,6 +7,85 @@
   <style>
       @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
       
+      .loading-screen {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: url('image1.png') center center no-repeat, #0a0a2e;
+  background-size: contain;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 0.6s;
+}
+.loading-screen.hide {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s;
+}
+.loading-content {
+  text-align: center;
+}
+.spaceship-loader {
+  position: relative;
+  width: 90px; height: 90px;
+  margin: 0 auto 16px;
+  animation: loader-float 2.5s ease-in-out infinite;
+}
+@keyframes loader-float {
+  0%, 100% { transform: translateY(0);}
+  50% { transform: translateY(-15px);}
+}
+.spaceship-loader img {
+  width: 90px; height: 90px;
+  filter: drop-shadow(0 0 25px #00bcd4cc);
+}
+.flames {
+  position: absolute;
+  left: 50%; bottom: 0;
+  transform: translateX(-50%);
+  width: 30px; height: 40px;
+  pointer-events: none;
+  background: radial-gradient(circle, #ffd70066 60%, transparent 100%);
+  z-index: -1;
+  animation: flame-flicker 0.18s infinite alternate;
+}
+@keyframes flame-flicker {
+  0% { filter: blur(1px) brightness(1);}
+  100% { filter: blur(4px) brightness(1.9);}
+}
+.loading-bar {
+  width: 220px;
+  height: 14px;
+  background: #222b;
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 24px auto 0;
+  border: 2px solid #00bcd4;
+  box-shadow: 0 0 12px #00bcd444;
+}
+.loading-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #ffd700, #00bcd4, #2196f3, #fff);
+  border-radius: 8px;
+  transition: width 0.5s;
+}
+.loading-text {
+  margin-top: 12px;
+  font-size: 1.5rem;
+  color: #fff;
+  letter-spacing: 2px;
+  font-family: 'Orbitron', monospace;
+  font-weight: bold;
+  text-shadow: 0 0 12px #00bcd4;
+}
+body.loading {
+  overflow: hidden !important;
+}
+      
       .ship-image {
   width: 100%;
   max-width: 120px;
@@ -222,24 +301,27 @@
           font-size: clamp(1rem, 2.5vw, 1.3rem);
       }
 
-      /* Screen Management */
-      .screen {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          display: none;
-          align-items: center;
-          justify-content: center;
-          flex-direction: column;
-          overflow-y: auto;
-          padding: clamp(1rem, 3vw, 2rem);
-      }
+     .screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .7s cubic-bezier(.5,2,.3,1);
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    overflow-y: auto;
+    padding: clamp(1rem, 3vw, 2rem);
+    display: flex; /* sempre flex! */
+}
 
-      .screen.active {
-          display: flex;
-      }
+.screen.active {
+    opacity: 1;
+    pointer-events: auto;
+}
 
       .menu-content {
           text-align: center;
@@ -988,7 +1070,21 @@
    </style>
 </head>
 <body>
-  <div class="particles" id="particles"></div>
+  
+  <div id="loadingScreen" class="loading-screen active">
+  <div class="loading-content">
+    <div class="spaceship-loader">
+      <img src="navicella1.png" id="loaderShip" />
+      <div class="flames"></div>
+    </div>
+    <div class="loading-text" id="loadingText">LOADING GALAXY...</div>
+    <div class="loading-bar">
+      <div class="loading-bar-fill" id="loadingBarFill"></div>
+    </div>
+  </div>
+</div>
+  
+    <div class="particles" id="particles"></div>
   
   <div id="notificationContainer"></div>
   
@@ -1128,18 +1224,25 @@
   <div class="menu-content">
     <h2 class="game-subtitle">Select Your Spaceship</h2>
     <div class="level-grid" id="shipInventory">
-      <div class="level-card" onclick="selectShip('ship1')">
-        <img src="navicella1.png" class="ship-image" />
-        <div class="level-boss">Falcon X</div>
-        <div class="level-difficulty">Agile & Fast</div>
-      </div>
-     <div class="level-card" onclick="selectShip('ship2')">
+     <div class="level-card" data-ship-id="ship1" onclick="selectShip('ship1')">
+  <img src="navicella1.png" class="ship-image" />
+  <div class="level-boss">Falcon X</div>
+  <div class="level-difficulty">Agile & Fast</div>
+</div>
+
+<div class="level-card" data-ship-id="ship2" onclick="selectShip('ship2')">
   <img src="navicella2.png" class="ship-image" />
   <div class="level-boss">Titan Omega</div>
   <div class="level-difficulty">Heavy Armor</div>
 </div>
 
-    </div>
+<div class="level-card" data-ship-id="ship3" onclick="selectShip('ship3')">
+  <img src="navicella3.png" class="ship-image" />
+  <div class="level-boss">Blue Star</div>
+  <div class="level-difficulty">Ultra Fast</div>
+</div>
+    
+</div>
   </div>
 </div>
    
@@ -1353,6 +1456,8 @@
 
   <script>
       
+      const missileSprite = new Image();
+missileSprite.src = "missili.png"; // usa il nome del tuo file
       // Game State Management
       let gameState = {
           currentScreen: 'mainMenu',
@@ -1477,23 +1582,14 @@
 
       let canvas, ctx;
       let animationId;
+      const playerImage = new Image(); // <- AGGIUNGI QUESTA RIGA QUI!
+
       
       const backgroundImage = new Image();
 backgroundImage.src = 'space-background.png'; // Senza /
 
 const enemyImage = new Image();
 enemyImage.src = 'alien-enemy2.png'; // Senza /
-
-const selectedShip = localStorage.getItem("selectedShip") || "ship1";
-const playerImage = new Image();
-
-if (selectedShip === "ship1") {
-    playerImage.src = "player-ship.png";
-} else if (selectedShip === "ship2") {
-    playerImage.src = "navicella2.png";
-} else {
-    playerImage.src = "player-ship.png"; // fallback
-}
 
       let backgroundY = 0; // posizione verticale dello sfondo
 
@@ -1766,6 +1862,8 @@ if (selectedShip === "ship1") {
                       case 'shift':
                           gameState.player.precisionMode = true;
                           break;
+                  
+                  
                   }
               }
           });
@@ -2039,17 +2137,18 @@ if (selectedShip === "ship1") {
     gameState.gameMode = 'endless';
     showScreen('gameScreen');
 
-    // 🔽 Carica la navicella selezionata
-    let selectedShip = getSelectedShip();
-    let shipSprite = new Image();
-    shipSprite.src = selectedShip === 'ship1' ? 'navicella1.png' : 'navicella2.png';
-    
-    // 🔄 Sovrascrivi lo sprite della navicella
-    assets.player.src = shipSprite.src;
+   let selectedShip = localStorage.getItem('selectedShip') || 'navicella1.png';
+assets.player = new Image();
+assets.player.src = selectedShip;
 
-    initGame();
-}
+console.log("Navicella selezionata:", selectedShip);
+console.log("Sprite caricato:", assets.player.src);
 
+
+// 🔄 Avvia il gioco
+initGame();
+
+     }
 
       function startSpeedrun() {
           gameState.gameMode = 'speedrun';
@@ -2073,51 +2172,94 @@ if (selectedShip === "ship1") {
     }
 }
       
-      // Game Core Functions
-      function startGame() {
-          gameState.obstacles = [];
-          gameState.gameRunning = true;
-          gameState.gamePaused = false;
-          setBackgroundForLevel(gameState.currentLevel);
-          gameState.levelStartTime = Date.now();
-          gameState.slowTimeActive = false;
-          gameState.timeScale = 1;
-          gameState.currentPhase = 0;
-          gameState.bulletHellIntensity = 0;
-          gameState.adaptiveDifficulty = 1.0;
-          gameState.screenShake = 0;
-          gameState.transformationActive = false;
-          
-          const savedData = JSON.parse(localStorage.getItem('stellarGuardianSave') || '{}');
-          const skills = savedData.skills || {};
-          
-          gameState.player.x = canvas.width / 2;
-          gameState.player.y = canvas.height / 2; // Start in center for 2D movement
-          gameState.player.health = 100 + (skills.hull_armor || 0) * 50;
-          gameState.player.maxHealth = 100 + (skills.hull_armor || 0) * 50;
-          gameState.player.energy = 100 + (skills.energy_core || 0) * 20;
-          gameState.player.maxEnergy = 100 + (skills.energy_core || 0) * 20;
-          gameState.player.emergencyShields = 1 + (skills.shield_generator || 0);
-          gameState.player.slowTimeEnergy = 100;
-          gameState.player.skills = skills;
-          gameState.player.invulnerabilityFrames = 0;
-          gameState.player.angle = 0;
-          
-          if (gameState.gameMode === 'endless') {
-              generateEndlessEnemy();
-          } else {
-              initializeCampaignEnemy();
-          }
-          
-          gameState.bullets = [];
-          gameState.enemyBullets = [];
-          gameState.particles = [];
-          gameState.powerUpItems = [];
-          
-          updateUI();
-          gameLoop();
-      }
+    function startGame() {
+    gameState.obstacles = [];
+    gameState.gameRunning = true;
+    gameState.gamePaused = false;
+    setBackgroundForLevel(gameState.currentLevel);
+    gameState.levelStartTime = Date.now();
+    gameState.slowTimeActive = false;
+    gameState.timeScale = 1;
+    gameState.currentPhase = 0;
+    gameState.bulletHellIntensity = 0;
+    gameState.adaptiveDifficulty = 1.0;
+    gameState.screenShake = 0;
+    gameState.transformationActive = false;
 
+    // --- NAVICELLA SELEZIONATA: sprite e statistiche ---
+    const selectedShip = localStorage.getItem("selectedShip") || "ship1";
+    let playerStats = {};
+
+    if (selectedShip === "ship1") {
+        playerImage.src = "navicella1.png";
+        playerStats = {
+            speed: 5,
+            maxHealth: 100,
+            maxEnergy: 100
+        };
+    } else if (selectedShip === "ship2") {
+        playerImage.src = "navicella2.png";
+        playerStats = {
+            speed: 3,
+            maxHealth: 180,
+            maxEnergy: 120
+        };
+    } else if (selectedShip === "ship3") {
+        playerImage.src = "navicella3.png";
+        playerStats = {
+            speed: 7,           // Più veloce delle altre
+            maxHealth: 80,      // Meno vita
+            maxEnergy: 140      // Più energia
+        };
+    } else {
+        // fallback per navicelle future/non trovate
+        playerImage.src = "navicella1.png";
+        playerStats = {
+            speed: 5,
+            maxHealth: 100,
+            maxEnergy: 100
+        };
+    }
+
+    // Applica le statistiche al player
+    gameState.player.speed = playerStats.speed;
+    gameState.player.maxHealth = playerStats.maxHealth;
+    gameState.player.health = playerStats.maxHealth;
+    gameState.player.maxEnergy = playerStats.maxEnergy;
+    gameState.player.energy = playerStats.maxEnergy;
+
+    const savedData = JSON.parse(localStorage.getItem('stellarGuardianSave') || '{}');
+    const skills = savedData.skills || {};
+
+    // Aggiungi bonus delle skill eventualmente già sbloccate
+    if (skills.hull_armor) {
+        gameState.player.maxHealth += skills.hull_armor * 50;
+        gameState.player.health = gameState.player.maxHealth;
+    }
+    if (skills.energy_core) {
+        gameState.player.maxEnergy += skills.energy_core * 20;
+        gameState.player.energy = gameState.player.maxEnergy;
+    }
+    gameState.player.emergencyShields = 1 + (skills.shield_generator || 0);
+    gameState.player.slowTimeEnergy = 100;
+    gameState.player.skills = skills;
+    gameState.player.invulnerabilityFrames = 0;
+    gameState.player.angle = 0;
+
+    if (gameState.gameMode === 'endless') {
+        generateEndlessEnemy();
+    } else {
+        initializeCampaignEnemy();
+    }
+
+    gameState.bullets = [];
+    gameState.enemyBullets = [];
+    gameState.particles = [];
+    gameState.powerUpItems = [];
+
+    updateUI();
+    gameLoop();
+}
       function initializeCampaignEnemy() {
           const levelData = LEVEL_DATA[gameState.currentLevel - 1];
           
@@ -2200,7 +2342,8 @@ if (selectedShip === "ship1") {
           checkEnemyPhaseTransition();
           
           if (gameState.enemy && gameState.enemy.health <= 0) {
-              levelComplete();
+                  esplodiBoss(gameState.enemy); // <-- qui!
+                  levelComplete();
           } else if (gameState.player.health <= 0 && gameState.player.invulnerabilityFrames <= 0) {
               gameOver();
           }
@@ -3230,30 +3373,27 @@ if (selectedShip === "ship1") {
 
 
       function renderBullets() {
-          gameState.bullets.forEach(bullet => {
-              ctx.save();
-              
-              if (bullet.charged || bullet.special) {
-                  ctx.shadowColor = bullet.color;
-                  ctx.shadowBlur = 15;
-              }
-              
-              ctx.fillStyle = bullet.color;
-              ctx.beginPath();
-              ctx.arc(bullet.x, bullet.y, bullet.size, 0, Math.PI * 2);
-              ctx.fill();
-              
-              // Enhanced trail effect
-              ctx.globalAlpha = 0.5;
-              ctx.fillStyle = bullet.color;
-              ctx.beginPath();
-              ctx.arc(bullet.x, bullet.y + 10, bullet.size * 0.6, 0, Math.PI * 2);
-              ctx.fill();
-              
-              ctx.restore();
-          });
-      }
+    gameState.bullets.forEach(bullet => {
+        ctx.save();
+        ctx.translate(bullet.x, bullet.y);
+        ctx.rotate(Math.atan2(bullet.vy, bullet.vx));
 
+        // Scegli quale missile mostrare in base al tipo
+        let sx = 0; // default: primo missile
+        let sy = 0;
+        let sw = 192; // larghezza missile (adatta se necessario)
+        let sh = 384; // altezza missile (adatta se necessario)
+        // Se vuoi cambiare missile in base al tipo, esempio:
+        // if (bullet.type === "blu") sx = 192;
+        // if (bullet.type === "doppio") sx = 384;
+        // if (bullet.type === "verde") sx = 576;
+
+        // Disegna il missile (scalato più piccolo se vuoi)
+        ctx.drawImage(missileSprite, sx, sy, sw, sh, -16, -32, 32, 64);
+
+        ctx.restore();
+    });
+}
       function renderEnemyBullets() {
           gameState.enemyBullets.forEach(bullet => {
               ctx.save();
@@ -3818,12 +3958,44 @@ function esplodiGiocatore(player) {
 }
 
 function esplodiBoss(boss) {
+    // Super esplosione centrale
     spawnSuperExplosion(boss.x, boss.y, {
         colors: ["#f00", "#fff", "#ffd700", "#9c27b0", "#ff7f00"],
         count: 140,
         sparkle: true
     });
+
+    // Ripple shockwave
     spawnRipple(boss.x, boss.y, "#ffd700");
+
+    // Mini esplosioni di fuoco attorno al boss (anello di fuochi)
+    for (let i = 0; i < 12; i++) {
+        const angle = (i / 12) * Math.PI * 2;
+        const fx = boss.x + Math.cos(angle) * 60;
+        const fy = boss.y + Math.sin(angle) * 60;
+        spawnSuperExplosion(fx, fy, {
+            colors: ["#ff9800", "#ffd700", "#fff"],
+            count: 18,
+            sparkle: false
+        });
+    }
+
+    // Fiamme che salgono dal boss
+    for (let i = 0; i < 24; i++) {
+        gameState.particles.push({
+            x: boss.x + (Math.random() - 0.5) * 48,
+            y: boss.y + 20 + Math.random() * 12,
+            vx: (Math.random() - 0.5) * 2,
+            vy: -4 - Math.random() * 3,
+            color: ["#ff9800", "#ffd700", "#fff", "#f44336"][Math.floor(Math.random() * 4)],
+            size: 8 + Math.random() * 8,
+            life: 44 + Math.random() * 28,
+            maxLife: 60,
+            alpha: 1
+        });
+    }
+
+    // Shake & flash finale
     startShake(28, 32);
     startFlash(0.5);
 }
@@ -3908,17 +4080,86 @@ function renderPlayerTrail(ctx) {
 }
   
 function selectShip(shipId) {
-    gameState.selectedShip = shipId;
-    localStorage.setItem("selectedShip", shipId); // opzionale ma utile
-    showNotification("Navicella selezionata: " + shipId);
+    localStorage.setItem('selectedShip', shipId);
+    alert(`🚀 Ship "${shipId}" selected!`);
+    highlightSelectedShip();
+  }
+
+  function getSelectedShip() {
+    return localStorage.getItem('selectedShip') || 'ship1';
+  }
+
+  function highlightSelectedShip() {
+    const selectedShip = getSelectedShip();
+    document.querySelectorAll('#shipInventory .level-card').forEach(card => {
+      card.classList.remove('selected-ship');
+      if (card.dataset.shipId === selectedShip) {
+        card.classList.add('selected-ship');
+      }
+    });
+  }
+
+  const style = document.createElement('style');
+  style.textContent = `.selected-ship {
+    border: 4px solid #ffd700;
+    box-shadow: 0 0 20px #ffd700;
+    transform: scale(1.03);
+  }`;
+  document.head.appendChild(style);
+
+  document.addEventListener('DOMContentLoaded', highlightSelectedShip);
+  
+  // Loading phrases & navicelle random
+const loadingScreen = document.getElementById('loadingScreen');
+const loadingBarFill = document.getElementById('loadingBarFill');
+const loadingText = document.getElementById('loadingText');
+const loadingPhrases = [
+  "Calibrating Hyperdrive...",
+  "Loading Cosmic Donuts...",
+  "Spazzolando la polvere di stelle...",
+  "Preparando la navicella per il decollo...",
+  "Caricando nemici dispettosi...",
+  "Compilando meme galattici...",
+  "Verifying ship's AI sarcasm level...",
+  "Sintonizzando la radio spaziale..."
+];
+const ships = ["navicella1.png", "navicella2.png", "navicella3.png"];
+setInterval(() => {
+  document.getElementById('loaderShip').src = ships[Math.floor(Math.random() * ships.length)];
+}, 900);
+
+function showLoadingScreen(duration = 2200) {
+  loadingScreen.style.display = 'flex';
+  loadingScreen.classList.remove('hide');
+  document.body.classList.add('loading');
+  loadingBarFill.style.width = '0%';
+  let progress = 0;
+  let interval = setInterval(() => {
+    progress += Math.random() * 13 + 7;
+    if (progress > 100) progress = 100;
+    loadingBarFill.style.width = progress + '%';
+    if (Math.random() < 0.24)
+      loadingText.textContent = loadingPhrases[Math.floor(Math.random() * loadingPhrases.length)];
+    if (progress >= 100) {
+      clearInterval(interval);
+      setTimeout(hideLoadingScreen, 700);
+    }
+  }, 350);
 }
 
-
-
-function getSelectedShip() {
-  return localStorage.getItem('selectedShip') || 'ship1'; // Default
+function hideLoadingScreen() {
+  loadingScreen.classList.add('hide');
+  document.body.classList.remove('loading');
+  setTimeout(() => {
+    loadingScreen.style.display = 'none';
+  }, 700); // deve essere >= della transition
 }
 
+// All'avvio mostra loading
+window.addEventListener('load', () => {
+  showLoadingScreen();
+  setTimeout(hideLoadingScreen, 2400);
+});
   
   </script>
   
