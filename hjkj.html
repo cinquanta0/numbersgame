@@ -2492,8 +2492,7 @@ initGame();
 
     // Mobile joystick movement
     if (gameState.isMobile && gameState.touchControls.joystick.active) {
-        const joystickStrength = 0.3;
-        const moveX = gameState.touchControls.joystick.currentX * joystickStrength;
+               const joystickStrength = 0.55; // Sensibilità aumentata! (era 0.3)        const moveX = gameState.touchControls.joystick.currentX * joystickStrength;
         const moveY = gameState.touchControls.joystick.currentY * joystickStrength;
 
         player.x += moveX;
