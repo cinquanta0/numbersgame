@@ -1770,29 +1770,22 @@ enemyImage.src = 'alien-enemy2.png'; // Senza /
           }, 100);
       }
 
-     function resizeCanvas() {
-    const container = document.getElementById('gameContainer');
-    let w = window.innerWidth;
-    let h = window.innerHeight;
+    function resizeCanvas() {
+          const container = document.getElementById('gameContainer');
+          const rect = container.getBoundingClientRect();
+          canvas.width = rect.width;
+          canvas.height = rect.height;
+          
+          if (gameState.gameRunning) {
+              gameState.player.x = Math.min(gameState.player.x, canvas.width - 50);
+              gameState.player.y = Math.min(gameState.player.y, canvas.height - 50);
+              
+              if (gameState.enemy) {
+                  gameState.enemy.x = Math.min(gameState.enemy.x, canvas.width - 100);
+              }
+          }
+      }
 
-    // PATCH: su mobile, limita la risoluzione massima del canvas!
-    if (gameState.isMobile) {
-        w = Math.min(w, 900);
-        h = Math.min(h, 600);
-    }
-
-    canvas.width = w;
-    canvas.height = h;
-
-    if (gameState.gameRunning) {
-        gameState.player.x = Math.min(gameState.player.x, canvas.width - 50);
-        gameState.player.y = Math.min(gameState.player.y, canvas.height - 50);
-
-        if (gameState.enemy) {
-            gameState.enemy.x = Math.min(gameState.enemy.x, canvas.width - 100);
-        }
-    }
-}
  function setupMobileControls() {
     if (!gameState.isMobile) return;
 
