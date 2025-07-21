@@ -1786,8 +1786,7 @@ enemyImage.src = 'alien-enemy2.png'; // Senza /
           }
       }
 
-      // Enhanced Mobile Controls Setup
-function setupMobileControls() {
+      function setupMobileControls() {
     if (!gameState.isMobile) return;
 
     const joystick = document.getElementById('mobileJoystick');
@@ -1797,105 +1796,71 @@ function setupMobileControls() {
     const shieldBtn = document.getElementById('mobileShield');
     const specialBtn = document.getElementById('mobileSpecial');
 
-    // PATCH: Joystick con try/catch e maxDistance ridotto
-    joystick.addEventListener('touchstart', (e) => {
-        try {
-            e.preventDefault();
-            const touch = e.touches[0];
-            if (!touch) return;
-            const rect = joystick.getBoundingClientRect();
-            const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top + rect.height / 2;
+    // --- Joystick touch events: SOLO sull'elemento joystick! ---
+    let activeTouchId = null;
 
-            gameState.touchControls.joystick.active = true;
-            gameState.touchControls.joystick.startX = centerX;
-            gameState.touchControls.joystick.startY = centerY;
-            gameState.touchControls.joystick.touchId = touch.identifier;
+    joystick.addEventListener('touchstart', function (e) {
+        const touch = e.changedTouches[0];
+        if (!touch) return;
+        activeTouchId = touch.identifier;
+        gameState.touchControls.joystick.active = true;
+        const rect = joystick.getBoundingClientRect();
+        gameState.touchControls.joystick.startX = rect.left + rect.width / 2;
+        gameState.touchControls.joystick.startY = rect.top + rect.height / 2;
+        gameState.touchControls.joystick.currentX = 0;
+        gameState.touchControls.joystick.currentY = 0;
+        if (navigator.vibrate) navigator.vibrate(10);
+        e.preventDefault();
+    }, { passive: false });
 
-            if (navigator.vibrate) {
-                navigator.vibrate(10);
+    joystick.addEventListener('touchmove', function (e) {
+        if (!gameState.touchControls.joystick.active) return;
+        for (let i = 0; i < e.changedTouches.length; i++) {
+            const touch = e.changedTouches[i];
+            if (touch.identifier === activeTouchId) {
+                const centerX = gameState.touchControls.joystick.startX;
+                const centerY = gameState.touchControls.joystick.startY;
+                const deltaX = touch.clientX - centerX;
+                const deltaY = touch.clientY - centerY;
+                const maxDistance = 40;
+                let moveX = deltaX, moveY = deltaY;
+                const dist = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+                if (dist > maxDistance) {
+                    const angle = Math.atan2(deltaY, deltaX);
+                    moveX = Math.cos(angle) * maxDistance;
+                    moveY = Math.sin(angle) * maxDistance;
+                }
+                gameState.touchControls.joystick.currentX = moveX;
+                gameState.touchControls.joystick.currentY = moveY;
+                if (joystickKnob) joystickKnob.style.transform = `translate(${moveX}px, ${moveY}px)`;
+                e.preventDefault();
+                break;
             }
-        } catch (err) {
-            console.error('touchstart error', err);
-            gameState.touchControls.joystick.active = false;
         }
     }, { passive: false });
 
-    document.addEventListener('touchmove', (e) => {
-        try {
-            if (!gameState.touchControls.joystick.active) return;
-            let relevantTouch = null;
-            for (let touch of e.touches) {
-                if (touch.identifier === gameState.touchControls.joystick.touchId) {
-                    relevantTouch = touch;
-                    break;
-                }
-            }
-            if (!relevantTouch) return;
-
-            e.preventDefault();
-
-            const centerX = gameState.touchControls.joystick.startX;
-            const centerY = gameState.touchControls.joystick.startY;
-
-            const deltaX = relevantTouch.clientX - centerX;
-            const deltaY = relevantTouch.clientY - centerY;
-            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-            const maxDistance = 40; // Ridotto per sicurezza
-
-            let moveX, moveY;
-            if (distance <= maxDistance) {
-                moveX = deltaX;
-                moveY = deltaY;
-            } else {
-                const angle = Math.atan2(deltaY, deltaX);
-                moveX = Math.cos(angle) * maxDistance;
-                moveY = Math.sin(angle) * maxDistance;
-            }
-            gameState.touchControls.joystick.currentX = moveX;
-            gameState.touchControls.joystick.currentY = moveY;
-            if (joystickKnob) {
-                joystickKnob.style.transform = `translate(${moveX}px, ${moveY}px)`;
-            }
-        } catch (err) {
-            console.error('touchmove error', err);
-            gameState.touchControls.joystick.active = false;
-        }
-    }, { passive: false });
-
-    document.addEventListener('touchend', (e) => {
-        try {
-            let touchEnded = true;
-            for (let touch of e.touches) {
-                if (touch.identifier === gameState.touchControls.joystick.touchId) {
-                    touchEnded = false;
-                    break;
-                }
-            }
-            if (touchEnded && gameState.touchControls.joystick.active) {
+    joystick.addEventListener('touchend', function (e) {
+        for (let i = 0; i < e.changedTouches.length; i++) {
+            const touch = e.changedTouches[i];
+            if (touch.identifier === activeTouchId) {
                 gameState.touchControls.joystick.active = false;
                 gameState.touchControls.joystick.currentX = 0;
                 gameState.touchControls.joystick.currentY = 0;
-                gameState.touchControls.joystick.touchId = null;
-                if (joystickKnob) {
-                    joystickKnob.style.transform = 'translate(0, 0)';
-                }
+                activeTouchId = null;
+                if (joystickKnob) joystickKnob.style.transform = 'translate(0, 0)';
+                e.preventDefault();
+                break;
             }
-        } catch (err) {
-            console.error('touchend error', err);
-            gameState.touchControls.joystick.active = false;
         }
     }, { passive: false });
 
-    // Enhanced action buttons
+    // --- Action buttons ---
     const setupActionButton = (button, action, hapticStrength = 20) => {
         button.addEventListener('touchstart', (e) => {
             e.preventDefault();
             action();
             button.style.transform = 'scale(0.9)';
-            if (navigator.vibrate) {
-                navigator.vibrate(hapticStrength);
-            }
+            if (navigator.vibrate) navigator.vibrate(hapticStrength);
         }, { passive: false });
 
         button.addEventListener('touchend', (e) => {
@@ -1913,18 +1878,16 @@ function setupMobileControls() {
     setupActionButton(shieldBtn, useEmergencyShield, 50);
     setupActionButton(specialBtn, specialAttack, 40);
 
-    // Enhanced canvas touch controls
+    // --- Canvas touch controls ---
     canvas.addEventListener('touchstart', (e) => {
         e.preventDefault();
         const touch = e.touches[0];
         const rect = canvas.getBoundingClientRect();
         gameState.mouse.x = touch.clientX - rect.left;
         gameState.mouse.y = touch.clientY - rect.top;
-
         gameState.touchControls.shooting = true;
         gameState.keys['shoot'] = true;
         gameState.touchControls.lastTouchTime = Date.now();
-
         if (e.touches.length > 1) {
             useEmergencyShield();
         }
@@ -1942,7 +1905,6 @@ function setupMobileControls() {
         e.preventDefault();
         gameState.touchControls.shooting = false;
         gameState.keys['shoot'] = false;
-
         const now = Date.now();
         if (now - gameState.touchControls.lastTouchTime < 300) {
             toggleSlowTime();
