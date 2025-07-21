@@ -1640,11 +1640,11 @@ missileSprite.src = "missili.png"; // usa il nome del tuo file
           {level: 13, enemy: "Galactic Overlord", difficulty: "Extreme", health: 12000, phases: 6, speed: 5.5, attackPatterns: ['basic', 'spread', 'tracking', 'wave', 'laser', 'swarm', 'spiral', 'chaos'], bulletSpeed: 6.5, bulletCount: 3.4},
           {level: 14, enemy: "Dimension Ripper", difficulty: "Nightmare", health: 14000, phases: 6, speed: 5.8, attackPatterns: ['basic', 'spread', 'tracking', 'wave', 'laser', 'swarm', 'spiral', 'chaos'], bulletSpeed: 6.8, bulletCount: 3.6},
           {level: 15, enemy: "Reality Shredder", difficulty: "Nightmare", health: 16500, phases: 6, speed: 6, attackPatterns: ['basic', 'spread', 'tracking', 'wave', 'laser', 'swarm', 'spiral', 'chaos', 'ultimate'], bulletSpeed: 7, bulletCount: 3.8},
-          {level: 16, enemy: "Cosmic Horror", difficulty: "Nightmare", health: 19000, phases: 7, speed: 6.2, attackPatterns: ['basic', 'spread', 'tracking', 'wave', 'laser', 'swarm', 'spiral', 'chaos', 'ultimate'], bulletSpeed: 7, bulletCount: 3.5},
-          {level: 17, enemy: "Universal Destroyer", difficulty: "Impossible", health: 22000, phases: 7, speed: 6.5, attackPatterns: ['basic', 'spread', 'tracking', 'wave', 'laser', 'swarm', 'spiral', 'chaos', 'ultimate'], bulletSpeed: 7.2, bulletCount: 3.7},
-          {level: 18, enemy: "Infinity Engine", difficulty: "Impossible", health: 25500, phases: 8, speed: 6.8, attackPatterns: ['basic', 'spread', 'tracking', 'wave', 'laser', 'swarm', 'spiral', 'chaos', 'ultimate'], bulletSpeed: 7.5, bulletCount: 3.8},
-          {level: 19, enemy: "Omnipotent Core", difficulty: "Impossible", health: 29000, phases: 8, speed: 7, attackPatterns: ['basic', 'spread', 'tracking', 'wave', 'laser', 'swarm', 'spiral', 'chaos', 'ultimate'], bulletSpeed: 7.8, bulletCount: 4.0},
-          {level: 20, enemy: "The Final Guardian", difficulty: "LEGENDARY", health: 35000, phases: 10, speed: 7.5, attackPatterns: ['basic', 'spread', 'tracking', 'wave', 'laser', 'swarm', 'spiral', 'chaos', 'ultimate'], bulletSpeed: 8.0, bulletCount: 4.2},
+          {level: 16, enemy: "Cosmic Horror", difficulty: "Nightmare", health: 19000, phases: 7, speed: 6.2, attackPatterns: ['basic', 'spread', 'tracking', 'wave', 'laser', 'swarm', 'spiral', 'chaos', 'ultimate'], bulletSpeed: 7.2, bulletCount: 4},
+          {level: 17, enemy: "Universal Destroyer", difficulty: "Impossible", health: 22000, phases: 7, speed: 6.5, attackPatterns: ['basic', 'spread', 'tracking', 'wave', 'laser', 'swarm', 'spiral', 'chaos', 'ultimate'], bulletSpeed: 7.5, bulletCount: 4.2},
+          {level: 18, enemy: "Infinity Engine", difficulty: "Impossible", health: 25500, phases: 8, speed: 6.8, attackPatterns: ['basic', 'spread', 'tracking', 'wave', 'laser', 'swarm', 'spiral', 'chaos', 'ultimate'], bulletSpeed: 7.8, bulletCount: 4.4},
+          {level: 19, enemy: "Omnipotent Core", difficulty: "Impossible", health: 29000, phases: 8, speed: 7, attackPatterns: ['basic', 'spread', 'tracking', 'wave', 'laser', 'swarm', 'spiral', 'chaos', 'ultimate'], bulletSpeed: 8, bulletCount: 4.6},
+          {level: 20, enemy: "The Final Guardian", difficulty: "LEGENDARY", health: 35000, phases: 10, speed: 7.5, attackPatterns: ['basic', 'spread', 'tracking', 'wave', 'laser', 'swarm', 'spiral', 'chaos', 'ultimate'], bulletSpeed: 8.5, bulletCount: 5}
       ];
 
       // Upgrade Skills Configuration
@@ -1770,7 +1770,7 @@ enemyImage.src = 'alien-enemy2.png'; // Senza /
           }, 100);
       }
 
-    function resizeCanvas() {
+      function resizeCanvas() {
           const container = document.getElementById('gameContainer');
           const rect = container.getBoundingClientRect();
           canvas.width = rect.width;
@@ -1786,128 +1786,156 @@ enemyImage.src = 'alien-enemy2.png'; // Senza /
           }
       }
 
- function setupMobileControls() {
-    if (!gameState.isMobile) return;
+      // Enhanced Mobile Controls Setup
+      function setupMobileControls() {
+          if (!gameState.isMobile) return;
 
-    const joystick = document.getElementById('mobileJoystick');
-    const joystickKnob = document.getElementById('mobileJoystickKnob');
-    const shootBtn = document.getElementById('mobileShoot');
-    const slowTimeBtn = document.getElementById('mobileSlowTime');
-    const shieldBtn = document.getElementById('mobileShield');
-    const specialBtn = document.getElementById('mobileSpecial');
+          const joystick = document.getElementById('mobileJoystick');
+          const joystickKnob = document.getElementById('mobileJoystickKnob');
+          const shootBtn = document.getElementById('mobileShoot');
+          const slowTimeBtn = document.getElementById('mobileSlowTime');
+          const shieldBtn = document.getElementById('mobileShield');
+          const specialBtn = document.getElementById('mobileSpecial');
 
-    // PATCH: Listener SOLO sul joystick!
-    joystick.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        const touch = e.touches[0];
-        const rect = joystick.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
+          // Enhanced joystick with better responsiveness
+          joystick.addEventListener('touchstart', (e) => {
+              e.preventDefault();
+              const touch = e.touches[0];
+              const rect = joystick.getBoundingClientRect();
+              const centerX = rect.left + rect.width / 2;
+              const centerY = rect.top + rect.height / 2;
+              
+              gameState.touchControls.joystick.active = true;
+              gameState.touchControls.joystick.startX = centerX;
+              gameState.touchControls.joystick.startY = centerY;
+              gameState.touchControls.joystick.touchId = touch.identifier;
+              
+              if (navigator.vibrate) {
+                  navigator.vibrate(10);
+              }
+          }, { passive: false });
 
-        gameState.touchControls.joystick.active = true;
-        gameState.touchControls.joystick.startX = centerX;
-        gameState.touchControls.joystick.startY = centerY;
-        gameState.touchControls.joystick.touchId = touch.identifier;
+          document.addEventListener('touchmove', (e) => {
+              if (!gameState.touchControls.joystick.active) return;
+              
+              let relevantTouch = null;
+              for (let touch of e.touches) {
+                  if (touch.identifier === gameState.touchControls.joystick.touchId) {
+                      relevantTouch = touch;
+                      break;
+                  }
+              }
+              
+              if (!relevantTouch) return;
+              
+              e.preventDefault();
+              
+              const centerX = gameState.touchControls.joystick.startX;
+              const centerY = gameState.touchControls.joystick.startY;
+              
+              const deltaX = relevantTouch.clientX - centerX;
+              const deltaY = relevantTouch.clientY - centerY;
+              const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+              const maxDistance = 50;
+              
+              if (distance <= maxDistance) {
+                  gameState.touchControls.joystick.currentX = deltaX;
+                  gameState.touchControls.joystick.currentY = deltaY;
+              } else {
+                  const angle = Math.atan2(deltaY, deltaX);
+                  gameState.touchControls.joystick.currentX = Math.cos(angle) * maxDistance;
+                  gameState.touchControls.joystick.currentY = Math.sin(angle) * maxDistance;
+              }
 
-        if (navigator.vibrate) navigator.vibrate(10);
-    }, { passive: false });
+              joystickKnob.style.transform = `translate(${gameState.touchControls.joystick.currentX}px, ${gameState.touchControls.joystick.currentY}px)`;
+          }, { passive: false });
 
-    joystick.addEventListener('touchmove', (e) => {
-        if (!gameState.touchControls.joystick.active) return;
-        e.preventDefault();
-        const touch = e.touches[0];
-        const rect = joystick.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
+          document.addEventListener('touchend', (e) => {
+              let touchEnded = true;
+              for (let touch of e.touches) {
+                  if (touch.identifier === gameState.touchControls.joystick.touchId) {
+                      touchEnded = false;
+                      break;
+                  }
+              }
+              
+              if (touchEnded && gameState.touchControls.joystick.active) {
+                  gameState.touchControls.joystick.active = false;
+                  gameState.touchControls.joystick.currentX = 0;
+                  gameState.touchControls.joystick.currentY = 0;
+                  gameState.touchControls.joystick.touchId = null;
+                  joystickKnob.style.transform = 'translate(0, 0)';
+              }
+          }, { passive: false });
 
-        const deltaX = touch.clientX - centerX;
-        const deltaY = touch.clientY - centerY;
-        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-        const maxDistance = 50;
+          // Enhanced action buttons
+          const setupActionButton = (button, action, hapticStrength = 20) => {
+              button.addEventListener('touchstart', (e) => {
+                  e.preventDefault();
+                  action();
+                  button.style.transform = 'scale(0.9)';
+                  if (navigator.vibrate) {
+                      navigator.vibrate(hapticStrength);
+                  }
+              }, { passive: false });
 
-        if (distance <= maxDistance) {
-            gameState.touchControls.joystick.currentX = deltaX;
-            gameState.touchControls.joystick.currentY = deltaY;
-        } else {
-            const angle = Math.atan2(deltaY, deltaX);
-            gameState.touchControls.joystick.currentX = Math.cos(angle) * maxDistance;
-            gameState.touchControls.joystick.currentY = Math.sin(angle) * maxDistance;
-        }
+              button.addEventListener('touchend', (e) => {
+                  e.preventDefault();
+                  button.style.transform = 'scale(1)';
+              }, { passive: false });
+          };
 
-        joystickKnob.style.transform = `translate(${gameState.touchControls.joystick.currentX}px, ${gameState.touchControls.joystick.currentY}px)`;
-    }, { passive: false });
+          setupActionButton(shootBtn, () => {
+              gameState.keys['shoot'] = true;
+              setTimeout(() => { gameState.keys['shoot'] = false; }, 100);
+          }, 10);
 
-    joystick.addEventListener('touchend', (e) => {
-        gameState.touchControls.joystick.active = false;
-        gameState.touchControls.joystick.currentX = 0;
-        gameState.touchControls.joystick.currentY = 0;
-        gameState.touchControls.joystick.touchId = null;
-        joystickKnob.style.transform = 'translate(0, 0)';
-    }, { passive: false });
+          setupActionButton(slowTimeBtn, toggleSlowTime, 30);
+          setupActionButton(shieldBtn, useEmergencyShield, 50);
+          setupActionButton(specialBtn, specialAttack, 40);
 
-    // BUTTONS: OK come li hai tu!
-    const setupActionButton = (button, action, hapticStrength = 20) => {
-        button.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            action();
-            button.style.transform = 'scale(0.9)';
-            if (navigator.vibrate) navigator.vibrate(hapticStrength);
-        }, { passive: false });
+          // Enhanced canvas touch controls
+          canvas.addEventListener('touchstart', (e) => {
+              e.preventDefault();
+              const touch = e.touches[0];
+              const rect = canvas.getBoundingClientRect();
+              gameState.mouse.x = touch.clientX - rect.left;
+              gameState.mouse.y = touch.clientY - rect.top;
+              
+              gameState.touchControls.shooting = true;
+              gameState.keys['shoot'] = true;
+              gameState.touchControls.lastTouchTime = Date.now();
+              
+              if (e.touches.length > 1) {
+                  useEmergencyShield();
+              }
+          }, { passive: false });
 
-        button.addEventListener('touchend', (e) => {
-            e.preventDefault();
-            button.style.transform = 'scale(1)';
-        }, { passive: false });
-    };
-    setupActionButton(shootBtn, () => {
-        gameState.keys['shoot'] = true;
-        setTimeout(() => { gameState.keys['shoot'] = false; }, 100);
-    }, 10);
-    setupActionButton(slowTimeBtn, toggleSlowTime, 30);
-    setupActionButton(shieldBtn, useEmergencyShield, 50);
-    setupActionButton(specialBtn, specialAttack, 40);
+          canvas.addEventListener('touchmove', (e) => {
+              e.preventDefault();
+              const touch = e.touches[0];
+              const rect = canvas.getBoundingClientRect();
+              gameState.mouse.x = touch.clientX - rect.left;
+              gameState.mouse.y = touch.clientY - rect.top;
+          }, { passive: false });
 
-    // CANVAS: OK come hai già tu!
-    canvas.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        const touch = e.touches[0];
-        const rect = canvas.getBoundingClientRect();
-        gameState.mouse.x = touch.clientX - rect.left;
-        gameState.mouse.y = touch.clientY - rect.top;
+          canvas.addEventListener('touchend', (e) => {
+              e.preventDefault();
+              gameState.touchControls.shooting = false;
+              gameState.keys['shoot'] = false;
+              
+              const now = Date.now();
+              if (now - gameState.touchControls.lastTouchTime < 300) {
+                  toggleSlowTime();
+              }
+          }, { passive: false });
 
-        gameState.touchControls.shooting = true;
-        gameState.keys['shoot'] = true;
-        gameState.touchControls.lastTouchTime = Date.now();
+          // Prevent zoom on mobile
+          document.addEventListener('gesturestart', (e) => e.preventDefault());
+          document.addEventListener('gesturechange', (e) => e.preventDefault());
+          document.addEventListener('gestureend', (e) => e.preventDefault());
+      }
 
-        if (e.touches.length > 1) {
-            useEmergencyShield();
-        }
-    }, { passive: false });
-
-    canvas.addEventListener('touchmove', (e) => {
-        e.preventDefault();
-        const touch = e.touches[0];
-        const rect = canvas.getBoundingClientRect();
-        gameState.mouse.x = touch.clientX - rect.left;
-        gameState.mouse.y = touch.clientY - rect.top;
-    }, { passive: false });
-
-    canvas.addEventListener('touchend', (e) => {
-        e.preventDefault();
-        gameState.touchControls.shooting = false;
-        gameState.keys['shoot'] = false;
-
-        const now = Date.now();
-        if (now - gameState.touchControls.lastTouchTime < 300) {
-            toggleSlowTime();
-        }
-    }, { passive: false });
-
-    // Prevent zoom
-    document.addEventListener('gesturestart', (e) => e.preventDefault());
-    document.addEventListener('gesturechange', (e) => e.preventDefault());
-    document.addEventListener('gestureend', (e) => e.preventDefault());
-}
       // Event Listeners Setup
       function setupEventListeners() {
           document.addEventListener('keydown', (e) => {
@@ -2250,7 +2278,7 @@ initGame();
     }
 }
       
-   function startGame() {
+    function startGame() {
     gameState.obstacles = [];
     gameState.gameRunning = true;
     gameState.gamePaused = false;
@@ -2317,7 +2345,7 @@ initGame();
     const savedData = JSON.parse(localStorage.getItem('stellarGuardianSave') || '{}');
     const skills = savedData.skills || {};
 
-    // Skill bonus
+    // Aggiungi bonus delle skill eventualmente già sbloccate
     if (skills.hull_armor) {
         gameState.player.maxHealth += skills.hull_armor * 50;
         gameState.player.health = gameState.player.maxHealth;
@@ -2331,11 +2359,6 @@ initGame();
     gameState.player.skills = skills;
     gameState.player.invulnerabilityFrames = 0;
     gameState.player.angle = 0;
-
-    // ------------- PATCH: Limiti special attack ---------------
-    gameState.player.specialCooldown = 0; // Cooldown per l'attacco speciale
-    gameState.player.specialUses = 2;     // Numero massimo di attacchi speciali per livello
-    // ---------------------------------------------------------
 
     if (gameState.gameMode === 'endless') {
         generateEndlessEnemy();
@@ -2409,7 +2432,7 @@ initGame();
           animationId = requestAnimationFrame(gameLoop);
       }
 
-     function update() {
+      function update() {
     const deltaTime = gameState.timeScale;
     
     updatePlayer(deltaTime);
@@ -2423,13 +2446,7 @@ initGame();
     updateAdaptiveDifficulty();
     updateScreenShake();
     checkCollisions();
-
-    // PATCH: Aggiorna il cooldown dell'attacco speciale!
-    if (gameState.player.specialCooldown > 0) {
-        gameState.player.specialCooldown--;
-    }
-    // -----------------------------------------------
-
+    
     if (gameState.gameMode === 'chaos') {
         updateChaosMode(1);
     } else if (gameState.gameMode === 'endless') {
@@ -2447,6 +2464,7 @@ initGame();
         gameOver();
     }
 }
+
      function updatePlayer(deltaTime) {
     const player = gameState.player;
     const skills = gameState.player.skills;
@@ -2464,7 +2482,8 @@ initGame();
 
     // Mobile joystick movement
     if (gameState.isMobile && gameState.touchControls.joystick.active) {
-               const joystickStrength = 0.55; // Sensibilità aumentata! (era 0.3)        const moveX = gameState.touchControls.joystick.currentX * joystickStrength;
+        const joystickStrength = 0.3;
+        const moveX = gameState.touchControls.joystick.currentX * joystickStrength;
         const moveY = gameState.touchControls.joystick.currentY * joystickStrength;
 
         player.x += moveX;
@@ -2976,44 +2995,27 @@ initGame();
       }
 
       function specialAttack() {
-    // PATCH: Limiti special attack (cooldown, uses, energia)
-    if (
-        gameState.player.health < gameState.player.maxHealth * 0.4 &&
-        gameState.player.specialCooldown <= 0 &&
-        gameState.player.specialUses > 0 &&
-        gameState.player.energy >= 30
-    ) {
-        const damage = 120;
-        for (let i = 0; i < 12; i++) {
-            const angle = (i / 12) * Math.PI * 2;
-            gameState.bullets.push({
-                x: gameState.player.x,
-                y: gameState.player.y - 20,
-                vx: Math.cos(angle) * 8,
-                vy: Math.sin(angle) * 8 - 4,
-                color: "#ffd700",
-                size: 12,
-                damage: damage,
-                special: true
-            });
-        }
-        gameState.player.health = Math.max(1, gameState.player.health - 15);
-        gameState.player.specialCooldown = 180; // 3 secondi @ 60fps
-        gameState.player.specialUses--;
-        gameState.player.energy -= 30;
-        showNotification(
-            `Special attack used! Left: ${gameState.player.specialUses}`,
-            "info"
-        );
-        updateUI();
-    } else if (gameState.player.specialUses <= 0) {
-        showNotification("No more special attacks left this level!", "info");
-    } else if (gameState.player.specialCooldown > 0) {
-        showNotification("Special attack reloading...", "info");
-    } else if (gameState.player.energy < 30) {
-        showNotification("Not enough energy for special attack!", "info");
-    }
-}
+          if (gameState.player.health < gameState.player.maxHealth * 0.4) {
+              const damage = 120;
+              
+              for (let i = 0; i < 12; i++) {
+                  const angle = (i / 12) * Math.PI * 2;
+                  gameState.bullets.push({
+                      x: gameState.player.x,
+                      y: gameState.player.y - 20,
+                      vx: Math.cos(angle) * 8,
+                      vy: Math.sin(angle) * 8 - 4,
+                      color: '#ffd700',
+                      size: 12,
+                      damage: damage,
+                      special: true
+                  });
+              }
+              
+              gameState.player.health = Math.max(1, gameState.player.health - 15);
+              updateUI();
+          }
+      }
 
       function updateEndlessMode() {
           if (gameState.gameMode !== 'endless') return;
