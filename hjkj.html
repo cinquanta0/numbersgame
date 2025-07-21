@@ -1786,8 +1786,7 @@ enemyImage.src = 'alien-enemy2.png'; // Senza /
           }
       }
 
-     // Enhanced Mobile Controls Setup (FIXED JOYSTICK FREEZE)
-function setupMobileControls() {
+    function setupMobileControls() {
     if (!gameState.isMobile) return;
 
     const joystick = document.getElementById('mobileJoystick');
@@ -1797,8 +1796,10 @@ function setupMobileControls() {
     const shieldBtn = document.getElementById('mobileShield');
     const specialBtn = document.getElementById('mobileSpecial');
 
-    // --- PATCH: JOYSTICK LISTENER SOLO SUL JOYSTICK! ---
-    joystick.addEventListener('touchstart', function (e) {
+    // --- PATCH: aggiungi i listener UNA SOLA VOLTA ---
+    let joystickTouchId = null;
+
+    joystick.addEventListener('touchstart', function(e) {
         e.preventDefault();
         const touch = e.touches[0];
         const rect = joystick.getBoundingClientRect();
@@ -1809,66 +1810,64 @@ function setupMobileControls() {
         gameState.touchControls.joystick.startX = centerX;
         gameState.touchControls.joystick.startY = centerY;
         gameState.touchControls.joystick.touchId = touch.identifier;
+        joystickTouchId = touch.identifier;
 
         if (navigator.vibrate) navigator.vibrate(10);
-
-        function handleMove(ev) {
-            // Trova il touch giusto
-            let relevantTouch = null;
-            for (let t of ev.touches) {
-                if (t.identifier === gameState.touchControls.joystick.touchId) {
-                    relevantTouch = t;
-                    break;
-                }
-            }
-            if (!relevantTouch) return;
-
-            ev.preventDefault();
-
-            const centerX = gameState.touchControls.joystick.startX;
-            const centerY = gameState.touchControls.joystick.startY;
-            const deltaX = relevantTouch.clientX - centerX;
-            const deltaY = relevantTouch.clientY - centerY;
-            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-            const maxDistance = 50;
-
-            if (distance <= maxDistance) {
-                gameState.touchControls.joystick.currentX = deltaX;
-                gameState.touchControls.joystick.currentY = deltaY;
-            } else {
-                const angle = Math.atan2(deltaY, deltaX);
-                gameState.touchControls.joystick.currentX = Math.cos(angle) * maxDistance;
-                gameState.touchControls.joystick.currentY = Math.sin(angle) * maxDistance;
-            }
-            joystickKnob.style.transform = `translate(${gameState.touchControls.joystick.currentX}px, ${gameState.touchControls.joystick.currentY}px)`;
-        }
-
-        function handleEnd(ev) {
-            // Se il touch con il nostro id è finito, resetta tutto
-            let stillActive = false;
-            for (let t of ev.touches) {
-                if (t.identifier === gameState.touchControls.joystick.touchId) {
-                    stillActive = true;
-                }
-            }
-            if (!stillActive) {
-                gameState.touchControls.joystick.active = false;
-                gameState.touchControls.joystick.currentX = 0;
-                gameState.touchControls.joystick.currentY = 0;
-                gameState.touchControls.joystick.touchId = null;
-                joystickKnob.style.transform = 'translate(0,0)';
-                joystick.removeEventListener('touchmove', handleMove);
-                joystick.removeEventListener('touchend', handleEnd);
-            }
-        }
-
-        joystick.addEventListener('touchmove', handleMove, { passive: false });
-        joystick.addEventListener('touchend', handleEnd, { passive: false });
     }, { passive: false });
 
-    // --- FINE PATCH JOYSTICK ---
+    // Listener GLOBALI per touchmove/touchend che controllano il touchId giusto!
+    document.addEventListener('touchmove', function(ev) {
+        if (!gameState.touchControls.joystick.active) return;
+        let relevantTouch = null;
+        for (let t of ev.touches) {
+            if (t.identifier === gameState.touchControls.joystick.touchId) {
+                relevantTouch = t;
+                break;
+            }
+        }
+        if (!relevantTouch) return;
 
-    // Enhanced action buttons
+        ev.preventDefault();
+
+        const centerX = gameState.touchControls.joystick.startX;
+        const centerY = gameState.touchControls.joystick.startY;
+        const deltaX = relevantTouch.clientX - centerX;
+        const deltaY = relevantTouch.clientY - centerY;
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+        const maxDistance = 50;
+
+        if (distance <= maxDistance) {
+            gameState.touchControls.joystick.currentX = deltaX;
+            gameState.touchControls.joystick.currentY = deltaY;
+        } else {
+            const angle = Math.atan2(deltaY, deltaX);
+            gameState.touchControls.joystick.currentX = Math.cos(angle) * maxDistance;
+            gameState.touchControls.joystick.currentY = Math.sin(angle) * maxDistance;
+        }
+        joystickKnob.style.transform = `translate(${gameState.touchControls.joystick.currentX}px, ${gameState.touchControls.joystick.currentY}px)`;
+    }, { passive: false });
+
+    document.addEventListener('touchend', function(ev) {
+        // Se il nostro touch id non è più presente, resetta tutto
+        let stillActive = false;
+        for (let t of ev.touches) {
+            if (t.identifier === gameState.touchControls.joystick.touchId) {
+                stillActive = true;
+            }
+        }
+        if (!stillActive && gameState.touchControls.joystick.active) {
+            gameState.touchControls.joystick.active = false;
+            gameState.touchControls.joystick.currentX = 0;
+            gameState.touchControls.joystick.currentY = 0;
+            gameState.touchControls.joystick.touchId = null;
+            joystickKnob.style.transform = 'translate(0,0)';
+            joystickTouchId = null;
+        }
+    }, { passive: false });
+
+    // --- FINE PATCH ---
+
+    // Button actions (queste puoi lasciarle come sono)
     const setupActionButton = (button, action, hapticStrength = 20) => {
         button.addEventListener('touchstart', (e) => {
             e.preventDefault();
@@ -1892,7 +1891,7 @@ function setupMobileControls() {
     setupActionButton(shieldBtn, useEmergencyShield, 50);
     setupActionButton(specialBtn, specialAttack, 40);
 
-    // Enhanced canvas touch controls
+    // Canvas touch controls (puoi lasciare come sono)
     canvas.addEventListener('touchstart', (e) => {
         e.preventDefault();
         const touch = e.touches[0];
@@ -1926,7 +1925,7 @@ function setupMobileControls() {
         }
     }, { passive: false });
 
-    // Prevent zoom on mobile
+    // Prevent zoom su mobile
     document.addEventListener('gesturestart', (e) => e.preventDefault());
     document.addEventListener('gesturechange', (e) => e.preventDefault());
     document.addEventListener('gestureend', (e) => e.preventDefault());
