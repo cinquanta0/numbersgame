@@ -2,8 +2,28 @@
 <html lang="en">
 <head>
       <script src="https://sdk.crazygames.com/crazygames-sdk-v3.js"></script>
+      <!-- Firebase App (compat) -->
+<script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-app-compat.js"></script>
+<!-- Firebase Database (compat) -->
+<script src="https://www.gstatic.com/firebasejs/10.10.0/firebase-database-compat.js"></script>
 
-    <meta charset="UTF-8">
+    <script>
+const firebaseConfig = {
+  apiKey: "AIzaSyASrOGnbvP7Udn851U0xVbIQibCRFch_Hc",
+  authDomain: "stellar-guardian.firebaseapp.com",
+  databaseURL: "https://stellar-guardian-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "stellar-guardian",
+  storageBucket: "stellar-guardian.firebasestorage.app",
+  messagingSenderId: "870279459832",
+  appId: "1:870279459832:web:feceb953e7d2b7db831c0d",
+  measurementId: "G-VJJZVYQ018"
+};
+// Inizializza Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+</script>
+      
+<meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>🌟 STELLAR GUARDIAN - COSMIC DEFENSE FORCE 🌟</title>
   <style>
@@ -1151,6 +1171,7 @@ body.loading {
                   <button class="menu-btn" onclick="startChaosMode()">💥 CAOS TOTALE</button>
                   <button id="pulsanteMusica">🎵 Musica ON</button>
                   <button class="menu-btn" onclick="showScreen('inventoryScreen')">🛸 SPACESHIP INVENTORY</button>
+                  <button class="menu-btn" onclick="showOnlineLeaderboard()">🌍 CLASSIFICA GLOBALE</button>
                   <button class="menu-btn" onclick="startEndlessMode()">♾️ ENDLESS DEFENSE</button>
                   <button class="menu-btn" onclick="showLocalLeaderboard()">🌟 CLASSIFICA LOCALE</button>
                   <button class="menu-btn" onclick="showScreen('skillTree')">⭐ UPGRADES</button>
@@ -4502,8 +4523,43 @@ function showLocalLeaderboard() {
   document.getElementById('localLeaderboardList').innerHTML = html;
 }
   
+  function submitOnlineScore(username, score, level) {
+  const scoreData = {
+    username: username,
+    score: score,
+    level: level,
+    timestamp: Date.now()
+  };
+  db.ref('leaderboard').push(scoreData);
+}
   
-  </script>
+ function getOnlineLeaderboard(callback) {
+  db.ref('leaderboard')
+    .orderByChild('score')
+    .limitToLast(10)
+    .once('value', function(snapshot) {
+      let leaderboard = [];
+      snapshot.forEach(function(child) {
+        leaderboard.push(child.val());
+      });
+      leaderboard.sort((a, b) => b.score - a.score);
+      callback(leaderboard);
+    });
+}
+ 
+ function showOnlineLeaderboard() {
+  showScreen('localLeaderboardScreen'); // puoi usare la stessa schermata per ora
+  getOnlineLeaderboard(function(data) {
+    let html = '<ol>';
+    data.forEach(item => {
+      html += `<li><b>${item.username}</b> — <span style="color:#ffd700;">${item.score}</span> (Lvl ${item.level})</li>`;
+    });
+    html += '</ol>';
+    document.getElementById('localLeaderboardList').innerHTML = html;
+  });
+}
+ 
+ </script>
   
 </body>
 </html>
