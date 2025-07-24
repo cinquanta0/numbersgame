@@ -1151,6 +1151,7 @@ body.loading {
                   <button class="menu-btn" onclick="startChaosMode()">💥 CAOS TOTALE</button>
                   <button id="pulsanteMusica">🎵 Musica ON</button>
                   <button class="menu-btn" onclick="showScreen('inventoryScreen')">🛸 SPACESHIP INVENTORY</button>
+                  <button class="menu-btn" onclick="showGlobalLeaderboard()">🌍 CLASSIFICA GLOBALE</button>
                   <button class="menu-btn" onclick="startEndlessMode()">♾️ ENDLESS DEFENSE</button>
                   <button class="menu-btn" onclick="showLocalLeaderboard()">🌟 CLASSIFICA LOCALE</button>
                   <button class="menu-btn" onclick="showScreen('skillTree')">⭐ UPGRADES</button>
@@ -1275,6 +1276,16 @@ body.loading {
   </div>
 </div>
 
+
+<div class="screen" id="globalLeaderboardScreen">
+  <button class="menu-btn home-btn" onclick="showScreen('mainMenu')">🏠 HOME</button>
+  <div class="menu-content">
+    <h2 class="game-subtitle">Classifica Globale</h2>
+    <div id="globalLeaderboardList">Loading...</div>
+    <button class="menu-btn" onclick="showGlobalLeaderboard()">Aggiorna classifica globale</button>
+    <button class="menu-btn" onclick="showScreen('mainMenu')">Back</button>
+  </div>
+</div>
 
 <!-- Ship Inventory Screen -->
 <div class="screen" id="inventoryScreen">
@@ -3240,35 +3251,33 @@ function eseguiSpecial() {
           }
       }
 
-     function levelComplete() {
+   function levelComplete() {
     gameState.gameRunning = false;
 
+    // Calcola tempo di sopravvivenza
     const survivalTime = (Date.now() - gameState.levelStartTime) / 1000;
     gameState.totalSurvivalTime += survivalTime;
 
-    const timeBonus = Math.max(0, 12000 - (survivalTime * 60));
-    const healthBonus = gameState.player.health * 50;
-    const phaseBonus = gameState.enemy.phases * 1000;
+    // NIENTE BONUS qui!
 
-    gameState.player.score += timeBonus + healthBonus + phaseBonus;
-
+    // Calcola upgrade points
     let upgradePointsEarned = Math.floor(gameState.currentLevel * 1.2) + 5;
-
     if (gameState.gameMode === 'endless') {
         upgradePointsEarned = Math.floor(gameState.endlessWave * 0.5);
     } else if (gameState.gameMode === 'speedrun') {
         upgradePointsEarned = Math.floor(survivalTime < 30 ? 50 : 25);
     }
-
     gameState.skillPoints += upgradePointsEarned;
 
-    // --- COINS: Calcola e aggiungi coins guadagnate ---
-    let coinsEarned = Math.floor(Math.random() * 8) + 3; // tra 3 e 10 coins
+    // Calcola coins
+    let coinsEarned = Math.floor(Math.random() * 8) + 3;
     gameState.coins += coinsEarned;
 
+    // Aggiorna salvataggio
     const savedData = JSON.parse(localStorage.getItem('stellarGuardianSave') || '{}');
     savedData.totalEnemiesDefeated = (savedData.totalEnemiesDefeated || 0) + 1;
 
+    // Aggiorna dati specifici modalità
     if (gameState.gameMode === 'campaign') {
         savedData.highestLevel = Math.max(savedData.highestLevel || 1, gameState.currentLevel + 1);
     } else if (gameState.gameMode === 'endless') {
@@ -3281,13 +3290,15 @@ function eseguiSpecial() {
         }
     }
 
+    // Aggiorna sempre bestScore!
     savedData.bestScore = Math.max(savedData.bestScore || 0, gameState.player.score);
+
+    // Aggiorna altri dati
     savedData.skillPoints = (savedData.skillPoints || 0) + upgradePointsEarned;
     savedData.longestSurvival = Math.max(savedData.longestSurvival || 0, survivalTime);
-
-    // --- COINS: Salva le coins nello storage ---
     savedData.coins = gameState.coins;
 
+    // Completa i livelli
     if (!savedData.completedLevels) {
         savedData.completedLevels = [];
     }
@@ -3295,43 +3306,15 @@ function eseguiSpecial() {
         savedData.completedLevels.push(gameState.currentLevel);
     }
 
-    if (gameState.isMobile) {
-        const mobileCompletions = (savedData.mobileCompletions || 0) + 1;
-        savedData.mobileCompletions = mobileCompletions;
-        if (mobileCompletions >= 10) {
-            unlockAchievement('mobile_pilot');
-        }
-    }
-
-    if (gameState.currentLevel === 1) unlockAchievement('first_victory');
-    if (gameState.currentLevel === 10) unlockAchievement('space_ace');
-    if (gameState.currentLevel === 15) unlockAchievement('galaxy_defender');
-    if (gameState.currentLevel === 20) unlockAchievement('cosmic_guardian');
-
-    if (survivalTime < 30) {
-        unlockAchievement('speed_runner');
-    }
-
-    if (gameState.player.health === gameState.player.maxHealth) {
-        unlockAchievement('perfect_mission');
-    }
-
-    if (gameState.gameMode === 'endless' && gameState.endlessWave >= 50) {
-        unlockAchievement('endless_warrior');
-    }
-
-    if (gameState.gameMode === 'speedrun' && gameState.totalSurvivalTime < 600) {
-        unlockAchievement('time_trial_master');
-    }
-
     localStorage.setItem('stellarGuardianSave', JSON.stringify(savedData));
 
-    // --- COINS: Notifica (+x coins) ---
+    // Notifica, leaderboard LOCAL + GLOBALE sempre!
     showNotification(`+${coinsEarned} Coins!`, 'info');
+    let username = getPlayerName();
+    submitLocalScore(username, gameState.player.score, gameState.currentLevel);
+    submitGlobalScore(username, gameState.player.score);
 
-let username = getPlayerName();
-submitLocalScore(username, gameState.player.score, gameState.currentLevel);
-
+    // Se hai completato il gioco (campagna lv20)
     if (gameState.gameMode === 'campaign' && gameState.currentLevel >= 20) {
         unlockAchievement('ultimate_guardian');
         document.getElementById('victoryScore').textContent = gameState.player.score.toLocaleString();
@@ -3356,31 +3339,39 @@ submitLocalScore(username, gameState.player.score, gameState.currentLevel);
     generateLevelGrid();
 }
 
-      function gameOver() {
+      function submitGlobalScore(username, score) {
+  const url = `https://dreamlo.com/lb/cgpr101Ep0yMn0IZPhMAqwVghoK20BG06c_rPh-i1Npg/add/${encodeURIComponent(username)}/${score}`;
+  fetch(url)
+    .then(() => console.log("Score inviato a Dreamlo!"))
+    .catch(err => console.error("Dreamlo errore:", err));
+}
+      
+  function gameOver() {
     gameState.gameRunning = false;
-    
     const survivalTime = (Date.now() - gameState.levelStartTime) / 1000;
-    
     let upgradePointsEarned = Math.floor(gameState.currentLevel * 0.6) + Math.floor(survivalTime / 20);
-    
+
     if (gameState.gameMode === 'endless') {
         upgradePointsEarned = Math.floor(gameState.endlessWave * 0.4);
     }
-    
+
     gameState.skillPoints += upgradePointsEarned;
-    
+
     const savedData = JSON.parse(localStorage.getItem('stellarGuardianSave') || '{}');
     savedData.totalDeaths = (savedData.totalDeaths || 0) + 1;
     savedData.skillPoints = (savedData.skillPoints || 0) + upgradePointsEarned;
     savedData.longestSurvival = Math.max(savedData.longestSurvival || 0, survivalTime);
-    
+
+    // PATCH: aggiorna bestScore sempre!
+    savedData.bestScore = Math.max(savedData.bestScore || 0, gameState.player.score);
+
     if (gameState.gameMode === 'endless') {
         savedData.endlessBestWave = Math.max(savedData.endlessBestWave || 0, gameState.endlessWave);
         savedData.endlessBestScore = Math.max(savedData.endlessBestScore || 0, gameState.player.score);
     }
-    
+
     localStorage.setItem('stellarGuardianSave', JSON.stringify(savedData));
-    
+
     document.getElementById('finalScore').textContent = gameState.player.score.toLocaleString();
     document.getElementById('finalLevel').textContent = gameState.gameMode === 'endless' ? 
         `Wave ${gameState.endlessWave}` : gameState.currentLevel;
@@ -3388,12 +3379,31 @@ submitLocalScore(username, gameState.player.score, gameState.currentLevel);
     document.getElementById('earnedSkillPoints').textContent = upgradePointsEarned;
 
     let username = getPlayerName();
-submitLocalScore(username, gameState.player.score, gameState.currentLevel);
+    submitLocalScore(username, gameState.player.score, gameState.currentLevel);
+    submitGlobalScore(username, gameState.player.score);
 
     showScreen('gameOver');
     updateUI();
 }
 
+   function fetchGlobalLeaderboard(callback) {
+  const url = "https://dreamlo.com/lb/cgpr101Ep0yMn0IZPhMAqwVghoK20BG06c_rPh-i1Npg/pipe";
+  fetch(url)
+    .then(res => res.text())
+    .then(txt => {
+      const rows = txt.trim().split('\n');
+      const leaderboard = rows
+        .map(row => {
+          const [name, score] = row.split('|');
+          if (!name || isNaN(parseInt(score))) return null;
+          return { name, score: parseInt(score) };
+        })
+        .filter(entry => entry !== null)
+        .sort((a, b) => b.score - a.score);
+      callback(leaderboard);
+    });
+}
+     
      function forfeitMission() {
     // USCITA DIRETTA senza conferma
     gameState.gameRunning = false;
@@ -3625,45 +3635,48 @@ submitLocalScore(username, gameState.player.score, gameState.currentLevel);
           ctx.restore();
       }
 
-      // UI Update Function
-      function updateUI() {
-          document.getElementById('currentLevel').textContent = gameState.gameMode === 'endless' ? 
-              `W${gameState.endlessWave}` : gameState.currentLevel;
-          document.getElementById('playerLives').textContent = gameState.player.lives;
-          document.getElementById('playerEnergy').textContent = Math.floor(gameState.player.energy);
-          document.getElementById('playerScore').textContent = gameState.player.score.toLocaleString();
-          document.getElementById('coinCount').textContent = gameState.coins;
-          const playerHealthPercent = (gameState.player.health / gameState.player.maxHealth) * 100;
-          document.getElementById('playerHealthFill').style.width = Math.max(0, playerHealthPercent) + '%';
-          document.getElementById('playerHealthText').textContent = 
-              `${Math.max(0, Math.floor(gameState.player.health))} / ${gameState.player.maxHealth}`;
-          
-          if (gameState.enemy) {
-              const enemyHealthPercent = (gameState.enemy.health / gameState.enemy.maxHealth) * 100;
-              document.getElementById('enemyHealthFill').style.width = Math.max(0, enemyHealthPercent) + '%';
-              document.getElementById('enemyHealthText').textContent = 
-                  `${Math.max(0, Math.floor(gameState.enemy.health))} / ${gameState.enemy.maxHealth}`;
-          }
-          
-          document.getElementById('energyFill').style.width = gameState.bulletHellIntensity + '%';
-          
-          const savedData = JSON.parse(localStorage.getItem('stellarGuardianSave') || '{}');
-          document.getElementById('totalEnemiesDefeated').textContent = savedData.totalEnemiesDefeated || 0;
-          document.getElementById('highestLevel').textContent = savedData.highestLevel || 1;
-          document.getElementById('totalScore').textContent = (savedData.bestScore || 0).toLocaleString();
-          document.getElementById('skillPoints').textContent = savedData.skillPoints || 0;
-          document.getElementById('availableSkillPoints').textContent = savedData.skillPoints || 0;
-          
-          document.getElementById('statTotalEnemies').textContent = savedData.totalEnemiesDefeated || 0;
-          document.getElementById('statHighestLevel').textContent = savedData.highestLevel || 1;
-          document.getElementById('statBestScore').textContent = (savedData.bestScore || 0).toLocaleString();
-          document.getElementById('statTotalDeaths').textContent = savedData.totalDeaths || 0;
-          document.getElementById('statSurvivalTime').textContent = Math.floor(savedData.longestSurvival || 0);
-          document.getElementById('statAchievements').textContent = (savedData.achievements || []).length;
-          
-          gameState.skillPoints = savedData.skillPoints || 0;
-      }
+     function updateUI() {
+    document.getElementById('currentLevel').textContent = gameState.gameMode === 'endless' ? 
+        `W${gameState.endlessWave}` : gameState.currentLevel;
+    document.getElementById('playerLives').textContent = gameState.player.lives;
+    document.getElementById('playerEnergy').textContent = Math.floor(gameState.player.energy);
+    document.getElementById('playerScore').textContent = gameState.player.score.toLocaleString();
+    document.getElementById('coinCount').textContent = gameState.coins;
+    const playerHealthPercent = (gameState.player.health / gameState.player.maxHealth) * 100;
+    document.getElementById('playerHealthFill').style.width = Math.max(0, playerHealthPercent) + '%';
+    document.getElementById('playerHealthText').textContent = 
+        `${Math.max(0, Math.floor(gameState.player.health))} / ${gameState.player.maxHealth}`;
+    
+    if (gameState.enemy) {
+        const enemyHealthPercent = (gameState.enemy.health / gameState.enemy.maxHealth) * 100;
+        document.getElementById('enemyHealthFill').style.width = Math.max(0, enemyHealthPercent) + '%';
+        document.getElementById('enemyHealthText').textContent = 
+            `${Math.max(0, Math.floor(gameState.enemy.health))} / ${gameState.enemy.maxHealth}`;
+    }
+    
+    document.getElementById('energyFill').style.width = gameState.bulletHellIntensity + '%';
+    
+    // Mostra bestScore correttamente
+    document.getElementById('totalScore').textContent = (gameState.bestScore || 0).toLocaleString();
 
+    // Se vuoi mostrare anche il punteggio attuale (opzionale)
+    // document.getElementById('currentScore').textContent = gameState.player.score.toLocaleString();
+
+    // Mostra anche altri dati delle statistiche se vuoi
+    const savedData = JSON.parse(localStorage.getItem('stellarGuardianSave') || '{}');
+    document.getElementById('totalEnemiesDefeated').textContent = savedData.totalEnemiesDefeated || 0;
+    document.getElementById('highestLevel').textContent = savedData.highestLevel || 1;
+    document.getElementById('skillPoints').textContent = savedData.skillPoints || 0;
+    document.getElementById('availableSkillPoints').textContent = savedData.skillPoints || 0;
+    document.getElementById('statTotalEnemies').textContent = savedData.totalEnemiesDefeated || 0;
+    document.getElementById('statHighestLevel').textContent = savedData.highestLevel || 1;
+    document.getElementById('statBestScore').textContent = (savedData.bestScore || 0).toLocaleString();
+    document.getElementById('statTotalDeaths').textContent = savedData.totalDeaths || 0;
+    document.getElementById('statSurvivalTime').textContent = Math.floor(savedData.longestSurvival || 0);
+    document.getElementById('statAchievements').textContent = (savedData.achievements || []).length;
+
+    gameState.skillPoints = savedData.skillPoints || 0;
+}
       // Data Management
       function saveGameData() {
           const savedData = JSON.parse(localStorage.getItem('stellarGuardianSave') || '{}');
@@ -3671,20 +3684,13 @@ submitLocalScore(username, gameState.player.score, gameState.currentLevel);
           localStorage.setItem('stellarGuardianSave', JSON.stringify(savedData));
       }
 
-     function loadGameData() {
+    function loadGameData() {
     const savedData = JSON.parse(localStorage.getItem('stellarGuardianSave') || '{}');
     gameState.skillPoints = savedData.skillPoints || 0;
     gameState.player.skills = savedData.skills || {};
     gameState.orientation = savedData.orientation || 'auto';
-    gameState.coins = Number(savedData.coins) || 0; // <--- AGGIUNGI QUI
-    
-    if (savedData.controlLayout) {
-        gameState.controlLayout = savedData.controlLayout;
-    }
-
-    if (gameState.orientation !== 'auto') {
-        setOrientation(gameState.orientation);
-    }
+    gameState.coins = Number(savedData.coins) || 0;
+    gameState.bestScore = Number(savedData.bestScore) || 0; // PATCH: aggiunto bestScore
 }
 
     function spawnObstacle() {
@@ -4237,9 +4243,8 @@ function renderPlayerTrail(ctx) {
   
 function selectShip(shipId) {
     localStorage.setItem('selectedShip', shipId);
-    alert(`🚀 Ship "${shipId}" selected!`);
     highlightSelectedShip();
-  }
+}
 
   function getSelectedShip() {
     return localStorage.getItem('selectedShip') || 'ship1';
@@ -4502,6 +4507,19 @@ function showLocalLeaderboard() {
   document.getElementById('localLeaderboardList').innerHTML = html;
 }
   
+  function showGlobalLeaderboard() {
+  showScreen('globalLeaderboardScreen');
+  document.getElementById('globalLeaderboardList').innerHTML = 'Loading...';
+  fetchGlobalLeaderboard(leaderboard => {
+    let html = '<ol style="font-size:1.2rem;">';
+    leaderboard.forEach(entry => {
+      html += `<li><b>${entry.name}</b> — <span style="color:#ffd700;">${entry.score}</span></li>`;
+    });
+    if (leaderboard.length === 0) html += "<li>Nessun punteggio ancora!</li>";
+    html += '</ol>';
+    document.getElementById('globalLeaderboardList').innerHTML = html;
+  });
+}
   
   </script>
   
