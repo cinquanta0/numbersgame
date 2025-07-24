@@ -3339,8 +3339,8 @@ function eseguiSpecial() {
     generateLevelGrid();
 }
 
-      function submitGlobalScore(username, score) {
-  const url = `https://dreamlo.com/lb/cgpr101Ep0yMn0IZPhMAqwVghoK20BG06c_rPh-i1Npg/add/${encodeURIComponent(username)}/${score}`;
+     function submitGlobalScore(username, score) {
+  const url = `https://dreamlo.com/lb/5z7d7N8IBkSwrhJdyZAXxAYn3Jv1KyTEm6GJZoIALRBw/add/${encodeURIComponent(username)}/${score}`;
   fetch(url)
     .then(() => console.log("Score inviato a Dreamlo!"))
     .catch(err => console.error("Dreamlo errore:", err));
@@ -3386,8 +3386,8 @@ function eseguiSpecial() {
     updateUI();
 }
 
-   function fetchGlobalLeaderboard(callback) {
-  const url = "https://dreamlo.com/lb/cgpr101Ep0yMn0IZPhMAqwVghoK20BG06c_rPh-i1Npg/pipe";
+  function fetchGlobalLeaderboard(callback) {
+  const url = "https://dreamlo.com/lb/5z7d7N8IBkSwrhJdyZAXxAYn3Jv1KyTEm6GJZoIALRBw/pipe";
   fetch(url)
     .then(res => res.text())
     .then(txt => {
