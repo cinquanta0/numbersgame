@@ -121,7 +121,6 @@ body.loading {
           background-size: 500% 500%;
           animation: cosmicGradient 15s ease infinite;
           color: #ffffff;
-          overflow: hidden;
           touch-action: manipulation;
       }
 
@@ -303,26 +302,25 @@ body.loading {
           font-size: clamp(1rem, 2.5vw, 1.3rem);
       }
 
-     .screen {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity .7s cubic-bezier(.5,2,.3,1);
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    overflow-y: auto;
-    padding: clamp(1rem, 3vw, 2rem);
-    display: flex; /* sempre flex! */
+   .screen {
+  display: none;
+  opacity: 0;
+  pointer-events: none;
+  width: 100%;
+  min-height: 100vh;
+  height: auto;
+  overflow-y: auto;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: clamp(1rem, 3vw, 2rem);
+  transition: opacity .7s cubic-bezier(.5,2,.3,1);
 }
 
 .screen.active {
-    opacity: 1;
-    pointer-events: auto;
+  display: flex;
+  opacity: 1;
+  pointer-events: auto;
 }
 
       .menu-content {
@@ -1144,7 +1142,7 @@ body.loading {
     <div>Coins</div>
 </div>
               
-    <audio id="musicaGioco" src="musica.mp3" loop></audio>        
+<audio id="musicaGioco" src="musica.mp3" loop></audio>        
                   <div class="menu-buttons">
                   <button class="menu-btn" onclick="showScreen('shop')">🛒 SHOP</button>
                   <button class="menu-btn" onclick="showScreen('levelSelect')">📋 SELECT MISSION</button>
@@ -1152,7 +1150,7 @@ body.loading {
                   <button id="pulsanteMusica">🎵 Musica ON</button>
                   <button class="menu-btn" onclick="showScreen('inventoryScreen')">🛸 SPACESHIP INVENTORY</button>
                   <button class="menu-btn" onclick="showGlobalLeaderboard()">🌍 CLASSIFICA GLOBALE</button>
-                  <button class="menu-btn" onclick="startEndlessMode()">♾️ ENDLESS DEFENSE</button>
+                  <button class="menu-btn" onclick="showDailyChallengeMenu()">🌟 Challenge Giornaliera</button>
                   <button class="menu-btn" onclick="showLocalLeaderboard()">🌟 CLASSIFICA LOCALE</button>
                   <button class="menu-btn" onclick="showScreen('skillTree')">⭐ UPGRADES</button>
                   <button class="menu-btn" onclick="showScreen('achievements')">🏆 ACHIEVEMENTS</button>
@@ -1207,7 +1205,9 @@ body.loading {
           </div>
       </div>
 
-      <div class="screen" id="shop">
+ 
+      <!-- SHOP SCREEN -->
+<div class="screen" id="shop">
   <button class="menu-btn home-btn" onclick="showScreen('mainMenu')">🏠 HOME</button>
   <div class="menu-content">
     <h2 class="game-subtitle">Galactic Shop</h2>
@@ -1217,54 +1217,62 @@ body.loading {
         <div>Cost: <span style="color:#ffd700;">20</span> Coins</div>
         <button class="menu-btn" onclick="buyShip()">Buy</button>
       </div>
-      
-      <div class="stats-display">
-  <div class="stat-item">
-    <div class="stat-value">+1 Ship</div>
-    <div>Cost: <span style="color:#ffd700;">20</span> Coins</div>
-    <button class="menu-btn" onclick="buyShip()">Buy</button>
-  </div>
-  <div class="stat-item">
-    <div class="stat-value">Energy Refill</div>
-    <div>Cost: <span style="color:#00bcd4;">10</span> Coins</div>
-    <button class="menu-btn" onclick="buyEnergyRefill()">Buy</button>
-  </div>
-  <div class="stat-item">
-    <div class="stat-value">Temporary Shield</div>
-    <div>Cost: <span style="color:#2196f3;">15</span> Coins</div>
-    <button class="menu-btn" onclick="buyTemporaryShield()">Buy</button>
-  </div>
-  <div class="stat-item">
-    <div class="stat-value">Bullet Upgrade</div>
-    <div>Cost: <span style="color:#e91e63;">30</span> Coins</div>
-    <button class="menu-btn" onclick="buyBulletUpgrade()">Buy</button>
-  </div>
-  <div class="stat-item">
-    <div class="stat-value">Auto-Fire Module</div>
-    <div>Cost: <span style="color:#4caf50;">25</span> Coins</div>
-    <button class="menu-btn" onclick="buyAutoFire()">Buy</button>
-  </div>
-  <div class="stat-item">
-    <div class="stat-value">Special Attack Charge</div>
-    <div>Cost: <span style="color:#9c27b0;">20</span> Coins</div>
-    <button class="menu-btn" onclick="buySpecialAttack()">Buy</button>
-  </div>
-  <div class="stat-item">
-    <div class="stat-value">Random Power-Up</div>
-    <div>Cost: <span style="color:#ffd700;">12</span> Coins</div>
-    <button class="menu-btn" onclick="buyRandomPowerUp()">Buy</button>
-  </div>
-  <div class="stat-item">
-    <div class="stat-value">Unlock Ship Skin</div>
-    <div>Cost: <span style="color:#00bcd4;">50</span> Coins</div>
-    <button class="menu-btn" onclick="buyShipSkin()">Buy</button>
-  </div>
-</div>
-      
-<!-- Puoi aggiungere altri articoli qui -->
+      <div class="stat-item">
+        <div class="stat-value">Energy Refill</div>
+        <div>Cost: <span style="color:#00bcd4;">10</span> Coins</div>
+        <button class="menu-btn" onclick="buyEnergyRefill()">Buy</button>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">Temporary Shield</div>
+        <div>Cost: <span style="color:#2196f3;">15</span> Coins</div>
+        <button class="menu-btn" onclick="buyTemporaryShield()">Buy</button>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">Bullet Upgrade</div>
+        <div>Cost: <span style="color:#e91e63;">30</span> Coins</div>
+        <button class="menu-btn" onclick="buyBulletUpgrade()">Buy</button>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">Auto-Fire Module</div>
+        <div>Cost: <span style="color:#4caf50;">25</span> Coins</div>
+        <button class="menu-btn" onclick="buyAutoFire()">Buy</button>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">Special Attack Charge</div>
+        <div>Cost: <span style="color:#9c27b0;">20</span> Coins</div>
+        <button class="menu-btn" onclick="buySpecialAttack()">Buy</button>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">Random Power-Up</div>
+        <div>Cost: <span style="color:#ffd700;">12</span> Coins</div>
+        <button class="menu-btn" onclick="buyRandomPowerUp()">Buy</button>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">Unlock Ship Skin</div>
+        <div>Cost: <span style="color:#00bcd4;">50</span> Coins</div>
+        <button class="menu-btn" onclick="buyShipSkin()">Buy</button>
+      </div>
+      <!-- ... puoi aggiungere altri item shop qui ... -->
     </div>
   </div>
 </div>
+<!-- FINE SHOP -->
+
+<!-- DAILY CHALLENGE SCREEN -->
+<div class="screen" id="dailyChallengeScreen">
+  <div class="menu-content">
+    <h2>🌟 Challenge Giornaliera</h2>
+    <div id="dailyChallengeDesc" style="margin-bottom:1.5rem;"></div>
+    <button class="menu-btn primary" id="dailyChallengeStartBtn">Inizia</button>
+    <button class="menu-btn" id="dailyChallengeBackBtn">Indietro</button>
+    <div style="margin-top:2rem;">
+      <h3>Classifica Giornaliera</h3>
+      <div id="dailyLeaderboardList">Caricamento...</div>
+    </div>
+  </div>
+</div>
+<!-- FINE DAILY CHALLENGE -->
+
       
   <!-- Local Leaderboard Screen (spostata!) -->
 <div class="screen" id="localLeaderboardScreen">
@@ -1545,11 +1553,17 @@ body.loading {
 
   // Poi tutto il tuo JS come prima...
 
-  window.addEventListener('load', async () => {
-    await initCrazyGamesSDK();
-    showLoadingScreen();
-    setTimeout(hideLoadingScreen, 2400);
-  });
+ window.addEventListener('load', async () => {
+  await initCrazyGamesSDK();
+  showLoadingScreen();
+  setTimeout(hideLoadingScreen, 2400);
+
+  // Event listener per i bottoni della Daily Challenge
+  const dailyStartBtn = document.getElementById('dailyChallengeStartBtn');
+  const dailyBackBtn = document.getElementById('dailyChallengeBackBtn');
+  if (dailyStartBtn) dailyStartBtn.onclick = startDailyChallenge;
+  if (dailyBackBtn) dailyBackBtn.onclick = () => showScreen('mainMenu');
+});
 
   // ESEMPIO: mostrare una pubblicità
   function showAd() {
@@ -2435,14 +2449,34 @@ initGame();
           };
       }
 
-      function gameLoop() {
-          if (!gameState.gameRunning || gameState.gamePaused) return;
+     function gameLoop() {
+    if (!gameState.gameRunning || gameState.gamePaused) return;
 
-          update();
-          render();
-          
-          animationId = requestAnimationFrame(gameLoop);
-      }
+    update();
+    render();
+
+    // --- GESTIONE FINE PARTITA E CHALLENGE GIORNALIERA ---
+    // Se il player ha perso o vinto e siamo in daily challenge, salva il punteggio e resetta il flag
+    let partitaFinita = false;
+    if (gameState.player.health <= 0 && gameState.player.invulnerabilityFrames <= 0) {
+        partitaFinita = true;
+    }
+    if (gameState.enemy && gameState.enemy.health <= 0) {
+        // Qui puoi aggiungere altre condizioni di vittoria
+        partitaFinita = true;
+    }
+
+    // Se challenge giornaliera
+    if (gameState.isDailyChallenge && partitaFinita) {
+        endDailyChallenge(gameState.player.score);
+        gameState.isDailyChallenge = false;
+        // Mostra schermata di game over/challenge completata
+        showScreen('mainMenu'); // o showScreen('gameOver'), come preferisci
+        return;
+    }
+
+    animationId = requestAnimationFrame(gameLoop);
+}
 
       function update() {
     const deltaTime = gameState.timeScale;
@@ -4520,6 +4554,131 @@ function showLocalLeaderboard() {
     document.getElementById('globalLeaderboardList').innerHTML = html;
   });
 }
+  
+  // ==== DAILY CHALLENGE: CONFIGURAZIONE ====
+
+const DAILY_CHALLENGES = [
+  { name: "1 Vita!", desc: "Sopravvivi più a lungo possibile con solo 1 vita", config: { lives: 1, endless: true } },
+  { name: "Solo Ship Veloce", desc: "Usa solo la navicella più veloce", config: { ship: "ship3" } },
+  { name: "Boss Rush", desc: "Affronta solo boss dal livello 5 in su", config: { bossOnly: true } },
+  { name: "Blitz", desc: "Fai più punti possibili in 60 secondi", config: { timeLimit: 60 } },
+  // ...aggiungi altre challenge!
+];
+
+// Calcola challenge del giorno
+function getDailyChallengeIndex() {
+  const now = new Date();
+  const daySeed = now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
+  return daySeed % DAILY_CHALLENGES.length;
+}
+function getDailyChallenge() {
+  return DAILY_CHALLENGES[getDailyChallengeIndex()];
+}
+
+function showDailyChallengeMenu() {
+  // Nascondi tutte le schermate
+  document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+  document.getElementById('dailyChallengeScreen').classList.add('active');
+  gameState.currentScreen = 'dailyChallengeScreen';
+
+  // Mostra challenge del giorno
+  const challenge = getDailyChallenge();
+  document.getElementById('dailyChallengeDesc').innerHTML = `<b>${challenge.name}</b><br><span>${challenge.desc}</span>`;
+  fetchDailyChallengeLeaderboard();
+}
+
+function startDailyChallenge() {
+  const challenge = getDailyChallenge();
+
+  // Applica regole della challenge
+  if (challenge.config.lives) gameState.player.lives = challenge.config.lives;
+  if (challenge.config.ship) localStorage.setItem('selectedShip', challenge.config.ship);
+  if (challenge.config.endless) gameState.gameMode = 'endless';
+  if (challenge.config.bossOnly) gameState.currentLevel = 5;
+  if (challenge.config.timeLimit) gameState.dailyTimeLimit = challenge.config.timeLimit;
+
+  gameState.isDailyChallenge = true; // Flag
+
+  showScreen('gameScreen'); // Usa la funzione "vera"!
+}
+
+// ==== FINE PARTITA: Salva punteggio ====
+function endDailyChallenge(score) {
+  const username = getPlayerName();
+  saveDailyChallengeScoreLocal(username, score);
+  submitDailyChallengeScoreGlobal(username, score);
+  // Mostra leaderboard aggiornata!
+  fetchDailyChallengeLeaderboard();
+}
+
+// ==== LEADERBOARD LOCALE ====
+function saveDailyChallengeScoreLocal(username, score) {
+  const today = (new Date()).toISOString().slice(0, 10);
+  let scores = JSON.parse(localStorage.getItem('dailyChallengeScores') || '{}');
+  if (!scores[today]) scores[today] = [];
+  scores[today].push({ username, score });
+  scores[today].sort((a, b) => b.score - a.score);
+  scores[today] = scores[today].slice(0, 10); // top 10
+  localStorage.setItem('dailyChallengeScores', JSON.stringify(scores));
+}
+
+// ==== LEADERBOARD GLOBALE DREAMLO ====
+function getDailyLeaderboardTag() {
+  const today = (new Date()).toISOString().slice(0, 10);
+  return "daily" + today.replace(/-/g, "");
+}
+
+// INVIO PUNTEGGIO GLOBALE
+function submitDailyChallengeScoreGlobal(username, score) {
+  const tag = getDailyLeaderboardTag();
+  const dreamloKey = "5z7d7N8IBkSwrhJdyZAXxAYn3Jv1KyTEm6GJZoIALRBw"; // <-- la tua KEY Dreamlo
+  const url = `https://dreamlo.com/lb/${dreamloKey}/add/${encodeURIComponent(username)}/${score}/${tag}`;
+  fetch(url)
+    .then(() => console.log("Score inviato a Dreamlo (daily)!"))
+    .catch(err => console.error("Dreamlo errore:", err));
+}
+
+// SCARICA LEADERBOARD GLOBALE
+function fetchDailyChallengeLeaderboard() {
+  const tag = getDailyLeaderboardTag();
+  const dreamloKey = "5z7d7N8IBkSwrhJdyZAXxAYn3Jv1KyTEm6GJZoIALRBw";
+  const url = `https://dreamlo.com/lb/${dreamloKey}/pipe-get/${tag}`;
+  fetch(url)
+    .then(res => res.text())
+    .then(txt => {
+      const rows = txt.trim().split('\n');
+      const leaderboard = rows
+        .map(row => {
+          const [name, score] = row.split('|');
+          if (!name || isNaN(parseInt(score))) return null;
+          return { name, score: parseInt(score) };
+        })
+        .filter(entry => entry !== null)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 10);
+      let html = "<ol style='font-size:1.1rem;'>";
+      leaderboard.forEach(entry => {
+        html += `<li><b>${entry.name}</b> — <span style="color:#ffd700;">${entry.score}</span></li>`;
+      });
+      if (leaderboard.length === 0) html += "<li>Nessun punteggio ancora!</li>";
+      html += "</ol>";
+      let el = document.getElementById('dailyLeaderboardList');
+      if (el) el.innerHTML = html;
+    });
+}
+
+// ==== UTILITY ====
+// getPlayerName già esistente nel tuo gioco!
+
+// ==== INTEGRAZIONE MENU ====
+// Aggiungi nel menu principale:
+// <button class="menu-btn" onclick="showDailyChallengeMenu()">🌟 Challenge Giornaliera</button>
+
+// ==== NEL GAME LOOP, ALLA FINE DELLA PARTITA ====
+// if (gameState.isDailyChallenge) endDailyChallenge(gameState.player.score);
+// Ricordati di resettare gameState.isDailyChallenge = false; quando esci dalla modalità!
+
+  
   
   </script>
   
