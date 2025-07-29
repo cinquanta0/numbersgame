@@ -1148,6 +1148,7 @@ body.loading {
                   <button class="menu-btn" onclick="showScreen('levelSelect')">📋 SELECT MISSION</button>
                   <button class="menu-btn" onclick="startChaosMode()">💥 CAOS TOTALE</button>
                   <button id="pulsanteMusica">🎵 Musica ON</button>
+                  <button class="menu-btn" onclick="changePlayerName()">👤 Cambia nickname</button>
                   <button class="menu-btn" onclick="showScreen('inventoryScreen')">🛸 SPACESHIP INVENTORY</button>
                   <button class="menu-btn" onclick="showGlobalLeaderboard()">🌍 CLASSIFICA GLOBALE</button>
                   <button class="menu-btn" onclick="showDailyChallengeMenu()">🌟 Challenge Giornaliera</button>
@@ -1496,49 +1497,81 @@ body.loading {
       </div>
 
       <!-- Game Over Screen -->
-      <div class="screen" id="gameOver">
-          <div style="text-align: center; padding: clamp(2rem, 6vw, 3rem); background: rgba(0, 0, 0, 0.95); border-radius: 25px; border: 4px solid #f44336; box-shadow: 0 0 60px rgba(244, 67, 54, 0.8); margin: 1rem; max-width: 90vw;">
-              <h2 style="font-size: clamp(2.5rem, 10vw, 4.5rem); color: #f44336; margin-bottom: 2rem; text-shadow: 0 0 30px #f44336;">MISSION FAILED</h2>
-              <div style="margin: 2rem 0;">
-                  <div style="font-size: clamp(1.3rem, 5vw, 1.8rem); margin-bottom: 1rem;">Score: <span id="finalScore" style="color: #ffd700;">0</span></div>
-                  <div style="font-size: clamp(1.1rem, 4vw, 1.4rem); margin-bottom: 1rem;">Level Reached: <span id="finalLevel" style="color: #00bcd4;">1</span></div>
-                  <div style="font-size: clamp(1.1rem, 4v w, 1.4rem); margin-bottom: 1rem;">Survival Time: <span id="finalTime" style="color: #4caf50;">0s</span></div>
-                  <div style="font-size: clamp(1.1rem, 4vw, 1.4rem);">Upgrade Points Earned: <span id="earnedSkillPoints" style="color: #9c27b0;">0</span></div>
-              </div>
-              
-              <div class="menu-buttons">
-                  <button class="menu-btn primary" onclick="restartGame()">🔄 RETRY MISSION</button>
-                  <button class="menu-btn" onclick="showScreen('skillTree')">⭐ UPGRADE SHIP</button>
-                  <button class="menu-btn" onclick="showScreen('levelSelect')">📋 SELECT MISSION</button>
-                  <button class="menu-btn" onclick="showScreen('mainMenu')">🏠 MAIN MENU</button>
-              </div>
-          </div>
-      </div>
+<div class="screen" id="gameOver">
+    <div style="text-align: center; padding: clamp(2rem, 6vw, 3rem); background: rgba(0, 0, 0, 0.95); border-radius: 25px; border: 4px solid #f44336; box-shadow: 0 0 60px rgba(244, 67, 54, 0.8); margin: 1rem; max-width: 90vw;">
+        <h2 style="font-size: clamp(2.5rem, 10vw, 4.5rem); color: #f44336; margin-bottom: 2rem; text-shadow: 0 0 30px #f44336;">MISSION FAILED</h2>
+        <div style="margin: 2rem 0;">
+            <div style="font-size: clamp(1.3rem, 5vw, 1.8rem); margin-bottom: 1rem;">Score: <span id="finalScore" style="color: #ffd700;">0</span></div>
+            <div style="font-size: clamp(1.1rem, 4vw, 1.4rem); margin-bottom: 1rem;">Level Reached: <span id="finalLevel" style="color: #00bcd4;">1</span></div>
+            <div style="font-size: clamp(1.1rem, 4vw, 1.4rem); margin-bottom: 1rem;">Survival Time: <span id="finalTime" style="color: #4caf50;">0s</span></div>
+            <div style="font-size: clamp(1.1rem, 4vw, 1.4rem);">Upgrade Points Earned: <span id="earnedSkillPoints" style="color: #9c27b0;">0</span></div>
+        </div>
+        
+        <div class="menu-buttons">
+            <button class="menu-btn primary" onclick="restartGame()">🔄 RETRY MISSION</button>
+            <button class="menu-btn" onclick="showScreen('skillTree')">⭐ UPGRADE SHIP</button>
+            <button class="menu-btn" onclick="showScreen('levelSelect')">📋 SELECT MISSION</button>
+            <button class="menu-btn" onclick="showScreen('mainMenu')">🏠 MAIN MENU</button>
+        </div>
 
-      <!-- Victory Screen -->
-      <div class="screen" id="victory">
-          <div style="text-align: center; padding: clamp(2rem, 6vw, 3rem); background: rgba(0, 0, 0, 0.95); border-radius: 25px; border: 4px solid #ffd700; box-shadow: 0 0 60px rgba(255, 215, 0, 0.8); margin: 1rem; max-width: 90vw;">
-              <h2 style="font-size: clamp(2.5rem, 10vw, 4.5rem); color: #ffd700; margin-bottom: 2rem; text-shadow: 0 0 30px #ffd700;">GALAXY SAVED!</h2>
-              <div style="margin: 2rem 0;">
-                  <div style="font-size: clamp(1.8rem, 6vw, 2.5rem); margin-bottom: 1rem; color: #ffd700;">👑 STELLAR GUARDIAN SUPREME! 👑</div>
-                  <div style="font-size: clamp(1.3rem, 5vw, 1.8rem); margin-bottom: 1rem;">Final Score: <span id="victoryScore" style="color: #ffd700;">0</span></div>
-                  <div style="font-size: clamp(1.1rem, 4vw, 1.4rem); margin-bottom: 1rem;">All 20 Levels Completed!</div>
-                  <div style="font-size: clamp(1.1rem, 4vw, 1.4rem); margin-bottom: 1rem;">Total Time: <span id="victoryTime" style="color: #4caf50;">0s</span></div>
-                  <div style="font-size: clamp(1.1rem, 4vw, 1.4rem);">You are the ultimate space defender!</div>
-              </div>
-              
-              <div class="menu-buttons">
-                  <button class="menu-btn primary" onclick="showScreen('levelSelect')">🚀 PLAY AGAIN</button>
-                  <button class="menu-btn" onclick="showScreen('achievements')">🏆 VIEW ACHIEVEMENTS</button>
-                  <button class="menu-btn" onclick="showScreen('stats')">📊 VIEW STATS</button>
-                  <button class="menu-btn" onclick="showScreen('mainMenu')">🏠 MAIN MENU</button>
-              </div>
-          </div>
-      </div>
-  </div>
+        <!-- Pulsanti Condividi Social -->
+        <div id="shareButtonsGameOver" style="margin-top:1.5rem; display:flex; gap:12px; flex-wrap:wrap; justify-content:center;">
+            <button class="menu-btn" onclick="shareScore()">🔗 Condividi il tuo record!</button>
+            <button class="menu-btn" onclick="copyScoreLink()">📋 Copia link</button>
+        </div>
+    </div>
+</div>
+
+     <!-- Victory Screen -->
+<div class="screen" id="victory">
+    <div style="text-align: center; padding: clamp(2rem, 6vw, 3rem); background: rgba(0, 0, 0, 0.95); border-radius: 25px; border: 4px solid #ffd700; box-shadow: 0 0 60px rgba(255, 215, 0, 0.8); margin: 1rem; max-width: 90vw;">
+        <h2 style="font-size: clamp(2.5rem, 10vw, 4.5rem); color: #ffd700; margin-bottom: 2rem; text-shadow: 0 0 30px #ffd700;">GALAXY SAVED!</h2>
+        <div style="margin: 2rem 0;">
+            <div style="font-size: clamp(1.8rem, 6vw, 2.5rem); margin-bottom: 1rem; color: #ffd700;">👑 STELLAR GUARDIAN SUPREME! 👑</div>
+            <div style="font-size: clamp(1.3rem, 5vw, 1.8rem); margin-bottom: 1rem;">Final Score: <span id="victoryScore" style="color: #ffd700;">0</span></div>
+            <div style="font-size: clamp(1.1rem, 4vw, 1.4rem); margin-bottom: 1rem;">All 20 Levels Completed!</div>
+            <div style="font-size: clamp(1.1rem, 4vw, 1.4rem); margin-bottom: 1rem;">Total Time: <span id="victoryTime" style="color: #4caf50;">0s</span></div>
+            <div style="font-size: clamp(1.1rem, 4vw, 1.4rem);">You are the ultimate space defender!</div>
+        </div>
+        
+        <div class="menu-buttons">
+            <button class="menu-btn primary" onclick="showScreen('levelSelect')">🚀 PLAY AGAIN</button>
+            <button class="menu-btn" onclick="showScreen('achievements')">🏆 VIEW ACHIEVEMENTS</button>
+            <button class="menu-btn" onclick="showScreen('stats')">📊 VIEW STATS</button>
+            <button class="menu-btn" onclick="showScreen('mainMenu')">🏠 MAIN MENU</button>
+        </div>
+
+        <!-- Pulsanti Condividi Social -->
+        <div id="shareButtonsVictory" style="margin-top:1.5rem; display:flex; gap:12px; flex-wrap:wrap; justify-content:center;">
+            <button class="menu-btn" onclick="shareScore()">🔗 Condividi il tuo record!</button>
+            <button class="menu-btn" onclick="copyScoreLink()">📋 Copia link</button>
+        </div>
+    </div>
+</div>
 
   <script>
-       // CrazyGames SDK v3 initialization (metti all’inizio!)
+       
+       const BOSS_IMAGES_BY_DIFFICULTY = {
+  "Medium": "sabaa1.png",
+  "Hard": "sabaa2.png",
+  "Very Hard": "sabaa3.png",
+  "Extreme": "sabaa4.png",
+  "Nightmare": "sabaa5.png",
+  "Impossible": "sabaa5.png",
+  "LEGENDARY": "sabaa6.png" // Se vuoi riutilizzare o aggiungere un altro
+};
+       
+       
+ function getBossImageForDifficulty(difficulty) {
+  if (difficulty === "Easy") {
+    return "alien-enemy2.png";
+  }
+  return BOSS_IMAGES_BY_DIFFICULTY[difficulty] || "sabaa1.png";
+}   
+      
+
+
+// CrazyGames SDK v3 initialization (metti all’inizio!)
   let crazyGamesReady = false;
 
   async function initCrazyGamesSDK() {
@@ -1719,6 +1752,8 @@ enemyImage.src = 'alien-enemy2.png'; // Senza /
 
       let backgroundY = 0; // posizione verticale dello sfondo
 
+      let bossImage = new Image();
+      
       // Game Initialization
       function initGame() {
           canvas = document.getElementById('gameCanvas');
@@ -2400,30 +2435,33 @@ initGame();
     updateUI();
     gameLoop();
 }
-      function initializeCampaignEnemy() {
-          const levelData = LEVEL_DATA[gameState.currentLevel - 1];
-          
-          gameState.enemy = {
-              x: canvas.width / 2,
-              y: 100,
-              health: levelData.health * gameState.adaptiveDifficulty,
-              maxHealth: levelData.health * gameState.adaptiveDifficulty,
-              speed: levelData.speed,
-              attackPatterns: levelData.attackPatterns,
-              phases: levelData.phases,
-              currentPhase: 1,
-              attackCooldown: 0,
-              moveDirection: 1,
-              specialCooldown: 0,
-              phaseTransition: false,
-              enraged: false,
-              bulletCount: levelData.bulletCount || 1,
-              bulletSpeed: levelData.bulletSpeed || 4,
-              attackSpeed: 1,
-              angle: 0
-          };
-      }
+     function initializeCampaignEnemy() {
+    const levelData = LEVEL_DATA[gameState.currentLevel - 1];
 
+    // Carica l'immagine del boss in base alla difficoltà (devi avere let bossImage = new Image(); globale)
+    bossImage = new Image();
+    bossImage.src = getBossImageForDifficulty(levelData.difficulty);
+
+    gameState.enemy = {
+        x: canvas.width / 2,
+        y: 100,
+        health: levelData.health * gameState.adaptiveDifficulty,
+        maxHealth: levelData.health * gameState.adaptiveDifficulty,
+        speed: levelData.speed,
+        attackPatterns: levelData.attackPatterns,
+        phases: levelData.phases,
+        currentPhase: 1,
+        attackCooldown: 0,
+        moveDirection: 1,
+        specialCooldown: 0,
+        phaseTransition: false,
+        enraged: false,
+        bulletCount: levelData.bulletCount || 1,
+        bulletSpeed: levelData.bulletSpeed || 4,
+        attackSpeed: 1,
+        angle: 0
+    };
+}
       function generateEndlessEnemy() {
           const randomLevel = Math.floor(Math.random() * LEVEL_DATA.length);
           const baseEnemy = LEVEL_DATA[randomLevel];
@@ -3542,7 +3580,7 @@ function eseguiSpecial() {
           ctx.restore();
       }
 
-      function renderEnemy() {
+     function renderEnemy() {
     const enemy = gameState.enemy;
     if (!enemy || enemy.health <= 0) return;
 
@@ -3550,22 +3588,17 @@ function eseguiSpecial() {
     ctx.translate(enemy.x, enemy.y);
     ctx.rotate(enemy.angle || 0);
 
-    // CAOS: Boss Meme
     if (gameState.chaosBossMeme) {
         ctx.font = "64px Arial";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        ctx.fillText("😂", 0, 0); // Emoji meme centrata
-    } else if (enemyImage.complete && enemyImage.naturalWidth !== 0) {
-        ctx.drawImage(enemyImage, -40, -40, 80, 80); 
+        ctx.fillText("😂", 0, 0);
+    } else if (bossImage.complete && bossImage.naturalWidth !== 0) {
+        ctx.drawImage(bossImage, -40, -40, 80, 80);
     } else {
-        // Fallback: simple triangle
         ctx.fillStyle = '#f44336';
         ctx.beginPath();
-        ctx.moveTo(0, -20);
-        ctx.lineTo(-15, 15);
-        ctx.lineTo(15, 15);
-        ctx.closePath();
+        ctx.arc(0, 0, 35, 0, Math.PI * 2);
         ctx.fill();
     }
 
@@ -4678,6 +4711,59 @@ function fetchDailyChallengeLeaderboard() {
 // if (gameState.isDailyChallenge) endDailyChallenge(gameState.player.score);
 // Ricordati di resettare gameState.isDailyChallenge = false; quando esci dalla modalità!
 
+  
+  function changePlayerName() {
+  const oldName = localStorage.getItem('playerName') || '';
+  const username = prompt('Inserisci il tuo nickname per la classifica:', oldName) || 'NoName';
+  localStorage.setItem('playerName', username);
+  showNotification('Il tuo nickname è stato aggiornato! I nuovi punteggi useranno questo nome.', 'info');
+}
+  
+  function shareScore() {
+  let score =
+    document.getElementById('finalScore')?.textContent ||
+    document.getElementById('victoryScore')?.textContent ||
+    0;
+  let level =
+    document.getElementById('finalLevel')?.textContent ||
+    "1";
+  let shareText = `Ho fatto ${score} punti a Stellar Guardian! Riuscirai a battermi?`;
+  let shareUrl = window.location.href;
+
+  if (navigator.share) {
+    navigator.share({
+      title: "Stellar Guardian",
+      text: shareText,
+      url: shareUrl
+    }).catch(() => {});
+  } else {
+    // Desktop: popup social
+    let tweet = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}&hashtags=StellarGuardian,arcadegame`;
+    let fb = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`;
+    let wa = `https://wa.me/?text=${encodeURIComponent(shareText + ' ' + shareUrl)}`;
+    let html = `
+      <div id="sharePopup" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#111;padding:2rem;border-radius:18px;z-index:9999;text-align:center;">
+        <b style="color:#ffd700;font-size:1.3rem;">Condividi il tuo record!</b><br><br>
+        <a href="${tweet}" target="_blank" style="margin:8px;">🐦 Twitter</a>
+        <a href="${fb}" target="_blank" style="margin:8px;">📘 Facebook</a>
+        <a href="${wa}" target="_blank" style="margin:8px;">🟢 WhatsApp</a><br><br>
+        <button onclick="document.getElementById('sharePopup').remove();" class="menu-btn">Chiudi</button>
+      </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', html);
+  }
+}
+
+function copyScoreLink() {
+  let score =
+    document.getElementById('finalScore')?.textContent ||
+    document.getElementById('victoryScore')?.textContent ||
+    0;
+  let shareText = `Ho fatto ${score} punti a Stellar Guardian! Gioca anche tu: ${window.location.href}`;
+  navigator.clipboard.writeText(shareText).then(() => {
+    showNotification('Link copiato negli appunti!', 'info');
+  });
+}
   
   
   </script>
