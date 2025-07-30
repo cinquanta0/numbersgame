@@ -4865,8 +4865,7 @@ let coopPositionInterval = null;
 function showCoopLobby() {
   showScreen('coopLobby');
   if (!socket) {
-    socket = io('http://localhost:3000'); // Cambia con la tua URL se serve!
-      setupBossListener(); // <----- AGGIUNGI SUBITO DOPO
+socket = io(); // Collega automaticamente al server in produzione!      setupBossListener(); // <----- AGGIUNGI SUBITO DOPO
 
     socket.on('connect', () => {
       mySocketId = socket.id;
