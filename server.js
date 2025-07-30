@@ -1,11 +1,22 @@
+// --- Stellar Guardian Multiplayer Server ---
+// Compatibile con Render, Heroku, Vercel
+
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
 
 const app = express();
 const server = http.createServer(app);
+
+// ✅ Risposta semplice per test HTTP (opzionale ma consigliata)
+app.get('/', (req, res) => {
+  res.send('🛡️ Stellar Guardian Multiplayer Server is running.');
+});
+
+// Inizializza Socket.io (CORS: accetta tutti per semplicità)
 const io = socketIo(server, { cors: { origin: "*" } });
 
+// --- Variabili globali co-op ---
 let players = {};
 let coopBoss = {
   x: 500,
@@ -14,19 +25,20 @@ let coopBoss = {
   health: 25000,
   maxHealth: 25000,
   dir: 1,
-  yDir: 1 // PATCH: aggiunto per vertical movement
+  yDir: 1
 };
 let gameInProgress = false;
 let hostId = null;
 
-// PATCH Boss Movement Parameters
-const BOSS_SPEED = 3.0; // px per tick
-const BOSS_Y_SPEED = 1.2; // px per tick vertical
+// --- Parametri boss movement ---
+const BOSS_SPEED = 3.0;
+const BOSS_Y_SPEED = 1.2;
 const BOSS_X_MIN = 100;
 const BOSS_X_MAX = 900;
 const BOSS_Y_MIN = 80;
 const BOSS_Y_MAX = 220;
 
+// --- Funzione reset boss/partita ---
 function resetGame() {
   coopBoss.x = 500;
   coopBoss.y = 150;
@@ -38,18 +50,17 @@ function resetGame() {
   gameInProgress = false;
 }
 
-// Movimento boss e invio stato ogni 40ms
+// --- Loop movimento boss + sync giocatori ogni 40ms ---
 setInterval(() => {
   if (gameInProgress) {
-    // Movimento orizzontale
     coopBoss.x += coopBoss.dir * BOSS_SPEED;
     if (coopBoss.x < BOSS_X_MIN) { coopBoss.x = BOSS_X_MIN; coopBoss.dir = 1; }
     if (coopBoss.x > BOSS_X_MAX) { coopBoss.x = BOSS_X_MAX; coopBoss.dir = -1; }
-    // Movimento verticale
+
     coopBoss.y += coopBoss.yDir * BOSS_Y_SPEED;
     if (coopBoss.y < BOSS_Y_MIN) { coopBoss.y = BOSS_Y_MIN; coopBoss.yDir = 1; }
     if (coopBoss.y > BOSS_Y_MAX) { coopBoss.y = BOSS_Y_MAX; coopBoss.yDir = -1; }
-    // Rotazione
+
     coopBoss.angle += 0.02;
 
     io.emit('bossUpdate', { ...coopBoss });
@@ -57,6 +68,7 @@ setInterval(() => {
   }
 }, 40);
 
+// --- Gestione socket.io ---
 io.on('connection', (socket) => {
   console.log('Nuovo player:', socket.id);
 
@@ -79,11 +91,10 @@ io.on('connection', (socket) => {
       players[socket.id].angle = data.angle || 0;
       players[socket.id].nickname = data.nickname;
     }
-    // Non serve emit qui, già fatto dal setInterval
   });
 
   socket.on('startCoopRaid', () => {
-    if (socket.id !== hostId) return; // Solo host può avviare
+    if (socket.id !== hostId) return;
     resetGame();
     gameInProgress = true;
     io.emit('gameStart', {
@@ -118,6 +129,8 @@ io.on('connection', (socket) => {
   }
 });
 
-server.listen(3000, () => {
-  console.log('Server listening on :3000');
+// --- Porta dinamica per Render/Heroku ---
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log('Server listening on :' + PORT);
 });
