@@ -1,23 +1,26 @@
 // --- Stellar Guardian Multiplayer Server ---
-// Compatibile con Render, Heroku, Vercel
+// Compatibile con Render, Heroku, Vercel, locale
 
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
-const path = require('path'); // ⬅️ necessario per servire file statici dalla root
+const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
 
-// ✅ Serve file statici dalla root del progetto
+// Serve file statici dalla root del progetto
+// Su Render, la root è la cartella dove c'è server.js e index.html (come in locale)
+// Non serve modificare nulla se tutti i file (immagini, audio, ecc.) sono nella stessa cartella
+
 app.use(express.static(__dirname));
 
-// ✅ Quando accedi a '/', mostra index.html dalla root
+// Quando accedi a '/', mostra index.html dalla root
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Inizializza Socket.io (CORS: accetta tutti per semplicità)
+// Inizializza Socket.io (CORS: accetta tutti)
 const io = socketIo(server, { cors: { origin: "*" } });
 
 // --- Variabili globali co-op ---
@@ -133,8 +136,8 @@ io.on('connection', (socket) => {
   }
 });
 
-// --- Porta dinamica per Render/Heroku ---
+// --- Porta per Render, Heroku, locale ---
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-  console.log('Server listening on :' + PORT);
+  console.log('Server listening on port ' + PORT);
 });
