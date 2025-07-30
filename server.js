@@ -4,13 +4,17 @@
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
+const path = require('path'); // ⬅️ necessario per servire file statici dalla root
 
 const app = express();
 const server = http.createServer(app);
 
-// ✅ Risposta semplice per test HTTP (opzionale ma consigliata)
+// ✅ Serve file statici dalla root del progetto
+app.use(express.static(__dirname));
+
+// ✅ Quando accedi a '/', mostra index.html dalla root
 app.get('/', (req, res) => {
-  res.send('🛡️ Stellar Guardian Multiplayer Server is running.');
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // Inizializza Socket.io (CORS: accetta tutti per semplicità)
