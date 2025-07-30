@@ -3,7 +3,43 @@
 <head>
       <script src="https://sdk.crazygames.com/crazygames-sdk-v3.js"></script>
 
-    <meta charset="UTF-8">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
+    
+      <!-- Inserisci subito dopo il tag <head> (dopo lo script CrazyGames se vuoi compatibilità multipla) -->
+<script type="text/javascript">
+   window.SDK_OPTIONS = {
+      gameId: "unnmh9hjtru4a1sfxm7sjqcxiv69e1s4", // <-- Il tuo Game ID GameMonetize
+      onEvent: function (a) {
+         switch (a.name) {
+            case "SDK_GAME_PAUSE":
+               // Metti in pausa il gioco e muta l'audio
+               if (typeof musicaGioco !== "undefined") musicaGioco.muted = true;
+               if (typeof pauseGame === "function") pauseGame();
+               break;
+            case "SDK_GAME_START":
+               // Riprendi il gioco e riattiva l'audio
+               if (typeof musicaGioco !== "undefined") musicaGioco.muted = false;
+               if (typeof resumeGame === "function") resumeGame();
+               break;
+            case "SDK_READY":
+               // L'SDK è pronto
+               break;
+            case "SDK_ERROR":
+               // Gestisci eventuali errori (opzionale)
+               break;
+         }
+      }
+   };
+   (function (a, b, c) {
+      var d = a.getElementsByTagName(b)[0];
+      a.getElementById(c) || (a = a.createElement(b), a.id = c, a.src = "https://api.gamemonetize.com/sdk.js", d.parentNode.insertBefore(a, d))
+   })(document, "script", "gamemonetize-sdk");
+</script>
+    
+    
+    
+    
+      <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>🌟 STELLAR GUARDIAN - COSMIC DEFENSE FORCE 🌟</title>
   <style>
@@ -1142,6 +1178,7 @@ body.loading {
     <div>Coins</div>
 </div>
               
+
 <audio id="musicaGioco" src="musica.mp3" loop></audio>        
                   <div class="menu-buttons">
                   <button class="menu-btn" onclick="showScreen('shop')">🛒 SHOP</button>
@@ -1151,6 +1188,7 @@ body.loading {
                   <button class="menu-btn" onclick="changePlayerName()">👤 Cambia nickname</button>
                   <button class="menu-btn" onclick="showScreen('inventoryScreen')">🛸 SPACESHIP INVENTORY</button>
                   <button class="menu-btn" onclick="showGlobalLeaderboard()">🌍 CLASSIFICA GLOBALE</button>
+                  <button class="menu-btn primary" onclick="showCoopLobby()">🌐 Raid Co-op Online</button>
                   <button class="menu-btn" onclick="showDailyChallengeMenu()">🌟 Challenge Giornaliera</button>
                   <button class="menu-btn" onclick="showLocalLeaderboard()">🌟 CLASSIFICA LOCALE</button>
                   <button class="menu-btn" onclick="showScreen('skillTree')">⭐ UPGRADES</button>
@@ -1534,7 +1572,7 @@ body.loading {
             <div style="font-size: clamp(1.1rem, 4vw, 1.4rem);">You are the ultimate space defender!</div>
         </div>
         
-        <div class="menu-buttons">
+               <div class="menu-buttons">
             <button class="menu-btn primary" onclick="showScreen('levelSelect')">🚀 PLAY AGAIN</button>
             <button class="menu-btn" onclick="showScreen('achievements')">🏆 VIEW ACHIEVEMENTS</button>
             <button class="menu-btn" onclick="showScreen('stats')">📊 VIEW STATS</button>
@@ -1547,6 +1585,16 @@ body.loading {
             <button class="menu-btn" onclick="copyScoreLink()">📋 Copia link</button>
         </div>
     </div>
+</div>
+
+<!-- LOBBY COOP - POSIZIONE GIUSTA! -->
+<div class="screen" id="coopLobby">
+  <div class="menu-content">
+    <h2 class="game-subtitle">Raid Co-op - Attendi altri giocatori...</h2>
+    <div id="coopPlayersList">Caricamento...</div>
+    <button class="menu-btn primary" onclick="startCoopRaid()">Inizia (test solo host)</button>
+    <button class="menu-btn" onclick="showScreen('mainMenu')">Back</button>
+  </div>
 </div>
 
   <script>
@@ -3454,6 +3502,11 @@ function eseguiSpecial() {
     submitLocalScore(username, gameState.player.score, gameState.currentLevel);
     submitGlobalScore(username, gameState.player.score);
 
+    // --- PUBBLICITÀ GameMonetize ---
+    if (typeof sdk !== 'undefined' && typeof sdk.showBanner === 'function') {
+        sdk.showBanner();
+    }
+
     showScreen('gameOver');
     updateUI();
 }
@@ -3476,13 +3529,14 @@ function eseguiSpecial() {
     });
 }
      
-     function forfeitMission() {
-    // USCITA DIRETTA senza conferma
-    gameState.gameRunning = false;
-    if (animationId) {
-        cancelAnimationFrame(animationId);
-    }
-    showScreen('mainMenu');
+   // --- Quando forfeit, ferma tutto ---
+function forfeitMission() {
+  gameState.gameRunning = false;
+  if (animationId) {
+    stopCoopGameLoop();
+    cancelAnimationFrame(animationId);
+  }
+  showScreen('mainMenu');
 }
 
      function restartGame() {
@@ -3524,6 +3578,7 @@ function eseguiSpecial() {
           
           renderSpaceBackground();
           renderPlayer();
+          if (gameState.gameMode === "coop") renderOtherPlayers(ctx);
           renderEnemy();
           renderObstacles();
           renderBullets();
@@ -3580,13 +3635,37 @@ function eseguiSpecial() {
           ctx.restore();
       }
 
-     function renderEnemy() {
-    const enemy = gameState.enemy;
-    if (!enemy || enemy.health <= 0) return;
-
+     
+ // --- RENDER ALTRI PLAYER ---
+function renderOtherPlayers(ctx) {
+  for (let id in otherPlayers) {
+    if (id === mySocketId) continue;
+    const p = otherPlayers[id];
+    // Interpolazione verso la posizione target
+    if (typeof p.targetX === "number" && typeof p.targetY === "number") {
+      p.x += (p.targetX - p.x) * 0.33;
+      p.y += (p.targetY - p.y) * 0.33;
+    }
     ctx.save();
-    ctx.translate(enemy.x, enemy.y);
-    ctx.rotate(enemy.angle || 0);
+    ctx.globalAlpha = 0.7;
+    ctx.drawImage(playerImage, p.x - 32, p.y - 32, 64, 64);
+    ctx.font = "bold 18px Orbitron";
+    ctx.fillStyle = "#ffd700";
+    ctx.textAlign = "center";
+    ctx.fillText(p.nickname, p.x, p.y - 40);
+    ctx.restore();
+  }
+}
+
+     
+     
+   // --- RENDER BOSS ---
+function renderEnemy() {
+  const enemy = gameState.enemy;
+  if (!enemy || enemy.health <= 0) return;
+  ctx.save();
+  ctx.translate(enemy.x, enemy.y);
+  ctx.rotate(enemy.angle || 0);
 
     if (gameState.chaosBossMeme) {
         ctx.font = "64px Arial";
@@ -3714,12 +3793,20 @@ function eseguiSpecial() {
     document.getElementById('playerHealthText').textContent = 
         `${Math.max(0, Math.floor(gameState.player.health))} / ${gameState.player.maxHealth}`;
     
-    if (gameState.enemy) {
-        const enemyHealthPercent = (gameState.enemy.health / gameState.enemy.maxHealth) * 100;
-        document.getElementById('enemyHealthFill').style.width = Math.max(0, enemyHealthPercent) + '%';
-        document.getElementById('enemyHealthText').textContent = 
-            `${Math.max(0, Math.floor(gameState.enemy.health))} / ${gameState.enemy.maxHealth}`;
-    }
+    if (
+  gameState.enemy &&
+  typeof gameState.enemy.health === "number" &&
+  typeof gameState.enemy.maxHealth === "number" &&
+  !isNaN(gameState.enemy.health) && !isNaN(gameState.enemy.maxHealth)
+) {
+  const enemyHealthPercent = (gameState.enemy.health / gameState.enemy.maxHealth) * 100;
+  document.getElementById('enemyHealthFill').style.width = Math.max(0, enemyHealthPercent) + '%';
+  document.getElementById('enemyHealthText').textContent =
+    `${Math.max(0, Math.floor(gameState.enemy.health))} / ${gameState.enemy.maxHealth}`;
+} else {
+  document.getElementById('enemyHealthFill').style.width = '0%';
+  document.getElementById('enemyHealthText').textContent = '-';
+}
     
     document.getElementById('energyFill').style.width = gameState.bulletHellIntensity + '%';
     
@@ -4764,6 +4851,255 @@ function copyScoreLink() {
     showNotification('Link copiato negli appunti!', 'info');
   });
 }
+  
+// --- CO-OP MULTIPLAYER REALTIME ---
+
+// Variabili globali
+let socket = null;
+let mySocketId = null;
+let otherPlayers = {}; // id: { x, y, nickname, angle, targetX, targetY, lastUpdate }
+let coopPlayers = [];
+let coopPositionInterval = null;
+
+// --- AVVIO LOBBY ---
+function showCoopLobby() {
+  showScreen('coopLobby');
+  if (!socket) {
+    socket = io('http://localhost:3000'); // Cambia con la tua URL se serve!
+      setupBossListener(); // <----- AGGIUNGI SUBITO DOPO
+
+    socket.on('connect', () => {
+      mySocketId = socket.id;
+    });
+
+    socket.on('lobbyUpdate', data => renderCoopPlayers(data));
+    socket.on('gameStart', data => startCoopRaidGame(data));
+
+    socket.on('bossDefeated', coopVictory);
+
+    socket.on('bossUpdate', data => {
+      // Sync boss: posizione, angolo, health!
+      if (gameState.enemy) {
+        gameState.enemy.health = data.health;
+        gameState.enemy.maxHealth = data.maxHealth;
+        if (typeof data.x === "number") gameState.enemy.x = data.x;
+        if (typeof data.y === "number") gameState.enemy.y = data.y;
+        if (typeof data.angle === "number") gameState.enemy.angle = data.angle;
+        updateUI();
+      }
+    });
+
+    // --- Sync altri player ---
+    socket.on('otherPlayers', data => {
+      data.players.forEach(p => {
+        if (p.id === mySocketId) return;
+        if (!otherPlayers[p.id]) {
+          otherPlayers[p.id] = { x: p.x, y: p.y, nickname: p.nickname, angle: p.angle || 0 };
+        }
+        otherPlayers[p.id].targetX = p.x;
+        otherPlayers[p.id].targetY = p.y;
+        otherPlayers[p.id].nickname = p.nickname;
+        otherPlayers[p.id].angle = p.angle || 0;
+        otherPlayers[p.id].lastUpdate = Date.now();
+      });
+      // Rimuovi player disconnessi
+      for (let id in otherPlayers) {
+        if (!data.players.find(p => p.id === id)) delete otherPlayers[id];
+      }
+    });
+  }
+  socket.emit('joinLobby', { nickname: getPlayerName() });
+}
+
+function renderCoopPlayers(data) {
+  coopPlayers = data.players;
+  document.getElementById('coopPlayersList').innerHTML =
+    '<b>Giocatori connessi:</b><ul>' +
+    data.players.map(p => `<li>${p.nickname}</li>`).join('') +
+    '</ul>';
+}
+
+function startCoopRaid() {
+  if (socket) socket.emit('startCoopRaid');
+}
+
+function startCoopRaidGame(data) {
+  gameState.currentLevel = 20;
+  initializeCampaignEnemy();
+  gameState.enemy.health = data.boss.health;
+  gameState.enemy.maxHealth = data.boss.maxHealth;
+  gameState.enemy.x = data.boss.x || gameState.enemy.x;
+  gameState.enemy.y = data.boss.y || gameState.enemy.y;
+  gameState.enemy.angle = data.boss.angle || 0;
+  coopPlayers = data.players;
+  gameState.gameMode = 'coop';
+  gameState.currentScreen = 'gameScreen';
+  showScreen('gameScreen');
+  startCoopGameLoop();
+}
+
+function coopVictory() {
+  showNotification("BOSS SCONFITTO! RAID CO-OP COMPLETATO!", "achievement");
+  showScreen('victory');
+}
+
+function coopShootBoss(damage) {
+  if (socket) socket.emit('bossDamage', { damage });
+}
+
+// --- GAMELOOP CO-OP ---
+function startCoopGameLoop() {
+  if (coopPositionInterval) clearInterval(coopPositionInterval);
+  coopPositionInterval = setInterval(sendMyPosition, 40); // invia posizione ogni 40ms
+
+  function coopLoop() {
+    updatePlayer(1);
+    updatePlayerTrail();
+    updateObstacles();
+    // Non aggiornare la posizione del boss localmente! (solo render e attacchi, la posizione arriva da server)
+    updateBullets(1);
+    updateEnemyBullets(1);
+    updateParticles(1);
+    updateSlowTime();
+    updateAdaptiveDifficulty();
+    updateScreenShake();
+    checkCollisionsCoop();
+    render();
+    if (gameState.currentScreen === 'gameScreen' && gameState.gameMode === 'coop')
+      requestAnimationFrame(coopLoop);
+  }
+  coopLoop();
+}
+
+function stopCoopGameLoop() {
+  if (coopPositionInterval) clearInterval(coopPositionInterval);
+  coopPositionInterval = null;
+}
+
+// Invio posizione + angolo + nickname
+function sendMyPosition() {
+  if (socket && gameState.gameMode === "coop") {
+    socket.emit('playerMove', {
+      x: gameState.player.x,
+      y: gameState.player.y,
+      angle: gameState.player.angle,
+      nickname: getPlayerName()
+    });
+  }
+}
+
+// --- COLLISIONI SOLO DANNO AL BOSS ---
+function checkCollisionsCoop() {
+  for (let i = gameState.bullets.length - 1; i >= 0; i--) {
+    const bullet = gameState.bullets[i];
+    const boss = gameState.enemy;
+    if (!boss) continue;
+    const dist = Math.sqrt(Math.pow(bullet.x - boss.x, 2) + Math.pow(bullet.y - boss.y, 2));
+    if (dist < 60) {
+      coopShootBoss(bullet.damage);
+      createHitParticles(bullet.x, bullet.y, bullet.color);
+      gameState.bullets.splice(i, 1);
+      updateUI();
+    }
+  }
+}
+
+ 
+// === PATCH: Boss co-op, barra vita fluida e funzionante ===
+
+// 1. Variabili globali
+let bossTarget = { x: null, y: null, angle: null };
+let bossVisualHealth = null;
+let lastFrameTime = performance.now();
+
+// 2. Socket.on('bossUpdate') patchato
+function setupBossListener() {
+  if (!socket) return;
+  socket.off?.('bossUpdate');
+  socket.on('bossUpdate', data => {
+    if (gameState.enemy) {
+      gameState.enemy.maxHealth = data.maxHealth;
+      gameState.enemy.targetHealth = data.health; // PATCH: aggiorna solo la target!
+      if (typeof data.x === "number") bossTarget.x = data.x;
+      if (typeof data.y === "number") bossTarget.y = data.y;
+      if (typeof data.angle === "number") bossTarget.angle = data.angle;
+      updateUI();
+    }
+  });
+}
+
+// 3. Interpolazione posizione boss
+function interpolateBoss() {
+  if (
+    gameState.gameMode === "coop" &&
+    gameState.enemy &&
+    bossTarget.x !== null &&
+    bossTarget.y !== null
+  ) {
+    gameState.enemy.x += (bossTarget.x - gameState.enemy.x) * 0.33;
+    gameState.enemy.y += (bossTarget.y - gameState.enemy.y) * 0.33;
+    if (bossTarget.angle !== null) {
+      gameState.enemy.angle += (bossTarget.angle - gameState.enemy.angle) * 0.18;
+    }
+  }
+}
+
+// 4. Interpolazione barra della vita boss
+function interpolateBossHealth() {
+  if (
+    gameState.gameMode === "coop" &&
+    gameState.enemy &&
+    typeof gameState.enemy.targetHealth === "number"
+  ) {
+    if (bossVisualHealth === null) bossVisualHealth = gameState.enemy.targetHealth;
+    bossVisualHealth += (gameState.enemy.targetHealth - bossVisualHealth) * 0.18;
+    if (Math.abs(bossVisualHealth - gameState.enemy.targetHealth) < 1) {
+      bossVisualHealth = gameState.enemy.targetHealth;
+    }
+    const percent = Math.max(0, bossVisualHealth) / gameState.enemy.maxHealth * 100;
+    document.getElementById('enemyHealthFill').style.width = percent + '%';
+    document.getElementById('enemyHealthText').textContent = `${Math.max(0, Math.floor(bossVisualHealth))} / ${gameState.enemy.maxHealth}`;
+  }
+}
+
+// 5. CoopLoop con deltaTime e patch smooth
+function startCoopGameLoop() {
+  if (coopPositionInterval) clearInterval(coopPositionInterval);
+  coopPositionInterval = setInterval(sendMyPosition, 40);
+  lastFrameTime = performance.now();
+
+  function coopLoop() {
+    let now = performance.now();
+    let rawDelta = (now - lastFrameTime) / 16.67;
+    lastFrameTime = now;
+
+    // Ignora deltaTime enorme (tab inattiva o lag browser)
+    let deltaTime = (rawDelta > 2.5 || rawDelta < 0.2) ? 1 : rawDelta;
+    // Limita deltaTime tra 0.7 e 1.5 (evita scatti e rallentamenti)
+    deltaTime = Math.max(0.7, Math.min(deltaTime, 1.5));
+
+    updatePlayer(deltaTime);
+    updatePlayerTrail();
+    updateObstacles(deltaTime);
+    updateBullets(deltaTime);
+    updateEnemyBullets(deltaTime);
+    updateParticles(deltaTime);
+    updateSlowTime();
+    updateAdaptiveDifficulty();
+    updateScreenShake();
+    checkCollisionsCoop();
+    interpolateBoss();
+    interpolateBossHealth();
+    render();
+    if (gameState.currentScreen === 'gameScreen' && gameState.gameMode === 'coop')
+      requestAnimationFrame(coopLoop);
+  }
+  coopLoop();
+}
+
+// 6. Assicurati che checkCollisionsCoop chiami coopShootBoss(damage) e socket sia inizializzato
+
+// --- FINE PATCH ---
   
   
   </script>
