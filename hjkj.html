@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-      <script src="https://sdk.crazygames.com/crazygames-sdk-v3.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
     
@@ -1173,6 +1172,11 @@ body.loading {
           <div class="menu-content">
               <h1 class="game-title">STELLAR GUARDIAN</h1>
               <p class="game-subtitle">COSMIC DEFENSE FORCE - Protect the Galaxy</p>
+              <div id="nicknameBox" style="margin:1.2rem 0;">
+ <label for="nicknameInput" style="color:#00bcd4;font-weight:bold;">Nickname:</label>
+ <input id="nicknameInput" type="text" maxlength="15" style="padding:0.5rem;border-radius:8px;margin-left:0.5rem;">
+ <button class="menu-btn" onclick="savePlayerName()">Save</button>
+</div>
               <div class="stat-item">
     <div class="stat-value" id="coinCount">0</div>
     <div>Coins</div>
@@ -1183,14 +1187,14 @@ body.loading {
                   <div class="menu-buttons">
                   <button class="menu-btn" onclick="showScreen('shop')">🛒 SHOP</button>
                   <button class="menu-btn" onclick="showScreen('levelSelect')">📋 SELECT MISSION</button>
-                  <button class="menu-btn" onclick="startChaosMode()">💥 CAOS TOTALE</button>
-                  <button id="pulsanteMusica">🎵 Musica ON</button>
-                  <button class="menu-btn" onclick="changePlayerName()">👤 Cambia nickname</button>
+                  <button class="menu-btn" onclick="startChaosMode()">💥 TOTAL CHAOS</button>
+                  <button id="pulsanteMusica">🎵 Music ON</button>
+                  <button class="menu-btn" onclick="changePlayerName()">👤 Change nickname</button>
                   <button class="menu-btn" onclick="showScreen('inventoryScreen')">🛸 SPACESHIP INVENTORY</button>
-                  <button class="menu-btn" onclick="showGlobalLeaderboard()">🌍 CLASSIFICA GLOBALE</button>
+                  <button class="menu-btn" onclick="showGlobalLeaderboard()">🌍 GLOBAL LEADERBOARD</button>
                   <button class="menu-btn primary" onclick="showCoopLobby()">🌐 Raid Co-op Online</button>
-                  <button class="menu-btn" onclick="showDailyChallengeMenu()">🌟 Challenge Giornaliera</button>
-                  <button class="menu-btn" onclick="showLocalLeaderboard()">🌟 CLASSIFICA LOCALE</button>
+                  <button class="menu-btn" onclick="showDailyChallengeMenu()">🌟 DAILY CHALLENGE</button>
+                  <button class="menu-btn" onclick="showLocalLeaderboard()">🌟 LOCAL LEADERBOARD</button>
                   <button class="menu-btn" onclick="showScreen('skillTree')">⭐ UPGRADES</button>
                   <button class="menu-btn" onclick="showScreen('achievements')">🏆 ACHIEVEMENTS</button>
                   <button class="menu-btn" onclick="showScreen('stats')">📊 STATISTICS</button>
@@ -1300,13 +1304,13 @@ body.loading {
 <!-- DAILY CHALLENGE SCREEN -->
 <div class="screen" id="dailyChallengeScreen">
   <div class="menu-content">
-    <h2>🌟 Challenge Giornaliera</h2>
+    <h2>🌟 Daily Challenge</h2>
     <div id="dailyChallengeDesc" style="margin-bottom:1.5rem;"></div>
-    <button class="menu-btn primary" id="dailyChallengeStartBtn">Inizia</button>
-    <button class="menu-btn" id="dailyChallengeBackBtn">Indietro</button>
+    <button class="menu-btn primary" id="dailyChallengeStartBtn">Start</button>
+    <button class="menu-btn" id="dailyChallengeBackBtn">Back</button>
     <div style="margin-top:2rem;">
-      <h3>Classifica Giornaliera</h3>
-      <div id="dailyLeaderboardList">Caricamento...</div>
+      <h3>Daily Leaderboard</h3>
+      <div id="dailyLeaderboardList">Loading...</div>
     </div>
   </div>
 </div>
@@ -1317,7 +1321,7 @@ body.loading {
 <div class="screen" id="localLeaderboardScreen">
   <button class="menu-btn home-btn" onclick="showScreen('mainMenu')">🏠 HOME</button>
   <div class="menu-content">
-    <h2 class="game-subtitle">Classifica Locale</h2>
+    <h2 class="game-subtitle">Local Leaderboard</h2>
     <div id="localLeaderboardList">Loading...</div>
     <button class="menu-btn" onclick="showScreen('mainMenu')">Back</button>
   </div>
@@ -1327,9 +1331,9 @@ body.loading {
 <div class="screen" id="globalLeaderboardScreen">
   <button class="menu-btn home-btn" onclick="showScreen('mainMenu')">🏠 HOME</button>
   <div class="menu-content">
-    <h2 class="game-subtitle">Classifica Globale</h2>
+    <h2 class="game-subtitle">Global Leaderboard</h2>
     <div id="globalLeaderboardList">Loading...</div>
-    <button class="menu-btn" onclick="showGlobalLeaderboard()">Aggiorna classifica globale</button>
+    <button class="menu-btn" onclick="showGlobalLeaderboard()">Update global ranking</button>
     <button class="menu-btn" onclick="showScreen('mainMenu')">Back</button>
   </div>
 </div>
@@ -1554,8 +1558,8 @@ body.loading {
 
         <!-- Pulsanti Condividi Social -->
         <div id="shareButtonsGameOver" style="margin-top:1.5rem; display:flex; gap:12px; flex-wrap:wrap; justify-content:center;">
-            <button class="menu-btn" onclick="shareScore()">🔗 Condividi il tuo record!</button>
-            <button class="menu-btn" onclick="copyScoreLink()">📋 Copia link</button>
+            <button class="menu-btn" onclick="shareScore()">🔗 Share your record!</button>
+            <button class="menu-btn" onclick="copyScoreLink()">📋 Copy link</button>
         </div>
     </div>
 </div>
@@ -1581,8 +1585,8 @@ body.loading {
 
         <!-- Pulsanti Condividi Social -->
         <div id="shareButtonsVictory" style="margin-top:1.5rem; display:flex; gap:12px; flex-wrap:wrap; justify-content:center;">
-            <button class="menu-btn" onclick="shareScore()">🔗 Condividi il tuo record!</button>
-            <button class="menu-btn" onclick="copyScoreLink()">📋 Copia link</button>
+            <button class="menu-btn" onclick="shareScore()">🔗 Share your record!</button>
+            <button class="menu-btn" onclick="copyScoreLink()">📋 Copy link</button>
         </div>
     </div>
 </div>
@@ -1590,14 +1594,46 @@ body.loading {
 <!-- LOBBY COOP - POSIZIONE GIUSTA! -->
 <div class="screen" id="coopLobby">
   <div class="menu-content">
-    <h2 class="game-subtitle">Raid Co-op - Attendi altri giocatori...</h2>
-    <div id="coopPlayersList">Caricamento...</div>
-    <button class="menu-btn primary" onclick="startCoopRaid()">Inizia (test solo host)</button>
+    <h2 class="game-subtitle">Raid Co-op - Wait for other players...</h2>
+    <div id="coopPlayersList">Loading...</div>
+    <button class="menu-btn primary" onclick="startCoopRaid()">Start (test host)</button>
     <button class="menu-btn" onclick="showScreen('mainMenu')">Back</button>
-  </div>
+    <button class="menu-btn" id="jitsiBtn" style="position:fixed;bottom:20px;right:20px;z-index:10001;" onclick="toggleJitsi()">🎤 Voice Chat (Jitsi)</button>
+</div>
 </div>
 
+  <!-- Contenitore iframe Jitsi nascosto di default -->
+<div id="jitsiContainer" style="display:none; position:fixed; bottom:80px; right:20px; width:360px; height:300px; z-index:10000; box-shadow:0 0 16px #000; border-radius:12px; background:#000;">
+  <iframe id="jitsiFrame"
+    src=""
+    style="width:100%; height:100%; border:0; border-radius:10px;"
+    allow="camera; microphone; fullscreen; display-capture"></iframe>
+  <button onclick="toggleJitsi()" style="position:absolute;top:4px;right:4px;z-index:10001;background:#ffd700;border:none;border-radius:8px;padding:2px 8px;cursor:pointer;">❌</button>
+</div>
+  
   <script>
+       
+      let firstGameAdShown = false;
+      
+     function showAd() {
+  if (isDevEnv()) {
+    console.log("DEV: showAd saltata (nessuna pubblicità in locale).");
+    return;
+  }
+  
+  if (typeof sdk !== 'undefined' && typeof sdk.showAd === 'function') {
+    sdk.showAd();
+    console.log('Ad GameMonetize chiamata!');
+    return;
+  }
+  if (typeof sdk !== 'undefined' && typeof sdk.showBanner === 'function') {
+    sdk.showBanner();
+    console.log('Banner GameMonetize chiamato!');
+    return;
+  }
+  console.log('No ad function available, continuing without ad!');
+}
+       
        
        const BOSS_IMAGES_BY_DIFFICULTY = {
   "Medium": "sabaa1.png",
@@ -1619,45 +1655,12 @@ body.loading {
       
 
 
-// CrazyGames SDK v3 initialization (metti all’inizio!)
-  let crazyGamesReady = false;
-
-  async function initCrazyGamesSDK() {
-    try {
-      await window.CrazyGames.SDK.init();
-      crazyGamesReady = true;
-      console.log('CrazyGames SDK inizializzato!');
-    } catch (e) {
-      console.error('Errore inizializzazione CrazyGames SDK:', e);
-    }
-  }
-
-  // Poi tutto il tuo JS come prima...
-
- window.addEventListener('load', async () => {
-  await initCrazyGamesSDK();
-  showLoadingScreen();
-  setTimeout(hideLoadingScreen, 2400);
-
   // Event listener per i bottoni della Daily Challenge
   const dailyStartBtn = document.getElementById('dailyChallengeStartBtn');
   const dailyBackBtn = document.getElementById('dailyChallengeBackBtn');
   if (dailyStartBtn) dailyStartBtn.onclick = startDailyChallenge;
   if (dailyBackBtn) dailyBackBtn.onclick = () => showScreen('mainMenu');
-});
-
-  // ESEMPIO: mostrare una pubblicità
-  function showAd() {
-    if (crazyGamesReady) {
-      window.CrazyGames.SDK.ad.showAd('midgame')
-        .then(() => {
-          console.log('Ad completata!');
-        })
-        .catch((e) => {
-          console.log('Errore ad:', e);
-        });
-    }
-  }
+;
 
   // Puoi chiamare showAd() dove preferisci, ad esempio:
   // function gameOver() { ... showAd(); ... }
@@ -2113,34 +2116,34 @@ enemyImage.src = 'alien-enemy2.png'; // Senza /
           }
       }
 
-      // Screen Management
-      function showScreen(screenId) {
-          document.querySelectorAll('.screen').forEach(screen => {
-              screen.classList.remove('active');
-          });
-          
-          document.getElementById(screenId).classList.add('active');
-          gameState.currentScreen = screenId;
-          
-          const mobileControls = document.getElementById('mobileControls');
-          if (screenId === 'gameScreen' && gameState.isMobile) {
-              mobileControls.classList.add('active');
-          } else {
-              mobileControls.classList.remove('active');
-          }
-          
-          if (screenId === 'gameScreen') {
-              if (!gameState.gameRunning) {
-                  startGame();
-              } else {
-                  resumeGame();
-              }
-          } else {
-              if (gameState.gameRunning) {
-                  pauseGame();
-              }
-          }
-      }
+     // Screen Management
+function showScreen(screenId) {
+    document.querySelectorAll('.screen').forEach(screen => {
+        screen.classList.remove('active');
+    });
+
+    document.getElementById(screenId).classList.add('active');
+    gameState.currentScreen = screenId;
+
+    const mobileControls = document.getElementById('mobileControls');
+    if (screenId === 'gameScreen' && gameState.isMobile) {
+        mobileControls.classList.add('active');
+    } else {
+        mobileControls.classList.remove('active');
+    }
+
+    if (screenId === 'gameScreen') {
+        if (!gameState.gameRunning) {
+            showAdAndStartGame(); // Mostra adv, poi avvia partita
+        } else {
+            resumeGame();
+        }
+    } else {
+        if (gameState.gameRunning) {
+            pauseGame();
+        }
+    }
+}
 
       // Level Grid Generation
       function generateLevelGrid() {
@@ -2336,11 +2339,15 @@ enemyImage.src = 'alien-enemy2.png'; // Senza /
           }
       }
 
-      function startLevel(levelNumber) {
-          gameState.currentLevel = levelNumber;
-          gameState.gameMode = 'campaign';
-          showScreen('gameScreen');
-      }
+     let pendingLevelToStart = null;
+
+     
+   function startLevel(levelNumber) {
+    pendingLevelToStart = levelNumber;
+    gameState.gameMode = 'campaign';
+    gameState.gameRunning = false;
+    showAdAndStartGame();
+}
 
      function startEndlessMode() {
     gameState.gameMode = 'endless';
@@ -2387,7 +2394,22 @@ initGame();
     }
 }
       
-    function startGame() {
+   function startGame(skipAd) {
+    // Aggiorna livello se necessario (come prima)
+    if (pendingLevelToStart !== null) {
+        gameState.currentLevel = pendingLevelToStart;
+        pendingLevelToStart = null;
+    }
+    if (!skipAd) {
+        showAdAndStartGame();
+        return; // Evita doppio avvio!
+    }
+
+    // PATCH: Segnala che stai avviando la partita (evita doppio showAd)
+    gameState.pendingStart = true;
+    showScreen('gameScreen');
+    gameState.pendingStart = false;
+
     gameState.obstacles = [];
     gameState.gameRunning = true;
     gameState.gamePaused = false;
@@ -2407,41 +2429,19 @@ initGame();
 
     if (selectedShip === "ship1") {
         playerImage.src = "navicella1.png";
-        playerStats = {
-            speed: 5,
-            maxHealth: 100,
-            maxEnergy: 100
-        };
+        playerStats = { speed: 5, maxHealth: 100, maxEnergy: 100 };
     } else if (selectedShip === "ship2") {
         playerImage.src = "navicella2.png";
-        playerStats = {
-            speed: 3,
-            maxHealth: 180,
-            maxEnergy: 120
-        };
+        playerStats = { speed: 3, maxHealth: 180, maxEnergy: 120 };
     } else if (selectedShip === "ship3") {
         playerImage.src = "navicella3.png";
-        playerStats = {
-            speed: 7,           // Più veloce delle altre
-            maxHealth: 80,      // Meno vita
-            maxEnergy: 140      // Più energia
-        };
+        playerStats = { speed: 7, maxHealth: 80, maxEnergy: 140 };
     } else if (selectedShip === "ship4") {
-        // PATCH: Nuova navicella Pixel Blue
-        playerImage.src = "navicella4.png"; // Usa il nome giusto del file!
-        playerStats = {
-            speed: 6,           // Personalizza le stats come vuoi!
-            maxHealth: 110,
-            maxEnergy: 120
-        };
+        playerImage.src = "navicella4.png";
+        playerStats = { speed: 6, maxHealth: 110, maxEnergy: 120 };
     } else {
-        // fallback per navicelle future/non trovate
         playerImage.src = "navicella1.png";
-        playerStats = {
-            speed: 5,
-            maxHealth: 100,
-            maxEnergy: 100
-        };
+        playerStats = { speed: 5, maxHealth: 100, maxEnergy: 100 };
     }
 
     // Applica le statistiche al player
@@ -2468,6 +2468,8 @@ initGame();
     gameState.player.skills = skills;
     gameState.player.invulnerabilityFrames = 0;
     gameState.player.angle = 0;
+    gameState.player.x = canvas.width / 2;
+    gameState.player.y = canvas.height - 120;
 
     if (gameState.gameMode === 'endless') {
         generateEndlessEnemy();
@@ -2535,71 +2537,63 @@ initGame();
           };
       }
 
-     function gameLoop() {
-    if (!gameState.gameRunning || gameState.gamePaused) return;
+     // Sostituisci TUTTA la funzione gameLoop con questa:
+let lastUpdateTime = performance.now();
 
-    update();
-    render();
+function gameLoop() {
+  if (!gameState.gameRunning || gameState.gamePaused) return;
+  let now = performance.now();
+  let rawDelta = (now - lastUpdateTime) / 16.67; // 16.67ms = 60fps
+  lastUpdateTime = now;
+  // Limita deltaTime per evitare scatti (tab inattiva, lag, ecc.)
+  let deltaTime = (rawDelta > 2.5 || rawDelta < 0.2) ? 1 : rawDelta;
+  deltaTime = Math.max(0.7, Math.min(deltaTime, 1.5));
 
-    // --- GESTIONE FINE PARTITA E CHALLENGE GIORNALIERA ---
-    // Se il player ha perso o vinto e siamo in daily challenge, salva il punteggio e resetta il flag
-    let partitaFinita = false;
-    if (gameState.player.health <= 0 && gameState.player.invulnerabilityFrames <= 0) {
-        partitaFinita = true;
-    }
-    if (gameState.enemy && gameState.enemy.health <= 0) {
-        // Qui puoi aggiungere altre condizioni di vittoria
-        partitaFinita = true;
-    }
+  update(deltaTime); // <-- Passa deltaTime!
+  render();
 
-    // Se challenge giornaliera
-    if (gameState.isDailyChallenge && partitaFinita) {
-        endDailyChallenge(gameState.player.score);
-        gameState.isDailyChallenge = false;
-        // Mostra schermata di game over/challenge completata
-        showScreen('mainMenu'); // o showScreen('gameOver'), come preferisci
-        return;
-    }
+  // --- Gestione fine partita e challenge giornaliera ---
+  let partitaFinita = false;
+  if (gameState.player.health <= 0 && gameState.player.invulnerabilityFrames <= 0) partitaFinita = true;
+  if (gameState.enemy && gameState.enemy.health <= 0) partitaFinita = true;
 
-    animationId = requestAnimationFrame(gameLoop);
+  if (gameState.isDailyChallenge && partitaFinita) {
+    endDailyChallenge(gameState.player.score);
+    gameState.isDailyChallenge = false;
+    showScreen('mainMenu');
+    return;
+  }
+
+  animationId = requestAnimationFrame(gameLoop);
 }
+     // Sostituisci la funzione update con questa:
+function update(deltaTime) {
+  updatePlayer(deltaTime);
+  updatePlayerTrail();
+  updateObstacles(deltaTime);
+  updateEnemy(deltaTime);
+  updateBullets(deltaTime);
+  updateEnemyBullets(deltaTime);
+  updateParticles(deltaTime);
+  updateSlowTime();
+  updateAdaptiveDifficulty();
+  updateScreenShake();
+  checkCollisions();
 
-      function update() {
-    const deltaTime = gameState.timeScale;
-    
-    updatePlayer(deltaTime);
-    updatePlayerTrail();
-    updateObstacles();
-    updateEnemy(deltaTime);
-    updateBullets(deltaTime);
-    updateEnemyBullets(deltaTime);
-    updateParticles(deltaTime);
-    updateSlowTime();
-    updateAdaptiveDifficulty();
-    updateScreenShake();
-    checkCollisions();
+  if (gameState.player.specialCooldown > 0) gameState.player.specialCooldown--;
 
-    // AGGIUNGI QUI: decremento cooldown special attack
-    if (gameState.player.specialCooldown > 0) {
-        gameState.player.specialCooldown--;
-    }
-    
-    if (gameState.gameMode === 'chaos') {
-        updateChaosMode(1);
-    } else if (gameState.gameMode === 'endless') {
-        updateEndlessMode();
-    } else if (gameState.gameMode === 'speedrun') {
-        updateSpeedrunTimer();
-    }
-    
-    checkEnemyPhaseTransition();
-    
-    if (gameState.enemy && gameState.enemy.health <= 0) {
-        esplodiBoss(gameState.enemy);
-        levelComplete();
-    } else if (gameState.player.health <= 0 && gameState.player.invulnerabilityFrames <= 0) {
-        gameOver();
-    }
+  if (gameState.gameMode === 'chaos') updateChaosMode(deltaTime);
+  else if (gameState.gameMode === 'endless') updateEndlessMode();
+  else if (gameState.gameMode === 'speedrun') updateSpeedrunTimer();
+
+  checkEnemyPhaseTransition();
+
+  if (gameState.enemy && gameState.enemy.health <= 0) {
+    esplodiBoss(gameState.enemy);
+    levelComplete();
+  } else if (gameState.player.health <= 0 && gameState.player.invulnerabilityFrames <= 0) {
+    gameOver();
+  }
 }
 
      function updatePlayer(deltaTime) {
@@ -3372,6 +3366,16 @@ function eseguiSpecial() {
       }
 
    function levelComplete() {
+     if (gameState.gameMode === 'campaign' && gameState.currentLevel >= 20) {
+    showAd();
+    unlockAchievement('ultimate_guardian');
+    document.getElementById('victoryScore').textContent = gameState.player.score.toLocaleString();
+    document.getElementById('victoryTime').textContent = Math.floor(gameState.totalSurvivalTime);
+    showScreen('victory');
+    return;
+  }
+    
+    
     gameState.gameRunning = false;
 
     // Calcola tempo di sopravvivenza
@@ -3467,6 +3471,8 @@ function eseguiSpecial() {
 }
       
   function gameOver() {
+     showAd();
+    
     gameState.gameRunning = false;
     const survivalTime = (Date.now() - gameState.levelStartTime) / 1000;
     let upgradePointsEarned = Math.floor(gameState.currentLevel * 0.6) + Math.floor(survivalTime / 20);
@@ -3638,6 +3644,8 @@ function forfeitMission() {
      
  // --- RENDER ALTRI PLAYER ---
 function renderOtherPlayers(ctx) {
+  console.log("Rendering otherPlayers:", otherPlayers);
+    
   for (let id in otherPlayers) {
     if (id === mySocketId) continue;
     const p = otherPlayers[id];
@@ -4431,12 +4439,12 @@ const loadingText = document.getElementById('loadingText');
 const loadingPhrases = [
   "Calibrating Hyperdrive...",
   "Loading Cosmic Donuts...",
-  "Spazzolando la polvere di stelle...",
-  "Preparando la navicella per il decollo...",
-  "Caricando nemici dispettosi...",
-  "Compilando meme galattici...",
+  "Brushing star dust...",
+  "Preparing spaceship for launch...",
+  "Loading mischievous enemies...",
+  "Compiling galactic memes...",
   "Verifying ship's AI sarcasm level...",
-  "Sintonizzando la radio spaziale..."
+  "Tuning space radio..."
 ];
 const ships = ["navicella1.png", "navicella2.png", "navicella3.png"];
 setInterval(() => {
@@ -4633,11 +4641,7 @@ function nextChaosEffect() {
   
  function getPlayerName() {
   let username = localStorage.getItem('playerName');
-  if (!username || username.length < 2) {
-    username = prompt("Inserisci il tuo nickname per la classifica:");
-    if (!username || username.length < 2) username = "NoName";
-    localStorage.setItem('playerName', username);
-  }
+  if (!username || username.length < 2) username = "NoName";
   return username;
 }
 
@@ -4678,11 +4682,11 @@ function showLocalLeaderboard() {
   // ==== DAILY CHALLENGE: CONFIGURAZIONE ====
 
 const DAILY_CHALLENGES = [
-  { name: "1 Vita!", desc: "Sopravvivi più a lungo possibile con solo 1 vita", config: { lives: 1, endless: true } },
-  { name: "Solo Ship Veloce", desc: "Usa solo la navicella più veloce", config: { ship: "ship3" } },
-  { name: "Boss Rush", desc: "Affronta solo boss dal livello 5 in su", config: { bossOnly: true } },
-  { name: "Blitz", desc: "Fai più punti possibili in 60 secondi", config: { timeLimit: 60 } },
-  // ...aggiungi altre challenge!
+  { name: "1 Life!", desc: "Survive as long as possible with only 1 life", config: { lives: 1, endless: true } },
+  { name: "Fastest Ship Only", desc: "Use only the fastest spaceship", config: { ship: "ship3" } },
+  { name: "Boss Rush", desc: "Face only bosses from level 5 and up", config: { bossOnly: true } },
+  { name: "Blitz", desc: "Score as many points as possible in 60 seconds", config: { timeLimit: 60 } },
+  // ...add more challenges!
 ];
 
 // Calcola challenge del giorno
@@ -4799,11 +4803,11 @@ function fetchDailyChallengeLeaderboard() {
 // Ricordati di resettare gameState.isDailyChallenge = false; quando esci dalla modalità!
 
   
-  function changePlayerName() {
-  const oldName = localStorage.getItem('playerName') || '';
-  const username = prompt('Inserisci il tuo nickname per la classifica:', oldName) || 'NoName';
-  localStorage.setItem('playerName', username);
-  showNotification('Il tuo nickname è stato aggiornato! I nuovi punteggi useranno questo nome.', 'info');
+function changePlayerName() {
+  if (document.getElementById('nicknameInput')) {
+    document.getElementById('nicknameInput').focus();
+  }
+  showNotification('Change your nickname above and press Save.', 'info');
 }
   
   function shareScore() {
@@ -4814,8 +4818,8 @@ function fetchDailyChallengeLeaderboard() {
   let level =
     document.getElementById('finalLevel')?.textContent ||
     "1";
-  let shareText = `Ho fatto ${score} punti a Stellar Guardian! Riuscirai a battermi?`;
-  let shareUrl = window.location.href;
+let shareText = `I scored ${score} points in Stellar Guardian! Can you beat me?`;                                                                                                                                                                                                                                           
+let shareUrl = window.location.href;
 
   if (navigator.share) {
     navigator.share({
@@ -4860,53 +4864,121 @@ let mySocketId = null;
 let otherPlayers = {}; // id: { x, y, nickname, angle, targetX, targetY, lastUpdate }
 let coopPlayers = [];
 let coopPositionInterval = null;
+let voiceChatActive = false;
+let playerVoiceStatus = {}; // socketId: true/false
 
-// --- AVVIO LOBBY ---
 function showCoopLobby() {
   showScreen('coopLobby');
   if (!socket) {
-socket = io(); // Collega automaticamente al server in produzione!      setupBossListener(); // <----- AGGIUNGI SUBITO DOPO
-
-    socket.on('connect', () => {
-      mySocketId = socket.id;
-    });
-
-    socket.on('lobbyUpdate', data => renderCoopPlayers(data));
-    socket.on('gameStart', data => startCoopRaidGame(data));
-
-    socket.on('bossDefeated', coopVictory);
-
-    socket.on('bossUpdate', data => {
-      // Sync boss: posizione, angolo, health!
-      if (gameState.enemy) {
-        gameState.enemy.health = data.health;
-        gameState.enemy.maxHealth = data.maxHealth;
-        if (typeof data.x === "number") gameState.enemy.x = data.x;
-        if (typeof data.y === "number") gameState.enemy.y = data.y;
-        if (typeof data.angle === "number") gameState.enemy.angle = data.angle;
-        updateUI();
-      }
-    });
-
-    // --- Sync altri player ---
-    socket.on('otherPlayers', data => {
-      data.players.forEach(p => {
-        if (p.id === mySocketId) return;
-        if (!otherPlayers[p.id]) {
-          otherPlayers[p.id] = { x: p.x, y: p.y, nickname: p.nickname, angle: p.angle || 0 };
-        }
-        otherPlayers[p.id].targetX = p.x;
-        otherPlayers[p.id].targetY = p.y;
-        otherPlayers[p.id].nickname = p.nickname;
-        otherPlayers[p.id].angle = p.angle || 0;
-        otherPlayers[p.id].lastUpdate = Date.now();
-      });
-      // Rimuovi player disconnessi
-      for (let id in otherPlayers) {
-        if (!data.players.find(p => p.id === id)) delete otherPlayers[id];
-      }
-    });
+    socket = io();
   }
+  setupBossListener();
+
+  // Pulizia listener precedenti
+  socket.off('connect');
+  socket.off('lobbyUpdate');
+  socket.off('gameStart');
+  socket.off('bossDefeated');
+  socket.off('otherPlayers');
+  socket.off('webrtc-offer');
+
+  // Connessione
+  socket.on('connect', () => {
+    mySocketId = socket.id;
+    console.log("Connected, socket id:", mySocketId);
+  });
+
+  // Aggiornamento lobby
+  socket.on('lobbyUpdate', data => {
+    console.log("Lobby update:", data);
+    renderCoopPlayers(data);
+  });
+
+  // Avvio partita co-op
+  socket.on('gameStart', data => startCoopRaidGame(data));
+
+  // Boss sconfitto
+  socket.on('bossDefeated', coopVictory);
+
+ // PATCH universale: aggiorna e pulisci la lista otherPlayers in modo atomico e sempre corretto
+socket.on('otherPlayers', data => {
+  // Rimuovi giocatori non più presenti
+  Object.keys(otherPlayers).forEach(id => {
+    if (!data.players.find(p => p.id === id)) delete otherPlayers[id];
+  });
+  // Aggiorna o aggiungi ogni player ricevuto
+  data.players.forEach(p => {
+    if (p.id === mySocketId) return;
+    if (!otherPlayers[p.id]) {
+      otherPlayers[p.id] = { x: p.x, y: p.y, nickname: p.nickname, angle: p.angle || 0 };
+    }
+    otherPlayers[p.id].targetX = p.x;
+    otherPlayers[p.id].targetY = p.y;
+    otherPlayers[p.id].nickname = p.nickname;
+    otherPlayers[p.id].angle = p.angle || 0;
+    otherPlayers[p.id].lastUpdate = Date.now();
+  });
+});
+
+  if (socket) {
+  socket.on('voiceActive', data => {
+    playerVoiceStatus[data.id] = data.active;
+    renderCoopPlayers({players: coopPlayers}); // aggiorna la lista
+  });
+}
+  
+  
+  // --- WebRTC OFFER LISTENER QUI ---
+  socket.on('webrtc-offer', data => {
+    let pc = peerConnections[data.fromId] || new RTCPeerConnection({
+      iceServers: [
+        { urls: "stun:stun.l.google.com:19302" },
+        {
+          urls: "turn:openrelay.metered.ca:80",
+          username: "openrelayproject",
+          credential: "openrelayproject"
+        }
+      ]
+    });
+    peerConnections[data.fromId] = pc;
+
+    // --- LOG STATO ICE E CONNECTION ---
+    pc.oniceconnectionstatechange = () => {
+      console.log(`[WebRTC ${data.fromId}] ICE state:`, pc.iceConnectionState);
+    };
+    pc.onicecandidateerror = e => {
+      console.error(`[WebRTC ${data.fromId}] ICE candidate error:`, e);
+    };
+    pc.onconnectionstatechange = () => {
+      console.log(`[WebRTC ${data.fromId}] Connection state:`, pc.connectionState);
+    };
+
+    pc.onicecandidate = e => {
+      if (e.candidate) socket.emit('webrtc-ice', { targetId: data.fromId, candidate: e.candidate });
+    };
+    pc.ontrack = e => {
+      let audio = document.createElement('audio');
+      audio.srcObject = e.streams[0];
+      audio.autoplay = true;
+      audio.controls = false;
+      audio.muted = false;
+      audio.volume = 1.0;
+      audio.style.display = 'none';
+      document.body.appendChild(audio);
+      // Log
+      console.log(`[WebRTC ${data.fromId}] Audio track received`);
+      audio.play().catch(err => console.log("Audio play error", err));
+    };
+
+    pc.setRemoteDescription(new RTCSessionDescription(data.sdp));
+    if (localStream) localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+    pc.createAnswer().then(answer => {
+      pc.setLocalDescription(answer);
+      socket.emit('webrtc-answer', { targetId: data.fromId, sdp: answer });
+    });
+  });
+
+  // Entro nella lobby (join)
   socket.emit('joinLobby', { nickname: getPlayerName() });
 }
 
@@ -4914,8 +4986,12 @@ function renderCoopPlayers(data) {
   coopPlayers = data.players;
   document.getElementById('coopPlayersList').innerHTML =
     '<b>Giocatori connessi:</b><ul>' +
-    data.players.map(p => `<li>${p.nickname}</li>`).join('') +
-    '</ul>';
+    data.players.map(p => {
+      const voiceIcon = playerVoiceStatus[p.id] ? " <span title='Voce attiva' style='color:#ffd700;'>🎤</span>" : "";
+      return `<li>${p.nickname}${voiceIcon}</li>`;
+    }).join('') +
+    '</ul>' +
+    "<div style='margin-top:6px;font-size:0.97em;color:#00bcd4;'>Tip: clicca <b>🎤 Voice Chat</b> per parlare con la squadra!</div>";
 }
 
 function startCoopRaid() {
@@ -4975,7 +5051,6 @@ function stopCoopGameLoop() {
   coopPositionInterval = null;
 }
 
-// Invio posizione + angolo + nickname
 function sendMyPosition() {
   if (socket && gameState.gameMode === "coop") {
     socket.emit('playerMove', {
@@ -5035,8 +5110,9 @@ function interpolateBoss() {
     bossTarget.x !== null &&
     bossTarget.y !== null
   ) {
-    gameState.enemy.x += (bossTarget.x - gameState.enemy.x) * 0.33;
-    gameState.enemy.y += (bossTarget.y - gameState.enemy.y) * 0.33;
+   // A:
+gameState.enemy.x += (bossTarget.x - gameState.enemy.x) * 0.13;  // più fluido!
+gameState.enemy.y += (bossTarget.y - gameState.enemy.y) * 0.13;
     if (bossTarget.angle !== null) {
       gameState.enemy.angle += (bossTarget.angle - gameState.enemy.angle) * 0.18;
     }
@@ -5099,6 +5175,163 @@ function startCoopGameLoop() {
 // 6. Assicurati che checkCollisionsCoop chiami coopShootBoss(damage) e socket sia inizializzato
 
 // --- FINE PATCH ---
+  
+ let localStream = null;
+let peerConnections = {};
+
+function startVoiceChat() {
+  navigator.mediaDevices.getUserMedia({ audio: true })
+    .then(stream => {
+      localStream = stream;
+      coopPlayers.forEach(p => {
+        if (p.id === mySocketId) return;
+        setupPeerVoice(p.id);
+      });
+      showNotification('Chat vocale attivata! Microfono collegato.', 'info');
+    })
+    .catch(() => showNotification('Impossibile accedere al microfono.', 'info'));
+}
+
+function setupPeerVoice(peerId) {
+  const pc = new RTCPeerConnection({ 
+    iceServers: [
+      { urls: "stun:stun.l.google.com:19302" },
+      {
+        urls: "turn:openrelay.metered.ca:80",
+        username: "openrelayproject",
+        credential: "openrelayproject"
+      }
+    ]
+  });  
+  peerConnections[peerId] = pc;
+  localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+
+  // --- LOG STATO ICE E CONNECTION ---
+  pc.oniceconnectionstatechange = () => {
+    console.log(`[WebRTC ${peerId}] ICE state:`, pc.iceConnectionState);
+  };
+  pc.onicecandidateerror = e => {
+    console.error(`[WebRTC ${peerId}] ICE candidate error:`, e);
+  };
+  pc.onconnectionstatechange = () => {
+    console.log(`[WebRTC ${peerId}] Connection state:`, pc.connectionState);
+  };
+
+  pc.onicecandidate = e => {
+    if (e.candidate) socket.emit('webrtc-ice', { targetId: peerId, candidate: e.candidate });
+  };
+  pc.ontrack = e => {
+    let audio = document.createElement('audio');
+    audio.srcObject = e.streams[0];
+    audio.autoplay = true;
+    audio.controls = false;
+    audio.style.display = 'none';
+    audio.muted = false;
+    audio.volume = 1.0;
+    document.body.appendChild(audio);
+    // Log
+    console.log(`[WebRTC ${peerId}] Audio track received`);
+    // Forza play (debug autoplay block)
+    audio.play().catch(err => console.log("Audio play error", err));
+  };
+  pc.createOffer().then(offer => {
+    pc.setLocalDescription(offer);
+    socket.emit('webrtc-offer', { targetId: peerId, sdp: offer });
+  });
+}
+  
+  
+ function savePlayerName() {
+  const val = document.getElementById('nicknameInput').value.trim();
+  if (val.length >= 2) {
+    localStorage.setItem('playerName', val);
+    showNotification('Nickname updated!', 'info');
+  } else {
+    showNotification('Nickname too short!', 'info');
+  }
+}
+  
+  window.addEventListener('DOMContentLoaded', () => {
+  if (document.getElementById('nicknameInput'))
+    document.getElementById('nicknameInput').value = localStorage.getItem('playerName') || '';
+});
+  
+  
+ function toggleJitsi() {
+  const cont = document.getElementById('jitsiContainer');
+  const frame = document.getElementById('jitsiFrame');
+  const roomName = "StellarGuardianCoopRoom";
+  if (cont.style.display === 'none') {
+    frame.src = "https://meet.jit.si/" + roomName + "#userInfo.displayName=\"" + (localStorage.getItem('playerName')||"Player") + "\"";
+    cont.style.display = 'block';
+    voiceChatActive = true;
+    if (socket) socket.emit('voiceActive', { active: true });
+  } else {
+    frame.src = "";
+    cont.style.display = 'none';
+    voiceChatActive = false;
+    if (socket) socket.emit('voiceActive', { active: false });
+  }
+}
+  
+  
+  function isDevEnv() {
+  // File://, localhost, 127.0.0.1, o qualsiasi dominio di test che vuoi
+  return (
+    location.protocol === "file:" ||
+    location.hostname === "localhost" ||
+    location.hostname === "127.0.0.1"
+    // || location.hostname.endsWith(".ngrok-free.app") // aggiungi altri domini di test se vuoi
+  );
+}
+
+function showAdAndStartGame() {
+  // Salta tutto se sei in sviluppo/locale!
+  if (isDevEnv()) {
+    console.log("DEV: saltata pubblicità, avvio diretto.");
+    startGame(true);
+    return;
+  }
+
+  // GameMonetize fallback
+  if (typeof sdk !== 'undefined' && typeof sdk.showAd === 'function') {
+    sdk.showAd();
+    setTimeout(() => startGame(true), 2000);
+    return;
+  }
+  // Nessuna ad, avvia subito
+  startGame(true);
+}
+  
+  
+function showScreen(screenId) {
+    document.querySelectorAll('.screen').forEach(screen => {
+        screen.classList.remove('active');
+    });
+
+    document.getElementById(screenId).classList.add('active');
+    gameState.currentScreen = screenId;
+
+    const mobileControls = document.getElementById('mobileControls');
+    if (screenId === 'gameScreen' && gameState.isMobile) {
+        mobileControls.classList.add('active');
+    } else {
+        mobileControls.classList.remove('active');
+    }
+
+    if (screenId === 'gameScreen') {
+        // PATCH: se pendingStart è true, NON fare showAdAndStartGame()
+        if (!gameState.gameRunning && !gameState.pendingStart) {
+            showAdAndStartGame(); // Mostra adv, poi avvia partita
+        } else if (gameState.gameRunning) {
+            resumeGame();
+        }
+    } else {
+        if (gameState.gameRunning) {
+            pauseGame();
+        }
+    }
+}
   
   
   </script>
