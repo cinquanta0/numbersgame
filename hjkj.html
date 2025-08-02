@@ -2395,6 +2395,8 @@ initGame();
 }
       
    function startGame(skipAd) {
+        resetBossVisualState(); // <--- AGGIUNGI QUI!!!
+
     // Aggiorna livello se necessario (come prima)
     if (pendingLevelToStart !== null) {
         gameState.currentLevel = pendingLevelToStart;
@@ -2689,7 +2691,9 @@ function update(deltaTime) {
     updateUI();
 }
       function updateEnemy(deltaTime) {
-          const enemy = gameState.enemy;
+            if (gameState.gameMode === "coop") return; // In co-op, posizione boss solo da server!
+
+const enemy = gameState.enemy;
           if (!enemy) return;
           
           const levelData = LEVEL_DATA[gameState.currentLevel - 1] || LEVEL_DATA[0];
@@ -2888,66 +2892,111 @@ function update(deltaTime) {
       }
 
       function shoot() {
-          const player = gameState.player;
-          const skills = gameState.player.skills;
-          let damage = 25;
-          
-          if (skills.targeting_system && player.precisionMode) {
-              damage *= 1.5;
-          }
-          
-          let targetX = gameState.mouse.x;
-          let targetY = gameState.mouse.y;
-          
-          if (gameState.isMobile && gameState.enemy) {
-              targetX = gameState.enemy.x;
-              targetY = gameState.enemy.y;
-          }
-          
-          const dx = targetX - player.x;
-          const dy = targetY - player.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          
-          const speed = 15;
-          const vx = dist > 0 ? (dx / dist) * speed : 0;
-          const vy = dist > 0 ? (dy / dist) * speed : -speed;
-          
-          gameState.bullets.push({
-              x: player.x,
-              y: player.y - 20,
-              vx: vx,
-              vy: vy,
-              color: '#00bcd4',
-              size: gameState.chaosBullets === "big" ? 28 : 6,
-              damage: damage
-          });
-          
-          createMuzzleFlash(player.x, player.y - 20);
-      }
+  // COOP: invia evento al server, non aggiungere subito il proiettile locale!
+  if (gameState.gameMode === "coop" && socket) {
+    let player = gameState.player;
+    let skills = player.skills || {};
+    let damage = 25;
+    if (skills.targeting_system && player.precisionMode) damage *= 1.5;
 
+    let targetX = gameState.mouse.x;
+    let targetY = gameState.mouse.y;
+    if (gameState.isMobile && gameState.enemy) {
+      targetX = gameState.enemy.x;
+      targetY = gameState.enemy.y;
+    }
+    const dx = targetX - player.x;
+    const dy = targetY - player.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const speed = 15;
+    const vx = dist > 0 ? (dx / dist) * speed : 0;
+    const vy = dist > 0 ? (dy / dist) * speed : -speed;
+
+    socket.emit('shoot', {
+      x: player.x,
+      y: player.y - 20,
+      vx, vy,
+      color: '#00bcd4',
+      size: gameState.chaosBullets === "big" ? 28 : 6,
+      damage,
+      owner: mySocketId // identifica chi ha sparato
+    });
+
+    createMuzzleFlash(player.x, player.y - 20);
+    return; // NON aggiungere il proiettile localmente!
+  }
+
+  // SINGLE PLAYER: come prima
+  let player = gameState.player;
+  let skills = player.skills || {};
+  let damage = 25;
+  if (skills.targeting_system && player.precisionMode) damage *= 1.5;
+
+  let targetX = gameState.mouse.x;
+  let targetY = gameState.mouse.y;
+  if (gameState.isMobile && gameState.enemy) {
+    targetX = gameState.enemy.x;
+    targetY = gameState.enemy.y;
+  }
+  const dx = targetX - player.x;
+  const dy = targetY - player.y;
+  const dist = Math.sqrt(dx * dx + dy * dy);
+  const speed = 15;
+  const vx = dist > 0 ? (dx / dist) * speed : 0;
+  const vy = dist > 0 ? (dy / dist) * speed : -speed;
+
+  gameState.bullets.push({
+    x: player.x,
+    y: player.y - 20,
+    vx, vy,
+    color: '#00bcd4',
+    size: gameState.chaosBullets === "big" ? 28 : 6,
+    damage,
+    owner: mySocketId
+  });
+
+  createMuzzleFlash(player.x, player.y - 20);
+}
       function chargedShot() {
-          const player = gameState.player;
-          const skills = gameState.player.skills;
-          let damage = 80;
-          
-          if (skills.targeting_system) {
-              damage *= 2;
-          }
-          
-          gameState.bullets.push({
-              x: player.x,
-              y: player.y - 20,
-              vx: 0,
-              vy: -18,
-              color: '#ffd700',
-              size: 15,
-              damage: damage,
-              charged: true
-          });
-          
-          createMuzzleFlash(player.x, player.y - 20, true);
-      }
+    const player = gameState.player;
+    const skills = gameState.player.skills;
+    let damage = 80;
 
+    if (skills.targeting_system) {
+        damage *= 2;
+    }
+
+    // PATCH: CO-OP multiplayer: invia al server come un normale proiettile!
+    if (gameState.gameMode === "coop" && socket) {
+        socket.emit('shoot', {
+            x: player.x,
+            y: player.y - 20,
+            vx: 0,
+            vy: -18,
+            color: '#ffd700',
+            size: 15,
+            damage: damage,
+            charged: true,
+            owner: mySocketId
+        });
+        createMuzzleFlash(player.x, player.y - 20, true);
+        return; // NON aggiungere localmente!
+    }
+
+    // SINGLEPLAYER / OFFLINE: aggiungi localmente
+    gameState.bullets.push({
+        x: player.x,
+        y: player.y - 20,
+        vx: 0,
+        vy: -18,
+        color: '#ffd700',
+        size: 15,
+        damage: damage,
+        charged: true
+    });
+
+    createMuzzleFlash(player.x, player.y - 20, true);
+}
       function createMuzzleFlash(x, y, charged = false) {
           const particleCount = charged ? 15 : 8;
           const color = charged ? '#ffd700' : '#00bcd4';
@@ -3546,7 +3595,9 @@ function forfeitMission() {
 }
 
      function restartGame() {
-    gameState.gameRunning = false;
+        resetBossVisualState(); // <--- AGGIUNGI QUI!!!
+
+        gameState.gameRunning = false;
     if (animationId) {
         cancelAnimationFrame(animationId);
     }
@@ -3874,16 +3925,17 @@ function renderEnemy() {
     });
 }
     
-    function updateObstacles() {
-    if (Math.random() < 0.035) spawnObstacle();
+    function updateObstacles(deltaTime) {
+  if (gameState.gameMode === "coop") return; // <-- AGGIUNGI QUESTA RIGA!
 
-    gameState.obstacles = gameState.obstacles.filter(o => {
-        o.x += o.vx;
-        o.y += o.vy;
-        o.angle += o.spin;
-        // Rimuovi se esce dal canvas o se è colpito
-        return o.y < canvas.height + 60 && o.x > -80 && o.x < canvas.width + 80 && !o.hit;
-    });
+  if (Math.random() < 0.035) spawnObstacle();
+
+  gameState.obstacles = gameState.obstacles.filter(o => {
+    o.x += o.vx * (deltaTime || 1);
+    o.y += o.vy * (deltaTime || 1);
+    o.angle += o.spin;
+    return o.y < canvas.height + 60 && o.x > -80 && o.x < canvas.width + 80 && !o.hit;
+  });
 }
       
       function resetStats() {
@@ -4349,19 +4401,28 @@ function renderPlayerTrail(ctx) {
   function checkObstacleCollisions() {
     const player = gameState.player;
     gameState.obstacles.forEach(ob => {
-        if (ob.hit) return; // già colpito
+        if (ob.hit) return;
         const dx = ob.x - player.x;
         const dy = ob.y - player.y;
         const dist = Math.sqrt(dx*dx + dy*dy);
-        const hitbox = 24 + ob.size / 2; // hitbox navicella + ostacolo
+        const hitbox = 24 + ob.size / 2;
         if (dist < hitbox) {
-            ob.hit = true; // segna come colpito
-            player.health -= (ob.type === "mine" ? 35 : 20); // mine fanno più danno
+            // PATCH: in co-op segnala al server quale ostacolo hai colpito!
+            if (gameState.gameMode === "coop" && socket && ob.id) {
+                socket.emit('obstacleHit', ob.id);
+            }
+            ob.hit = true;
+            player.health -= (ob.type === "mine" ? 35 : 20);
             spawnSuperExplosion(ob.x, ob.y, {colors:["#ffe700","#ff9800","#fff"],count:18});
             startShake(14, 10);
+        
+        
         }
     });
 }
+ 
+  
+  
   
   function renderObstacles() {
     gameState.obstacles.forEach(ob => {
@@ -4873,8 +4934,33 @@ function showCoopLobby() {
     socket = io();
   }
   setupBossListener();
+  
+  if (socket) {
+  socket.off?.('spawnBullet');
+  socket.on('spawnBullet', data => {
+    gameState.bullets.push(data);
+  });
+}
+  
+  if (socket) {
+  socket.on('obstaclesUpdate', obstacles => {
+    if (gameState.gameMode === "coop") {
+      gameState.obstacles = obstacles;
+    }
+  });
+}
 
-  // Pulizia listener precedenti
+if (socket) {
+  // ... altri eventi ...
+  socket.off?.('bossAttack');
+  socket.on('bossAttack', data => {
+    if (gameState.gameMode === "coop") {
+      executeBossAttackFromServer(data);
+    }
+  });
+}
+
+// Pulizia listener precedenti
   socket.off('connect');
   socket.off('lobbyUpdate');
   socket.off('gameStart');
@@ -4999,6 +5085,7 @@ function startCoopRaid() {
 }
 
 function startCoopRaidGame(data) {
+  resetBossVisualState(); // <--- AGGIUNGI QUESTA RIGA!!!
   gameState.currentLevel = 20;
   initializeCampaignEnemy();
   gameState.enemy.health = data.boss.health;
@@ -5040,6 +5127,8 @@ function startCoopGameLoop() {
     updateScreenShake();
     checkCollisionsCoop();
     render();
+    renderBossBar(); // <---- AGGIUNGI QUI!
+
     if (gameState.currentScreen === 'gameScreen' && gameState.gameMode === 'coop')
       requestAnimationFrame(coopLoop);
   }
@@ -5057,12 +5146,17 @@ function sendMyPosition() {
       x: gameState.player.x,
       y: gameState.player.y,
       angle: gameState.player.angle,
-      nickname: getPlayerName()
+      nickname: getPlayerName(),
+      // PATCH: sincronizza stato vitale
+      health: gameState.player.health,
+      maxHealth: gameState.player.maxHealth,
+      energy: gameState.player.energy,
+      maxEnergy: gameState.player.maxEnergy,
+      lives: gameState.player.lives
     });
   }
 }
 
-// --- COLLISIONI SOLO DANNO AL BOSS ---
 function checkCollisionsCoop() {
   for (let i = gameState.bullets.length - 1; i >= 0; i--) {
     const bullet = gameState.bullets[i];
@@ -5070,39 +5164,48 @@ function checkCollisionsCoop() {
     if (!boss) continue;
     const dist = Math.sqrt(Math.pow(bullet.x - boss.x, 2) + Math.pow(bullet.y - boss.y, 2));
     if (dist < 60) {
-      coopShootBoss(bullet.damage);
+      // Solo il proprietario manda il danno!
+      if (bullet.owner === mySocketId) {
+        coopShootBoss(bullet.damage);
+      }
       createHitParticles(bullet.x, bullet.y, bullet.color);
       gameState.bullets.splice(i, 1);
       updateUI();
     }
   }
 }
-
  
 // === PATCH: Boss co-op, barra vita fluida e funzionante ===
 
 // 1. Variabili globali
 let bossTarget = { x: null, y: null, angle: null };
-let bossVisualHealth = null;
+let bossServerHealth = null;     // <-- LA VERA health ricevuta dal server!
+let bossMaxHealth = null;        // <-- La maxHealth del boss dal server!
+let bossVisualHealth = null;     // <-- Per l'interpolazione fluida della barra
 let lastFrameTime = performance.now();
 
-// 2. Socket.on('bossUpdate') patchato
+function resetBossVisualState() {
+  bossVisualHealth = null;
+  bossServerHealth = null;
+  bossMaxHealth = null;
+  bossTarget = { x: null, y: null, angle: null };
+}
+
+
 function setupBossListener() {
   if (!socket) return;
   socket.off?.('bossUpdate');
   socket.on('bossUpdate', data => {
-    if (gameState.enemy) {
-      gameState.enemy.maxHealth = data.maxHealth;
-      gameState.enemy.targetHealth = data.health; // PATCH: aggiorna solo la target!
-      if (typeof data.x === "number") bossTarget.x = data.x;
-      if (typeof data.y === "number") bossTarget.y = data.y;
-      if (typeof data.angle === "number") bossTarget.angle = data.angle;
-      updateUI();
-    }
+    bossServerHealth = data.health;
+    bossMaxHealth = data.maxHealth;
+    if (bossVisualHealth === null) bossVisualHealth = bossServerHealth;
+    // PATCH: salva bersaglio di posizione boss
+    bossTarget.x = data.x;
+    bossTarget.y = data.y;
+    bossTarget.angle = data.angle;
   });
 }
 
-// 3. Interpolazione posizione boss
 function interpolateBoss() {
   if (
     gameState.gameMode === "coop" &&
@@ -5110,16 +5213,15 @@ function interpolateBoss() {
     bossTarget.x !== null &&
     bossTarget.y !== null
   ) {
-   // A:
-gameState.enemy.x += (bossTarget.x - gameState.enemy.x) * 0.13;  // più fluido!
-gameState.enemy.y += (bossTarget.y - gameState.enemy.y) * 0.13;
+    // Interpolazione fluida
+    gameState.enemy.x += (bossTarget.x - gameState.enemy.x) * 0.13;
+    gameState.enemy.y += (bossTarget.y - gameState.enemy.y) * 0.13;
     if (bossTarget.angle !== null) {
       gameState.enemy.angle += (bossTarget.angle - gameState.enemy.angle) * 0.18;
     }
   }
 }
 
-// 4. Interpolazione barra della vita boss
 function interpolateBossHealth() {
   if (
     gameState.gameMode === "coop" &&
@@ -5131,6 +5233,7 @@ function interpolateBossHealth() {
     if (Math.abs(bossVisualHealth - gameState.enemy.targetHealth) < 1) {
       bossVisualHealth = gameState.enemy.targetHealth;
     }
+    console.log("interpolateBossHealth:", bossVisualHealth, "/", gameState.enemy.maxHealth); // <--- LOG
     const percent = Math.max(0, bossVisualHealth) / gameState.enemy.maxHealth * 100;
     document.getElementById('enemyHealthFill').style.width = percent + '%';
     document.getElementById('enemyHealthText').textContent = `${Math.max(0, Math.floor(bossVisualHealth))} / ${gameState.enemy.maxHealth}`;
@@ -5331,6 +5434,165 @@ function showScreen(screenId) {
             pauseGame();
         }
     }
+}
+  
+  function renderBossBar() {
+  if (bossServerHealth === null || bossMaxHealth === null) return;
+  if (bossVisualHealth === null) bossVisualHealth = bossServerHealth;
+  // Interpolazione fluida (più reattiva = 0.4)
+  bossVisualHealth += (bossServerHealth - bossVisualHealth) * 0.4;
+  if (Math.abs(bossVisualHealth - bossServerHealth) < 0.7) bossVisualHealth = bossServerHealth;
+  // Aggiorna barra
+  const percent = Math.max(0, bossVisualHealth) / bossMaxHealth * 100;
+  document.getElementById('enemyHealthFill').style.width = percent + '%';
+  document.getElementById('enemyHealthText').textContent =
+    `${Math.max(0, Math.floor(bossVisualHealth))} / ${bossMaxHealth}`;
+}
+ 
+  // Esegui il pattern proiettili boss in co-op, chiamata dal server
+function executeBossAttackFromServer({ pattern, x, y }) {
+  // Usa i dati del livello 20 come riferimento per il raid co-op
+  const levelData = LEVEL_DATA[19] || LEVEL_DATA[0];
+  const bulletSpeed = levelData.bulletSpeed || 4;
+  const bulletCount = 3.5; // Puoi regolare per più difficoltà
+
+  switch (pattern) {
+    case 'basic':
+      for (let i = 0; i < Math.floor(3 * bulletCount); i++) {
+        gameState.enemyBullets.push({
+          x: x + (i - 1) * 30,
+          y: y + 50,
+          vx: (i - 1) * 0.5,
+          vy: bulletSpeed,
+          color: '#f44336',
+          size: 8,
+          damage: 15
+        });
+      }
+      break;
+    case 'spread':
+      const spreadCount = Math.floor(5 * bulletCount);
+      for (let i = 0; i < spreadCount; i++) {
+        const angle = (i / spreadCount) * Math.PI - Math.PI / 2;
+        gameState.enemyBullets.push({
+          x: x,
+          y: y + 50,
+          vx: Math.cos(angle) * bulletSpeed,
+          vy: Math.sin(angle) * bulletSpeed + 2,
+          color: '#e91e63',
+          size: 6,
+          damage: 12
+        });
+      }
+      break;
+    case 'tracking':
+      const dx = gameState.player.x - x;
+      const dy = gameState.player.y - y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      for (let i = 0; i < Math.floor(2 * bulletCount); i++) {
+        gameState.enemyBullets.push({
+          x: x,
+          y: y + 50,
+          vx: (dx / dist) * bulletSpeed + (Math.random() - 0.5) * 1,
+          vy: (dy / dist) * bulletSpeed + (Math.random() - 0.5) * 1,
+          color: '#9c27b0',
+          size: 10,
+          damage: 18,
+          tracking: true,
+          trackingStrength: 0.03
+        });
+      }
+      break;
+    case 'laser':
+      for (let i = 0; i < 15; i++) {
+        gameState.enemyBullets.push({
+          x: x,
+          y: y + 50 + i * 12,
+          vx: 0,
+          vy: bulletSpeed * 1.5,
+          color: '#ff9800',
+          size: 12,
+          damage: 20
+        });
+      }
+      break;
+    case 'wave':
+      for (let i = 0; i < Math.floor(8 * bulletCount); i++) {
+        const angle = (i / 8) * Math.PI * 2;
+        gameState.enemyBullets.push({
+          x: x,
+          y: y + 50,
+          vx: Math.cos(angle) * 2,
+          vy: Math.sin(angle) * 2 + bulletSpeed,
+          color: '#673ab7',
+          size: 8,
+          damage: 15,
+          wave: true,
+          waveOffset: i * 0.5
+        });
+      }
+      break;
+    case 'swarm':
+      for (let i = 0; i < Math.floor(12 * bulletCount); i++) {
+        gameState.enemyBullets.push({
+          x: x + (Math.random() - 0.5) * 100,
+          y: y + 30,
+          vx: (Math.random() - 0.5) * 4,
+          vy: bulletSpeed * 0.8,
+          color: '#3f51b5',
+          size: 6,
+          damage: 10
+        });
+      }
+      break;
+    case 'spiral':
+      const spiralCount = Math.floor(10 * bulletCount);
+      for (let i = 0; i < spiralCount; i++) {
+        const angle = (i / spiralCount) * Math.PI * 4 + (Date.now() * 0.01);
+        gameState.enemyBullets.push({
+          x: x,
+          y: y + 50,
+          vx: Math.cos(angle) * 3,
+          vy: Math.sin(angle) * 3 + bulletSpeed,
+          color: '#2196f3',
+          size: 7,
+          damage: 14
+        });
+      }
+      break;
+    case 'chaos':
+      for (let i = 0; i < Math.floor(15 * bulletCount); i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 4 + 2;
+        gameState.enemyBullets.push({
+          x: x,
+          y: y + 50,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed + 1,
+          color: '#00bcd4',
+          size: Math.random() * 8 + 4,
+          damage: 16
+        });
+      }
+      break;
+    case 'ultimate':
+      for (let i = 0; i < Math.floor(20 * bulletCount); i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 6 + 3;
+        gameState.enemyBullets.push({
+          x: x,
+          y: y + 50,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          color: '#ffd700',
+          size: 15,
+          damage: 25,
+          ultimate: true
+        });
+      }
+      break;
+  }
+  gameState.bulletHellIntensity = Math.min(100, gameState.bulletHellIntensity + 2);
 }
   
   
