@@ -1,9 +1,10 @@
-// --- Stellar Guardian Multiplayer Server OPTIMIZED ---
+// --- Stellar Guardian Multiplayer Server OPTIMIZED + COOP DREAMLO LEADERBOARD ---
 
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
 const path = require('path');
+const fetch = require('node-fetch'); // <-- AGGIUNGI QUESTO
 
 const app = express();
 const server = http.createServer(app);
@@ -44,6 +45,16 @@ function resetGame() {
   coopBoss.dir = 1; coopBoss.yDir = 1;
   coopObstacles = [];
   gameInProgress = false; bossAttackCooldown = 0;
+}
+
+// --- DREAMLO CO-OP LEADERBOARD ---
+function submitCoopTeamScore(teamName, score) {
+  const dreamloKey = "5z7d7N8IBkSwrhJdyZAXxAYn3Jv1KyTEm6GJZoIALRBw"; // Public key Dreamlo
+  const tag = "coopraid";
+  const url = `https://dreamlo.com/lb/${dreamloKey}/add/${encodeURIComponent(teamName)}/${score}/${tag}`;
+  fetch(url)
+    .then(() => console.log(`[Dreamlo] Co-op score inviato: ${teamName} - ${score}`))
+    .catch(err => console.error("[Dreamlo] Errore invio co-op:", err));
 }
 
 // --- Obstacles ---
@@ -147,6 +158,9 @@ io.on('connection', (socket) => {
     io.emit('bossUpdate', { ...coopBoss });
     if (coopBoss.health <= 0) {
       gameInProgress = false;
+      // --- DREAMLO PATCH: invia score co-op ---
+      const squadNicknames = Object.values(players).map(p => p.nickname).join("_") || "Team";
+      submitCoopTeamScore(squadNicknames, Math.floor(coopBoss.maxHealth));
       io.emit('bossDefeated');
     }
   });
