@@ -1599,6 +1599,7 @@ body.loading {
     <button class="menu-btn primary" onclick="startCoopRaid()">Start (test host)</button>
     <button class="menu-btn" onclick="showScreen('mainMenu')">Back</button>
     <button class="menu-btn" id="jitsiBtn" style="position:fixed;bottom:20px;right:20px;z-index:10001;" onclick="toggleJitsi()">🎤 Voice Chat (Jitsi)</button>
+    <button class="menu-btn" onclick="showCoopLeaderboard()">🤝 CO-OP LEADERBOARD</button>
 </div>
 </div>
 
@@ -1609,6 +1610,17 @@ body.loading {
     style="width:100%; height:100%; border:0; border-radius:10px;"
     allow="camera; microphone; fullscreen; display-capture"></iframe>
   <button onclick="toggleJitsi()" style="position:absolute;top:4px;right:4px;z-index:10001;background:#ffd700;border:none;border-radius:8px;padding:2px 8px;cursor:pointer;">❌</button>
+</div>
+  
+  
+  <div class="screen" id="coopLeaderboardScreen">
+  <button class="menu-btn home-btn" onclick="showScreen('mainMenu')">🏠 HOME</button>
+  <div class="menu-content">
+    <h2 class="game-subtitle">Co-op Teams Leaderboard</h2>
+    <div id="coopLeaderboardList">Loading...</div>
+    <button class="menu-btn" onclick="showCoopLeaderboard()">Update</button>
+    <button class="menu-btn" onclick="showScreen('mainMenu')">Back</button>
+  </div>
 </div>
   
   <script>
@@ -5595,6 +5607,40 @@ function executeBossAttackFromServer({ pattern, x, y }) {
   gameState.bulletHellIntensity = Math.min(100, gameState.bulletHellIntensity + 2);
 }
   
+  
+  function fetchCoopLeaderboard(callback) {
+  const dreamloKey = "5z7d7N8IBkSwrhJdyZAXxAYn3Jv1KyTEm6GJZoIALRBw"; // tua public key Dreamlo
+  const tag = "coopraid"; // scegli un tag chiaro!
+  const url = `https://dreamlo.com/lb/${dreamloKey}/pipe-get/${tag}`;
+  fetch(url)
+    .then(res => res.text())
+    .then(txt => {
+      const rows = txt.trim().split('\n');
+      const leaderboard = rows
+        .map(row => {
+          const [team, score] = row.split('|');
+          if (!team || isNaN(parseInt(score))) return null;
+          return { team, score: parseInt(score) };
+        })
+        .filter(entry => entry !== null)
+        .sort((a, b) => b.score - a.score);
+      callback(leaderboard);
+    });
+}
+  
+  function showCoopLeaderboard() {
+  showScreen('coopLeaderboardScreen');
+  document.getElementById('coopLeaderboardList').innerHTML = 'Loading...';
+  fetchCoopLeaderboard(leaderboard => {
+    let html = '<ol style="font-size:1.2rem;">';
+    leaderboard.forEach(entry => {
+      html += `<li><b>${entry.team.replace(/_/g, " / ")}</b> — <span style="color:#ffd700;">${entry.score}</span></li>`;
+    });
+    if (leaderboard.length === 0) html += "<li>No team scores yet!</li>";
+    html += '</ol>';
+    document.getElementById('coopLeaderboardList').innerHTML = html;
+  });
+}
   
   </script>
   
