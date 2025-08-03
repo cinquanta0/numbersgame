@@ -1150,6 +1150,38 @@ body.loading {
   }
    
    
+   /* PATCH: Joystick mobile più grande e spazioso */
+@media (pointer: coarse), (max-width: 900px) {
+  .mobile-joystick {
+    width: clamp(130px, 25vw, 180px) !important;
+    height: clamp(130px, 25vw, 180px) !important;
+    left: clamp(22px, 5vw, 38px) !important;
+    bottom: clamp(22px, 5vw, 38px) !important;
+    border-width: 4px !important;
+    box-shadow: 0 0 22px #00bcd4cc;
+  }
+  .mobile-joystick-knob {
+    width: clamp(48px, 10vw, 68px) !important;
+    height: clamp(48px, 10vw, 68px) !important;
+    border-width: 3px !important;
+  }
+}
+
+@media (max-width: 600px) {
+  /* Ancora più grande su telefoni piccoli */
+  .mobile-joystick {
+    width: clamp(130px, 36vw, 200px) !important;
+    height: clamp(130px, 36vw, 200px) !important;
+    left: clamp(14px, 5vw, 22px) !important;
+    bottom: clamp(14px, 5vw, 22px) !important;
+  }
+  .mobile-joystick-knob {
+    width: clamp(50px, 14vw, 70px) !important;
+    height: clamp(50px, 14vw, 70px) !important;
+  }
+}
+   
+   
    </style>
 </head>
 <body>
