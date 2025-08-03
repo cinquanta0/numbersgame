@@ -1654,18 +1654,18 @@ body.loading {
     </div>
 </div>
 
-<!-- LOBBY COOP - POSIZIONE GIUSTA! -->
 <div class="screen" id="coopLobby">
   <div class="menu-content">
     <h2 class="game-subtitle">Raid Co-op - Wait for other players...</h2>
     <div id="coopPlayersList">Loading...</div>
-            
-        <button class="menu-btn" onclick="showCoopLeaderboard()">🤝 CO-OP LEADERBOARD</button>
-
-    <button class="menu-btn primary" onclick="startCoopRaid()">Start (test host)</button>
-    <button class="menu-btn" onclick="showScreen('mainMenu')">Back</button>
-    <button class="menu-btn" id="jitsiBtn" style="position:fixed;bottom:20px;right:20px;z-index:10001;" onclick="toggleJitsi()">🎤 Voice Chat (Jitsi)</button>
-
+    
+    <!-- Nuovo contenitore bottoni -->
+    <div class="lobby-buttons">
+      <button class="menu-btn" onclick="showCoopLeaderboard()">🤝 CO-OP LEADERBOARD</button>
+      <button class="menu-btn primary" onclick="startCoopRaid()">Start (test host)</button>
+      <button class="menu-btn" onclick="showScreen('mainMenu')">Back</button>
+      <button class="menu-btn" id="jitsiBtn" onclick="toggleJitsi()">🎤 Voice Chat (Jitsi)</button>
+    </div>
   </div>
 </div>
 
@@ -6229,3 +6229,4 @@ function renderEnemy() {
   
 </body>
 </html>
+v
