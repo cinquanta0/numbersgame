@@ -5722,7 +5722,7 @@ function isSummerEventActive() {
 }
  
  
- // === PATCH MOBILE GAMEPLAY: INCOLLA QUESTO ALLA FINE DEL TUO index.html (prima di </body>) ===
+// === PATCH MOBILE: AIM ASSIST SOLO, SENZA AUTO-FIRE ===
 
 // 1. Forza landscape su mobile all'avvio
 window.addEventListener('DOMContentLoaded', function() {
@@ -5739,7 +5739,6 @@ function isMobileDevice() {
 }
 
 // 3. PATCH: meno proiettili e più lenti su mobile
-// Sostituisci la logica di bulletCount/bulletSpeed nei pattern boss con questa funzione
 function getMobileBulletParams(baseCount, baseSpeed) {
   if (isMobileDevice()) {
     return {
@@ -5750,8 +5749,15 @@ function getMobileBulletParams(baseCount, baseSpeed) {
   return { count: baseCount, speed: baseSpeed };
 }
 
-// *** MODIFICA la funzione executeAttackPattern così: ***
-const oldExecuteAttackPattern = window.executeAttackPattern;
+// 4. PATCH: hitbox player più piccola su mobile
+function getPlayerHitboxSize() {
+  let baseSize = 25;
+  if (isMobileDevice()) baseSize = 13;
+  if (gameState.player.precisionMode) baseSize *= 0.7;
+  return baseSize;
+}
+
+// 5. PATCH: sostituisci executeAttackPattern con la versione mobile
 window.executeAttackPattern = function(pattern) {
   const enemy = gameState.enemy;
   const levelData = LEVEL_DATA[gameState.currentLevel - 1] || LEVEL_DATA[0];
@@ -5896,17 +5902,7 @@ window.executeAttackPattern = function(pattern) {
   }
 };
 
-
-// 4. PATCH: hitbox player più piccola su mobile
-function getPlayerHitboxSize() {
-  let baseSize = 25;
-  if (isMobileDevice()) baseSize = 13;
-  if (gameState.player.precisionMode) baseSize *= 0.7;
-  return baseSize;
-}
-
-// *** MODIFICA LA COLLISIONE PROIETTILE-PLAYER COSÌ ***
-const oldCheckCollisions = window.checkCollisions;
+// 6. PATCH: collisione proiettile-player con hitbox ridotta su mobile
 window.checkCollisions = function() {
   // Player bullets hitting enemy
   gameState.bullets.forEach((bullet, bulletIndex) => {
@@ -5969,8 +5965,7 @@ window.checkCollisions = function() {
   checkObstacleCollisions();
 };
 
-// 5. PATCH: auto-fire sempre attivo su mobile
-const oldUpdatePlayer = window.updatePlayer;
+// 7. PATCH: updatePlayer SENZA auto-fire, solo aim assist mobile
 window.updatePlayer = function(deltaTime) {
   const player = gameState.player;
   const skills = gameState.player.skills;
@@ -6026,10 +6021,8 @@ window.updatePlayer = function(deltaTime) {
   // Keep player in bounds
   player.x = Math.max(50, Math.min(canvas.width - 50, player.x));
   player.y = Math.max(50, Math.min(canvas.height - 50, player.y));
-  // PATCH: auto-fire su mobile
-  if (isMobileDevice()) {
-    gameState.keys['shoot'] = true;
-  }
+  // --- NON C'E' AUTO-FIRE SU MOBILE! ---
+  // Solo aim assist: la mira si sposta verso il boss, ma si spara solo premendo "shoot"
   // Shooting
   if ((gameState.keys['shoot'] || gameState.keys[' '] || gameState.keys['Space'] || gameState.touchControls.shooting) && player.energy > 0) {
     if (Math.random() < 0.25) {
@@ -6053,7 +6046,74 @@ window.updatePlayer = function(deltaTime) {
   updateUI();
 };
 
-// === FINE PATCH MOBILE GAMEPLAY ===
+// --- La funzione shoot rimane invariata: su mobile mira verso il boss, ma NON spara da solo! ---
+
+// === FINE PATCH ===
+ 
+ 
+ // === PATCH: Popup suggerimento landscape su mobile ===
+
+// 1. Crea l'elemento popup in HTML (lo inserisce via JS all'avvio)
+function createOrientationAdvicePopup() {
+  if (document.getElementById('orientationAdvicePopup')) return; // già presente
+
+  const popup = document.createElement('div');
+  popup.id = 'orientationAdvicePopup';
+  popup.style.position = 'fixed';
+  popup.style.top = '50%';
+  popup.style.left = '50%';
+  popup.style.transform = 'translate(-50%, -50%)';
+  popup.style.background = 'linear-gradient(45deg, #00bcd4, #2196f3)';
+  popup.style.color = '#fff';
+  popup.style.padding = '2rem 2.5rem';
+  popup.style.borderRadius = '22px';
+  popup.style.boxShadow = '0 0 40px #00bcd488';
+  popup.style.zIndex = 99999;
+  popup.style.fontSize = '1.3rem';
+  popup.style.textAlign = 'center';
+  popup.style.display = 'none';
+  popup.innerHTML = `
+    <div style="font-size:2.3rem;margin-bottom:0.5em;">🔄</div>
+    <b>Rotate your phone horizontally<br>for the best experience!</b>
+    <div style="margin-top:1em;"><button onclick="document.getElementById('orientationAdvicePopup').style.display='none'" style="margin-top:0.5em;padding:0.6em 1.3em;border-radius:15px;background:#ffd700;color:#222;font-weight:bold;border:none;cursor:pointer;">OK</button></div>
+  `;
+  document.body.appendChild(popup);
+}
+
+// 2. Mostra il popup se in portrait su mobile
+function checkAndShowOrientationAdvice() {
+  if (!isMobileDevice()) return;
+  // Controlla se siamo in portrait (più alti che larghi)
+  const portrait = window.innerHeight > window.innerWidth;
+  if (portrait && typeof setOrientation === "function" && gameState.orientation === "auto") {
+    createOrientationAdvicePopup();
+    const popup = document.getElementById('orientationAdvicePopup');
+    if (popup) {
+      popup.style.display = 'block';
+    }
+  } else {
+    // Nascondi se in landscape
+    const popup = document.getElementById('orientationAdvicePopup');
+    if (popup) popup.style.display = 'none';
+  }
+}
+
+// 3. Rileva il cambio orientamento e mostra/nasconde il popup
+window.addEventListener('orientationchange', checkAndShowOrientationAdvice);
+window.addEventListener('resize', checkAndShowOrientationAdvice);
+
+// 4. All'avvio della partita, mostra il popup se serve
+window.addEventListener('DOMContentLoaded', function() {
+  setTimeout(checkAndShowOrientationAdvice, 300); // Delay per layout
+});
+
+// 5. Mostra il popup anche quando si entra nel gameScreen (se serve)
+const originalShowScreen = window.showScreen;
+window.showScreen = function(screenId) {
+  originalShowScreen(screenId);
+  if (screenId === 'gameScreen') setTimeout(checkAndShowOrientationAdvice, 350);
+};
+
  
  </script>
   
