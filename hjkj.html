@@ -6115,6 +6115,81 @@ window.showScreen = function(screenId) {
 };
 
  
+ // PATCH: Boss co-op visibile su mobile
+
+function getSafeBossPosition(x, y) {
+  // Calcola margine minimo per boss su mobile (landscape/portrait)
+  let marginX = 80, marginY = 80;
+  if (isMobileDevice()) {
+    // Aumenta margini su mobile per evitare taglio
+    marginX = Math.max(window.innerWidth * 0.08, 60);
+    marginY = Math.max(window.innerHeight * 0.08, 60);
+    // Se landscape molto stretto, aumenta ancora
+    if (window.innerWidth > window.innerHeight) {
+      marginY = Math.max(window.innerHeight * 0.12, 80);
+    }
+  }
+  // Limita la posizione
+  const safeX = Math.max(marginX, Math.min(x, window.innerWidth - marginX));
+  const safeY = Math.max(marginY, Math.min(y, window.innerHeight - marginY));
+  return { x: safeX, y: safeY };
+}
+
+// PATCH: Interpolazione boss co-op (aggiungi limitazione posizione)
+function interpolateBoss() {
+  if (
+    gameState.gameMode === "coop" &&
+    gameState.enemy &&
+    bossTarget.x !== null &&
+    bossTarget.y !== null
+  ) {
+    // Interpolazione fluida
+    let newX = gameState.enemy.x + (bossTarget.x - gameState.enemy.x) * 0.13;
+    let newY = gameState.enemy.y + (bossTarget.y - gameState.enemy.y) * 0.13;
+    // Limita posizione
+    const safe = getSafeBossPosition(newX, newY);
+    gameState.enemy.x = safe.x;
+    gameState.enemy.y = safe.y;
+    if (bossTarget.angle !== null) {
+      gameState.enemy.angle += (bossTarget.angle - gameState.enemy.angle) * 0.18;
+    }
+  }
+}
+
+// PATCH: Riduci dimensione boss su mobile landscape
+function renderEnemy() {
+  const enemy = gameState.enemy;
+  if (!enemy || enemy.health <= 0) return;
+  ctx.save();
+  ctx.translate(enemy.x, enemy.y);
+  ctx.rotate(enemy.angle || 0);
+
+  // Modifica grandezza su mobile
+  let bossSize = 80;
+  if (isMobileDevice()) {
+    bossSize = Math.min(window.innerWidth, window.innerHeight) < 500 ? 54 : 64;
+    // Landscape molto stretto (altezza bassa): riduci ancora
+    if (window.innerWidth > window.innerHeight && window.innerHeight < 360) bossSize = 44;
+  }
+
+  if (gameState.chaosBossMeme) {
+    ctx.font = bossSize + "px Arial";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("😂", 0, 0);
+  } else if (bossImage.complete && bossImage.naturalWidth !== 0) {
+    ctx.drawImage(bossImage, -bossSize/2, -bossSize/2, bossSize, bossSize);
+  } else {
+    ctx.fillStyle = '#f44336';
+    ctx.beginPath();
+    ctx.arc(0, 0, bossSize/2, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  ctx.restore();
+}
+ 
+ 
  </script>
   
 </body>
