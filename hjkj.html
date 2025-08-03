@@ -1659,11 +1659,14 @@ body.loading {
   <div class="menu-content">
     <h2 class="game-subtitle">Raid Co-op - Wait for other players...</h2>
     <div id="coopPlayersList">Loading...</div>
+            
+        <button class="menu-btn" onclick="showCoopLeaderboard()">🤝 CO-OP LEADERBOARD</button>
+
     <button class="menu-btn primary" onclick="startCoopRaid()">Start (test host)</button>
     <button class="menu-btn" onclick="showScreen('mainMenu')">Back</button>
     <button class="menu-btn" id="jitsiBtn" style="position:fixed;bottom:20px;right:20px;z-index:10001;" onclick="toggleJitsi()">🎤 Voice Chat (Jitsi)</button>
-    <button class="menu-btn" onclick="showCoopLeaderboard()">🤝 CO-OP LEADERBOARD</button>
-</div>
+
+  </div>
 </div>
 
   <!-- Contenitore iframe Jitsi nascosto di default -->
@@ -2693,7 +2696,7 @@ function update(deltaTime) {
 
     // Mobile joystick movement
     if (gameState.isMobile && gameState.touchControls.joystick.active) {
-        const joystickStrength = 0.3;
+        const joystickStrength = 0.18;
         const moveX = gameState.touchControls.joystick.currentX * joystickStrength;
         const moveY = gameState.touchControls.joystick.currentY * joystickStrength;
 
