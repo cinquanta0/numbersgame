@@ -3986,7 +3986,7 @@ function renderEnemy() {
 
     function spawnObstacle() {
     if (!gameState.obstacles) gameState.obstacles = [];
-    const types = ["asteroid", "mine"];
+    const types = ["asteroid"]; // SOLO ASTEROIDI, niente mine!
     const type = types[Math.floor(Math.random() * types.length)];
     const x = Math.random() * canvas.width;
     const size = 32 + Math.random() * 32;
@@ -6011,7 +6011,7 @@ window.updatePlayer = function(deltaTime) {
   speed *= deltaTime;
   // Mobile joystick movement
   if (isMobileDevice() && gameState.touchControls.joystick.active) {
-    const joystickStrength = 0.3;
+    const joystickStrength = 0.18;
     const moveX = gameState.touchControls.joystick.currentX * joystickStrength;
     const moveY = gameState.touchControls.joystick.currentY * joystickStrength;
     player.x += moveX;
