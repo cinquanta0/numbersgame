@@ -1,10 +1,11 @@
 // --- Stellar Guardian Multiplayer Server OPTIMIZED + COOP DREAMLO LEADERBOARD ---
+// PATCH: Solo ASTEROIDI in co-op (NO MINE) + ottimizzazione mobile
 
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
 const path = require('path');
-const fetch = require('node-fetch'); // <-- AGGIUNGI QUESTO
+const fetch = require('node-fetch');
 
 const app = express();
 const server = http.createServer(app);
@@ -42,6 +43,7 @@ function generateUniqueId() { return Math.random().toString(36).substr(2, 9) + D
 function resetGame() {
   coopBoss.x = 500; coopBoss.y = 150; coopBoss.angle = 0;
   coopBoss.maxHealth = 25000; // Leave health as is
+  coopBoss.health = 25000; // Reset health at new game
   coopBoss.dir = 1; coopBoss.yDir = 1;
   coopObstacles = [];
   gameInProgress = false; bossAttackCooldown = 0;
@@ -49,7 +51,7 @@ function resetGame() {
 
 // --- DREAMLO CO-OP LEADERBOARD ---
 function submitCoopTeamScore(teamName, score) {
-  const dreamloKey = "5z7d7N8IBkSwrhJdyZAXxAYn3Jv1KyTEm6GJZoIALRBw"; // Public key Dreamlo
+  const dreamloKey = "5z7d7N8IBkSwrhJdyZAXxAYn3Jv1KyTEm6GJZoIALRBw";
   const tag = "coopraid";
   const url = `https://dreamlo.com/lb/${dreamloKey}/add/${encodeURIComponent(teamName)}/${score}/${tag}`;
   fetch(url)
@@ -57,11 +59,11 @@ function submitCoopTeamScore(teamName, score) {
     .catch(err => console.error("[Dreamlo] Errore invio co-op:", err));
 }
 
-// --- Obstacles ---
+// --- Obstacles (PATCH: solo asteroid in co-op) ---
 function spawnGlobalObstacle() {
   const id = generateUniqueId();
-  const types = ["asteroid", "mine"];
-  const type = types[Math.floor(Math.random() * types.length)];
+  // PATCH: solo asteroid
+  const type = "asteroid";
   coopObstacles.push({
     id, x: Math.random() * GAME_WIDTH, y: -40,
     vx: (Math.random() - 0.5) * 1.5, vy: 2 + Math.random() * 2,
@@ -101,7 +103,7 @@ setInterval(() => {
 
     io.emit('bossUpdate', { ...coopBoss });
 
-    // --- BOSS ATTACK LOGIC: solo se c'è almeno un player vivo (latency saver) ---
+    // --- BOSS ATTACK LOGIC: solo se c'è almeno un player vivo ---
     bossAttackCooldown -= 40;
     if (bossAttackCooldown <= 0 && Object.keys(players).length > 0) {
       let unlockedPatterns = Math.min(Math.ceil((coopBoss.maxHealth - coopBoss.health) / 3000) + 2, BOSS_ATTACK_PATTERNS.length);
@@ -110,15 +112,15 @@ setInterval(() => {
       bossAttackCooldown = Math.random() * (MAX_ATTACK_INTERVAL - MIN_ATTACK_INTERVAL) + MIN_ATTACK_INTERVAL;
     }
 
+    // PATCH: solo asteroid!
     if (Math.random() < 0.035) spawnGlobalObstacle();
     updateObstacles();
     io.emit('obstaclesUpdate', coopObstacles);
   }
-}, 50); // 20Hz: ottimo compromesso per azione/co-op
+}, 50); // 20Hz
 
 // --- SOCKET.IO HANDLERS ---
 io.on('connection', (socket) => {
-  // JOIN LOBBY
   socket.on('joinLobby', (data) => {
     players[socket.id] = {
       id: socket.id,
@@ -132,7 +134,6 @@ io.on('connection', (socket) => {
     inviaLobbyAggiornata();
   });
 
-  // PLAYER MOVE (solo dati necessari, no broadcast diretto)
   socket.on('playerMove', (data) => {
     if (players[socket.id]) {
       players[socket.id].x = data.x;
@@ -142,7 +143,6 @@ io.on('connection', (socket) => {
     }
   });
 
-  // START RAID (solo host)
   socket.on('startCoopRaid', () => {
     if (socket.id !== hostId) return;
     resetGame();
@@ -150,7 +150,6 @@ io.on('connection', (socket) => {
     io.emit('gameStart', { boss: { ...coopBoss }, players: Object.values(players) });
   });
 
-  // BOSS DAMAGE (no overkill)
   socket.on('bossDamage', ({ damage }) => {
     if (!gameInProgress || coopBoss.health <= 0) return;
     coopBoss.health -= damage;
@@ -158,30 +157,25 @@ io.on('connection', (socket) => {
     io.emit('bossUpdate', { ...coopBoss });
     if (coopBoss.health <= 0) {
       gameInProgress = false;
-      // --- DREAMLO PATCH: invia score co-op ---
       const squadNicknames = Object.values(players).map(p => p.nickname).join("_") || "Team";
       submitCoopTeamScore(squadNicknames, Math.floor(coopBoss.maxHealth));
       io.emit('bossDefeated');
     }
   });
 
-  // VOICE CHAT STATE
   socket.on('voiceActive', (data) => {
     playerVoiceStatus[socket.id] = !!data.active;
     io.emit('voiceActive', { id: socket.id, active: !!data.active });
   });
 
-  // SHOOT: Propaga a tutti (nessun check, lato client le collisioni)
   socket.on('shoot', (data) => io.emit('spawnBullet', data));
 
-  // Ostacolo colpito: segna come colpito
   socket.on('obstacleHit', (obstacleId) => {
     const ob = coopObstacles.find(o => o.id === obstacleId);
     if (ob) ob.hit = true;
     io.emit('obstaclesUpdate', coopObstacles);
   });
 
-  // --- DISCONNESSIONE ---
   socket.on('disconnect', () => {
     delete players[socket.id];
     delete playerVoiceStatus[socket.id];
@@ -198,7 +192,7 @@ io.on('connection', (socket) => {
     io.emit('lobbyUpdate', { players: Object.values(players) });
   }
 
-  // --- WebRTC Signaling (lasciato invariato, ottimo) ---
+  // --- WebRTC Signaling ---
   socket.on('webrtc-offer', (data) =>
     socket.to(data.targetId).emit('webrtc-offer', { fromId: socket.id, sdp: data.sdp }));
   socket.on('webrtc-answer', (data) =>
