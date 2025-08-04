@@ -168,8 +168,22 @@ io.on('connection', (socket) => {
     io.emit('voiceActive', { id: socket.id, active: !!data.active });
   });
 
+
+ // --- CHAT PATCH: chat testuale multiplayer ---
+  socket.on('chatMessage', (data) => {
+    if (typeof data.text === "string" && data.text.length <= 200) {
+      io.emit('chatMessage', {
+        nickname: data.nickname || 'Player',
+        text: data.text
+      });
+    }
+  });
+
+
   socket.on('shoot', (data) => io.emit('spawnBullet', data));
 
+  
+  
   socket.on('obstacleHit', (obstacleId) => {
     const ob = coopObstacles.find(o => o.id === obstacleId);
     if (ob) ob.hit = true;
