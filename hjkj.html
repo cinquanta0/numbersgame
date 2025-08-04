@@ -1663,6 +1663,14 @@ body.loading {
     <h2 class="game-subtitle">Raid Co-op - Wait for other players...</h2>
     <div id="coopPlayersList">Loading...</div>
     
+    <div class="chat-container" id="chatContainer" style="margin-top:2rem;">
+  <div id="chatMessages" style="max-height:180px;overflow-y:auto;background:#111;border-radius:10px;padding:0.7rem 1rem;font-size:1rem;color:#fff;margin-bottom:0.7rem;"></div>
+  <input id="chatInput" type="text" maxlength="80" placeholder="Type a message..." style="width:70%;padding:0.3rem;border-radius:8px;">
+  <button class="menu-btn" onclick="sendChatMessage()" style="padding:0.5rem 1.2rem;margin-left:0.6rem;">Send</button>
+</div>
+  
+    
+    
     <!-- Nuovo contenitore bottoni -->
     <div class="lobby-buttons">
       <button class="menu-btn" onclick="showCoopLeaderboard()">🤝 CO-OP LEADERBOARD</button>
@@ -1692,6 +1700,7 @@ body.loading {
     <button class="menu-btn" onclick="showScreen('mainMenu')">Back</button>
   </div>
 </div>
+  
   
   <script>
        
@@ -5021,39 +5030,47 @@ function showCoopLobby() {
     socket = io();
   }
   setupBossListener();
-  
-  if (socket) {
-  socket.off?.('spawnBullet');
-  socket.on('spawnBullet', data => {
-    gameState.bullets.push(data);
-  });
-}
-  
-  if (socket) {
-  socket.on('obstaclesUpdate', obstacles => {
-    if (gameState.gameMode === "coop") {
-      gameState.obstacles = obstacles;
-    }
-  });
-}
 
-if (socket) {
-  // ... altri eventi ...
-  socket.off?.('bossAttack');
-  socket.on('bossAttack', data => {
-    if (gameState.gameMode === "coop") {
-      executeBossAttackFromServer(data);
-    }
-  });
-}
+  // --- PATCH: Chat multiplayer, sempre aggiungi il listener qui! ---
+  if (socket) {
+    if (typeof socket.off === "function") socket.off('chatMessage');
+    socket.on('chatMessage', addChatMessage);
+  }
 
-// Pulizia listener precedenti
-  socket.off('connect');
-  socket.off('lobbyUpdate');
-  socket.off('gameStart');
-  socket.off('bossDefeated');
-  socket.off('otherPlayers');
-  socket.off('webrtc-offer');
+  // Eventi multiplayer co-op
+  if (socket) {
+    if (typeof socket.off === "function") socket.off('spawnBullet');
+    socket.on('spawnBullet', data => {
+      gameState.bullets.push(data);
+    });
+  }
+
+  if (socket) {
+    socket.on('obstaclesUpdate', obstacles => {
+      if (gameState.gameMode === "coop") {
+        gameState.obstacles = obstacles;
+      }
+    });
+  }
+
+  if (socket) {
+    if (typeof socket.off === "function") socket.off('bossAttack');
+    socket.on('bossAttack', data => {
+      if (gameState.gameMode === "coop") {
+        executeBossAttackFromServer(data);
+      }
+    });
+  }
+
+  // Pulizia listener precedenti
+  if (typeof socket.off === "function") {
+    socket.off('connect');
+    socket.off('lobbyUpdate');
+    socket.off('gameStart');
+    socket.off('bossDefeated');
+    socket.off('otherPlayers');
+    socket.off('webrtc-offer');
+  }
 
   // Connessione
   socket.on('connect', () => {
@@ -5073,34 +5090,33 @@ if (socket) {
   // Boss sconfitto
   socket.on('bossDefeated', coopVictory);
 
- // PATCH universale: aggiorna e pulisci la lista otherPlayers in modo atomico e sempre corretto
-socket.on('otherPlayers', data => {
-  // Rimuovi giocatori non più presenti
-  Object.keys(otherPlayers).forEach(id => {
-    if (!data.players.find(p => p.id === id)) delete otherPlayers[id];
+  // PATCH universale: aggiorna e pulisci la lista otherPlayers in modo atomico e sempre corretto
+  socket.on('otherPlayers', data => {
+    // Rimuovi giocatori non più presenti
+    Object.keys(otherPlayers).forEach(id => {
+      if (!data.players.find(p => p.id === id)) delete otherPlayers[id];
+    });
+    // Aggiorna o aggiungi ogni player ricevuto
+    data.players.forEach(p => {
+      if (p.id === mySocketId) return;
+      if (!otherPlayers[p.id]) {
+        otherPlayers[p.id] = { x: p.x, y: p.y, nickname: p.nickname, angle: p.angle || 0 };
+      }
+      otherPlayers[p.id].targetX = p.x;
+      otherPlayers[p.id].targetY = p.y;
+      otherPlayers[p.id].nickname = p.nickname;
+      otherPlayers[p.id].angle = p.angle || 0;
+      otherPlayers[p.id].lastUpdate = Date.now();
+    });
   });
-  // Aggiorna o aggiungi ogni player ricevuto
-  data.players.forEach(p => {
-    if (p.id === mySocketId) return;
-    if (!otherPlayers[p.id]) {
-      otherPlayers[p.id] = { x: p.x, y: p.y, nickname: p.nickname, angle: p.angle || 0 };
-    }
-    otherPlayers[p.id].targetX = p.x;
-    otherPlayers[p.id].targetY = p.y;
-    otherPlayers[p.id].nickname = p.nickname;
-    otherPlayers[p.id].angle = p.angle || 0;
-    otherPlayers[p.id].lastUpdate = Date.now();
-  });
-});
 
   if (socket) {
-  socket.on('voiceActive', data => {
-    playerVoiceStatus[data.id] = data.active;
-    renderCoopPlayers({players: coopPlayers}); // aggiorna la lista
-  });
-}
-  
-  
+    socket.on('voiceActive', data => {
+      playerVoiceStatus[data.id] = data.active;
+      renderCoopPlayers({players: coopPlayers}); // aggiorna la lista
+    });
+  }
+
   // --- WebRTC OFFER LISTENER QUI ---
   socket.on('webrtc-offer', data => {
     let pc = peerConnections[data.fromId] || new RTCPeerConnection({
@@ -6270,6 +6286,37 @@ window.addEventListener('DOMContentLoaded', () => {
   // Fallback: nessuna pubblicità, avvia la partita subito
   startGame(true);
 }
+ 
+ 
+ // Funzione per inviare messaggi
+function sendChatMessage() {
+  const input = document.getElementById('chatInput');
+  let msg = input.value.trim();
+  if (!msg) return;
+  if (socket) {
+    socket.emit('chatMessage', {nickname: getPlayerName(), text: msg});
+    input.value = '';
+  }
+}
+
+// Funzione per mostrare messaggi in chat
+function addChatMessage(data) {
+  const chatDiv = document.getElementById('chatMessages');
+  if (!chatDiv) return;
+  let safeText = (''+data.text).replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  chatDiv.innerHTML += `<div><b style="color:#ffd700;">${data.nickname}</b>: ${safeText}</div>`;
+  chatDiv.scrollTop = chatDiv.scrollHeight;
+}
+
+// Listener ricezione messaggi
+if (typeof socket !== 'undefined' && socket) {
+  socket.on('chatMessage', addChatMessage);
+}
+
+// (opzionale) Invio con Enter
+document.getElementById('chatInput')?.addEventListener('keydown', function(e){
+  if (e.key === "Enter") sendChatMessage();
+});
  
  </script>
   
