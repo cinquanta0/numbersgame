@@ -1253,9 +1253,13 @@ body.loading {
               <h1 class="game-title">STELLAR GUARDIAN</h1>
               <p class="game-subtitle">COSMIC DEFENSE FORCE - Protect the Galaxy</p>
               <div id="nicknameBox" style="margin:1.2rem 0;">
- <label for="nicknameInput" style="color:#00bcd4;font-weight:bold;">Nickname:</label>
- <input id="nicknameInput" type="text" maxlength="15" style="padding:0.5rem;border-radius:8px;margin-left:0.5rem;">
- <button class="menu-btn" onclick="savePlayerName()">Save</button>
+  <label for="nicknameInput" style="color:#00bcd4;font-weight:bold;">Nickname:</label>
+  <input id="nicknameInput" type="text" maxlength="15" style="padding:0.5rem;border-radius:8px;margin-left:0.5rem;">
+  <button class="menu-btn" onclick="savePlayerName()">Save</button>
+</div>
+<div class="menu-buttons">
+<button class="menu-btn primary" id="playBtn" onclick="onPlayClicked()">▶️ PLAY</button>  
+<!-- altri bottoni -->
 </div>
               
 <!-- COPYRIGHT FOOTER -->
@@ -3496,7 +3500,9 @@ function eseguiSpecial() {
       }
 
    function levelComplete() {
-     if (gameState.gameMode === 'campaign' && gameState.currentLevel >= 20) {
+      showAd();  // PATCH: mostra pubblicità alla vittoria
+
+    if (gameState.gameMode === 'campaign' && gameState.currentLevel >= 20) {
     showAd();
     unlockAchievement('ultimate_guardian');
     document.getElementById('victoryScore').textContent = gameState.player.score.toLocaleString();
@@ -6224,9 +6230,48 @@ function renderEnemy() {
   ctx.restore();
 }
  
+ window.addEventListener('DOMContentLoaded', () => {
+  const nickInput = document.getElementById('nicknameInput');
+  if (nickInput) {
+    nickInput.value = localStorage.getItem('playerName') || '';
+  }
+});
+ 
+ 
+ function updatePlayButtonVisibility() {
+  const playBtn = document.getElementById('playBtn');
+  const nicknameInput = document.getElementById('nicknameInput');
+  if (!playBtn || !nicknameInput) return;
+  const nickname = nicknameInput.value.trim();
+  playBtn.style.display = nickname.length >= 2 ? 'inline-block' : 'none';
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  const nicknameInput = document.getElementById('nicknameInput');
+  if (nicknameInput) {
+    nicknameInput.addEventListener('input', updatePlayButtonVisibility);
+    updatePlayButtonVisibility();
+  }
+});
+ 
+ function onPlayClicked() {
+  // Salta pubblicità se sei in locale/dev
+  if (isDevEnv()) {
+    startGame(true);
+    return;
+  }
+  // Mostra la pubblicità (GameMonetize)
+  if (typeof sdk !== 'undefined' && typeof sdk.showAd === 'function') {
+    // La partita partirà solo quando ricevi l'evento "SDK_GAME_START"
+    sdk.showAd();
+    window._pendingStartGame = true; // Flag per evitare doppio avvio
+    return;
+  }
+  // Fallback: nessuna pubblicità, avvia la partita subito
+  startGame(true);
+}
  
  </script>
   
 </body>
 </html>
-v
