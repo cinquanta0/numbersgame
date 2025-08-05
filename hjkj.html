@@ -1676,19 +1676,12 @@ body.loading {
       <button class="menu-btn" onclick="showCoopLeaderboard()">🤝 CO-OP LEADERBOARD</button>
       <button class="menu-btn primary" onclick="startCoopRaid()">Start (test host)</button>
       <button class="menu-btn" onclick="showScreen('mainMenu')">Back</button>
-      <button class="menu-btn" id="jitsiBtn" onclick="toggleJitsi()">🎤 Voice Chat (Jitsi)</button>
-    </div>
+      <button class="menu-btn" id="dailyBtn" onclick="toggleDaily()">🎤 Voice Chat (Daily.co)</button>    
+</div>
   </div>
 </div>
 
-  <!-- Contenitore iframe Jitsi nascosto di default -->
-<div id="jitsiContainer" style="display:none; position:fixed; bottom:80px; right:20px; width:360px; height:300px; z-index:10000; box-shadow:0 0 16px #000; border-radius:12px; background:#000;">
-  <iframe id="jitsiFrame"
-    src=""
-    style="width:100%; height:100%; border:0; border-radius:10px;"
-    allow="camera; microphone; fullscreen; display-capture"></iframe>
-  <button onclick="toggleJitsi()" style="position:absolute;top:4px;right:4px;z-index:10001;background:#ffd700;border:none;border-radius:8px;padding:2px 8px;cursor:pointer;">❌</button>
-</div>
+ 
   
   
   <div class="screen" id="coopLeaderboardScreen">
@@ -1703,6 +1696,17 @@ body.loading {
   
   
 <div class="mobile-action-btn special" id="mobileSlowTime" style="display:none;">⏰</div>  
+  
+  
+  <!-- Contenitore iframe Daily.co nascosto di default -->
+<div id="dailyContainer" style="display:none; position:fixed; bottom:80px; right:20px; width:360px; height:300px; z-index:10000; box-shadow:0 0 16px #000; border-radius:12px; background:#000;">
+  <iframe id="dailyFrame"
+    src=""
+    allow="camera; microphone; fullscreen; display-capture"
+    style="width:100%; height:100%; border:0; border-radius:10px;"></iframe>
+  <button onclick="toggleDaily()" style="position:absolute;top:4px;right:4px;z-index:10001;background:#ffd700;border:none;border-radius:8px;padding:2px 8px;cursor:pointer;">❌</button>
+</div>
+  
   
   <script>
        
@@ -5499,24 +5503,6 @@ function setupPeerVoice(peerId) {
 });
   
   
- function toggleJitsi() {
-  const cont = document.getElementById('jitsiContainer');
-  const frame = document.getElementById('jitsiFrame');
-  const roomName = "StellarGuardianCoopRoom";
-  if (cont.style.display === 'none') {
-    frame.src = "https://meet.jit.si/" + roomName + "#userInfo.displayName=\"" + (localStorage.getItem('playerName')||"Player") + "\"";
-    cont.style.display = 'block';
-    voiceChatActive = true;
-    if (socket) socket.emit('voiceActive', { active: true });
-  } else {
-    frame.src = "";
-    cont.style.display = 'none';
-    voiceChatActive = false;
-    if (socket) socket.emit('voiceActive', { active: false });
-  }
-}
-  
-  
   function isDevEnv() {
   // File://, localhost, 127.0.0.1, o qualsiasi dominio di test che vuoi
   return (
@@ -6365,6 +6351,21 @@ document.getElementById('chatInput')?.addEventListener('keydown', function(e){
   }
 }
  
+ 
+ function toggleDaily() {
+  const cont = document.getElementById('dailyContainer');
+  const frame = document.getElementById('dailyFrame');
+  const roomName = "StellarGuardianCoopRoom"; // oppure dinamico se vuoi
+  const dailyURL = "https://stellarguardian.daily.co/" + roomName;
+  
+  if (cont.style.display === 'none') {
+    frame.src = dailyURL;
+    cont.style.display = 'block';
+  } else {
+    frame.src = "";
+    cont.style.display = 'none';
+  }
+}
  
  </script>
   
