@@ -4,35 +4,34 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
     
-      <!-- Inserisci subito dopo il tag <head> (dopo lo script CrazyGames se vuoi compatibilità multipla) -->
-<script type="text/javascript">
+     <script type="text/javascript">
    window.SDK_OPTIONS = {
-      gameId: "unnmh9hjtru4a1sfxm7sjqcxiv69e1s4", // <-- Il tuo Game ID GameMonetize
+      gameId: "unnmh9hjtru4a1sfxm7sjqcxiv69e1s4",
       onEvent: function (a) {
          switch (a.name) {
             case "SDK_GAME_PAUSE":
-               // Metti in pausa il gioco e muta l'audio
-               if (typeof musicaGioco !== "undefined") musicaGioco.muted = true;
-               if (typeof pauseGame === "function") pauseGame();
+               // pause game logic / mute audio
                break;
             case "SDK_GAME_START":
-               // Riprendi il gioco e riattiva l'audio
-               if (typeof musicaGioco !== "undefined") musicaGioco.muted = false;
-               if (typeof resumeGame === "function") resumeGame();
+               // advertisement done, resume game logic and unmute audio
                break;
             case "SDK_READY":
-               // L'SDK è pronto
-               break;
-            case "SDK_ERROR":
-               // Gestisci eventuali errori (opzionale)
+               // when sdk is ready
                break;
          }
       }
    };
-   (function (a, b, c) {
-      var d = a.getElementsByTagName(b)[0];
-      a.getElementById(c) || (a = a.createElement(b), a.id = c, a.src = "https://api.gamemonetize.com/sdk.js", d.parentNode.insertBefore(a, d))
-   })(document, "script", "gamemonetize-sdk");
+(function (a, b, c) {
+   var d = a.getElementsByTagName(b)[0];
+   a.getElementById(c) || (a = a.createElement(b), a.id = c, a.src = "https://api.gamemonetize.com/sdk.js", d.parentNode.insertBefore(a, d))
+})(document, "script", "gamemonetize-sdk"); 
+
+
+if (typeof sdk !== 'undefined' && sdk.showBanner !== 'undefined') {
+sdk.showBanner();
+}
+
+
 </script>
     
     
@@ -42,7 +41,234 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>🌟 STELLAR GUARDIAN - COSMIC DEFENSE FORCE 🌟</title>
   <style>
-      @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
+      
+      @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+
+#nicknameBox {
+  background: #fff !important;
+  color: #222 !important;
+  box-shadow: 0 0 24px #00bcd4;
+  border: 2px solid #00bcd4;
+  position: relative;
+  z-index: 9999;
+}
+#nicknameInput, #nicknameBox label, #nicknameBox button {
+  color: #222 !important;
+  font-size: 1.1rem !important;
+}
+
+
+.menu-content {
+  background: none !important;           /* NIENTE sfondo */
+  box-shadow: none !important;           /* NIENTE ombra */
+  border: none !important;               /* NIENTE bordo */
+  border-radius: 0 !important;           /* NIENTE angoli */
+  padding: 0 !important;                 /* Meno spazio */
+  max-width: 100vw !important;
+  margin: 0 !important;
+  text-align: center;
+  font-family: 'Press Start 2P', monospace !important;
+}
+
+/* Se vuoi un effetto leggerissimo HUD, puoi aggiungere solo una riga trasparente sotto le scritte */
+.menu-title, .game-title, .game-subtitle {
+  background: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.menu-btn {
+  font-family: 'Press Start 2P', monospace !important;
+  background: url('pixel-btn.png') repeat, linear-gradient(90deg,#ffe700 0%,#00bcd4 100%) !important;
+  border: 4px solid #222 !important;
+  border-radius: 0 !important;
+  box-shadow: 0 4px 0 #ffe700, 0 0 12px #00bcd4 !important;
+  color: #222 !important;
+  font-size: 1.1rem !important;
+  text-shadow: 1px 1px 0 #fff !important;
+  padding: 1.2rem 2.3rem !important;
+  margin: 0.7rem 0 !important;
+  image-rendering: pixelated !important;
+}
+.menu-btn:active, .menu-btn:hover {
+  transform: scale(0.97);
+  box-shadow: 0 2px 0 #ffe700, 0 0 16px #ffd700 !important;
+  background: url('pixel-btn.png') repeat, linear-gradient(90deg,#00bcd4 0%,#ffe700 100%) !important;
+  color: #fff !important;
+}
+
+/* Se vuoi pulsanti più piccoli/fluttuanti */
+.menu-buttons {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: center !important;
+  gap: 18px !important;
+  background: none !important;
+  margin: 18px 0 !important;
+}
+
+/* Sottotitoli e nickname floating */
+.game-subtitle, #nicknameBox {
+  background: none !important;
+  box-shadow: none !important;
+  border: none !important;
+  margin: 18px 0 !important;
+}
+
+
+
+
+
+      /* Sfondo pixel art per i menu */
+.galaxy-bg {
+  background: url('pixel-art-galaxy.png') repeat !important;
+  background-size: 900px 600px !important;
+  image-rendering: pixelated !important;
+  filter: saturate(1.15) brightness(0.96);
+}
+
+
+
+/* Titolo pixel art */
+.game-title {
+  font-family: 'Press Start 2P', monospace !important;
+  font-size: 3rem !important;
+  color: #ffe700 !important;
+  letter-spacing: 0.07em !important;
+  text-shadow: 0 0 2px #222, 0 0 8px #ffe700 !important;
+  border-bottom: 4px dashed #ffe700 !important;
+  padding-bottom: 0.7rem !important;
+}
+
+
+/* Statistiche pixel art */
+.stat-item {
+  background: url('pixel-dither.png') repeat, #222 !important;
+  border: 4px solid #ffe700 !important;
+  box-shadow: 0 0 16px #ffd70044 !important;
+  font-family: 'Press Start 2P', monospace !important;
+  color: #ffe700 !important;
+  image-rendering: pixelated !important;
+}
+
+.stat-value {
+  font-size: 2.0rem !important;
+  color: #00bcd4 !important;
+  text-shadow: 0 0 2px #222, 0 0 6px #00bcd4 !important;
+}
+      
+      
+      /* Galaxy animated background for menu */
+.galaxy-bg {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 60% 30%, #2c3e50 0%, #0a0a2e 65%);
+  animation: menuGalaxyMove 18s linear infinite;
+}
+@keyframes menuGalaxyMove {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 100% 100%; }
+}
+
+/* Glow and shadow for title */
+.game-title {
+  text-shadow: 0 0 40px #00bcd4, 0 0 80px #ffd700;
+  filter: drop-shadow(0 0 12px #ffd700);
+  letter-spacing: 0.12em;
+}
+
+/* Animated ship icon */
+.menu-ship-anim {
+  position: absolute;
+  bottom: 50px;
+  right: 40px;
+  animation: floatShipMenu 3s ease-in-out infinite;
+  z-index: 2;
+}
+.menu-ship-anim img {
+  width: 110px;
+  filter: drop-shadow(0 0 32px #ffd700);
+}
+@keyframes floatShipMenu {
+  0%,100% { transform: translateY(0);}
+  50% { transform: translateY(-18px);}
+}
+
+.menu-btn {
+  font-family: 'Press Start 2P', monospace !important;
+  background: url('pixel-btn.png') repeat, linear-gradient(90deg,#ffe700 0%,#00bcd4 100%) !important;
+  border: 4px solid #222 !important;
+  border-radius: 0 !important;
+  box-shadow: 0 4px 0 #ffe700, 0 0 12px #00bcd4 !important;
+  color: #222 !important;
+  font-size: 1.1rem !important;
+  text-shadow: 1px 1px 0 #fff !important;
+  padding: 1.2rem 2.3rem !important;
+  margin: 0.7rem 0 !important;
+  image-rendering: pixelated !important;
+}
+.menu-btn:active, .menu-btn:hover {
+  transform: scale(0.97);
+  box-shadow: 0 2px 0 #ffe700, 0 0 16px #ffd700 !important;
+  background: url('pixel-btn.png') repeat, linear-gradient(90deg,#00bcd4 0%,#ffe700 100%) !important;
+  color: #fff !important;
+}
+
+/* Animated menu entrance */
+.screen.active#mainMenu {
+  animation: menuFadeIn 1.1s cubic-bezier(.5,2,.3,1);
+}
+@keyframes menuFadeIn {
+  0% { opacity:0; transform: scale(0.9);}
+  100% { opacity:1; transform: scale(1);}
+}
+
+/* Statistic cards visual boost */
+.stat-value {
+  color: #ffd700;
+  font-size: 2.1rem;
+  text-shadow: 0 0 12px #ffd700;
+}
+.stat-item {
+  background: linear-gradient(135deg,#0a0a2e 80%,#00bcd4 100%);
+  border: 2px solid #ffd700;
+  box-shadow: 0 0 18px #ffd70066;
+}
+
+/* Coin counter glowing */
+#coinCount {
+  color: #ffd700;
+  font-size: 2.2rem;
+  text-shadow: 0 0 16px #ffd700;
+  animation: coinPulse 1.3s infinite;
+}
+@keyframes coinPulse {
+  0%,100% { filter:brightness(1);}
+  50% { filter:brightness(1.4);}
+}
+
+/* Footer beautification */
+.menu-content > div:last-child {
+  margin-top: 2.5rem;
+  color: #00bcd4;
+  font-size: 1.1rem;
+  opacity: 0.7;
+  text-shadow: 0 0 10px #00bcd4;
+}
+
+/* Parallax for stat items (desktop only) */
+@media (min-width: 700px) {
+  .stat-item {
+    transition: transform 0.18s;
+  }
+}
+      
+      
+      
+      
       
       .loading-screen {
   position: fixed;
@@ -358,18 +584,17 @@ body.loading {
   pointer-events: auto;
 }
 
-      .menu-content {
-          text-align: center;
-          max-width: min(1200px, 95vw);
-          padding: clamp(2rem, 6vw, 3rem);
-          background: rgba(0, 0, 0, 0.9);
-          border-radius: 25px;
-          border: 4px solid;
-          border-image: linear-gradient(45deg, #00bcd4, #2196f3, #3f51b5, #9c27b0, #e91e63) 1;
-          box-shadow: 0 0 80px rgba(0, 188, 212, 0.4);
-          backdrop-filter: blur(15px);
-          margin: clamp(1rem, 3vw, 2rem);
-      }
+.menu-content {
+  background: none !important;
+  box-shadow: none !important;
+  border: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  margin: 0 auto !important;
+  max-width: 100vw !important;
+  text-align: center !important;
+  font-family: 'Press Start 2P', monospace !important;
+}
 
       .game-title {
           font-size: clamp(2.5rem, 10vw, 5rem);
@@ -1183,6 +1408,51 @@ body.loading {
 }
    
    
+   .duel-lobby {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  background: linear-gradient(135deg, #141e30 80%, #243b55 100%);
+  border-radius: 24px; box-shadow: 0 0 80px #00bcd466;
+  padding: 2.5rem 2.5rem 2.2rem 2.5rem; text-align: center;
+  z-index: 9000; min-width: 380px; max-width: 95vw; min-height: 290px;
+  animation: popin 0.7s cubic-bezier(.5,2,.3,1);
+}
+@keyframes popin { 0%{transform:scale(0.7) translate(-50%,-50%);} 100%{transform:scale(1) translate(-50%,-50%);} }
+.duel-header { font-size: 2.1rem; color: #ffd700; font-weight: bold; margin-bottom: 1.3rem; }
+.duel-players { display: flex; align-items: center; justify-content: center; gap: 2.7rem; }
+.duel-player { display: flex; flex-direction: column; align-items: center; }
+.duel-ship { width: 98px; height: 98px; animation: float 2.2s infinite; border-radius: 16px; background: #222; }
+@keyframes float { 0%,100%{transform:translateY(0);} 50%{transform:translateY(-12px);} }
+.duel-nick { margin-top:0.8rem; color: #00bcd4; font-weight: bold; font-size:1.15rem; }
+.duel-vs { font-size: 2.7rem; color: #fff; font-weight: bold; text-shadow: 0 0 25px #ffd700; animation: pulse 1.3s infinite; }
+@keyframes pulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.14);} }
+.duel-status { margin-top: 1.5rem; color: #fff; font-size: 1.2rem; min-height: 34px; }
+.menu-btn { margin-top: 1.6rem; }
+.hidden { display: none !important; }
+
+.duel-countdown {
+  position: fixed; top: 40%; left: 50%; transform: translate(-50%,-50%);
+  font-size: 5rem; color: #ffd700; text-shadow: 0 0 45px #00bcd4;
+  font-family: 'Orbitron', monospace; z-index: 9100;
+  background: rgba(0,0,0,0.7); border-radius: 20px; padding: 1.5rem 3rem;
+  animation: popin 0.55s cubic-bezier(.5,2,.3,1);
+}
+
+.duel-end {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  background: linear-gradient(135deg, #2b2e4a 70%, #ffd700 100%);
+  border-radius: 26px; box-shadow: 0 0 60px #ffd70088;
+  padding: 2.5rem 3.5rem; text-align: center; z-index: 9200; min-width: 380px;
+  animation: popin 0.7s cubic-bezier(.5,2,.3,1);
+}
+#duelEndTitle { font-size:2.7rem; font-weight:900; margin-bottom:1.2rem;}
+#duelEndStats { font-size:1.2rem; margin-bottom:1.7rem; }
+@media (max-width: 600px) {
+  .duel-lobby, .duel-end { min-width: 94vw; padding: 1.2rem; }
+  .duel-ship { width: 64px; height:64px; }
+  .duel-header { font-size:1.3rem; }
+}
+   
+   
    </style>
 </head>
 <body>
@@ -1246,20 +1516,26 @@ body.loading {
       </div>
   </div>
   
-  <div id="gameContainer">
-      <!-- Main Menu Screen -->
-      <div class="screen active" id="mainMenu">
-          <div class="menu-content">
-              <h1 class="game-title">STELLAR GUARDIAN</h1>
-              <p class="game-subtitle">COSMIC DEFENSE FORCE - Protect the Galaxy</p>
-              <div id="nicknameBox" style="margin:1.2rem 0;">
+<div id="gameContainer">
+  <!-- Main Menu Screen -->
+  <div class="screen active" id="mainMenu">
+    <!-- Galaxy background -->
+    <div class="galaxy-bg"></div>
+    <!-- Animated spaceship -->
+    <div class="menu-ship-anim">
+      <img src="navicella1.png" alt="Spaceship" />
+    </div>
+    <div class="menu-content">
+      <h1 class="game-title">STELLAR GUARDIAN</h1>
+      <p class="game-subtitle">COSMIC DEFENSE FORCE - Protect the Galaxy</p>
+      <p style="color:#ffd700; font-size:1.1rem; margin-bottom:1.5rem; text-shadow: 0 0 8px #00bcd4;">
+        🔔  For a better experience activate the <strong>fullscreen</strong>. Without it, it could lag!
+      </p>
+      <!-- ... resto del tuo menu ... -->
+             <div id="nicknameBox" style="margin:1.2rem 0; padding:0.8rem 1rem; background:rgba(0,188,212,0.07); border-radius:12px; box-shadow:0 0 18px #00bcd455;">
   <label for="nicknameInput" style="color:#00bcd4;font-weight:bold;">Nickname:</label>
   <input id="nicknameInput" type="text" maxlength="15" style="padding:0.5rem;border-radius:8px;margin-left:0.5rem;">
-  <button class="menu-btn" onclick="savePlayerName()">Save</button>
-</div>
-<div class="menu-buttons">
-<button class="menu-btn primary" id="playBtn" onclick="onPlayClicked()">▶️ PLAY</button>  
-<!-- altri bottoni -->
+  <button class="menu-btn primary" onclick="savePlayerName()">Save</button>
 </div>
               
 <!-- COPYRIGHT FOOTER -->
@@ -1279,11 +1555,11 @@ body.loading {
                   <button class="menu-btn" onclick="showScreen('shop')">🛒 SHOP</button>
                   <button class="menu-btn" onclick="showScreen('levelSelect')">📋 SELECT MISSION</button>
                   <button class="menu-btn" onclick="startChaosMode()">💥 TOTAL CHAOS</button>
-                  <button id="pulsanteMusica">🎵 Music ON</button>
-                  <button class="menu-btn" onclick="changePlayerName()">👤 Change nickname</button>
+                  <button class="menu-btn primary" id="pulsanteMusica">🎵 Music ON</button>                  <button class="menu-btn" onclick="changePlayerName()">👤 Change nickname</button>
                   <button class="menu-btn" onclick="showScreen('inventoryScreen')">🛸 SPACESHIP INVENTORY</button>
                   <button class="menu-btn" onclick="showGlobalLeaderboard()">🌍 GLOBAL LEADERBOARD</button>
                   <button class="menu-btn primary" onclick="showCoopLobby()">🌐 Raid Co-op Online</button>
+                  <button class="menu-btn" onclick="window.open('https://stellarguardian72.onrender.com','_blank')">🌐 Sito Ufficiale</button>
                   <button class="menu-btn" onclick="showDailyChallengeMenu()">🌟 DAILY CHALLENGE</button>
                   <button class="menu-btn" onclick="showLocalLeaderboard()">🌟 LOCAL LEADERBOARD</button>
                   <button class="menu-btn" onclick="showScreen('skillTree')">⭐ UPGRADES</button>
@@ -1291,7 +1567,7 @@ body.loading {
                   <button class="menu-btn" onclick="showScreen('stats')">📊 STATISTICS</button>
                   <button class="menu-btn" onclick="showScreen('controls')">🎮 CONTROLS</button>
                   <button class="menu-btn" onclick="showOrientationSelector()">📱 ORIENTATION</button>
-                  
+                  <button class="menu-btn primary" onclick="startDuelQueue()">⚔️ 1v1 DUELS</button>
                 </div>
               
               <div class="stats-display">
@@ -1708,6 +1984,44 @@ body.loading {
 </div>
   
   
+  <!-- DUEL LOBBY MODAL -->
+<div id="duelLobby" class="duel-lobby hidden">
+  <div class="duel-header">⚔️ 1v1 DUELS</div>
+  <div class="duel-players">
+    <div class="duel-player">
+      <img id="duelShip1" class="duel-ship" src="navicella1.png"/>
+      <div id="duelNick1" class="duel-nick">You</div>
+    </div>
+    <div class="duel-vs">VS</div>
+    <div class="duel-player">
+      <img id="duelShip2" class="duel-ship" src="navicella2.png"/>
+      <div id="duelNick2" class="duel-nick">Searching...</div>
+    </div>
+  </div>
+  <div id="duelStatus" class="duel-status">Looking for opponent...</div>
+  <button class="menu-btn" id="duelCancelBtn">Cancel</button>
+</div>
+
+<!-- ARENA 1v1 OVERLAY -->
+<div id="duelCountdown" class="duel-countdown hidden"></div>
+<div id="duelEndScreen" class="duel-end hidden">
+  <div id="duelEndTitle"></div>
+  <div id="duelEndStats"></div>
+  <button class="menu-btn" id="duelRematchBtn">Rematch</button>
+  <button class="menu-btn" id="duelLobbyBtn">Back to Lobby</button>
+</div>
+  
+  
+  <div id="fullscreenAdvicePopup" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:linear-gradient(45deg,#00bcd4,#2196f3);color:#fff;padding:2.1rem 2.8rem;border-radius:24px;box-shadow:0 0 40px #00bcd488;z-index:100000;font-size:1.25rem;text-align:center;">
+  <div style="font-size:2.1rem;margin-bottom:0.4em;">🖥️</div>
+  <b>Click to enable Fullscreen<br>for the best experience!</b>
+  <div style="margin-top:1.1em;">
+    <button onclick="enableFullscreenFromPopup()" style="margin-top:0.5em;padding:0.7em 1.3em;border-radius:15px;background:#ffd700;color:#222;font-weight:bold;border:none;cursor:pointer;">Go Fullscreen</button>
+    <button onclick="document.getElementById('fullscreenAdvicePopup').style.display='none'" style="margin-top:0.5em;padding:0.7em 1.3em;border-radius:15px;background:#444;color:#fff;font-weight:bold;border:none;cursor:pointer;margin-left:0.7em;">Close</button>
+  </div>
+</div>
+  
+  
   <script>
        
       let firstGameAdShown = false;
@@ -1766,6 +2080,9 @@ body.loading {
 missileSprite.src = "missili.png"; // usa il nome del tuo file
       // Game State Management
 let gameState = {
+    
+    
+    
     currentScreen: 'mainMenu',
     currentLevel: 1,
     gameRunning: false,
@@ -1830,6 +2147,10 @@ let gameState = {
         buttons: { right: '20px', bottom: '30px' }
     }
 };
+window.gameState = gameState;
+      
+      
+      
       // Level Data Configuration
       const LEVEL_DATA = [
           {level: 1, enemy: "Scout Drone", difficulty: "Easy", health: 800, phases: 1, speed: 2, attackPatterns: ['basic'], bulletSpeed: 3, bulletCount: 1},
@@ -2232,35 +2553,6 @@ enemyImage.src = 'alien-enemy2.png'; // Senza /
           }
       }
 
-     // Screen Management
-function showScreen(screenId) {
-    document.querySelectorAll('.screen').forEach(screen => {
-        screen.classList.remove('active');
-    });
-
-    document.getElementById(screenId).classList.add('active');
-    gameState.currentScreen = screenId;
-
-    const mobileControls = document.getElementById('mobileControls');
-    if (screenId === 'gameScreen' && gameState.isMobile) {
-        mobileControls.classList.add('active');
-    } else {
-        mobileControls.classList.remove('active');
-    }
-
-    if (screenId === 'gameScreen') {
-        if (!gameState.gameRunning) {
-            showAdAndStartGame(); // Mostra adv, poi avvia partita
-        } else {
-            resumeGame();
-        }
-    } else {
-        if (gameState.gameRunning) {
-            pauseGame();
-        }
-    }
-}
-
       // Level Grid Generation
       function generateLevelGrid() {
           const levelGrid = document.getElementById('levelGrid');
@@ -2459,6 +2751,10 @@ function showScreen(screenId) {
 
      
    function startLevel(levelNumber) {
+     console.log("🔴 STARTLEVEL chiamato con livello:", levelNumber);
+    console.trace(); // Mostra da dove viene chiamata
+    
+    
     pendingLevelToStart = levelNumber;
     gameState.gameMode = 'campaign';
     gameState.gameRunning = false;
@@ -2511,20 +2807,23 @@ initGame();
 }
       
    function startGame(skipAd) {
-        resetBossVisualState(); // <--- AGGIUNGI QUI!!!
+  resetBossVisualState();
 
-    // Aggiorna livello se necessario (come prima)
-    if (pendingLevelToStart !== null) {
-        gameState.currentLevel = pendingLevelToStart;
-        pendingLevelToStart = null;
-    }
-    if (!skipAd) {
-        showAdAndStartGame();
-        return; // Evita doppio avvio!
-    }
+  if (pendingLevelToStart !== null) {
+          console.log("🔵 CAMBIO LIVELLO da", gameState.currentLevel, "a", pendingLevelToStart);
+
+      gameState.currentLevel = pendingLevelToStart;
+      pendingLevelToStart = null;
+  }
+  if (!skipAd) {
+      showAdAndStartGame();
+      return;
+  }
 
     // PATCH: Segnala che stai avviando la partita (evita doppio showAd)
     gameState.pendingStart = true;
+      gameState.gameRunning = true; // <--- AGGIUNGI QUESTO PRIMA
+
     showScreen('gameScreen');
     gameState.pendingStart = false;
 
@@ -2534,7 +2833,7 @@ initGame();
     setBackgroundForLevel(gameState.currentLevel);
     gameState.levelStartTime = Date.now();
     gameState.slowTimeActive = false;
-    gameState.timeScale = 1;
+    gameState.timeScale = 0.3;
     gameState.currentPhase = 0;
     gameState.bulletHellIntensity = 0;
     gameState.adaptiveDifficulty = 1.0;
@@ -2607,7 +2906,10 @@ initGame();
     gameLoop();
 }
      function initializeCampaignEnemy() {
-    const levelData = LEVEL_DATA[gameState.currentLevel - 1];
+      if (gameState.gameMode === "duel1v1") return;
+
+
+      const levelData = LEVEL_DATA[gameState.currentLevel - 1];
 
     // Carica l'immagine del boss in base alla difficoltà (devi avere let bossImage = new Image(); globale)
     bossImage = new Image();
@@ -2634,7 +2936,9 @@ initGame();
     };
 }
       function generateEndlessEnemy() {
-          const randomLevel = Math.floor(Math.random() * LEVEL_DATA.length);
+            if (gameState.gameMode === "duel1v1") return;
+
+        const randomLevel = Math.floor(Math.random() * LEVEL_DATA.length);
           const baseEnemy = LEVEL_DATA[randomLevel];
           
           gameState.enemy = {
@@ -2689,6 +2993,10 @@ function gameLoop() {
 }
      // Sostituisci la funzione update con questa:
 function update(deltaTime) {
+    deltaTime *= gameState.timeScale;  // <--- QUESTA RIGA!
+
+  
+  
   updatePlayer(deltaTime);
   updatePlayerTrail();
   updateObstacles(deltaTime);
@@ -2831,6 +3139,8 @@ if (gameState._frameCount % 300 === 0) {
     updateUI();
 }
       function updateEnemy(deltaTime) {
+              if (gameState.gameMode === "duel1v1") return; // Non aggiornare boss in 1v1!
+
             if (gameState.gameMode === "coop") return; // In co-op, posizione boss solo da server!
 
 const enemy = gameState.enemy;
@@ -3549,25 +3859,28 @@ function eseguiSpecial() {
       }
 
    function levelComplete() {
-      showAd();  // PATCH: mostra pubblicità alla vittoria
+    // PATCH: Previeni avanzamenti multipli
+    if (window.levelAdvancing) return;
+    window.levelAdvancing = true;
 
+    showAd(); // Mostra pubblicità alla vittoria
+
+    // Se hai completato la campagna (livello 20)
     if (gameState.gameMode === 'campaign' && gameState.currentLevel >= 20) {
-    showAd();
-    unlockAchievement('ultimate_guardian');
-    document.getElementById('victoryScore').textContent = gameState.player.score.toLocaleString();
-    document.getElementById('victoryTime').textContent = Math.floor(gameState.totalSurvivalTime);
-    showScreen('victory');
-    return;
-  }
-    
-    
+        unlockAchievement('ultimate_guardian');
+        document.getElementById('victoryScore').textContent = gameState.player.score.toLocaleString();
+        document.getElementById('victoryTime').textContent = Math.floor(gameState.totalSurvivalTime);
+        showScreen('victory');
+        updateUI();
+        window.levelAdvancing = false; // Sblocca flag
+        return;
+    }
+
     gameState.gameRunning = false;
 
     // Calcola tempo di sopravvivenza
     const survivalTime = (Date.now() - gameState.levelStartTime) / 1000;
     gameState.totalSurvivalTime += survivalTime;
-
-    // NIENTE BONUS qui!
 
     // Calcola upgrade points
     let upgradePointsEarned = Math.floor(gameState.currentLevel * 1.2) + 5;
@@ -3599,7 +3912,7 @@ function eseguiSpecial() {
         }
     }
 
-    // Aggiorna sempre bestScore!
+    // Aggiorna bestScore sempre!
     savedData.bestScore = Math.max(savedData.bestScore || 0, gameState.player.score);
 
     // Aggiorna altri dati
@@ -3607,7 +3920,7 @@ function eseguiSpecial() {
     savedData.longestSurvival = Math.max(savedData.longestSurvival || 0, survivalTime);
     savedData.coins = gameState.coins;
 
-    // Completa i livelli
+    // Segna livello completato
     if (!savedData.completedLevels) {
         savedData.completedLevels = [];
     }
@@ -3617,35 +3930,33 @@ function eseguiSpecial() {
 
     localStorage.setItem('stellarGuardianSave', JSON.stringify(savedData));
 
-    // Notifica, leaderboard LOCAL + GLOBALE sempre!
+    // Notifica, leaderboard LOCAL + GLOBALE
     showNotification(`+${coinsEarned} Coins!`, 'info');
     let username = getPlayerName();
     submitLocalScore(username, gameState.player.score, gameState.currentLevel);
     submitGlobalScore(username, gameState.player.score);
 
-    // Se hai completato il gioco (campagna lv20)
-    if (gameState.gameMode === 'campaign' && gameState.currentLevel >= 20) {
-        unlockAchievement('ultimate_guardian');
-        document.getElementById('victoryScore').textContent = gameState.player.score.toLocaleString();
-        document.getElementById('victoryTime').textContent = Math.floor(gameState.totalSurvivalTime);
-        showScreen('victory');
-    } else if (gameState.gameMode === 'campaign') {
-        setTimeout(() => {
-            gameState.currentLevel++;
-            startGame();
+    // Gestione avanzamento livello/modalità
+    if (gameState.gameMode === 'campaign') {
+        if (window.levelTimeout) clearTimeout(window.levelTimeout);
+        window.levelTimeout = setTimeout(() => {
+            pendingLevelToStart = gameState.currentLevel + 1;
+            gameState.gameRunning = false;
+            startGame(true); // skipAd:true per evitare loop pubblicità
+            window.levelAdvancing = false; // Sblocca flag dopo avanzamento!
         }, 2000);
+    } else if (gameState.gameMode === 'endless') {
+        if (window.levelTimeout) clearTimeout(window.levelTimeout);
+        window.levelTimeout = setTimeout(() => {
+            startGame();
+            window.levelAdvancing = false;
+        }, 1500);
     } else {
-        if (gameState.gameMode === 'endless') {
-            setTimeout(() => {
-                startGame();
-            }, 1500);
-        } else {
-            showScreen('mainMenu');
-        }
+        showScreen('mainMenu');
+        window.levelAdvancing = false;
     }
 
     updateUI();
-    generateLevelGrid();
 }
 
      function submitGlobalScore(username, score) {
@@ -3753,40 +4064,44 @@ function forfeitMission() {
           gameLoop();
       }
 
-      // Rendering Functions
-      function render() {
-          backgroundY += 1;
-          if (backgroundY >= canvas.height) backgroundY = 0;
+     function render() {
+  backgroundY += 1;
+  if (backgroundY >= canvas.height) backgroundY = 0;
 
-          ctx.fillStyle = '#0a0a2e';
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-          
-          if (gameState.screenShake > 0) {
-              ctx.save();
-              ctx.translate(
-                  (Math.random() - 0.5) * gameState.screenShake,
-                  (Math.random() - 0.5) * gameState.screenShake
-              );
-          }
-          
-          renderSpaceBackground();
-          renderPlayer();
-          if (gameState.gameMode === "coop") renderOtherPlayers(ctx);
-          renderEnemy();
-          renderObstacles();
-          renderBullets();
-          renderEnemyBullets();
-          renderParticles();
-          
-          if (gameState.slowTimeActive) {
-              renderSlowTimeOverlay();
-          }
-          
-          if (gameState.screenShake > 0) {
-              ctx.restore();
-          }
-      }
+  ctx.fillStyle = '#0a0a2e';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+  if (gameState.screenShake > 0) {
+    ctx.save();
+    ctx.translate(
+      (Math.random() - 0.5) * gameState.screenShake,
+      (Math.random() - 0.5) * gameState.screenShake
+    );
+  }
+
+  renderSpaceBackground();
+  renderPlayer();
+  if (gameState.gameMode === "duel1v1") {
+    renderOpponent(ctx); // SOLO avversario
+  } else if (gameState.gameMode === "coop") {
+    renderOtherPlayers(ctx); // co-op
+    renderEnemy(); // Boss co-op
+  } else {
+    renderEnemy(); // Campagna/endless/chaos
+  }
+  renderObstacles();
+  renderBullets();
+  renderEnemyBullets();
+  renderParticles();
+
+  if (gameState.slowTimeActive) {
+    renderSlowTimeOverlay();
+  }
+
+  if (gameState.screenShake > 0) {
+    ctx.restore();
+  }
+}
       function renderSpaceBackground() {
           if (backgroundImage.complete) {
               ctx.drawImage(backgroundImage, 0, backgroundY, canvas.width, canvas.height);
@@ -3854,31 +4169,7 @@ function renderOtherPlayers(ctx) {
 
      
      
-   // --- RENDER BOSS ---
-function renderEnemy() {
-  const enemy = gameState.enemy;
-  if (!enemy || enemy.health <= 0) return;
-  ctx.save();
-  ctx.translate(enemy.x, enemy.y);
-  ctx.rotate(enemy.angle || 0);
-
-    if (gameState.chaosBossMeme) {
-        ctx.font = "64px Arial";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText("😂", 0, 0);
-    } else if (bossImage.complete && bossImage.naturalWidth !== 0) {
-        ctx.drawImage(bossImage, -40, -40, 80, 80);
-    } else {
-        ctx.fillStyle = '#f44336';
-        ctx.beginPath();
-        ctx.arc(0, 0, 35, 0, Math.PI * 2);
-        ctx.fill();
-    }
-
-    ctx.restore();
-}
-
+  
       function renderBullets() {
     gameState.bullets.forEach(bullet => {
         ctx.save();
@@ -3976,40 +4267,62 @@ function renderEnemy() {
           ctx.restore();
       }
 
-     function updateUI() {
-    document.getElementById('currentLevel').textContent = gameState.gameMode === 'endless' ? 
-        `W${gameState.endlessWave}` : gameState.currentLevel;
+         
+function updateUI() {
+    document.getElementById('currentLevel').textContent = gameState.gameMode === 'endless'
+        ? `W${gameState.endlessWave}`
+        : gameState.currentLevel;
     document.getElementById('playerLives').textContent = gameState.player.lives;
     document.getElementById('playerEnergy').textContent = Math.floor(gameState.player.energy);
     document.getElementById('playerScore').textContent = gameState.player.score.toLocaleString();
     document.getElementById('coinCount').textContent = gameState.coins;
+    
     const playerHealthPercent = (gameState.player.health / gameState.player.maxHealth) * 100;
     document.getElementById('playerHealthFill').style.width = Math.max(0, playerHealthPercent) + '%';
-    document.getElementById('playerHealthText').textContent = 
+    document.getElementById('playerHealthText').textContent =
         `${Math.max(0, Math.floor(gameState.player.health))} / ${gameState.player.maxHealth}`;
-    
-    if (
-  gameState.enemy &&
-  typeof gameState.enemy.health === "number" &&
-  typeof gameState.enemy.maxHealth === "number" &&
-  !isNaN(gameState.enemy.health) && !isNaN(gameState.enemy.maxHealth)
-) {
-  const enemyHealthPercent = (gameState.enemy.health / gameState.enemy.maxHealth) * 100;
-  document.getElementById('enemyHealthFill').style.width = Math.max(0, enemyHealthPercent) + '%';
-  document.getElementById('enemyHealthText').textContent =
-    `${Math.max(0, Math.floor(gameState.enemy.health))} / ${gameState.enemy.maxHealth}`;
-} else {
-  document.getElementById('enemyHealthFill').style.width = '0%';
-  document.getElementById('enemyHealthText').textContent = '-';
-}
-    
+
+    // PATCH: Nascondi SOLO la barra ENEMY in duel1v1, mostra altrove
+    const healthBarWrappers = document.querySelectorAll('.health-bar-wrapper');
+    healthBarWrappers.forEach(wrapper => {
+        // Cerca il div che contiene "ENEMY" come label
+        const isEnemyBar = Array.from(wrapper.children).some(child =>
+            child.textContent && child.textContent.trim().toUpperCase() === "ENEMY"
+        );
+        if (isEnemyBar) {
+            if (gameState.gameMode === "duel1v1") {
+                wrapper.style.display = "none";
+            } else {
+                wrapper.style.display = "";
+            }
+        }
+    });
+
+    // Gestione barra ENEMY: aggiorna valori solo se visibile
+    const enemyHealthFill = document.getElementById('enemyHealthFill');
+    const enemyHealthText = document.getElementById('enemyHealthText');
+    if (gameState.gameMode === "duel1v1") {
+        if (enemyHealthFill) enemyHealthFill.style.width = '0%';
+        if (enemyHealthText) enemyHealthText.textContent = '-';
+    } else if (
+        gameState.enemy &&
+        typeof gameState.enemy.health === "number" &&
+        typeof gameState.enemy.maxHealth === "number" &&
+        !isNaN(gameState.enemy.health) && !isNaN(gameState.enemy.maxHealth)
+    ) {
+        const enemyHealthPercent = (gameState.enemy.health / gameState.enemy.maxHealth) * 100;
+        if (enemyHealthFill) enemyHealthFill.style.width = Math.max(0, enemyHealthPercent) + '%';
+        if (enemyHealthText) enemyHealthText.textContent =
+            `${Math.max(0, Math.floor(gameState.enemy.health))} / ${gameState.enemy.maxHealth}`;
+    } else {
+        if (enemyHealthFill) enemyHealthFill.style.width = '0%';
+        if (enemyHealthText) enemyHealthText.textContent = '-';
+    }
+
     document.getElementById('energyFill').style.width = gameState.bulletHellIntensity + '%';
-    
+
     // Mostra bestScore correttamente
     document.getElementById('totalScore').textContent = (gameState.bestScore || 0).toLocaleString();
-
-    // Se vuoi mostrare anche il punteggio attuale (opzionale)
-    // document.getElementById('currentScore').textContent = gameState.player.score.toLocaleString();
 
     // Mostra anche altri dati delle statistiche se vuoi
     const savedData = JSON.parse(localStorage.getItem('stellarGuardianSave') || '{}');
@@ -4026,7 +4339,8 @@ function renderEnemy() {
 
     gameState.skillPoints = savedData.skillPoints || 0;
 }
-      // Data Management
+
+ // Data Management
       function saveGameData() {
           const savedData = JSON.parse(localStorage.getItem('stellarGuardianSave') || '{}');
           savedData.controlLayout = gameState.controlLayout; // Save control layout
@@ -4062,6 +4376,8 @@ function renderEnemy() {
 }
     
     function updateObstacles(deltaTime) {
+      if (!gameState.obstacles) gameState.obstacles = [];
+
   if (gameState.gameMode === "coop") return; // <-- AGGIUNGI QUESTA RIGA!
 
   if (Math.random() < 0.035) spawnObstacle();
@@ -5524,7 +5840,7 @@ function showAdAndStartGame() {
   // GameMonetize fallback
   if (typeof sdk !== 'undefined' && typeof sdk.showAd === 'function') {
     sdk.showAd();
-    setTimeout(() => startGame(true), 2000);
+    window.levelTimeout = setTimeout(() => startGame(true), 2000);
     return;
   }
   // Nessuna ad, avvia subito
@@ -5533,20 +5849,40 @@ function showAdAndStartGame() {
   
   
 function showScreen(screenId) {
+    console.log("showScreen chiamata con:", screenId);
+    
+    // Cancella eventuali timeout attivi per evitare salti di livello
+    if (window.levelTimeout) {
+        clearTimeout(window.levelTimeout);
+        window.levelTimeout = null;
+    }
+
+    // Disattiva tutte le schermate
     document.querySelectorAll('.screen').forEach(screen => {
         screen.classList.remove('active');
     });
-    
-    document.getElementById(screenId).classList.add('active');
-    gameState.currentScreen = screenId;
 
-    const mobileControls = document.getElementById('mobileControls');
-    if (screenId === 'gameScreen' && gameState.isMobile) {
-        mobileControls.classList.add('active');
+    // Attiva la schermata scelta, se esiste
+    const screenElem = document.getElementById(screenId);
+    if (screenElem) {
+        screenElem.classList.add('active');
+        gameState.currentScreen = screenId;
     } else {
-        mobileControls.classList.remove('active');
+        console.warn("Schermata non trovata:", screenId);
+        return;
     }
 
+    // Mobile controls
+    const mobileControls = document.getElementById('mobileControls');
+    if (mobileControls) {
+        if (screenId === 'gameScreen' && gameState.isMobile) {
+            mobileControls.classList.add('active');
+        } else {
+            mobileControls.classList.remove('active');
+        }
+    }
+
+    // Gestione logica specifica per schermate
     if (screenId === 'gameScreen') {
         // PATCH: se pendingStart è true, NON fare showAdAndStartGame()
         if (!gameState.gameRunning && !gameState.pendingStart) {
@@ -5558,15 +5894,15 @@ function showScreen(screenId) {
         if (gameState.gameRunning) {
             pauseGame();
         }
-    
     }
 
-      if (screenId === 'inventoryScreen') {
-    generaInventarioNavicelle();
-
+    // RICHIAMA INVENTARIO NAVICELLE OGNI VOLTA CHE ENTRI NELLA SCHERMATA
+    if (screenId === 'inventoryScreen') {
+        if (typeof generaInventarioNavicelle === 'function') {
+            generaInventarioNavicelle();
+        }
+    }
 }
-       
-} 
 
 
 function renderBossBar() {
@@ -6237,6 +6573,8 @@ function interpolateBoss() {
 
 // PATCH: Riduci dimensione boss su mobile landscape
 function renderEnemy() {
+    if (gameState.gameMode === "duel1v1") return; // Non disegnare boss in 1v1!
+
   const enemy = gameState.enemy;
   if (!enemy || enemy.health <= 0) return;
   ctx.save();
@@ -6367,7 +6705,406 @@ document.getElementById('chatInput')?.addEventListener('keydown', function(e){
   }
 }
  
- </script>
+ 
+ // ========== SOCKET.IO CONNECTION ==========
+
+// ========== UI ELEMENTS ==========
+const duelLobby = document.getElementById('duelLobby');
+const duelShip1 = document.getElementById('duelShip1');
+const duelShip2 = document.getElementById('duelShip2');
+const duelNick1 = document.getElementById('duelNick1');
+const duelNick2 = document.getElementById('duelNick2');
+const duelStatus = document.getElementById('duelStatus');
+const duelCancelBtn = document.getElementById('duelCancelBtn');
+const duelCountdown = document.getElementById('duelCountdown');
+const duelEndScreen = document.getElementById('duelEndScreen');
+const duelEndTitle = document.getElementById('duelEndTitle');
+const duelEndStats = document.getElementById('duelEndStats');
+const duelRematchBtn = document.getElementById('duelRematchBtn');
+const duelLobbyBtn = document.getElementById('duelLobbyBtn');
+
+duelCancelBtn.onclick = () => {
+  if (window.socket) {
+    window.socket.emit("duel_cancel", {});
+  }
+  duelLobby.classList.add('hidden');
+};
+
+
+
+// ========== STATE ==========
+let duelRoomId = null;
+let duelOpponent = null;
+let duelGameActive = false;
+
+// ========== LOBBY FLOW ==========
+function openDuelLobby() {
+  duelLobby.classList.remove('hidden');
+  duelStatus.textContent = "Looking for opponent...";
+  duelNick1.textContent = getPlayerName();
+  duelShip1.src = getSelectedShipImage();
+  duelNick2.textContent = "Searching...";
+  duelShip2.src = "navicella2.png";
+  
+}
+
+function startDuelQueue() {
+  if (!window.socket) {
+    window.socket = io();
+    setupDuelListeners();
+  }
+  // Assicurati di avere SEMPRE la reference giusta:
+  window.openDuelLobby();
+  window.socket.emit("duel_queue", {
+    nickname: getPlayerName(),
+    skin: getSelectedShipImage()
+  });
+}
+
+
+
+function startDuelCountdown() {
+  duelLobby.classList.add('hidden');
+  duelCountdown.classList.remove('hidden');
+  let count = 3;
+  duelCountdown.textContent = count;
+  const interval = setInterval(() => {
+    count--;
+    if (count > 0) {
+      duelCountdown.textContent = count;
+    } else if (count === 0) {
+      duelCountdown.textContent = "DUEL!";
+    } else {
+      clearInterval(interval);
+      duelCountdown.classList.add('hidden');
+      startDuelGame();
+    }
+  }, 1000);
+}
+
+function startDuelGame() {
+  duelGameActive = true;
+  showScreen('gameScreen');
+  window.gameState.gameMode = 'duel1v1';
+  window.gameState.duelRoomId = duelRoomId;
+  window.gameState.opponent = duelOpponent;
+  gameState.enemy = null;
+
+  // ... setup arena ...
+  initDuelArena();
+
+  // Avvia loop di sincronizzazione
+  duelSyncLoop();
+
+  // AVVIA IL GAMELOOP DEDICATO AL 1v1!
+  startDuelLoop();
+}
+
+function duelSyncLoop() {
+  if (!duelGameActive) return;
+  if (!window.socket) {
+    console.warn("socket non inizializzato in duelSyncLoop");
+    return;
+  }
+  const payload = {
+    room: duelRoomId,
+    player: {
+      x: window.gameState.player.x,
+      y: window.gameState.player.y,
+      health: window.gameState.player.health,
+      energy: window.gameState.player.energy,
+      angle: window.gameState.player.angle
+    },
+    action: window.gameState.lastAction
+  };
+  window.socket.emit("duel_update", payload);
+  setTimeout(duelSyncLoop, 50);
+}
+
+function showDuelEnd(winner, stats) {
+  duelEndScreen.classList.remove('hidden');
+  if (winner === (window.socket && window.socket.id)) {
+    duelEndTitle.textContent = "🏆 VICTORY!";
+  } else if (winner === "draw") {
+    duelEndTitle.textContent = "🤝 DRAW";
+  } else {
+    duelEndTitle.textContent = "😵 DEFEAT";
+  }
+  // Safe extract id
+  const myId = (window.socket && window.socket.id) ? window.socket.id : "me";
+  const oppId = (duelOpponent && duelOpponent.id) ? duelOpponent.id : "opponent";
+  duelEndStats.innerHTML = `
+    <b>You:</b> ${stats?.[myId]?.kills ?? 0} kills, ${stats?.[myId]?.damage ?? 0} damage<br>
+    <b>${duelOpponent?.nickname || "Opponent"}:</b> ${stats?.[oppId]?.kills ?? 0} kills, ${stats?.[oppId]?.damage ?? 0} damage
+  `;
+  setupDuelEndButtons?.(); // se c'è la funzione per i bottoni
+}
+
+// ========== GAMEPLAY: POWERUP & OSTACOLI (Esempio) ==========
+function processDuelEvents(events) {
+  if (!events) return;
+  for (const evt of events) {
+    if (evt.type === "powerup_spawn") spawnPowerup(evt.data);
+    if (evt.type === "powerup_pick") applyPowerup(evt.data);
+    if (evt.type === "obstacle_move") moveObstacle(evt.data);
+    // ... (puoi estendere)
+  }
+}
+function spawnPowerup(data) { /* disegna/aggiorna powerup */ }
+function applyPowerup(data) { /* applica powerup al player */ }
+function moveObstacle(data) { /* muovi ostacolo in arena */ }
+
+// ========== UTILS ==========
+function getPlayerName() {
+  return localStorage.getItem('playerName') || "NoName";
+}
+function getSelectedShipImage() {
+  return localStorage.getItem('selectedShip') || "navicella1.png";
+}
+
+function initDuelArena() {
+  gameState.player.x = 300;
+  gameState.player.y = 600;
+  gameState.player.health = 100;
+  gameState.player.energy = 100;
+  gameState.opponentState = {
+    x: 900,
+    y: 600,
+    health: 100,
+    energy: 100,
+    maxHealth: 100 // PATCH: sempre presente!
+  };
+  gameState.powerups = [];
+  gameState.obstacles = [];
+}
+ 
+ 
+// PATCH 2: Colore barra vita avversario sempre corretto
+function renderOpponent(ctx) {
+  const opp = gameState.opponentState;
+  if (!opp) return;
+  ctx.save();
+  ctx.globalAlpha = 0.8;
+  const img = new Image();
+  img.src = getShipImageFromId(duelOpponent?.skin) || "navicella2.png";
+  ctx.drawImage(img, opp.x - 32, opp.y - 32, 64, 64);
+
+  // Barra vita
+  const barWidth = 56, barHeight = 10;
+  const healthPercent = Math.max(0, opp.health) / (opp.maxHealth || 100);
+  // LOG: console.log("HP%", healthPercent, opp.health, opp.maxHealth);
+
+  ctx.fillStyle = healthPercent > 0.6 ? "#4caf50" : healthPercent > 0.3 ? "#ffd700" : "#f44336";
+  ctx.fillRect(opp.x - barWidth / 2, opp.y - 50, barWidth * healthPercent, barHeight);
+  ctx.strokeStyle = "#fff";
+  ctx.lineWidth = 2;
+  ctx.strokeRect(opp.x - barWidth / 2, opp.y - 50, barWidth, barHeight);
+  ctx.font = "bold 18px Orbitron";
+  ctx.fillStyle = "#ffd700";
+  ctx.textAlign = "center";
+  ctx.fillText(duelOpponent?.nickname || "Opponent", opp.x, opp.y - 60);
+  ctx.restore();
+}
+ 
+function setupDuelListeners() {
+  if (!window.socket) return; // AGGIUNGI QUESTA RIGA!
+  window.socket.off('duel_opponent_found');
+  window.socket.off('duel_state');
+  window.socket.off('duel_end');
+  window.socket.on('duel_opponent_found', ({ room, opponent }) => {
+    duelRoomId = room;
+    duelOpponent = opponent;
+    duelNick2.textContent = opponent.nickname;
+    duelShip2.src = opponent.skin;
+    duelStatus.textContent = "Opponent found! Get ready...";
+    setTimeout(() => startDuelCountdown(), 1200);
+  });
+  window.socket.on('duel_state', ({ opponent, powerups, obstacles, events }) => {
+    window.gameState.opponentState = opponent;
+    window.gameState.powerups = powerups;
+    window.gameState.obstacles = obstacles;
+    processDuelEvents(events);
+  });
+  window.socket.on('duel_end', ({ winner, stats }) => {
+    duelGameActive = false;
+    showDuelEnd(winner, stats);
+  });
+}
+
+
+// Funzione per controllare se sei effettivamente in fullscreen
+function isFullscreen() {
+  return !!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement || document.msFullscreenElement);
+}
+
+// Mostra il popup se NON sei in fullscreen e SEI nel gameScreen (solo su PC!)
+function showFullscreenAdvice() {
+  // Solo su PC (no mobile/tablet)
+  if (/Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) return;
+  // Solo se sei nella schermata di gioco
+  if (gameState.currentScreen !== "gameScreen") {
+    document.getElementById("fullscreenAdvicePopup").style.display = "none";
+    return;
+  }
+  // Se sei già in fullscreen, nascondi il popup
+  if (isFullscreen()) {
+    document.getElementById("fullscreenAdvicePopup").style.display = "none";
+    return;
+  }
+  // Mostra il popup
+  document.getElementById("fullscreenAdvicePopup").style.display = "block";
+}
+
+// Azione per entrare in fullscreen dal popup
+function enableFullscreenFromPopup() {
+  const elem = document.getElementById('gameContainer');
+  if (elem.requestFullscreen) elem.requestFullscreen();
+  else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
+  else if (elem.msRequestFullscreen) elem.msRequestFullscreen();
+  setTimeout(showFullscreenAdvice, 600); // Aggiorna popup dopo il tentativo
+}
+
+(function() {
+  const _originalShowScreen = window.showScreen; // <- Cambia qui
+  window.showScreen = function(screenId) {
+    if (typeof _originalShowScreen === "function") _originalShowScreen(screenId);
+    setTimeout(showFullscreenAdvice, 250);
+  };
+  document.addEventListener('fullscreenchange', showFullscreenAdvice);
+  window.addEventListener('focus', showFullscreenAdvice);
+})();
+
+
+window.addEventListener('DOMContentLoaded', () => {
+  duelRematchBtn.onclick = () => {
+    duelEndScreen.classList.add('hidden');
+    safeCloseSocket(() => {
+      duelGameActive = false;
+      duelRoomId = null;
+      duelOpponent = null;
+      window.socket = io();
+      setupDuelListeners();
+      window.socket.on('connect', () => {
+        startDuelQueue();
+      });
+    });
+  };
+
+  duelLobbyBtn.onclick = () => {
+    duelEndScreen.classList.add('hidden');
+    duelGameActive = false;
+    duelRoomId = null;
+    duelOpponent = null;
+    showScreen('mainMenu');
+    safeCloseSocket();
+  };
+});
+
+// Funzione helper per chiudere socket in sicurezza
+function safeCloseSocket(cb) {
+  if (window.socket) {
+    try {
+      window.socket.on('disconnect', () => {
+        window.socket = null;
+        if (cb) setTimeout(cb, 50);
+      });
+      window.socket.disconnect();
+      setTimeout(() => {
+        if (cb) cb();
+      }, 500);
+    } catch (e) { if (cb) cb(); }
+  } else {
+    if (cb) cb();
+  }
+}
+
+
+function getShipImageFromId(id) {
+  switch (id) {
+    case "ship1": return "navicella1.png";
+    case "ship2": return "navicella2.png";
+    case "ship3": return "navicella3.png";
+    case "ship4": return "navicella4.png";
+    case "summer": return "navicella-summer.png";
+    default: return "navicella2.png";
+  }
+}
+
+
+function setupDuelEndButtons() {
+  // Rimuovi i vecchi listener se già presenti
+  duelRematchBtn.onclick = null;
+  duelLobbyBtn.onclick = null;
+
+  duelRematchBtn.onclick = function() {
+    duelEndScreen.classList.add('hidden');
+    safeCloseSocket(() => {
+      duelGameActive = false;
+      duelRoomId = null;
+      duelOpponent = null;
+      window.socket = io();
+      setupDuelListeners();
+      window.socket.on('connect', () => {
+        startDuelQueue();
+      });
+    });
+  };
+
+  duelLobbyBtn.onclick = function() {
+    duelEndScreen.classList.add('hidden');
+    duelGameActive = false;
+    duelRoomId = null;
+    duelOpponent = null;
+    showScreen('mainMenu');
+    safeCloseSocket();
+  };
+}
+
+function startDuelLoop() {
+  function duelLoop() {
+    if (!duelGameActive || gameState.currentScreen !== 'gameScreen' || gameState.gameMode !== 'duel1v1') return;
+    updatePlayer(1); // aggiorna il tuo player
+    updatePlayerTrail();
+    updateObstacles(1);
+    updateBullets(1);
+    updateEnemyBullets(1);
+    updateParticles(1);
+    checkCollisionsDuel();
+    render();
+    requestAnimationFrame(duelLoop);
+  }
+  duelLoop();
+}
+
+// PATCH 3: Disconnessione immediata al termine duello
+function checkCollisionsDuel() {
+  if (!duelGameActive || !gameState.opponentState) return;
+  for (let i = gameState.bullets.length - 1; i >= 0; i--) {
+    const bullet = gameState.bullets[i];
+    const opp = gameState.opponentState;
+    const dist = Math.sqrt((bullet.x - opp.x) ** 2 + (bullet.y - opp.y) ** 2);
+    const hitbox = 32;
+    if (dist < hitbox && opp.health > 0) {
+      opp.health -= bullet.damage || 20;
+      gameState.bullets.splice(i, 1);
+      createHitParticles(bullet.x, bullet.y, bullet.color || "#ffd700");
+      if (window.socket && duelRoomId) {
+        window.socket.emit("duel_hit", {
+          room: duelRoomId,
+          damage: bullet.damage || 20
+        });
+      }
+    }
+  }
+  if (gameState.opponentState.health <= 0) {
+    duelGameActive = false;
+    showDuelEnd(window.socket.id, {/* ... */});
+    safeCloseSocket(); // <--- chiudi subito la connessione!
+  }
+}
+
+
+</script>
   
 </body>
 </html>
