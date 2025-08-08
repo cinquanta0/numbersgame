@@ -1577,7 +1577,7 @@ body.loading {
                   <button class="menu-btn" onclick="showScreen('inventoryScreen')">🛸 SPACESHIP INVENTORY</button>
                   <button class="menu-btn" onclick="showGlobalLeaderboard()">🌍 GLOBAL LEADERBOARD</button>
                   <button class="menu-btn primary" onclick="showCoopLobby()">🌐 Raid Co-op Online</button>
-                  <button class="menu-btn" onclick="window.open('https://site-stellarguardian999.onrender.com','_blank')">🌐 Sito Ufficiale</button>
+                  <button class="menu-btn" onclick="window.open('https://stellarguardian72.onrender.com','_blank')">🌐 Sito Ufficiale</button>
                   <button class="menu-btn" onclick="showDailyChallengeMenu()">🌟 DAILY CHALLENGE</button>
                   <button class="menu-btn" onclick="showLocalLeaderboard()">🌟 LOCAL LEADERBOARD</button>
                   <button class="menu-btn" onclick="showScreen('skillTree')">⭐ UPGRADES</button>
@@ -2323,7 +2323,7 @@ enemyImage.src = 'alien-enemy2.png'; // Senza /
     const rect = container.getBoundingClientRect();
 
     // Limite massimo risoluzione
-    const maxWidth = 1920, maxHeight = 1080;
+    const maxWidth = 1280, maxHeight = 720;
     const aspect = maxWidth / maxHeight;
 
     let width = Math.min(rect.width, maxWidth);
@@ -3064,20 +3064,23 @@ if (gameState._frameCount % 300 === 0) {
   }
 }
 
-     function updatePlayer(deltaTime) {
+   function updatePlayer(deltaTime) {
     const player = gameState.player;
     const skills = gameState.player.skills;
-    let speed = player.precisionMode ? 4 : 8;
+let speed = player.precisionMode ? 2 : 4; // valori più bassi!
+if (skills.targeting_system && player.precisionMode) speed *= 0.7;
 
-    if (skills.targeting_system && player.precisionMode) {
-        speed *= 0.7;
-    }
+if (isMobileDevice()) {
+    speed *= 0.7;
+    if (skills.mobile_optimizer) speed *= 1.1;
+} else {
+    speed *= 0.8;
+}
 
-    if (skills.mobile_optimizer && gameState.isMobile) {
-        speed *= 1.2;
-    }
+speed *= deltaTime;
 
-    speed *= deltaTime;
+// Fattore globale per rallentare tutto:
+speed *= 0.7; // 70% della velocità finale
 
     // Mobile joystick movement
     if (gameState.isMobile && gameState.touchControls.joystick.active) {
@@ -4374,17 +4377,22 @@ function updateUI() {
     gameState.bestScore = Number(savedData.bestScore) || 0; // PATCH: aggiunto bestScore
 }
 
-    function spawnObstacle() {
+   function spawnObstacle() {
     if (!gameState.obstacles) gameState.obstacles = [];
-    const types = ["asteroid"]; // SOLO ASTEROIDI, niente mine!
+    const types = ["asteroid"];
     const type = types[Math.floor(Math.random() * types.length)];
     const x = Math.random() * canvas.width;
     const size = 32 + Math.random() * 32;
+
+    // PATCH: velocità più bassa su mobile
+    let vy = 2 + Math.random() * 2;
+    if (isMobileDevice()) vy *= 0.55; // circa metà velocità su mobile
+
     gameState.obstacles.push({
         x: x,
         y: -size,
         vx: (Math.random() - 0.5) * 1.5,
-        vy: 2 + Math.random() * 2,
+        vy: vy, // usa la velocità modificata!
         size: size,
         type: type,
         angle: 0,
@@ -6402,7 +6410,7 @@ window.checkCollisions = function() {
 window.updatePlayer = function(deltaTime) {
   const player = gameState.player;
   const skills = gameState.player.skills;
-  let speed = player.precisionMode ? 4 : 8;
+  let speed = player.precisionMode ? 3 : 6;
   if (skills.targeting_system && player.precisionMode) {
     speed *= 0.7;
   }
@@ -7126,6 +7134,3 @@ function checkCollisionsDuel() {
   
 </body>
 </html>
-
-
-
