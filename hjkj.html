@@ -46,16 +46,34 @@ sdk.showBanner();
 
 
 #nicknameBox {
-  background: #fff !important;
-  color: #222 !important;
+  background: rgba(0, 0, 0, 0.8) !important; /* Sfondo nero semi-trasparente */
+  color: #ffffff !important; /* Testo bianco invece di grigio scuro */
   box-shadow: 0 0 24px #00bcd4;
   border: 2px solid #00bcd4;
   position: relative;
   z-index: 9999;
+  backdrop-filter: blur(5px); /* Aggiunge effetto blur */
 }
+
 #nicknameInput, #nicknameBox label, #nicknameBox button {
-  color: #222 !important;
+  color: #ffffff !important; /* Bianco invece di #222 */
   font-size: 1.1rem !important;
+  background: rgba(255, 255, 255, 0.1); /* Sfondo leggermente più chiaro per input */
+}
+
+#nicknameInput {
+  background: rgba(255, 255, 255, 0.9) !important; /* Input con sfondo quasi bianco */
+  color: #000000 !important; /* Testo nero nell'input per contrasto */
+  border: 1px solid #00bcd4;
+  padding: 8px;
+}
+
+#nicknameBox button {
+  background: #00bcd4 !important;
+  color: #000000 !important; /* Testo nero sul pulsante azzurro */
+  border: none;
+  padding: 8px 15px;
+  font-weight: bold;
 }
 
 
@@ -1559,7 +1577,7 @@ body.loading {
                   <button class="menu-btn" onclick="showScreen('inventoryScreen')">🛸 SPACESHIP INVENTORY</button>
                   <button class="menu-btn" onclick="showGlobalLeaderboard()">🌍 GLOBAL LEADERBOARD</button>
                   <button class="menu-btn primary" onclick="showCoopLobby()">🌐 Raid Co-op Online</button>
-                  <button class="menu-btn" onclick="window.open('https://stellarguardian113.onrender.com','_blank')">🌐 Sito Ufficiale</button>
+                  <button class="menu-btn" onclick="window.open('https://stellarguardian72.onrender.com','_blank')">🌐 Sito Ufficiale</button>
                   <button class="menu-btn" onclick="showDailyChallengeMenu()">🌟 DAILY CHALLENGE</button>
                   <button class="menu-btn" onclick="showLocalLeaderboard()">🌟 LOCAL LEADERBOARD</button>
                   <button class="menu-btn" onclick="showScreen('skillTree')">⭐ UPGRADES</button>
@@ -7108,4 +7126,3 @@ function checkCollisionsDuel() {
   
 </body>
 </html>
-
