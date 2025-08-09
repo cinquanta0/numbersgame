@@ -2319,43 +2319,34 @@ enemyImage.src = 'alien-enemy2.png'; // Senza /
           }, 100);
       }
 
-     function resizeCanvas() {
-    const container = document.getElementById('gameContainer');
-    const rect = container.getBoundingClientRect();
+    function resizeCanvas() {
+  const container = document.getElementById('gameContainer');
+  let maxWidth, maxHeight;
 
-    // Limite massimo risoluzione
-    const maxWidth = 1280, maxHeight = 720;
-    const aspect = maxWidth / maxHeight;
+  if (isMobileDevice && isMobileDevice()) {
+    maxWidth = 960;   // o 1280
+    maxHeight = 540;  // o 720
+  } else {
+    maxWidth = 1280;
+    maxHeight = 720;
+  }
 
-    let width = Math.min(rect.width, maxWidth);
-    let height = Math.min(rect.height, maxHeight);
+  const aspect = maxWidth / maxHeight;
+  let width = Math.min(container.offsetWidth, maxWidth);
+  let height = Math.min(container.offsetHeight, maxHeight);
 
-    // Mantieni proporzione 16:9 (o quella che vuoi)
-    if (width / height > aspect) {
-        width = Math.round(height * aspect);
-    } else {
-        height = Math.round(width / aspect);
-    }
+  if (width / height > aspect) {
+    width = Math.round(height * aspect);
+  } else {
+    height = Math.round(width / aspect);
+  }
 
-    // Canvas interno sempre fisso (pixel perfect, anti-lag)
-    canvas.width = maxWidth;
-    canvas.height = maxHeight;
-
-    // Canvas visibile scalato (ma senza mai upscaling "sporco")
-    canvas.style.width = width + "px";
-    canvas.style.height = height + "px";
-    canvas.style.display = "block";
-    canvas.style.margin = "auto";
-
-    // ...resto della funzione...
-    if (gameState.gameRunning) {
-        gameState.player.x = Math.min(gameState.player.x, canvas.width - 50);
-        gameState.player.y = Math.min(gameState.player.y, canvas.height - 50);
-
-        if (gameState.enemy) {
-            gameState.enemy.x = Math.min(gameState.enemy.x, canvas.width - 100);
-        }
-    }
+  canvas.width = maxWidth;
+  canvas.height = maxHeight;
+  canvas.style.width = width + "px";
+  canvas.style.height = height + "px";
+  canvas.style.display = "block";
+  canvas.style.margin = "auto";
 }
 
       // Enhanced Mobile Controls Setup
@@ -4419,9 +4410,15 @@ function updateUI() {
 
   if (gameState.gameMode === "coop") return; // <-- AGGIUNGI QUESTA RIGA!
 
+if (isMobileDevice && isMobileDevice()) {
+  // Su mobile: asteroidi molto meno frequenti!
+  if (Math.random() < 0.014) spawnObstacle();
+} else {
+  // Desktop: come prima
   if (Math.random() < 0.035) spawnObstacle();
-
-  gameState.obstacles = gameState.obstacles.filter(o => {
+}
+  
+gameState.obstacles = gameState.obstacles.filter(o => {
     o.x += o.vx * (deltaTime || 1);
     o.y += o.vy * (deltaTime || 1);
     o.angle += o.spin;
