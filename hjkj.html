@@ -1509,19 +1509,8 @@ body.loading {
       </div>
   </div>
   
-  <!-- Enhanced Mobile Controls -->
-  <div class="mobile-controls" id="mobileControls">
-      <div class="mobile-joystick" id="mobileJoystick">
-          <div class="mobile-joystick-knob" id="mobileJoystickKnob"></div>
-      </div>
-      <div class="mobile-action-buttons" id="mobileActionButtons">
-          <div class="mobile-action-btn" id="mobileShoot">🚀</div>
-          <div class="mobile-action-btn" id="mobileShield">🛡️</div>
-          <div class="mobile-action-btn special" id="mobileSpecial">⚡</div>
-      </div>
-  </div>
-
-  <!-- Control Adjustment Overlay -->
+  
+          <!-- Control Adjustment Overlay -->
   <div class="control-adjustment-overlay" id="controlAdjustmentOverlay">
       <h2 style="color: #ffd700; margin-bottom: 1rem; font-size: clamp(1.8rem, 6vw, 2.5rem);">Adjust Controls</h2>
       <p style="margin-bottom: 1.5rem; font-size: clamp(1rem, 3vw, 1.2rem);">Drag and drop the controls to your preferred positions.</p>
@@ -1534,7 +1523,8 @@ body.loading {
       </div>
   </div>
   
-<div id="gameContainer">
+
+  <div id="gameContainer">
   <!-- Main Menu Screen -->
   <div class="screen active" id="mainMenu">
     <!-- Galaxy background -->
@@ -1567,6 +1557,17 @@ body.loading {
     <div>Coins</div>
 </div>
               
+ <!-- Mobile Speed Control -->
+                <div id="mobileSpeedControl" style="margin:2rem 0; display:none;">
+                    <h3 style="color:#00bcd4; margin-bottom:0.8rem;">Mobile Ship Speed</h3>
+                    <input type="range" id="mobileSpeedSlider" min="0.4" max="1.2" step="0.02" value="0.7" style="width: 220px;">
+                    <span id="mobileSpeedValue" style="color:#ffd700;font-weight:bold;margin-left:10px;">0.70x</span>
+                    <div style="font-size:0.95rem; margin-top:0.7em; color:#bbb;">
+                        Adjust for your comfort. Default: 0.7x (slower = easier to control)
+                    </div>
+                </div>
+
+
 
 <audio id="musicaGioco" src="musica.mp3" loop></audio>        
                   <div class="menu-buttons">
@@ -1586,6 +1587,9 @@ body.loading {
                   <button class="menu-btn" onclick="showScreen('controls')">🎮 CONTROLS</button>
                   <button class="menu-btn" onclick="showOrientationSelector()">📱 ORIENTATION</button>
                   <button class="menu-btn primary" onclick="startDuelQueue()">⚔️ 1v1 DUELS</button>
+                  <!-- Apri il Mobile Customization menu -->
+                  <button class="menu-btn" onclick="showScreen('mobileCustomizationMenu')">📱 MOBILE SETTINGS</button>
+
                 </div>
               
               <div class="stats-display">
@@ -2038,6 +2042,58 @@ body.loading {
     <button onclick="document.getElementById('fullscreenAdvicePopup').style.display='none'" style="margin-top:0.5em;padding:0.7em 1.3em;border-radius:15px;background:#444;color:#fff;font-weight:bold;border:none;cursor:pointer;margin-left:0.7em;">Close</button>
   </div>
 </div>
+  
+  
+  <!-- MOBILE CUSTOMIZATION MENU -->
+<div class="screen" id="mobileCustomizationMenu">
+  <button class="menu-btn home-btn" onclick="showScreen('mainMenu')">🏠 HOME</button>
+  <div class="menu-content">
+    <h2 class="game-subtitle">📱 Mobile Controls & Ship Settings</h2>
+
+    <!-- Pulsanti selezionabili -->
+    <div>
+      <h3 style="color:#00bcd4;">Select Action Buttons</h3>
+      <button class="menu-btn" onclick="toggleMobileButton('shoot')">🔫 Shoot</button>
+      <button class="menu-btn" onclick="toggleMobileButton('special')">💥 Special</button>
+      <button class="menu-btn" onclick="toggleMobileButton('shield')">🛡 Shield</button>
+    </div>
+
+    <!-- Velocità navicella -->
+    <div style="margin-top:1.5rem;">
+      <h3 style="color:#00bcd4;">Ship Speed</h3>
+      <input type="range" id="shipSpeedSlider" min="0.4" max="1.2" step="0.02" value="0.7" 
+             oninput="updateShipSpeedValue(this.value)">
+      <span id="shipSpeedValue" style="color:#ffd700;font-weight:bold;">0.70x</span>
+    </div>
+
+    <!-- Dimensione e colore pulsanti -->
+    <div style="margin-top:1.5rem;">
+      <h3 style="color:#00bcd4;">Button Size</h3>
+      <input type="range" id="buttonSizeSlider" min="40" max="120" value="80" oninput="updateButtonSize(this.value)">
+      <span id="buttonSizeValue" style="color:#ffd700;font-weight:bold;">80px</span>
+
+      <h3 style="color:#00bcd4; margin-top:1rem;">Button Color</h3>
+      <input type="color" id="buttonColorPicker" value="#00bcd4" onchange="updateButtonColor(this.value)">
+    </div>
+
+    <!-- Nickname sopra navicella -->
+<div style="margin-top:1.5rem;">
+  <h3 style="color:#00bcd4;">Nickname Display</h3>
+  <input type="text" id="nicknameAboveShip" placeholder="Your nickname">
+  <input type="color" id="nicknameColorPicker" value="#ffffff" onchange="updateNicknameColor(this.value)">
+</div>
+
+<!-- Pulsanti Salva/Reset -->
+<div style="margin-top:1.5rem; display:flex; gap:12px; justify-content:center;">
+  <button class="menu-btn primary" onclick="applyMobileSettings()">💾 APPLICA</button>
+  <button class="menu-btn" onclick="resetMobileSettings()">♻️ RESET</button>
+</div>
+
+</div> <!-- fine .menu-content -->
+</div> <!-- fine #mobileCustomizationMenu -->
+
+
+  
   
   
   <script>
@@ -3065,9 +3121,9 @@ if (skills.targeting_system && player.precisionMode) speed *= 0.7;
 
     speed *= 2.3;
 
-// Applica il rallentamento solo su mobile
 if (isMobileDevice && isMobileDevice()) {
-  speed *= 0.7;
+  let custom = Number(localStorage.getItem('mobileShipSpeed')) || 0.7;
+  speed *= custom;
 }
 
 speed *= deltaTime;
@@ -6832,6 +6888,108 @@ function checkCollisionsDuel() {
   document.addEventListener('fullscreenchange', showFullscreenAdvice);
   window.addEventListener('focus', showFullscreenAdvice);
 })();
+function toggleMobileButton(buttonId) {
+  // Logica per attivare/disattivare un pulsante nel layout mobile
+  console.log("Toggled:", buttonId);
+}
+
+function updateShipSpeedValue(value) {
+  document.getElementById('shipSpeedValue').textContent = parseFloat(value).toFixed(2) + "x";
+  // Qui imposti la variabile di velocità della navicella nel gioco
+}
+
+function updateButtonSize(value) {
+  document.getElementById('buttonSizeValue').textContent = value + "px";
+  document.querySelectorAll('.mobile-action-btn').forEach(btn => {
+    btn.style.width = value + "px";
+    btn.style.height = value + "px";
+  });
+}
+
+function updateButtonColor(color) {
+  document.querySelectorAll('.mobile-action-btn').forEach(btn => {
+    btn.style.backgroundColor = color;
+  });
+}
+
+function updateNicknameColor(color) {
+  const nickElement = document.getElementById('nicknameAboveShipDisplay');
+  if (nickElement) nickElement.style.color = color;
+}
+
+function applyMobileSettings() {
+  // velocità
+  const speed = parseFloat(document.getElementById('shipSpeedSlider').value);
+  window.gameSettings = window.gameSettings || {};
+  window.gameSettings.shipSpeed = speed;
+  // Applica al gioco (adatta alla tua variabile reale del gioco)
+  if (window.playerShip && typeof window.playerShip.setSpeedMultiplier === 'function') {
+    window.playerShip.setSpeedMultiplier(speed);
+  } else if (window.playerShip) {
+    window.playerShip.speedMultiplier = speed;
+  }
+
+  // dimensione e colore pulsanti
+  const size = document.getElementById('buttonSizeSlider').value + 'px';
+  const color = document.getElementById('buttonColorPicker').value;
+  document.querySelectorAll('.mobile-action-btn').forEach(btn => {
+    btn.style.width = size;
+    btn.style.height = size;
+    btn.style.background = color;
+  });
+
+  // nickname sopra la navicella + colore
+  const nick = document.getElementById('nicknameAboveShip')?.value || '';
+  const nickColor = document.getElementById('nicknameColorPicker')?.value || '#fff';
+  let nickEl = document.getElementById('nicknameAboveShipDisplay');
+  if (!nickEl) {
+    nickEl = document.createElement('div');
+    nickEl.id = 'nicknameAboveShipDisplay';
+    nickEl.style.position = 'absolute';
+    nickEl.style.pointerEvents = 'none';
+    nickEl.style.fontFamily = "'Orbitron', monospace";
+    nickEl.style.fontWeight = '900';
+    nickEl.style.textShadow = '0 0 8px rgba(0,0,0,0.6)';
+    nickEl.style.zIndex = 2000;
+    nickEl.style.transform = 'translate(-50%,-120%)';
+    document.getElementById('gameContainer').appendChild(nickEl);
+  }
+  nickEl.textContent = nick;
+  nickEl.style.color = nickColor;
+
+  // salva su localStorage per persistenza
+  localStorage.setItem('sg_mobileSettings', JSON.stringify(window.gameSettings));
+
+  // notifica rapida
+  showNotification && typeof showNotification === 'function'
+    ? showNotification('Mobile settings applicati ✅')
+    : alert('Mobile settings applicati ✅');
+}
+
+// resettare le impostazioni (facoltativo)
+function resetMobileSettings() {
+  // ripristina valori di default
+  document.getElementById('shipSpeedSlider').value = 0.7;
+  document.getElementById('shipSpeedValue').textContent = '0.70x';
+  document.getElementById('buttonSizeSlider').value = 80;
+  document.getElementById('buttonSizeValue').textContent = '80px';
+  document.getElementById('buttonColorPicker').value = '#00bcd4';
+  document.getElementById('nicknameAboveShip').value = '';
+  document.getElementById('nicknameColorPicker').value = '#ffffff';
+  applyMobileSettings();
+}
+
+
+function updateNicknamePosition() {
+  const nickEl = document.getElementById('nicknameAboveShipDisplay');
+  if (!nickEl || !window.playerShip) return;
+  // supponiamo playerShip abbia .x e .y in coordinate del canvas
+  const rect = document.getElementById('gameCanvas').getBoundingClientRect();
+  const shipScreenX = rect.left + (window.playerShip.x / GAME_WIDTH) * rect.width;
+  const shipScreenY = rect.top + (window.playerShip.y / GAME_HEIGHT) * rect.height;
+  nickEl.style.left = shipScreenX + 'px';
+  nickEl.style.top = shipScreenY + 'px';
+}
 
 
 </script>
