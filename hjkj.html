@@ -3127,6 +3127,10 @@ if (gameState._frameCount % 300 === 0) {
     const player = gameState.player;
     const skills = gameState.player.skills;
 let speed = player.precisionMode ? 2 : 4; // valori più bassi!
+
+  // <<< INCOLLA QUI >>>
+    document.getElementById('coinCount').textContent = "Speed " + (window.gameState.mobileShipSpeed || localStorage.getItem('mobileShipSpeed'));
+
 if (skills.targeting_system && player.precisionMode) speed *= 0.7;
 
 
@@ -3137,7 +3141,9 @@ if (isMobileDevice && isMobileDevice()) {
   let custom = (window.gameState && window.gameState.mobileShipSpeed !== undefined)
     ? window.gameState.mobileShipSpeed
     : Number(localStorage.getItem('mobileShipSpeed')) || 0.7;
-  speed *= custom;
+       console.log("Valore custom di velocità (mobileShipSpeed) in updatePlayer:", custom);
+
+    speed *= custom;
 }
 
 speed *= deltaTime;
@@ -6961,6 +6967,8 @@ function applyMobileSettings() {
   // PATCH: aggiorna dinamicamente la velocità anche in partita
   if (window.gameState && window.gameState.isMobile) {
     window.gameState.mobileShipSpeed = speed;
+    console.log("Nuova velocità impostata in applyMobileSettings:", speed, "window.gameState.mobileShipSpeed:", window.gameState.mobileShipSpeed);
+
     if (window.gameState.player) {
       // Se vuoi puoi forzare l’update su player
       window.gameState._forceMobileSpeedUpdate = true;
