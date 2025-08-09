@@ -1586,8 +1586,8 @@ body.loading {
                   <button class="menu-btn" onclick="showScreen('stats')">📊 STATISTICS</button>
                   <button class="menu-btn" onclick="showScreen('controls')">🎮 CONTROLS</button>
                   <button class="menu-btn" onclick="showOrientationSelector()">📱 ORIENTATION</button>
-                  <button class="menu-btn primary" onclick="startDuelQueue()">⚔️ 1v1 DUELS</button>
-                  <!-- Apri il Mobile Customization menu -->
+                  <button class="menu-btn primary" onclick="loadDuelClient()">⚔️ 1v1 DUELS</button>                   
+                    <!-- Apri il Mobile Customization menu -->
                   <button class="menu-btn" onclick="showScreen('mobileCustomizationMenu')">📱 MOBILE SETTINGS</button>
 
                 </div>
@@ -3123,24 +3123,18 @@ if (gameState._frameCount % 300 === 0) {
   }
 }
 
-  function updatePlayer(deltaTime) {
+   function updatePlayer(deltaTime) {
     const player = gameState.player;
     const skills = gameState.player.skills;
-    let speed = player.precisionMode ? 2 : 4; // valori più bassi!
+let speed = player.precisionMode ? 2 : 4; // valori più bassi!
 
-    // <<< INCOLLA QUI >>>
+  // <<< INCOLLA QUI >>>
     document.getElementById('coinCount').textContent = "Speed " + (window.gameState.mobileShipSpeed || localStorage.getItem('mobileShipSpeed'));
 
-    if (skills.targeting_system && player.precisionMode) speed *= 0.7;
+if (skills.targeting_system && player.precisionMode) speed *= 0.7;
+
 
     speed *= 2.3;
-
-    // PATCH: velocità globale super bassa per tutti
-    speed *= 1.4; // Cambia 0.18 con quanto lento vuoi (0.1 = lentissimo, 1 = normale)
-
-    // Il resto come prima
-    speed *= deltaTime;
-    speed *= gameState.globalSpeed; // puoi anche forzarlo a 1 se vuoi
 
 if (isMobileDevice && isMobileDevice()) {
   // Applica runtime la velocità aggiornata senza reload
@@ -6271,12 +6265,11 @@ window.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-
+// 2. Utility: rileva mobile
 function isMobileDevice() {
-  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Opera Mobi|Mobile|Silk|Kindle|Windows Phone|PlayBook|BB10|webOS|Mobile Safari|Fennec/i
-    .test(navigator.userAgent)
-    || ("ontouchstart" in window && screen.width < 900);
+  return /Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 }
+
  
  // === PATCH: Popup suggerimento landscape su mobile ===
 
@@ -7073,6 +7066,28 @@ function loadMobileSettings() {
     document.getElementById('nicknameColorPicker').value = saved.nicknameColor;
   }
 }
+
+
+window.stellar1v1Loaded = false;
+
+function loadDuelClient() {
+  if (window.stellar1v1Loaded) {
+    if (window.stellarGuardian && window.stellarGuardian.joinDuelQueue) {
+      window.stellarGuardian.joinDuelQueue();
+    }
+    return;
+  }
+  const script = document.createElement('script');
+  script.src = 'stellar_guardian_client.js';
+  script.onload = () => {
+    window.stellar1v1Loaded = true;
+    if (window.stellarGuardian && window.stellarGuardian.joinDuelQueue) {
+      window.stellarGuardian.joinDuelQueue();
+    }
+  };
+  document.body.appendChild(script);
+}
+
 
 </script>
   
