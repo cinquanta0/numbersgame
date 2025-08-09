@@ -6265,11 +6265,12 @@ window.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-// 2. Utility: rileva mobile
-function isMobileDevice() {
-  return /Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-}
 
+function isMobileDevice() {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Opera Mobi|Mobile|Silk|Kindle|Windows Phone|PlayBook|BB10|webOS|Mobile Safari|Fennec/i
+    .test(navigator.userAgent)
+    || ("ontouchstart" in window && screen.width < 900);
+}
  
  // === PATCH: Popup suggerimento landscape su mobile ===
 
