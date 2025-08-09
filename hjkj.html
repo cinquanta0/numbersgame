@@ -2160,10 +2160,11 @@ let gameState = {
     timeScale: 1,
     screenShake: 0,
     transformationActive: false,
-    controlLayout: {
+     controlLayout: {
         joystick: { left: '20px', bottom: '30px' },
         buttons: { right: '20px', bottom: '30px' }
-    }
+    },
+    globalSpeed: 0.50 // <--- QUI, dentro la graffa, senza virgola!
 };
 window.gameState = gameState;
       
@@ -3012,7 +3013,7 @@ function gameLoop() {
      // Sostituisci la funzione update con questa:
 function update(deltaTime) {
     deltaTime *= gameState.timeScale;  // <--- QUESTA RIGA!
-
+    deltaTime *= gameState.globalSpeed;
   
   
   updatePlayer(deltaTime);
