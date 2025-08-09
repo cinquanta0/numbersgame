@@ -3079,7 +3079,7 @@ if (isMobileDevice()) {
 }
 
 speed *= deltaTime;
-
+speed *= gameState.globalSpeed;
 // Fattore globale per rallentare tutto:
 speed *= 0.7; // 70% della velocità finale
 
