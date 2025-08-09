@@ -3072,13 +3072,15 @@ let speed = player.precisionMode ? 2 : 4; // valori più bassi!
 if (skills.targeting_system && player.precisionMode) speed *= 0.7;
 
 
-    speed *= 0.8;
+    speed *= 2.3;
 
+// Applica il rallentamento solo su mobile
+if (isMobileDevice && isMobileDevice()) {
+  speed *= 0.7;
+}
 
 speed *= deltaTime;
 speed *= gameState.globalSpeed;
-// Fattore globale per rallentare tutto:
-speed *= 0.7; // 70% della velocità finale
 
     // Mobile joystick movement
     if (gameState.isMobile && gameState.touchControls.joystick.active) {
@@ -3204,7 +3206,20 @@ const enemy = gameState.enemy;
               enemy.attackCooldown -= deltaTime;
           }
       }
-
+      
+      // --- PATCH: funzione mancante per parametri proiettili mobile ---
+function getMobileBulletParams(count, speed) {
+  // Se sei su mobile, riduci il numero di proiettili e la loro velocità per evitare lag
+  if (isMobileDevice && typeof isMobileDevice === "function" && isMobileDevice()) {
+    return {
+      count: Math.max(1, Math.round(count * 0.6)),
+      speed: speed * 1.2
+    };
+  }
+  // Su desktop, torna tutto normale
+  return { count, speed };
+}
+      
       function executeAttackPattern(pattern) {
   const enemy = gameState.enemy;
   const levelData = LEVEL_DATA[gameState.currentLevel - 1] || LEVEL_DATA[0];
@@ -6234,12 +6249,7 @@ window.addEventListener('DOMContentLoaded', function() {
   setTimeout(checkAndShowOrientationAdvice, 300); // Delay per layout
 });
 
-// 5. Mostra il popup anche quando si entra nel gameScreen (se serve)
-const originalShowScreen = window.showScreen;
-window.showScreen = function(screenId) {
-  originalShowScreen(screenId);
-  if (screenId === 'gameScreen') setTimeout(checkAndShowOrientationAdvice, 350);
-};
+
 
  
  // PATCH: Boss co-op visibile su mobile
@@ -6676,15 +6686,6 @@ function enableFullscreenFromPopup() {
   setTimeout(showFullscreenAdvice, 600); // Aggiorna popup dopo il tentativo
 }
 
-(function() {
-  const _originalShowScreen = window.showScreen; // <- Cambia qui
-  window.showScreen = function(screenId) {
-    if (typeof _originalShowScreen === "function") _originalShowScreen(screenId);
-    setTimeout(showFullscreenAdvice, 250);
-  };
-  document.addEventListener('fullscreenchange', showFullscreenAdvice);
-  window.addEventListener('focus', showFullscreenAdvice);
-})();
 
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -6814,6 +6815,26 @@ function checkCollisionsDuel() {
     safeCloseSocket(); // <--- chiudi subito la connessione!
   }
 }
+
+
+// PATCH FINALE: showScreen UNICA, con tutte le azioni extra
+(function() {
+  // Salva la versione originale una volta sola!
+  const realShowScreen = window.showScreen;
+  window.showScreen = function(screenId) {
+    if (typeof realShowScreen === "function") realShowScreen(screenId);
+
+    // Tutte le azioni aggiuntive qui dentro!
+    if (screenId === 'gameScreen') {
+      setTimeout(checkAndShowOrientationAdvice, 350);
+      setTimeout(showFullscreenAdvice, 250);
+    }
+    // (aggiungi qui altre azioni future se vuoi)
+  };
+
+  document.addEventListener('fullscreenchange', showFullscreenAdvice);
+  window.addEventListener('focus', showFullscreenAdvice);
+})();
 
 
 </script>
