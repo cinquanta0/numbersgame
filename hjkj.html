@@ -3123,18 +3123,24 @@ if (gameState._frameCount % 300 === 0) {
   }
 }
 
-   function updatePlayer(deltaTime) {
+  function updatePlayer(deltaTime) {
     const player = gameState.player;
     const skills = gameState.player.skills;
-let speed = player.precisionMode ? 2 : 4; // valori più bassi!
+    let speed = player.precisionMode ? 2 : 4; // valori più bassi!
 
-  // <<< INCOLLA QUI >>>
+    // <<< INCOLLA QUI >>>
     document.getElementById('coinCount').textContent = "Speed " + (window.gameState.mobileShipSpeed || localStorage.getItem('mobileShipSpeed'));
 
-if (skills.targeting_system && player.precisionMode) speed *= 0.7;
-
+    if (skills.targeting_system && player.precisionMode) speed *= 0.7;
 
     speed *= 2.3;
+
+    // PATCH: velocità globale super bassa per tutti
+    speed *= 1.4; // Cambia 0.18 con quanto lento vuoi (0.1 = lentissimo, 1 = normale)
+
+    // Il resto come prima
+    speed *= deltaTime;
+    speed *= gameState.globalSpeed; // puoi anche forzarlo a 1 se vuoi
 
 if (isMobileDevice && isMobileDevice()) {
   // Applica runtime la velocità aggiornata senza reload
