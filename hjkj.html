@@ -1539,13 +1539,29 @@ body.loading {
       <p style="color:#ffd700; font-size:1.1rem; margin-bottom:1.5rem; text-shadow: 0 0 8px #00bcd4;">
         🔔  For a better experience activate the <strong>fullscreen</strong>. Without it, it could lag!
       </p>
-      <!-- ... resto del tuo menu ... -->
-             <div id="nicknameBox" style="margin:1.2rem 0; padding:0.8rem 1rem; background:rgba(0,188,212,0.07); border-radius:12px; box-shadow:0 0 18px #00bcd455;">
+    <div id="nicknameBox" style="margin:1.2rem 0; padding:0.8rem 1rem; background:rgba(0,188,212,0.07); border-radius:12px; box-shadow:0 0 18px #00bcd455;">
   <label for="nicknameInput" style="color:#00bcd4;font-weight:bold;">Nickname:</label>
   <input id="nicknameInput" type="text" maxlength="15" style="padding:0.5rem;border-radius:8px;margin-left:0.5rem;">
   <button class="menu-btn primary" onclick="savePlayerName()">Save</button>
+  <!-- ELO Display DENTRO nicknameBox -->
+  <div id="eloDisplay" style="
+    color:#ffd700;
+    font-size:1.15rem;
+    font-weight:bold;
+    margin-top:10px;
+    border:2px solid #ffd700;
+    background:rgba(0,0,0,0.41);
+    border-radius:11px;
+    box-shadow:0 0 12px #ffd70055;
+    padding:0.4em 1.1em;
+    display:inline-block;
+  ">
+    <span style="margin-right:6px;">🏅</span>
+    ELO: <span id="eloPoints">1000</span>
+  </div>
 </div>
-              
+
+
 <!-- COPYRIGHT FOOTER -->
 <div style="color:#9c27b0; font-size:0.95rem; margin:12px 0 0 0; text-align:center;">
   © 2024-2025 Luka. All rights reserved.
@@ -1586,10 +1602,13 @@ body.loading {
                   <button class="menu-btn" onclick="showScreen('stats')">📊 STATISTICS</button>
                   <button class="menu-btn" onclick="showScreen('controls')">🎮 CONTROLS</button>
                   <button class="menu-btn" onclick="showOrientationSelector()">📱 ORIENTATION</button>
-                  <button class="menu-btn primary" onclick="loadDuelClient()">⚔️ 1v1 DUELS</button>                   
-                    <!-- Apri il Mobile Customization menu -->
+                  <button class="menu-btn primary" onclick="startDuelQueue()">⚔️ 1v1 DUELS</button>
+                  <!-- Apri il Mobile Customization menu -->
                   <button class="menu-btn" onclick="showScreen('mobileCustomizationMenu')">📱 MOBILE SETTINGS</button>
-
+                  <button class="menu-btn" onclick="showDuelLeaderboard()">🏅 1v1 DUEL LEADERBOARD</button>
+                
+                
+                
                 </div>
               
               <div class="stats-display">
@@ -1901,7 +1920,25 @@ body.loading {
           <div class="transformation-overlay" id="transformationOverlay"></div>
           
          <canvas id="gameCanvas" width="960" height="540" style="width:100vw;height:100vh;"></canvas>      
+
+          
+      
+         
+         
+         
+         <!-- Emoji Chat QuickBar 1v1 -->
+<div id="duelEmojiBar" style="position:fixed;bottom:40px;left:50%;transform:translateX(-50%);z-index:8000;display:flex;gap:18px;background:rgba(0,0,0,0.5);border-radius:16px;padding:0.5em 1.2em;">
+  <button class="menu-btn" onclick="sendDuelEmote('👍')">👍</button>
+  <button class="menu-btn" onclick="sendDuelEmote('😂')">😂</button>
+  <button class="menu-btn" onclick="sendDuelEmote('💥')">💥</button>
+  <button class="menu-btn" onclick="sendDuelEmote('GG')">GG</button>
+  <button class="menu-btn" onclick="sendDuelEmote('😱')">😱</button>
+  <button class="menu-btn" onclick="sendDuelEmote('😎')">😎</button>
+  <button class="menu-btn" onclick="sendDuelEmote('Nice shot!')">Nice shot!</button>
 </div>
+
+
+        </div>
 
       <!-- Game Over Screen -->
 <div class="screen" id="gameOver">
@@ -2104,7 +2141,15 @@ body.loading {
 </div>
 
 
-  
+  <div class="screen" id="duelLeaderboardScreen">
+  <button class="menu-btn home-btn" onclick="showScreen('mainMenu')">🏠 HOME</button>
+  <div class="menu-content">
+    <h2 class="game-subtitle">1v1 Duel Leaderboard</h2>
+    <div id="duelLeaderboardList">Loading...</div>
+    <button class="menu-btn" onclick="showDuelLeaderboard()">Update</button>
+    <button class="menu-btn" onclick="showScreen('mainMenu')">Back</button>
+  </div>
+</div>
   
   
   <script>
@@ -2191,7 +2236,9 @@ let gameState = {
     },
     coins: 0, // <--- AGGIUNTO QUI
     player: {
-        x: 0,
+        elo: 1000, // <--- AGGIUNGI QUESTA RIGA QUI!
+
+      x: 0,
         y: 0,
         health: 100,
         maxHealth: 100,
@@ -3052,6 +3099,13 @@ function gameLoop() {
   deltaTime = Math.max(0.7, Math.min(deltaTime, 1.5));
 
   update(deltaTime); // <-- Passa deltaTime!
+  
+  // ---- QUI METTI LA TUA RIGA! ----
+  if (gameState.gameMode === "duel1v1") {
+    checkPowerupPickup();
+  }
+  
+  
   render();
 
   // --- Gestione fine partita e challenge giornaliera ---
@@ -3123,18 +3177,24 @@ if (gameState._frameCount % 300 === 0) {
   }
 }
 
-   function updatePlayer(deltaTime) {
+  function updatePlayer(deltaTime) {
     const player = gameState.player;
     const skills = gameState.player.skills;
-let speed = player.precisionMode ? 2 : 4; // valori più bassi!
+    let speed = player.precisionMode ? 2 : 4; // valori più bassi!
 
-  // <<< INCOLLA QUI >>>
+    // <<< INCOLLA QUI >>>
     document.getElementById('coinCount').textContent = "Speed " + (window.gameState.mobileShipSpeed || localStorage.getItem('mobileShipSpeed'));
 
-if (skills.targeting_system && player.precisionMode) speed *= 0.7;
-
+    if (skills.targeting_system && player.precisionMode) speed *= 0.7;
 
     speed *= 2.3;
+
+    // PATCH: velocità globale super bassa per tutti
+    speed *= 1.4; // Cambia 0.18 con quanto lento vuoi (0.1 = lentissimo, 1 = normale)
+
+    // Il resto come prima
+    speed *= deltaTime;
+    speed *= gameState.globalSpeed; // puoi anche forzarlo a 1 se vuoi
 
 if (isMobileDevice && isMobileDevice()) {
   // Applica runtime la velocità aggiornata senza reload
@@ -4165,7 +4225,7 @@ function forfeitMission() {
           gameLoop();
       }
 
-     function render() {
+    function render() {
   backgroundY += 1;
   if (backgroundY >= canvas.height) backgroundY = 0;
 
@@ -4181,7 +4241,14 @@ function forfeitMission() {
   }
 
   renderSpaceBackground();
+
+  // PATCH: Powerup solo in 1v1, subito dopo lo sfondo
+  if (gameState.gameMode === "duel1v1") {
+    renderDuelPowerups(ctx, window.gameState.powerups);
+  }
+
   renderPlayer();
+
   if (gameState.gameMode === "duel1v1") {
     renderOpponent(ctx); // SOLO avversario
   } else if (gameState.gameMode === "coop") {
@@ -4377,6 +4444,20 @@ function updateUI() {
     document.getElementById('playerEnergy').textContent = Math.floor(gameState.player.energy);
     document.getElementById('playerScore').textContent = gameState.player.score.toLocaleString();
     document.getElementById('coinCount').textContent = gameState.coins;
+    
+     // PATCH: aggiorna ELO
+    document.getElementById('eloPoints').textContent = gameState.elo || 1000;
+    
+    // Dentro updateUI
+const league = getEloLeague(gameState.elo || 1000);
+const eloDisplay = document.getElementById('eloDisplay');
+eloDisplay.style.borderColor = league.color;
+eloDisplay.style.boxShadow = `0 0 12px ${league.color}55`;
+eloDisplay.innerHTML =
+  `<span style="margin-right:6px;">${league.icon}</span>
+   ELO: <span id="eloPoints">${gameState.elo || 1000}</span>
+   <span style="font-size:1.05em; font-weight:bold; color:${league.color}; margin-left:10px;">${league.name}</span>`;
+    
     
     const playerHealthPercent = (gameState.player.health / gameState.player.maxHealth) * 100;
     document.getElementById('playerHealthFill').style.width = Math.max(0, playerHealthPercent) + '%';
@@ -6265,11 +6346,12 @@ window.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-// 2. Utility: rileva mobile
-function isMobileDevice() {
-  return /Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-}
 
+function isMobileDevice() {
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Opera Mobi|Mobile|Silk|Kindle|Windows Phone|PlayBook|BB10|webOS|Mobile Safari|Fennec/i
+    .test(navigator.userAgent)
+    || ("ontouchstart" in window && screen.width < 900);
+}
  
  // === PATCH: Popup suggerimento landscape su mobile ===
 
@@ -6630,13 +6712,36 @@ function showDuelEnd(winner, stats) {
   } else {
     duelEndTitle.textContent = "😵 DEFEAT";
   }
+
   // Safe extract id
   const myId = (window.socket && window.socket.id) ? window.socket.id : "me";
   const oppId = (duelOpponent && duelOpponent.id) ? duelOpponent.id : "opponent";
+
+  // PATCH ELO: calcolo e visualizzazione
+  let myElo = gameState.elo || 1000;
+  let oppElo = duelOpponent?.elo || 1000;
+  let result = 0.5;
+  if (winner === (window.socket && window.socket.id)) result = 1;
+  else if (winner === (duelOpponent?.id || "opponent")) result = 0;
+
+  function calculateElo(myElo, oppElo, result, k = 32) {
+    const expected = 1 / (1 + Math.pow(10, (oppElo - myElo) / 400));
+    const newElo = myElo + k * (result - expected);
+    return Math.round(newElo);
+  }
+
+  const newElo = calculateElo(myElo, oppElo, result);
+  const delta = newElo - myElo;
+  gameState.elo = newElo;
+  saveGameData?.();
+  updateUI?.();
+
   duelEndStats.innerHTML = `
     <b>You:</b> ${stats?.[myId]?.kills ?? 0} kills, ${stats?.[myId]?.damage ?? 0} damage<br>
     <b>${duelOpponent?.nickname || "Opponent"}:</b> ${stats?.[oppId]?.kills ?? 0} kills, ${stats?.[oppId]?.damage ?? 0} damage
+    <br><span style="color:#ffd700;">ELO change: ${delta > 0 ? "+" : ""}${delta} (ELO: ${newElo})</span>
   `;
+
   setupDuelEndButtons?.(); // se c'è la funzione per i bottoni
 }
 
@@ -6725,11 +6830,47 @@ function setupDuelListeners() {
     window.gameState.obstacles = obstacles;
     processDuelEvents(events);
   });
+  
+  
+  // Listener powerup spawn
+window.socket.on('powerup_spawn', function(powerup) {
+  window.gameState.powerups.push(powerup);
+});
+// Listener powerup raccolto
+window.socket.on('powerup_picked', function({ player, powerup }) {
+  window.gameState.powerups = window.gameState.powerups.filter(p => p.id !== powerup.id);
+  if (player === window.socket.id) applyPowerupEffect(powerup.type);
+});
+  
+  
+  window.socket.on('duel_obstacle_spawn', function(obstacle) {
+  window.gameState.obstacles.push(obstacle);
+});
+window.socket.on('duel_obstacle_hit', function({ obstacle }) {
+  window.gameState.obstacles = window.gameState.obstacles.filter(o => o.id !== obstacle.id);
+});
+  
+  
+  window.socket.on('duel_emote', function({ player, emote }) {
+  showDuelEmoteOnScreen(emote, player === window.socket.id);
+  showNotification(`Opponent: ${emote}`);
+});
+
+function sendDuelEmote(emote) {
+  window.socket.emit('duel_update', { room: duelRoomId, player: {...window.gameState.player}, action: 'emote', emote });
+  showDuelEmoteOnScreen(emote, true);
+}
+  
+  
+  
   window.socket.on('duel_end', ({ winner, stats }) => {
     duelGameActive = false;
     showDuelEnd(winner, stats);
   });
 }
+
+
+
 
 
 // Funzione per controllare se sei effettivamente in fullscreen
@@ -6867,32 +7008,7 @@ function startDuelLoop() {
   duelLoop();
 }
 
-// PATCH 3: Disconnessione immediata al termine duello
-function checkCollisionsDuel() {
-  if (!duelGameActive || !gameState.opponentState) return;
-  for (let i = gameState.bullets.length - 1; i >= 0; i--) {
-    const bullet = gameState.bullets[i];
-    const opp = gameState.opponentState;
-    const dist = Math.sqrt((bullet.x - opp.x) ** 2 + (bullet.y - opp.y) ** 2);
-    const hitbox = 32;
-    if (dist < hitbox && opp.health > 0) {
-      opp.health -= bullet.damage || 20;
-      gameState.bullets.splice(i, 1);
-      createHitParticles(bullet.x, bullet.y, bullet.color || "#ffd700");
-      if (window.socket && duelRoomId) {
-        window.socket.emit("duel_hit", {
-          room: duelRoomId,
-          damage: bullet.damage || 20
-        });
-      }
-    }
-  }
-  if (gameState.opponentState.health <= 0) {
-    duelGameActive = false;
-    showDuelEnd(window.socket.id, {/* ... */});
-    safeCloseSocket(); // <--- chiudi subito la connessione!
-  }
-}
+
 
 
 // PATCH FINALE: showScreen UNICA, con tutte le azioni extra
@@ -7068,25 +7184,338 @@ function loadMobileSettings() {
 }
 
 
-window.stellar1v1Loaded = false;
+function applyPowerupEffect(type) {
+  switch(type) {
+    case 'heal': window.gameState.player.health = Math.min(window.gameState.player.maxHealth, window.gameState.player.health + 40); showNotification("💚 Healed!"); break;
+    case 'shield': window.gameState.player.invulnerabilityFrames = 120; showNotification("🛡 Shield!"); break;
+    case 'damage': window.gameState.player.damageBuff = 100; showNotification("🔫 Damage Up!"); break;
+    case 'speed': window.gameState.player.speedBuff = 1.7; showNotification("⚡ Speed Up!"); break;
+  }
+}
 
-function loadDuelClient() {
-  if (window.stellar1v1Loaded) {
-    if (window.stellarGuardian && window.stellarGuardian.joinDuelQueue) {
-      window.stellarGuardian.joinDuelQueue();
+
+function checkPowerupPickup() {
+  window.gameState.powerups.forEach(p => {
+    const dx = window.gameState.player.x - p.x;
+    const dy = window.gameState.player.y - p.y;
+    if (Math.sqrt(dx*dx + dy*dy) < 32 && p.active) {
+      window.socket.emit('duel_update', { room: duelRoomId, player: {...window.gameState.player}, action: 'powerup_pick', powerupId: p.id });
+      p.active = false;
     }
+  });
+}
+
+
+function renderDuelPowerups(ctx, powerups) {
+  powerups.forEach(p => {
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 20, 0, Math.PI * 2);
+    ctx.fillStyle = p.type === 'heal' ? '#4caf50'
+      : p.type === 'shield' ? '#2196f3'
+      : p.type === 'damage' ? '#f44336'
+      : '#ffd700';
+    ctx.fill();
+    ctx.restore();
+  });
+}
+if (gameState.gameMode === "duel1v1") renderDuelPowerups(ctx, window.gameState.powerups);
+
+
+function checkObstacleHit() {
+  window.gameState.obstacles.forEach((o, idx) => {
+    const dx = window.gameState.player.x - o.x;
+    const dy = window.gameState.player.y - o.y;
+    if (Math.sqrt(dx*dx + dy*dy) < o.size/2 + 20 && !o.hit) {
+      window.socket.emit('duel_update', { room: duelRoomId, player: {...window.gameState.player}, action: 'obstacle_hit', obstacleId: o.id });
+      o.hit = true;
+      window.gameState.player.health -= 20;
+      showNotification("💥 Mine hit!");
+    }
+  });
+}
+if (gameState.gameMode === "duel1v1") checkObstacleHit();
+
+
+function updateDuelEmojiBar() {
+  const bar = document.getElementById('duelEmojiBar');
+  if (!bar) return;
+  // FORZA la barra emoji sempre visibile in gameScreen (debug)
+  bar.style.display = (gameState.currentScreen === "gameScreen") ? "flex" : "none";
+}
+window.showScreen = (function(orig){
+  return function(screenId) {
+    orig(screenId);
+    updateDuelEmojiBar();
+  };
+})(window.showScreen);
+
+
+function sendDuelEmote(emote) {
+  if (window.socket && duelRoomId) {
+    window.socket.emit('duel_update', {
+      room: duelRoomId,
+      player: {...window.gameState.player},
+      action: 'emote',
+      emote: emote
+    });
+    showDuelEmoteOnScreen(emote, true); // Mostra anche lato tuo!
+  }
+}
+
+
+function showDuelEmoteOnScreen(emote, isSelf = false) {
+  const div = document.createElement('div');
+  div.style.position = 'fixed';
+  div.style.left = isSelf ? 'calc(25% - 38px)' : 'calc(75% - 38px)';
+  div.style.bottom = '120px';
+  div.style.background = isSelf ? '#00bcd4' : '#ffd700';
+  div.style.color = '#222';
+  div.style.fontSize = '2.5rem';
+  div.style.padding = '1.1em';
+  div.style.borderRadius = '50%';
+  div.style.boxShadow = '0 0 28px ' + (isSelf ? '#00bcd4' : '#ffd700');
+  div.style.zIndex = 99999;
+  div.style.textAlign = 'center';
+  div.style.opacity = '0.92';
+  div.style.transition = 'all 0.7s cubic-bezier(.5,2,.3,1)';
+  div.textContent = emote;
+  document.body.appendChild(div);
+  setTimeout(() => { div.style.opacity = '0'; div.style.transform = 'scale(1.6)'; }, 900);
+  setTimeout(() => { div.remove(); }, 1400);
+}
+
+
+// === PATCH: DUEL 1v1 Best of 3 + Barra vita in alto ===
+
+// 1. Variabili di stato per i round
+let duelRounds = 0;
+let myRoundWins = 0;
+let oppRoundWins = 0;
+let duelMaxRounds = 3;
+
+// 2. UI per i round (aggiungi in HTML subito dopo il canvas, oppure via JS)
+(function() {
+  // Crea la barra vita avversario in alto a destra
+  let bar = document.getElementById('duelOpponentHealthBar');
+  if (!bar) {
+    bar = document.createElement('div');
+    bar.id = 'duelOpponentHealthBar';
+    bar.style.top = '24px';
+bar.style.left = '24px';
+bar.style.right = 'auto';
+    bar.style.background = 'rgba(30,30,30,0.93)';
+    bar.style.borderRadius = '12px';
+    bar.style.padding = '0.7em 1.4em';
+    bar.style.zIndex = '9001';
+    bar.style.minWidth = '160px';
+    bar.style.boxShadow = '0 0 30px #ffd70088';
+    bar.style.display = 'none';
+    bar.innerHTML = `
+      <div id="duelOpponentNick" style="font-weight:900;color:#ffd700;font-size:1.2em;margin-bottom:2px;">OPPONENT</div>
+      <div style="width:100%;height:18px;background:#333;border-radius:8px;overflow:hidden;box-shadow:0 0 8px #ffd700;">
+        <div id="duelOpponentHealthBarFill" style="height:100%;width:100%;background:linear-gradient(90deg,#4caf50,#ffd700,#f44336);transition:width .3s;"></div>
+      </div>
+      <div id="duelOpponentHealthText" style="font-size:0.96em;color:#fff;margin-top:2px;">100 / 100</div>
+      <div id="duelRoundInfo" style="margin-top:8px;font-size:1.12em;color:#ffd700;">Round: 1 / 3</div>
+      <div id="duelRoundsScore" style="font-size:0.99em;color:#00bcd4;">You: 0 | Opponent: 0</div>
+    `;
+    document.getElementById('gameContainer').appendChild(bar);
+  }
+})();
+
+// 3 Barra vita avversario + round info (già presente nel tuo codice, ma puoi personalizzare)
+function updateDuelOpponentHealthBar() {
+  const bar = document.getElementById('duelOpponentHealthBar');
+  if (!bar) return;
+  if (gameState.currentScreen === "gameScreen" && gameState.gameMode === "duel1v1") {
+    bar.style.display = 'block';
+    // Aggiorna dati
+    if (gameState.opponentState) {
+      const health = Math.max(0, Math.floor(gameState.opponentState.health || 0));
+      const maxHealth = Math.max(1, Math.floor(gameState.opponentState.maxHealth || 100));
+      const percent = Math.min(100, 100 * health / maxHealth);
+      document.getElementById('duelOpponentHealthBarFill').style.width = percent + "%";
+      document.getElementById('duelOpponentHealthText').textContent = `${health} / ${maxHealth}`;
+      document.getElementById('duelOpponentNick').textContent = duelOpponent?.nickname || "Opponent";
+    }
+    document.getElementById('duelRoundInfo').textContent = `Round: ${duelRounds+1} / ${duelMaxRounds}`;
+    document.getElementById('duelRoundsScore').textContent = `You: ${myRoundWins} | Opponent: ${oppRoundWins}`;
+  } else {
+    bar.style.display = 'none';
+  }
+}
+
+
+window.showScreen = (function(orig){
+  return function(screenId) {
+    orig(screenId);
+    updateDuelEmojiBar();
+  };
+})(window.showScreen);
+
+// 5. Logica per gestire i round (best of 3)
+function handleDuelRoundEnd(winnerId) {
+  duelRounds++;
+  if (winnerId === (window.socket && window.socket.id)) myRoundWins++;
+  else oppRoundWins++;
+
+  // Aggiorna la barra subito
+  updateDuelOpponentHealthBar();
+
+  // Controlla se qualcuno ha vinto 2 round
+  if (myRoundWins >= 2 || oppRoundWins >= 2 || duelRounds >= duelMaxRounds) {
+    // Fine match: mostra schermata finale
+    setTimeout(() => {
+      showDuelEnd(
+        myRoundWins > oppRoundWins
+          ? (window.socket && window.socket.id)
+          : (myRoundWins === oppRoundWins ? "draw" : (duelOpponent?.id || "opponent")),
+        { /* puoi passare stats qui */ }
+      );
+    }, 1200);
     return;
   }
-  const script = document.createElement('script');
-  script.src = 'stellar_guardian_client.js';
-  script.onload = () => {
-    window.stellar1v1Loaded = true;
-    if (window.stellarGuardian && window.stellarGuardian.joinDuelQueue) {
-      window.stellarGuardian.joinDuelQueue();
-    }
-  };
-  document.body.appendChild(script);
+
+  // Se non è finito, prepara nuovo round!
+  setTimeout(() => {
+    startNextDuelRound();
+  }, 1800);
 }
+
+function startNextDuelRound() {
+  // Reset stato giocatori
+  gameState.player.x = 300;
+  gameState.player.y = 600;
+  gameState.player.health = 100;
+  gameState.player.energy = 100;
+  gameState.opponentState.x = 900;
+  gameState.opponentState.y = 600;
+  gameState.opponentState.health = 100;
+  gameState.opponentState.energy = 100;
+  gameState.bullets = [];
+  gameState.enemyBullets = [];
+  // Countdown visivo?
+  showNotification(`Round ${duelRounds+1} — Get Ready!`);
+  updateDuelOpponentHealthBar();
+  // Puoi riavviare il loop se serve (startDuelLoop();)
+}
+
+// 6. Modifica la funzione checkCollisionsDuel per gestire i round
+function checkCollisionsDuel() {
+  if (!duelGameActive || !gameState.opponentState) return;
+  for (let i = gameState.bullets.length - 1; i >= 0; i--) {
+    const bullet = gameState.bullets[i];
+    const opp = gameState.opponentState;
+    const dist = Math.sqrt((bullet.x - opp.x) ** 2 + (bullet.y - opp.y) ** 2);
+    const hitbox = 32;
+    if (dist < hitbox && opp.health > 0) {
+      opp.health -= bullet.damage || 20;
+      gameState.bullets.splice(i, 1);
+      createHitParticles(bullet.x, bullet.y, bullet.color || "#ffd700");
+      if (window.socket && duelRoomId) {
+        window.socket.emit("duel_hit", {
+          room: duelRoomId,
+          damage: bullet.damage || 20
+        });
+      }
+    }
+  }
+  updateDuelOpponentHealthBar();
+  // Patch: round end
+  if (gameState.opponentState.health <= 0) {
+    duelGameActive = false;
+    handleDuelRoundEnd(window.socket.id);
+  } else if (gameState.player.health <= 0) {
+    duelGameActive = false;
+    handleDuelRoundEnd(duelOpponent?.id || "opponent");
+  }
+}
+
+// 7. Quando inizi un nuovo duello, resetta i round
+window.startDuelGame = (function(orig){
+  return function() {
+    duelGameActive = true;
+    duelRounds = 0;
+    myRoundWins = 0;
+    oppRoundWins = 0;
+    showScreen('gameScreen');
+    window.gameState.gameMode = 'duel1v1';
+    window.gameState.duelRoomId = duelRoomId;
+    window.gameState.opponent = duelOpponent;
+    gameState.enemy = null;
+    initDuelArena();
+    duelSyncLoop();
+    startDuelLoop();
+    updateDuelOpponentHealthBar();
+  };
+})(window.startDuelGame);
+
+// 8. Aggiorna la barra vita avversario ogni frame nel loop
+function startDuelLoop() {
+  function duelLoop() {
+    if (!duelGameActive || gameState.currentScreen !== 'gameScreen' || gameState.gameMode !== 'duel1v1') return;
+    updatePlayer(1); updatePlayerTrail(); updateObstacles(1); updateBullets(1); updateEnemyBullets(1); updateParticles(1);
+    checkCollisionsDuel();
+    render();
+    updateDuelOpponentHealthBar();
+    requestAnimationFrame(duelLoop);
+  }
+  duelLoop();
+}
+
+// FINE PATCH
+
+
+function getEloLeague(elo) {
+  if (elo < 1100) return { name: "Bronze", color: "#b97a57", icon: "🥉" };
+  if (elo < 1300) return { name: "Silver", color: "#bdbdbd", icon: "🥈" };
+  if (elo < 1500) return { name: "Gold", color: "#ffd700", icon: "🥇" };
+  if (elo < 1700) return { name: "Platinum", color: "#aeefff", icon: "💠" };
+  if (elo < 1900) return { name: "Diamond", color: "#00e0ff", icon: "🔷" };
+  if (elo < 2200) return { name: "Master", color: "#9c27b0", icon: "🎖️" };
+  return { name: "Legend", color: "#ff9800", icon: "🏆" };
+}
+
+
+const DUEL_LEADERBOARD_TAG = "duel1v1";
+
+function fetchDuelLeaderboard(callback) {
+  const dreamloKey = "5z7d7N8IBkSwrhJdyZAXxAYn3Jv1KyTEm6GJZoIALRBw";
+  const tag = DUEL_LEADERBOARD_TAG;
+  const url = `https://dreamlo.com/lb/${dreamloKey}/pipe-get/${tag}`;
+  fetch(url)
+    .then(res => res.text())
+    .then(txt => {
+      const rows = txt.trim().split('\n');
+      const leaderboard = rows
+        .map(row => {
+          const [name, score] = row.split('|');
+          if (!name || isNaN(parseInt(score))) return null;
+          return { name, score: parseInt(score) };
+        })
+        .filter(entry => entry !== null)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 20); // top 20
+      callback(leaderboard);
+    });
+}
+
+function showDuelLeaderboard() {
+  showScreen('duelLeaderboardScreen');
+  document.getElementById('duelLeaderboardList').innerHTML = 'Loading...';
+  fetchDuelLeaderboard(leaderboard => {
+    let html = '<ol style="font-size:1.2rem;">';
+    leaderboard.forEach(entry => {
+      html += `<li><b>${entry.name}</b> — <span style="color:#ffd700;">${entry.score}</span></li>`;
+    });
+    if (leaderboard.length === 0) html += "<li>No duel scores yet!</li>";
+    html += '</ol>';
+    document.getElementById('duelLeaderboardList').innerHTML = html;
+  });
+}
+
+
 
 
 </script>
