@@ -7547,6 +7547,29 @@ function startFirstMission(){
 }
 
 
+window.addEventListener('load', function(){
+  // Premio di benvenuto
+  if (!localStorage.getItem('welcomeBonusGiven')) {
+    let coins = parseInt(localStorage.getItem('coins') || '0');
+    coins += 300;
+    localStorage.setItem('coins', coins);
+    localStorage.setItem('welcomeBonusGiven', 'true');
+    const el = document.getElementById('coinCount');
+    if (el) el.innerText = coins;
+    alert('🎁 Benvenuto! Hai ricevuto +300 coins!');
+  }
+
+  // Sfida Giornaliera
+  const challenges = [
+    {text: 'Sopravvivi 60 secondi', reward: 150},
+    {text: 'Distruggi 20 nemici', reward: 120},
+    {text: 'Completa 2 livelli', reward: 200}
+  ];
+  const dayIndex = new Date().getDate() % challenges.length;
+  const challenge = challenges[dayIndex];
+  alert(`🔥 Sfida di oggi: ${challenge.text} (+${challenge.reward} coins)`);
+});
+
 
 </script>
   
