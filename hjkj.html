@@ -1583,6 +1583,10 @@ body.loading {
                     </div>
                 </div>
 
+<!-- PULSANTE GIOCA ORA: mettilo all'inizio di .menu-buttons -->
+<button id="playNowBtn" class="menu-btn primary" style="font-size:1.4rem; padding:1.4rem 2.5rem;" onclick="startFirstMission()">
+  🚀 GIOCA ORA
+</button>
 
 
 <audio id="musicaGioco" src="musica.mp3" loop></audio>        
@@ -7515,6 +7519,32 @@ function showDuelLeaderboard() {
   });
 }
 
+
+
+/* startFirstMission: prova a chiamare le funzioni esistenti (startMission / startGame),
+   con fallback non distruttivi se non trovate. */
+function startFirstMission(){
+  console.log('startFirstMission called');
+  // 1) preferiamo una funzione che accetta il livello: startMission(1)
+  if (typeof startMission === 'function'){
+    try { startMission(1); return; } catch(e){ console.warn('startMission error', e); }
+  }
+
+  // 2) fallback a startGame(true) (se il tuo startGame supporta skipAd o flag)
+  if (typeof startGame === 'function'){
+    try { startGame(true); return; } catch(e) {
+      try { startGame(); return; } catch(e2) { console.warn('startGame error', e2); }
+    }
+  }
+
+  // 3) fallback: apri la schermata di selezione livelli se esiste
+  if (typeof showScreen === 'function'){
+    try { showScreen('levelSelect'); return; } catch(e){ console.warn('showScreen error', e); }
+  }
+
+  // 4) ultima risorsa: avvisa l'utente
+  alert('Impossibile avviare automaticamente la partita: controlla la console per errori.');
+}
 
 
 
