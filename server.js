@@ -1,4 +1,4 @@
-// --- Stellar Guardian Multiplayer Server: COOP + 1v1 DUEL Optimized ---
+// --- Stellar Guardian Multiplayer Server: COOP + 1v1 DUEL + Spettatori ---
 // Node.js + Socket.io v4+
 // (c) 2024-2025 Luka
 
@@ -83,6 +83,7 @@ function updateObstacles() {
 // === 1v1 DUEL STATE ===
 let duelQueue = []; // [{socket, nickname, skin}]
 let duelRooms = {}; // roomId: { p1: socket, p2: socket, states: {id: {}}, stats: {}, ... }
+let duelSpectators = {}; // roomId: [socket.id,...]
 
 // --- DUEL HELPERS ---
 function createDuelRoom(p1, p2) {
@@ -99,14 +100,46 @@ function createDuelRoom(p1, p2) {
     playerMeta: {
       [p1.id]: { skin: p1.skin || "navicella2.png", nickname: p1.nickname || "Player" },
       [p2.id]: { skin: p2.skin || "navicella2.png", nickname: p2.nickname || "Player" }
-    }
+    },
+    roundNum: 1,
+    roundWins: { [p1.id]: 0, [p2.id]: 0 },
+    maxRounds: 3 // Best of 3
   };
+  duelSpectators[room] = [];
   return room;
 }
 function getOpponent(room, id) {
   const duel = duelRooms[room];
   if (!duel) return null;
   return (duel.p1.id === id) ? duel.p2 : duel.p1;
+}
+
+function startNextDuelRound(roomId, roundNumber = 1) {
+  const duel = duelRooms[roomId];
+  if (!duel) return;
+  // PATCH: health e maxHealth a 500
+  const INIT_HEALTH = 500;
+  
+  const playerStates = {
+    [duel.p1.id]: { x: 300, y: 600, health: INIT_HEALTH, energy: 100 },
+    [duel.p2.id]: { x: 900, y: 600, health: INIT_HEALTH, energy: 100 }
+  };
+  duel.states[duel.p1.id] = { ...playerStates[duel.p1.id], id: duel.p1.id, maxHealth: INIT_HEALTH };
+  duel.states[duel.p2.id] = { ...playerStates[duel.p2.id], id: duel.p2.id, maxHealth: INIT_HEALTH };
+  duel.powerups = [];
+  duel.obstacles = [];
+  duel.events = [];
+  console.log(`[DUEL] Inizio nuovo round ${roundNumber} in room ${roomId}`);
+  io.in(roomId).emit('duel_next_round', {
+    round: roundNumber,
+    playerStates
+  });
+  duelSpectators[roomId]?.forEach(sid => {
+    io.to(sid).emit('duel_next_round', {
+      round: roundNumber,
+      playerStates
+    });
+  });
 }
 
 // === DUEL POWERUP MANAGEMENT ===
@@ -119,9 +152,11 @@ function spawnDuelPowerup(room) {
   if (duelRooms[room]) {
     duelRooms[room].powerups.push(powerup);
     io.in(room).emit('powerup_spawn', powerup);
+    duelSpectators[room]?.forEach(sid => {
+      io.to(sid).emit('powerup_spawn', powerup);
+    });
   }
 }
-// Obstacles 1v1 (esempio: mine)
 function spawnDuelObstacle(room) {
   const type = "mine";
   const x = 150 + Math.random() * 700;
@@ -130,6 +165,9 @@ function spawnDuelObstacle(room) {
   if (duelRooms[room]) {
     duelRooms[room].obstacles.push(obstacle);
     io.in(room).emit('duel_obstacle_spawn', obstacle);
+    duelSpectators[room]?.forEach(sid => {
+      io.to(sid).emit('duel_obstacle_spawn', obstacle);
+    });
   }
 }
 
@@ -141,12 +179,10 @@ setInterval(() => {
   lastBossFrame = now;
   delta = Math.max(0.02, Math.min(delta, 0.07));
 
-  // COOP: sync otherPlayers
   if (Object.keys(players).length > 0) {
     io.emit('otherPlayers', { players: Object.values(players) });
   }
 
-  // COOP: Boss movement, attacks, obstacles
   if (gameInProgress) {
     coopBoss.x += coopBoss.dir * BOSS_SPEED * (delta * 60);
     if (coopBoss.x < BOSS_X_MIN) { coopBoss.x = BOSS_X_MIN; coopBoss.dir = 1; }
@@ -158,7 +194,6 @@ setInterval(() => {
 
     io.emit('bossUpdate', { ...coopBoss });
 
-    // Boss attack logic
     bossAttackCooldown -= 40;
     if (bossAttackCooldown <= 0 && Object.keys(players).length > 0) {
       let unlockedPatterns = Math.min(Math.ceil((coopBoss.maxHealth - coopBoss.health) / 3000) + 2, BOSS_ATTACK_PATTERNS.length);
@@ -172,36 +207,59 @@ setInterval(() => {
     io.emit('obstaclesUpdate', coopObstacles);
   }
 
-  // DUEL 1v1: Sync states and events, spawn powerups/obstacles
   for (const [room, duel] of Object.entries(duelRooms)) {
     if (duel.ended) continue;
 
-    // Powerup spawn ogni 4 secondi circa
     if (Math.random() < 0.025) spawnDuelPowerup(room);
-    // Obstacle spawn ogni 7 secondi circa
     if (Math.random() < 0.012) spawnDuelObstacle(room);
 
     [duel.p1, duel.p2].forEach(playerSocket => {
-      if (!playerSocket.connected) return;
-      const oppId = getOpponent(room, playerSocket.id)?.id;
-      let oppState = duel.states[oppId] || {};
-      let meta = duel.playerMeta[oppId] || {};
-      // PATCH: Always send maxHealth in opponent state for client health bar
-      if (typeof oppState.maxHealth !== "number") oppState.maxHealth = 100;
-      playerSocket.emit('duel_state', {
-        opponent: { ...oppState, skin: meta.skin, nickname: meta.nickname },
-        powerups: duel.powerups,
-        obstacles: duel.obstacles,
-        events: duel.events
+  if (!playerSocket.connected) return;
+  const oppId = getOpponent(room, playerSocket.id)?.id;
+  let oppState = duel.states[oppId] || {};
+  let meta = duel.playerMeta[oppId] || {};
+  if (typeof oppState.maxHealth !== "number") oppState.maxHealth = 100;
+
+  // PATCH: aggiungi self con lo stato del player stesso!
+  let selfState = duel.states[playerSocket.id] || {};
+  if (typeof selfState.maxHealth !== "number") selfState.maxHealth = 100;
+
+  playerSocket.emit('duel_state', {
+    opponent: { ...oppState, skin: meta.skin, nickname: meta.nickname },
+    self: selfState, // <--- AGGIUNGI QUESTO!
+    powerups: duel.powerups,
+    obstacles: duel.obstacles,
+    events: duel.events
+  });
+});
+
+    if (duelSpectators[room]) {
+      const playerStates = [
+        {
+          ...duel.states[duel.p1.id],
+          ...duel.playerMeta[duel.p1.id]
+        },
+        {
+          ...duel.states[duel.p2.id],
+          ...duel.playerMeta[duel.p2.id]
+        }
+      ];
+      duelSpectators[room].forEach(sid => {
+        io.to(sid).emit('duel_state', {
+          players: playerStates,
+          spectators: duelSpectators[room].length
+        });
+        io.to(sid).emit('powerup_spawn', ...duel.powerups);
+        io.to(sid).emit('duel_obstacle_spawn', ...duel.obstacles);
       });
-    });
+    }
+
     duel.events = [];
   }
 }, 50);
 
 // === SOCKET.IO HANDLERS ===
 io.on('connection', (socket) => {
-  // --- COOP MODE ---
   socket.on('joinLobby', (data) => {
     players[socket.id] = {
       id: socket.id,
@@ -265,7 +323,7 @@ io.on('connection', (socket) => {
     io.emit('obstaclesUpdate', coopObstacles);
   });
 
-  // --- DISCONNECTION: COOP + DUEL ---
+  // --- DISCONNECTION: COOP + DUEL + SPECTATOR ---
   socket.on('disconnect', () => {
     delete players[socket.id];
     delete playerVoiceStatus[socket.id];
@@ -277,10 +335,8 @@ io.on('connection', (socket) => {
     inviaLobbyAggiornata();
     io.emit('voiceActive', { id: socket.id, active: false });
 
-    // Rimuovi dalla queue DUEL
     duelQueue = duelQueue.filter(p => p.socket.id !== socket.id);
 
-    // Se era in una room DUEL, notifica avversario e termina la room
     for (const [room, duel] of Object.entries(duelRooms)) {
       if (duel.ended) continue;
       if (duel.p1.id === socket.id || duel.p2.id === socket.id) {
@@ -288,9 +344,20 @@ io.on('connection', (socket) => {
         const winner = (duel.p1.id === socket.id) ? duel.p2.id : duel.p1.id;
         if (io.sockets.sockets.get(winner))
           io.to(winner).emit('duel_opponent_left');
-        io.to(duel.p1.id).emit('duel_end', { winner, stats: duel.stats });
-        io.to(duel.p2.id).emit('duel_end', { winner, stats: duel.stats });
+        io.to(duel.p1.id).emit('duel_end', {
+          winner: (duel.p1.id === winner ? duel.p1.id : duel.p2.id),
+          stats: duel.stats
+        });
+        io.to(duel.p2.id).emit('duel_end', {
+          winner: (duel.p2.id === winner ? duel.p2.id : duel.p1.id),
+          stats: duel.stats
+        });
         delete duelRooms[room];
+        duelSpectators[room]?.forEach(sid => io.to(sid).emit('duel_end', { winner, stats: duel.stats }));
+        delete duelSpectators[room];
+      }
+      if (duelSpectators[room]) {
+        duelSpectators[room] = duelSpectators[room].filter(sid => sid !== socket.id);
       }
     }
   });
@@ -299,7 +366,6 @@ io.on('connection', (socket) => {
     io.emit('lobbyUpdate', { players: Object.values(players) });
   }
 
-  // --- WebRTC Signaling ---
   socket.on('webrtc-offer', (data) =>
     socket.to(data.targetId).emit('webrtc-offer', { fromId: socket.id, sdp: data.sdp }));
   socket.on('webrtc-answer', (data) =>
@@ -327,60 +393,169 @@ io.on('connection', (socket) => {
     duelQueue = duelQueue.filter(p => p.socket.id !== socket.id);
   });
 
+  // --- PATCH BEST OF 3 CORRETTO ---
   socket.on('duel_update', (data) => {
+
+    
     const { room, player, action } = data;
     const duel = duelRooms[room];
     if (!duel || duel.ended) return;
+
+    // Aggiorna meta
     if (player.skin) duel.playerMeta[socket.id].skin = player.skin;
     if (player.nickname) duel.playerMeta[socket.id].nickname = player.nickname;
-    duel.states[socket.id] = { ...player, id: socket.id, maxHealth: (typeof player.maxHealth === "number" ? player.maxHealth : 100) };
+
+    // Aggiorna stato player
+    if (
+      duel.roundNum &&
+      duel.states[socket.id] &&
+      duel.states[socket.id].health === 100 &&
+      player.health < 100
+    ) {
+      // Ignora update errato
+    } else {
+      duel.states[socket.id] = { ...player, id: socket.id, maxHealth: (typeof player.maxHealth === "number" ? player.maxHealth : 100) };
+    }
     if (action === "shoot") {
       duel.events.push({ type: "shoot", player: socket.id, ...player });
       duel.stats[socket.id].damage += 25;
     }
-    // Eventi: emote, powerup, ecc.
     if (action === "emote" && data.emote) {
       duel.events.push({ type: "emote", player: socket.id, emote: data.emote });
       io.in(room).emit('duel_emote', { player: socket.id, emote: data.emote });
+      duelSpectators[room]?.forEach(sid => {
+        io.to(sid).emit('duel_emote', { player: socket.id, emote: data.emote });
+      });
     }
-    // Powerup raccolto
     if (action === "powerup_pick" && data.powerupId) {
       const idx = duel.powerups.findIndex(p => p.id === data.powerupId);
       if (idx >= 0) {
         duel.powerups[idx].active = false;
         duel.events.push({ type: "powerup_pick", player: socket.id, powerup: duel.powerups[idx] });
         io.in(room).emit('powerup_picked', { player: socket.id, powerup: duel.powerups[idx] });
+        duelSpectators[room]?.forEach(sid => {
+          io.to(sid).emit('powerup_picked', { player: socket.id, powerup: duel.powerups[idx] });
+        });
       }
     }
-    // Ostacolo colpito
     if (action === "obstacle_hit" && data.obstacleId) {
       const idx = duel.obstacles.findIndex(o => o.id === data.obstacleId);
       if (idx >= 0) {
         duel.obstacles[idx].hit = true;
         duel.events.push({ type: "obstacle_hit", player: socket.id, obstacle: duel.obstacles[idx] });
         io.in(room).emit('duel_obstacle_hit', { player: socket.id, obstacle: duel.obstacles[idx] });
+        duelSpectators[room]?.forEach(sid => {
+          io.to(sid).emit('duel_obstacle_hit', { player: socket.id, obstacle: duel.obstacles[idx] });
+        });
       }
     }
-    // Gestione morte server-side (race condition safe)
+
+    // PATCH: Logica best of 3 corretta
     const p1dead = duel.states[duel.p1.id]?.health <= 0;
     const p2dead = duel.states[duel.p2.id]?.health <= 0;
+
     if ((p1dead || p2dead) && !duel.ended) {
-      duel.ended = true;
-      let winner = null;
-      if (p1dead && p2dead) winner = "draw";
-      else if (p1dead) winner = duel.p2.id;
-      else if (p2dead) winner = duel.p1.id;
+
+      if (!duel.roundNum) duel.roundNum = 1;
+      if (!duel.roundWins) duel.roundWins = { [duel.p1.id]: 0, [duel.p2.id]: 0 };
+      if (!duel.maxRounds) duel.maxRounds = 3;
+
+      let roundWinner = null;
+      if (p1dead && p2dead) roundWinner = "draw";
+      else if (p1dead) roundWinner = duel.p2.id;
+      else if (p2dead) roundWinner = duel.p1.id;
+
+      if (roundWinner && roundWinner !== "draw") duel.roundWins[roundWinner] += 1;
       duel.stats[duel.p1.id].kills = p2dead ? 1 : 0;
       duel.stats[duel.p2.id].kills = p1dead ? 1 : 0;
-      duel.winner = winner;
-      io.to(duel.p1.id).emit('duel_end', { winner, stats: duel.stats });
-      io.to(duel.p2.id).emit('duel_end', { winner, stats: duel.stats });
-      setTimeout(() => delete duelRooms[room], 3000);
+
+      // PATCH: ora la condizione è SOLO se uno arriva a 2 round vinti, OPPURE 3 round giocati
+      const winNeeded = Math.ceil(duel.maxRounds / 2); // 2 se 3 round
+      const p1Win = duel.roundWins[duel.p1.id] >= winNeeded;
+      const p2Win = duel.roundWins[duel.p2.id] >= winNeeded;
+      const roundsPlayed = duel.roundNum; // parte da 1
+      const roundsFinished = roundsPlayed >= duel.maxRounds;
+
+      if (p1Win || p2Win || roundsFinished) {
+        duel.ended = true;
+        let finalWinner;
+        if (duel.roundWins[duel.p1.id] > duel.roundWins[duel.p2.id]) finalWinner = duel.p1.id;
+        else if (duel.roundWins[duel.p2.id] > duel.roundWins[duel.p1.id]) finalWinner = duel.p2.id;
+        else finalWinner = "draw";
+        duel.winner = finalWinner;
+        io.to(duel.p1.id).emit('duel_end', {
+          winner: finalWinner === "draw" ? "draw" : (duel.p1.id === finalWinner ? duel.p1.id : duel.p2.id),
+          stats: duel.stats
+        });
+        io.to(duel.p2.id).emit('duel_end', {
+          winner: finalWinner === "draw" ? "draw" : (duel.p2.id === finalWinner ? duel.p2.id : duel.p1.id),
+          stats: duel.stats
+        });
+        duelSpectators[room]?.forEach(sid =>
+          io.to(sid).emit('duel_end', { winner: finalWinner, stats: duel.stats })
+        );
+        setTimeout(() => {
+          delete duelRooms[room];
+          delete duelSpectators[room];
+        }, 3000);
+      } else {
+        duel.roundNum += 1;
+        startNextDuelRound(room, duel.roundNum);
+      }
     }
   });
 
-  // --- PATCH: Rematch (il client farà semplicemente startDuelQueue di nuovo) ---
+  
+  socket.on('duel_hit', ({ room, damage }) => {
+  const duel = duelRooms[room];
+  if (!duel || duel.ended) return;
+
+  // Chi ha mandato il messaggio è l’attaccante, l’altro subisce danno
+  const attackerId = socket.id;
+  const defenderId = getOpponent(room, attackerId)?.id;
+  if (!defenderId) return;
+
+  // Applica danno solo se entrambi sono vivi
+  if (duel.states[defenderId] && duel.states[defenderId].health > 0) {
+    duel.states[defenderId].health -= damage || 20;
+    if (duel.states[defenderId].health < 0) duel.states[defenderId].health = 0;
+    duel.stats[attackerId].damage += damage || 20;
+  }
 });
+  
+  
+  socket.on('duel_join', ({ roomId, role, nickname }) => {
+    if (!roomId || !duelRooms[roomId]) {
+      socket.emit('error', { message: 'Room not found' });
+      return;
+    }
+    if (role === 'spectator') {
+      if (!duelSpectators[roomId]) duelSpectators[roomId] = [];
+      duelSpectators[roomId].push(socket.id);
+      socket.join(roomId);
+      const duel = duelRooms[roomId];
+      const playerStates = [
+        {
+          ...duel.states[duel.p1.id],
+          ...duel.playerMeta[duel.p1.id]
+        },
+        {
+          ...duel.states[duel.p2.id],
+          ...duel.playerMeta[duel.p2.id]
+        }
+      ];
+      socket.emit('duel_state', {
+        players: playerStates,
+        spectators: duelSpectators[roomId].length
+      });
+    }
+  });
+  // Rematch: il client fa semplicemente startDuelQueue di nuovo
+});
+
+
+
+
 
 // === PORT ===
 const PORT = process.env.PORT || 3000;
