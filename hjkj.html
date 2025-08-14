@@ -1598,7 +1598,7 @@ body.loading {
                   <button class="menu-btn" onclick="showScreen('inventoryScreen')">🛸 SPACESHIP INVENTORY</button>
                   <button class="menu-btn" onclick="showGlobalLeaderboard()">🌍 GLOBAL LEADERBOARD</button>
                   <button class="menu-btn primary" onclick="showCoopLobby()">🌐 Raid Co-op Online</button>
-                  <button class="menu-btn" onclick="window.open('https://site-stellarguardian999.onrender.com','_blank')">🌐 Sito Ufficiale</button>
+                  <button class="menu-btn" onclick="window.open('https://stellarguardian72.onrender.com','_blank')">🌐 Sito Ufficiale</button>
                   <button class="menu-btn" onclick="showDailyChallengeMenu()">🌟 DAILY CHALLENGE</button>
                   <button class="menu-btn" onclick="showLocalLeaderboard()">🌟 LOCAL LEADERBOARD</button>
                   <button class="menu-btn" onclick="showScreen('skillTree')">⭐ UPGRADES</button>
@@ -1890,7 +1890,7 @@ body.loading {
                       <div class="health-bar" style="border-color: #00bcd4;">
                           <div id="playerHealthFill" class="health-fill" style="background: linear-gradient(90deg, #4caf50, #8bc34a, #cddc39); width: 100%;"></div>
                       </div>
-                      <div id="playerHealthText" class="health-text">100 / 100</div>
+                      <div id="playerHealthText" class="health-text">500 / 500</div>
                   </div>
                   
                   <div class="health-bar-wrapper">
@@ -1927,7 +1927,14 @@ body.loading {
 
           
       
-         
+         <!-- Overlay fine round DUEL 1v1 -->
+<div id="duelRoundOverlay"
+  style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+  background:rgba(0,0,0,0.93);color:#ffd700;border-radius:22px;z-index:9600;
+  padding:2.2em 3em;font-size:2.1rem;text-align:center;box-shadow:0 0 40px #00bcd4;">
+  <span id="duelRoundOverlayMsg"></span>
+  <div id="duelNextRoundCountdown" style="font-size:2.4rem;margin-top:12px;"></div>
+</div>
          
          
          <!-- Emoji Chat QuickBar 1v1 -->
@@ -2154,6 +2161,25 @@ body.loading {
     <button class="menu-btn" onclick="showScreen('mainMenu')">Back</button>
   </div>
 </div>
+  
+  
+  <!-- Pulsante per spettatore + room input -->
+<div style="text-align:center; margin-top:24px;">
+  <input type="text" id="spectatorRoomInput" placeholder="Room ID" style="padding:5px 10px; border-radius:7px; border:1px solid #00bcd4; width:120px;">
+  <button id="spectatorBtn" style="background:#00bcd4; color:#222; border:none; font-weight:bold; border-radius:7px; padding:7px 20px; margin-left:8px; font-size:1.1rem; cursor:pointer;">
+    👁️ Spettatore 1v1
+  </button>
+</div>
+
+<!-- Overlay spettatore (info partita live) -->
+<div id="spectatorPanel"
+     style="display:none; position:fixed; top:20px; right:20px; z-index:9999; background:rgba(20,30,40,0.91); color:#fff; padding:1em 1.3em; border-radius:16px; min-width:220px; box-shadow:0 0 18px #00bcd488; font-family:monospace;">
+  <div style="font-weight:bold; color:#ffd700; margin-bottom:6px;">👁️ Modalità Spettatore</div>
+  <div id="spectatorPlayers"></div>
+  <div id="spectatorCount" style="margin-top:8px;color:#00bcd4;"></div>
+  <button onclick="document.getElementById('spectatorPanel').style.display='none';" style="background:#ffd700; color:#222; border:none; border-radius:8px; padding:2px 13px; margin-top:10px; cursor:pointer;">Chiudi</button>
+</div>
+  
   
   
   <script>
@@ -4528,18 +4554,20 @@ eloDisplay.innerHTML =
 
  // Data Management
       function saveGameData() {
-          const savedData = JSON.parse(localStorage.getItem('stellarGuardianSave') || '{}');
-          savedData.controlLayout = gameState.controlLayout; // Save control layout
-          localStorage.setItem('stellarGuardianSave', JSON.stringify(savedData));
-      }
+  const savedData = JSON.parse(localStorage.getItem('stellarGuardianSave') || '{}');
+  savedData.controlLayout = gameState.controlLayout; // Save control layout
+  savedData.elo = gameState.elo; // <-- AGGIUNGI QUESTA RIGA!
+  localStorage.setItem('stellarGuardianSave', JSON.stringify(savedData));
+}
 
     function loadGameData() {
-    const savedData = JSON.parse(localStorage.getItem('stellarGuardianSave') || '{}');
-    gameState.skillPoints = savedData.skillPoints || 0;
-    gameState.player.skills = savedData.skills || {};
-    gameState.orientation = savedData.orientation || 'auto';
-    gameState.coins = Number(savedData.coins) || 0;
-    gameState.bestScore = Number(savedData.bestScore) || 0; // PATCH: aggiunto bestScore
+  const savedData = JSON.parse(localStorage.getItem('stellarGuardianSave') || '{}');
+  gameState.skillPoints = savedData.skillPoints || 0;
+  gameState.player.skills = savedData.skills || {};
+  gameState.orientation = savedData.orientation || 'auto';
+  gameState.coins = Number(savedData.coins) || 0;
+  gameState.bestScore = Number(savedData.bestScore) || 0;
+  gameState.elo = savedData.elo || 1000; // <-- AGGIUNGI QUI!
 }
 
    function spawnObstacle() {
@@ -6709,6 +6737,8 @@ function duelSyncLoop() {
 
 function showDuelEnd(winner, stats) {
   duelEndScreen.classList.remove('hidden');
+    document.getElementById('duelOpponentHealthBar').style.display = 'none'; // nascondi la barra round
+
   if (winner === (window.socket && window.socket.id)) {
     duelEndTitle.textContent = "🏆 VICTORY!";
   } else if (winner === "draw") {
@@ -6735,10 +6765,10 @@ function showDuelEnd(winner, stats) {
   }
 
   const newElo = calculateElo(myElo, oppElo, result);
-  const delta = newElo - myElo;
-  gameState.elo = newElo;
-  saveGameData?.();
-  updateUI?.();
+const delta = newElo - myElo;
+gameState.elo = newElo;
+saveGameData(); // <--- assicurati che sia qui!
+updateUI();
 
   duelEndStats.innerHTML = `
     <b>You:</b> ${stats?.[myId]?.kills ?? 0} kills, ${stats?.[myId]?.damage ?? 0} damage<br>
@@ -6774,14 +6804,14 @@ function getSelectedShipImage() {
 function initDuelArena() {
   gameState.player.x = 300;
   gameState.player.y = 600;
-  gameState.player.health = 100;
+  gameState.player.health = 500;
   gameState.player.energy = 100;
   gameState.opponentState = {
     x: 900,
     y: 600,
-    health: 100,
+    health: 500,
     energy: 100,
-    maxHealth: 100 // PATCH: sempre presente!
+    maxHealth: 500 // PATCH: sempre presente!
   };
   gameState.powerups = [];
   gameState.obstacles = [];
@@ -6825,17 +6855,29 @@ function setupDuelListeners() {
     duelOpponent = opponent;
     duelNick2.textContent = opponent.nickname;
     duelShip2.src = opponent.skin;
-    duelStatus.textContent = "Opponent found! Get ready...";
+  duelStatus.textContent = `Opponent found! RoomID: ${room}`; // <-- Mostra l'ID qui!
     setTimeout(() => startDuelCountdown(), 1200);
   });
-  window.socket.on('duel_state', ({ opponent, powerups, obstacles, events }) => {
-    window.gameState.opponentState = opponent;
-    window.gameState.powerups = powerups;
-    window.gameState.obstacles = obstacles;
-    processDuelEvents(events);
-  });
-  
-  
+  window.socket.on('duel_state', ({ opponent, self, powerups, obstacles, events }) => {
+  window.gameState.opponentState = opponent;
+  window.gameState.powerups = powerups;
+  window.gameState.obstacles = obstacles;
+  processDuelEvents(events);
+
+  // PATCH: aggiorna la tua health locale!
+  if (self && typeof self.health === "number") {
+    window.gameState.player.health = self.health;
+    window.gameState.player.energy = self.energy;
+    // Altri parametri se vuoi!
+  }
+
+// (resto del tuo codice)
+if (duelRounds === 0 || window.gameState.opponentState.health > 500) {
+  window.gameState.opponentState.health = 500;
+  window.gameState.opponentState.maxHealth = 500;
+}
+
+});
   // Listener powerup spawn
 window.socket.on('powerup_spawn', function(powerup) {
   window.gameState.powerups.push(powerup);
@@ -6865,16 +6907,17 @@ function sendDuelEmote(emote) {
   showDuelEmoteOnScreen(emote, true);
 }
   
-  
-  
   window.socket.on('duel_end', ({ winner, stats }) => {
-    duelGameActive = false;
-    showDuelEnd(winner, stats);
-  });
+  duelGameActive = false;
+  gameState.gameMode = 'duel1v1'; // forza la modalità
+  gameState.currentScreen = 'gameScreen';
+  updateDuelOpponentHealthBar();
+  showScreen('gameScreen'); // forza la schermata, se serve
+  duelEndScreen.classList.remove('hidden'); // mostra la schermata finale
+  showDuelEnd(winner, stats);
+});
+
 }
-
-
-
 
 
 // Funzione per controllare se sei effettivamente in fullscreen
@@ -6996,21 +7039,7 @@ function setupDuelEndButtons() {
   };
 }
 
-function startDuelLoop() {
-  function duelLoop() {
-    if (!duelGameActive || gameState.currentScreen !== 'gameScreen' || gameState.gameMode !== 'duel1v1') return;
-    updatePlayer(1); // aggiorna il tuo player
-    updatePlayerTrail();
-    updateObstacles(1);
-    updateBullets(1);
-    updateEnemyBullets(1);
-    updateParticles(1);
-    checkCollisionsDuel();
-    render();
-    requestAnimationFrame(duelLoop);
-  }
-  duelLoop();
-}
+
 
 
 
@@ -7320,7 +7349,7 @@ bar.style.right = 'auto';
       <div style="width:100%;height:18px;background:#333;border-radius:8px;overflow:hidden;box-shadow:0 0 8px #ffd700;">
         <div id="duelOpponentHealthBarFill" style="height:100%;width:100%;background:linear-gradient(90deg,#4caf50,#ffd700,#f44336);transition:width .3s;"></div>
       </div>
-      <div id="duelOpponentHealthText" style="font-size:0.96em;color:#fff;margin-top:2px;">100 / 100</div>
+      <div id="duelOpponentHealthText" style="font-size:0.96em;color:#fff;margin-top:2px;">500 / 500</div>
       <div id="duelRoundInfo" style="margin-top:8px;font-size:1.12em;color:#ffd700;">Round: 1 / 3</div>
       <div id="duelRoundsScore" style="font-size:0.99em;color:#00bcd4;">You: 0 | Opponent: 0</div>
     `;
@@ -7367,10 +7396,20 @@ function handleDuelRoundEnd(winnerId) {
   // Aggiorna la barra subito
   updateDuelOpponentHealthBar();
 
+  // MOSTRA OVERLAY SUBITO!
+  if (winnerId === (window.socket && window.socket.id)) {
+    showDuelRoundOverlay("win", duelRounds);
+  } else if (winnerId === "draw") {
+    showDuelRoundOverlay("draw", duelRounds);
+  } else {
+    showDuelRoundOverlay("lose", duelRounds);
+  }
+
   // Controlla se qualcuno ha vinto 2 round
   if (myRoundWins >= 2 || oppRoundWins >= 2 || duelRounds >= duelMaxRounds) {
     // Fine match: mostra schermata finale
     setTimeout(() => {
+      hideDuelRoundOverlay(); // Nascondi overlay prima della schermata finale
       showDuelEnd(
         myRoundWins > oppRoundWins
           ? (window.socket && window.socket.id)
@@ -7383,19 +7422,31 @@ function handleDuelRoundEnd(winnerId) {
 
   // Se non è finito, prepara nuovo round!
   setTimeout(() => {
+    hideDuelRoundOverlay(); // Nascondi overlay quando riparte il prossimo round
     startNextDuelRound();
   }, 1800);
 }
+  
+  
+  // RIMUOVI QUESTA SEZIONE BUGGY:
+  // ❌ CANCELLA QUESTE RIGHE (erano il problema):
+  /*
+  if (winnerId !== window.socket.id) {
+    duelRounds++;  // <-- DOPPIO INCREMENTO!
+    updateDuelOpponentHealthBar();
+    showDuelEnd("lose", { });  // <-- SCHERMATA PERDENTE NEI ROUND INTERMEDI!
+  }
+  */
 
 function startNextDuelRound() {
   // Reset stato giocatori
   gameState.player.x = 300;
   gameState.player.y = 600;
-  gameState.player.health = 100;
+  gameState.player.health = 500;
   gameState.player.energy = 100;
   gameState.opponentState.x = 900;
   gameState.opponentState.y = 600;
-  gameState.opponentState.health = 100;
+  gameState.opponentState.health = 500;
   gameState.opponentState.energy = 100;
   gameState.bullets = [];
   gameState.enemyBullets = [];
@@ -7407,6 +7458,8 @@ function startNextDuelRound() {
 
 // 6. Modifica la funzione checkCollisionsDuel per gestire i round
 function checkCollisionsDuel() {
+  console.log('[CHECK COLLISIONS] Player HP:', gameState.player.health, 'Opponent HP:', gameState.opponentState?.health);
+
   if (!duelGameActive || !gameState.opponentState) return;
   for (let i = gameState.bullets.length - 1; i >= 0; i--) {
     const bullet = gameState.bullets[i];
@@ -7414,7 +7467,7 @@ function checkCollisionsDuel() {
     const dist = Math.sqrt((bullet.x - opp.x) ** 2 + (bullet.y - opp.y) ** 2);
     const hitbox = 32;
     if (dist < hitbox && opp.health > 0) {
-      opp.health -= bullet.damage || 20;
+      // NON MODIFICARE la health qui!
       gameState.bullets.splice(i, 1);
       createHitParticles(bullet.x, bullet.y, bullet.color || "#ffd700");
       if (window.socket && duelRoomId) {
@@ -7427,13 +7480,7 @@ function checkCollisionsDuel() {
   }
   updateDuelOpponentHealthBar();
   // Patch: round end
-  if (gameState.opponentState.health <= 0) {
-    duelGameActive = false;
-    handleDuelRoundEnd(window.socket.id);
-  } else if (gameState.player.health <= 0) {
-    duelGameActive = false;
-    handleDuelRoundEnd(duelOpponent?.id || "opponent");
-  }
+  // La fine round va gestita SOLO quando ricevi la health aggiornata dal server nella socket 'duel_state'
 }
 
 // 7. Quando inizi un nuovo duello, resetta i round
@@ -7457,8 +7504,13 @@ window.startDuelGame = (function(orig){
 
 // 8. Aggiorna la barra vita avversario ogni frame nel loop
 function startDuelLoop() {
+  console.log('[startDuelLoop] Avviato con:', duelGameActive, window.gameState.currentScreen, window.gameState.gameMode);
+
   function duelLoop() {
-    if (!duelGameActive || gameState.currentScreen !== 'gameScreen' || gameState.gameMode !== 'duel1v1') return;
+    // Log per ogni frame!
+    console.log('[duelLoop tick]', duelGameActive, window.gameState.currentScreen, window.gameState.gameMode, window.gameState.bullets.length);
+
+    if (!duelGameActive || window.gameState.currentScreen !== 'gameScreen' || window.gameState.gameMode !== 'duel1v1') return;
     updatePlayer(1); updatePlayerTrail(); updateObstacles(1); updateBullets(1); updateEnemyBullets(1); updateParticles(1);
     checkCollisionsDuel();
     render();
@@ -7547,32 +7599,162 @@ function startFirstMission(){
 }
 
 
-window.addEventListener('load', function(){
-  // Premio di benvenuto
-  if (!localStorage.getItem('welcomeBonusGiven')) {
-    let coins = parseInt(localStorage.getItem('coins') || '0');
-    coins += 300;
-    localStorage.setItem('coins', coins);
-    localStorage.setItem('welcomeBonusGiven', 'true');
-    const el = document.getElementById('coinCount');
-    if (el) el.innerText = coins;
-    alert('🎁 Benvenuto! Hai ricevuto +300 coins!');
-  }
+// === Spettatore 1v1 ===
 
-  // Sfida Giornaliera
-  const challenges = [
-    {text: 'Sopravvivi 60 secondi', reward: 150},
-    {text: 'Distruggi 20 nemici', reward: 120},
-    {text: 'Completa 2 livelli', reward: 200}
-  ];
-  const dayIndex = new Date().getDate() % challenges.length;
-  const challenge = challenges[dayIndex];
-  alert(`🔥 Sfida di oggi: ${challenge.text} (+${challenge.reward} coins)`);
+document.getElementById('spectatorBtn').onclick = function() {
+  const roomId = document.getElementById('spectatorRoomInput').value || 'room123';
+  joinAsSpectator(roomId);
+};
+
+function joinAsSpectator(roomId) {
+  if (!window.spectatorSocket) {
+    window.spectatorSocket = io();
+  }
+  window.spectatorSocket.emit('duel_join', { roomId, role: 'spectator', nickname: "Spectator" });
+
+  window.spectatorSocket.on('duel_state', (data) => {
+    updateSpectatorView(data.players, data.spectators);
+  });
+
+  // Mostra overlay
+  document.getElementById('spectatorPanel').style.display = 'block';
+  document.getElementById('spectatorPanel').style.background = 'rgba(20,30,40,0.94)';
+}
+
+function updateSpectatorView(players, spectators) {
+  let html = '';
+  players.forEach((p, i) => {
+    html += `
+      <div style="margin-bottom:6px;${i===0?'':'border-top:1px solid #333; padding-top:5px;'}">
+        <span style="color:#00bcd4;font-weight:bold;">Player ${i+1}:</span>
+        <b style="color:#ffd700">${p.nickname || 'Player'}</b><br>
+        Pos: <span style="color:#fff;">${Math.round(p.x)},${Math.round(p.y)}</span><br>
+        HP: <span style="color:#4caf50">${p.hp}</span> | Score: <span style="color:#ffd700">${p.score}</span>
+      </div>
+    `;
+  });
+  document.getElementById('spectatorPlayers').innerHTML = html || "<i>No players in game</i>";
+  document.getElementById('spectatorCount').textContent = spectators + " spettatori attuali";
+}
+
+
+
+function resetDuelRound(data) {
+  console.log('[resetDuelRound] Chiamato', data);
+
+  // Reset stato player
+  gameState.player.x = data.playerStates[window.socket.id].x;
+  gameState.player.y = data.playerStates[window.socket.id].y;
+  gameState.player.health = 500;
+  gameState.player.energy = 100;
+  gameState.player.invulnerabilityFrames = 0;
+
+  // Reset opponent
+  const oppId = Object.keys(data.playerStates).find(id => id !== window.socket.id);
+  gameState.opponentState.x = data.playerStates[oppId].x;
+  gameState.opponentState.y = data.playerStates[oppId].y;
+  gameState.opponentState.health = 500;
+  gameState.opponentState.energy = 100;
+  gameState.opponentState.invulnerabilityFrames = 0;
+  gameState.opponentState.maxHealth = 500;
+
+  // Azzera bullets, powerups, ostacoli
+  gameState.bullets = [];
+  gameState.enemyBullets = [];
+  gameState.powerups = [];
+  gameState.obstacles = [];
+
+  duelGameActive = true; // <-- AGGIUNGI QUI!
+  gameState.player.specialCooldown = 0; // Reset cooldown
+
+  // LOG stato dopo il reset
+  console.log('[resetDuelRound] Stato:', {
+    bullets: gameState.bullets.length,
+    enemyBullets: gameState.enemyBullets.length,
+    powerups: gameState.powerups.length,
+    obstacles: gameState.obstacles.length,
+    duelGameActive
+  });
+
+  updateDuelOpponentHealthBar();
+  updateUI();
+}
+  
+
+
+window.socket.on('duel_next_round', function(data) {
+  hideDuelRoundOverlay();
+  resetDuelRound(data);
+
+  
+      duelRounds = data.round - 1;      // <-- QUI!
+
+  duelGameActive = false;
+  window.gameState.gameMode = 'duel1v1';
+  window.gameState.currentScreen = 'gameScreen';
+
+  // Mostra overlay con countdown
+  showNextRoundOverlay(data.round, duelMaxRounds || 3, 7, function() {
+    duelGameActive = true;
+    window.gameState.gameMode = 'duel1v1';
+    window.gameState.currentScreen = 'gameScreen';
+    startDuelLoop();
+    updateDuelOpponentHealthBar();     // <-- QUI!
+    console.log('[duel_next_round] startDuelLoop() chiamato');
+  });
 });
+
+
+
+function forceRestartDuelLoop() {
+  duelGameActive = false;
+  setTimeout(() => {
+    duelGameActive = true;
+    startDuelLoop();
+  }, 50); // piccolo delay, serve a "sbloccare" eventuali stalli
+}
+
+
+function showDuelRoundOverlay(status, round) {
+  let msg = "";
+  if (status === "win") msg = "✅ HAI VINTO IL ROUND " + round + "!";
+  else if (status === "lose") msg = "❌ HAI PERSO IL ROUND " + round + "!";
+  else if (status === "draw") msg = "🤝 PAREGGIO nel round " + round;
+  else msg = status;
+  document.getElementById("duelRoundOverlayMsg").textContent = msg;
+  document.getElementById("duelRoundOverlay").style.display = "block";
+}
+
+function hideDuelRoundOverlay() {
+  document.getElementById("duelRoundOverlay").style.display = "none";
+}
+
+
+function showNextRoundOverlay(roundNum, maxRounds, seconds, cb) {
+  const overlay = document.getElementById('duelRoundOverlay');
+  const msg = document.getElementById('duelRoundOverlayMsg');
+  const countdown = document.getElementById('duelNextRoundCountdown');
+  overlay.style.display = 'block';
+  msg.textContent = `🌀 ROUND ${roundNum} / ${maxRounds}`;
+  
+  let remaining = seconds;
+  countdown.textContent = `Prossimo round in ${remaining}...`;
+
+  const interval = setInterval(() => {
+    remaining--;
+    if (remaining > 0) {
+      countdown.textContent = `Prossimo round in ${remaining}...`;
+    } else {
+      clearInterval(interval);
+      overlay.style.display = 'none';
+      countdown.textContent = '';
+      if (typeof cb === "function") cb(); // <---- QUESTA RIGA!!
+    }
+  }, 1000);
+}
 
 
 </script>
   
 </body>
 </html>
-
