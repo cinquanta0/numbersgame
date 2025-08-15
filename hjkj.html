@@ -1471,6 +1471,11 @@ body.loading {
 }
    
    
+ @keyframes slideInLeft {0%{transform:translateX(-200px);opacity:0;}100%{transform:translateX(0);opacity:1;}}
+@keyframes slideInRight {0%{transform:translateX(200px);opacity:0;}100%{transform:translateX(0);opacity:1;}}
+@keyframes pulseVS {0%,100%{transform:scale(1);}50%{transform:scale(1.15);}}
+   
+   
    </style>
 </head>
 <body>
@@ -1927,13 +1932,27 @@ body.loading {
 
           
       
-         <!-- Overlay fine round DUEL 1v1 -->
-<div id="duelRoundOverlay"
-  style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
-  background:rgba(0,0,0,0.93);color:#ffd700;border-radius:22px;z-index:9600;
-  padding:2.2em 3em;font-size:2.1rem;text-align:center;box-shadow:0 0 40px #00bcd4;">
-  <span id="duelRoundOverlayMsg"></span>
-  <div id="duelNextRoundCountdown" style="font-size:2.4rem;margin-top:12px;"></div>
+  <!-- Inserisci questo sopra il canvas o sopra la HUD, visibile solo in modalità 1v1 -->
+<div id="duelScoreBar" style="
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9001;
+  display: flex;
+  gap: 44px;
+  background: rgba(20,30,40,0.94);
+  border-radius: 18px;
+  box-shadow: 0 0 24px #00bcd4a8;
+  padding: 0.9em 2.4em;
+  font-family: 'Orbitron', monospace;
+  font-size: 1.25em;
+  font-weight: 700;
+  color: #ffd700;
+">
+  <span id="scorePlayer1">👤 You: <b>0</b></span>
+  <span id="scoreRound">Round: <b>1</b>/3</span>
+  <span id="scorePlayer2">Opponent: <b>0</b></span>
 </div>
          
          
@@ -2072,6 +2091,27 @@ body.loading {
   <button class="menu-btn" id="duelCancelBtn">Cancel</button>
 </div>
 
+
+<!-- PATCH: LOADING SCREEN DUEL 1v1 ANIMATA -->
+<div id="duelLoadingScreen" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:100000;background:radial-gradient(ellipse at center,#222 50%,#0a0a2e 100%);align-items:center;justify-content:center;flex-direction:column;">
+  <div style="display:flex;gap:80px;align-items:center;">
+    <div style="text-align:center;animation:slideInLeft 0.8s;">
+      <img id="duelLoadShip1" src="navicella1.png" style="width:110px;filter:drop-shadow(0 0 22px #00bcd4);" />
+      <div id="duelLoadNick1" style="color:#00bcd4;font-weight:bold;font-size:1.3em;">Player1</div>
+      <div id="duelLoadElo1" style="color:#ffd700;font-size:1.1em;">🥇 Gold</div>
+    </div>
+    <div style="font-size:3.5em;color:#fff;font-weight:bold;text-shadow:0 0 20px #ffd700;animation:pulseVS 1s infinite;">VS</div>
+    <div style="text-align:center;animation:slideInRight 0.8s;">
+      <img id="duelLoadShip2" src="navicella2.png" style="width:110px;filter:drop-shadow(0 0 22px #ffd700);" />
+      <div id="duelLoadNick2" style="color:#ffd700;font-weight:bold;font-size:1.3em;">Player2</div>
+      <div id="duelLoadElo2" style="color:#00bcd4;font-size:1.1em;">💠 Platinum</div>
+    </div>
+  </div>
+  <div id="duelLoadingCountdown" style="font-size:2.8em;color:#ffd700;margin-top:2.5rem;">3</div>
+  <div id="duelLoadingPhrase" style="color:#fff;margin-top:1.3rem;">Prepare for cosmic battle!</div>
+</div>
+
+
 <!-- ARENA 1v1 OVERLAY -->
 <div id="duelCountdown" class="duel-countdown hidden"></div>
 <div id="duelEndScreen" class="duel-end hidden">
@@ -2184,7 +2224,8 @@ body.loading {
   
   <script>
        
-      let firstGameAdShown = false;
+      
+       let firstGameAdShown = false;
       
      function showAd() {
   if (isDevEnv()) {
@@ -2238,8 +2279,27 @@ body.loading {
      
       const missileSprite = new Image();
 missileSprite.src = "missili.png"; // usa il nome del tuo file
-      // Game State Management
-let gameState = {
+      
+const POWERUP_IMAGES = {
+  heal: 'powerup-heal-removebg-preview.png',
+  shield: 'powerup-shield-removebg-preview.png',
+  damage: 'powerup-ammo-removebg-preview.png',
+  special: 'powerup-energy-removebg-preview.png'
+};
+const POWERUP_SPRITES = {};
+for (let key in POWERUP_IMAGES) {
+  POWERUP_SPRITES[key] = new Image();
+  POWERUP_SPRITES[key].src = POWERUP_IMAGES[key];
+}
+
+
+
+// Game State Management
+
+
+
+
+      let gameState = {
     
     
     
@@ -2373,6 +2433,19 @@ window.gameState = gameState;
 
       let canvas, ctx;
       let animationId;
+      
+      // --- ANIMAZIONE ENTRATA NAVICELLE DUEL 1v1 ---
+let duelEntryAnimation = {
+  active: false,
+  progress: 0,
+  duration: 50 // ~0.8 sec a 60fps
+};
+
+function lerp(a, b, t) {
+  return a + (b - a) * t;
+}
+      
+      
       const playerImage = new Image(); // <- AGGIUNGI QUESTA RIGA QUI!
 
       
@@ -4319,27 +4392,28 @@ function forfeitMission() {
       }
 
       function renderPlayer() {
-          const player = gameState.player;
-          renderPlayerTrail(ctx);
-          ctx.save();
-          ctx.translate(player.x, player.y);
-          ctx.rotate(player.angle);
-
-          if (playerImage.complete) {
-              ctx.drawImage(playerImage, -32, -32, 64, 64); 
-          } else {
-              // Fallback: simple triangle
-              ctx.fillStyle = '#00bcd4';
-              ctx.beginPath();
-              ctx.moveTo(0, -20);
-              ctx.lineTo(-15, 15);
-              ctx.lineTo(15, 15);
-              ctx.closePath();
-              ctx.fill();
-          }
-
-          ctx.restore();
-      }
+  const player = gameState.player;
+  let x = player.x, y = player.y;
+  if (duelEntryAnimation.active) {
+    x = lerp(-100, player.x, duelEntryAnimation.progress);
+  }
+  renderPlayerTrail(ctx);
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(player.angle);
+  if (playerImage.complete) {
+    ctx.drawImage(playerImage, -32, -32, 64, 64); 
+  } else {
+    ctx.fillStyle = '#00bcd4';
+    ctx.beginPath();
+    ctx.moveTo(0, -20);
+    ctx.lineTo(-15, 15);
+    ctx.lineTo(15, 15);
+    ctx.closePath();
+    ctx.fill();
+  }
+  ctx.restore();
+}
 
      
  // --- RENDER ALTRI PLAYER ---
@@ -6678,22 +6752,18 @@ function startDuelQueue() {
 
 
 function startDuelCountdown() {
-  duelLobby.classList.add('hidden');
-  duelCountdown.classList.remove('hidden');
-  let count = 3;
-  duelCountdown.textContent = count;
-  const interval = setInterval(() => {
-    count--;
-    if (count > 0) {
-      duelCountdown.textContent = count;
-    } else if (count === 0) {
-      duelCountdown.textContent = "DUEL!";
-    } else {
-      clearInterval(interval);
-      duelCountdown.classList.add('hidden');
-      startDuelGame();
-    }
-  }, 1000);
+  duelLobby.classList.add('hidden'); // Nascondi la lobby
+
+  // Mostra la schermata animata!
+  showDuelLoadingScreen(
+    getPlayerName(),                        // tuo nickname
+    getSelectedShipImage(),                 // tua skin nave
+    getEloLeague(gameState.elo).icon + " " + getEloLeague(gameState.elo).name, // tuo ELO/lega
+    duelOpponent?.nickname || "Opponent",   // nickname avversario
+    duelOpponent?.skin || "navicella2.png", // skin avversario
+    getEloLeague(duelOpponent?.elo || 1000).icon + " " + getEloLeague(duelOpponent?.elo || 1000).name, // ELO avversario
+    "Ready for the cosmic duel?"            // frase motivazionale (puoi mettere random)
+  );
 }
 
 function startDuelGame() {
@@ -6802,17 +6872,21 @@ function getSelectedShipImage() {
 }
 
 function initDuelArena() {
-  gameState.player.x = 300;
-  gameState.player.y = 600;
+  // Player 1: alto a sinistra
+  gameState.player.x = 100;
+  gameState.player.y = 90;
   gameState.player.health = 500;
   gameState.player.energy = 100;
+
+  // Player 2: alto a destra
   gameState.opponentState = {
-    x: 900,
-    y: 600,
+    x: canvas.width - 100, // <-- cambia qui!
+    y: 90,
     health: 500,
     energy: 100,
-    maxHealth: 500 // PATCH: sempre presente!
+    maxHealth: 500
   };
+
   gameState.powerups = [];
   gameState.obstacles = [];
 }
@@ -6822,11 +6896,15 @@ function initDuelArena() {
 function renderOpponent(ctx) {
   const opp = gameState.opponentState;
   if (!opp) return;
+  let x = opp.x, y = opp.y;
+  if (duelEntryAnimation.active) {
+    x = lerp(canvas.width + 100, opp.x, duelEntryAnimation.progress);
+  }
   ctx.save();
   ctx.globalAlpha = 0.8;
   const img = new Image();
   img.src = getShipImageFromId(duelOpponent?.skin) || "navicella2.png";
-  ctx.drawImage(img, opp.x - 32, opp.y - 32, 64, 64);
+  ctx.drawImage(img, x - 32, y - 32, 64, 64);
 
   // Barra vita
   const barWidth = 56, barHeight = 10;
@@ -7234,6 +7312,7 @@ function checkPowerupPickup() {
     if (Math.sqrt(dx*dx + dy*dy) < 32 && p.active) {
       window.socket.emit('duel_update', { room: duelRoomId, player: {...window.gameState.player}, action: 'powerup_pick', powerupId: p.id });
       p.active = false;
+      applyPowerupEffect(p.type); // <--- AGGIUNGI QUESTA RIGA QUI!
     }
   });
 }
@@ -7241,14 +7320,28 @@ function checkPowerupPickup() {
 
 function renderDuelPowerups(ctx, powerups) {
   powerups.forEach(p => {
+    if (!p.active) return;
     ctx.save();
+
+    // Glow sottostante
+    ctx.globalAlpha = 0.23;
     ctx.beginPath();
-    ctx.arc(p.x, p.y, 20, 0, Math.PI * 2);
-    ctx.fillStyle = p.type === 'heal' ? '#4caf50'
-      : p.type === 'shield' ? '#2196f3'
-      : p.type === 'damage' ? '#f44336'
-      : '#ffd700';
+    ctx.arc(p.x, p.y, 32, 0, Math.PI * 2);
+    ctx.fillStyle = "#fff";
     ctx.fill();
+    ctx.globalAlpha = 1;
+
+    // Disegna sprite
+    const img = POWERUP_SPRITES[p.type] || POWERUP_SPRITES['heal'];
+    ctx.drawImage(img, p.x - 24, p.y - 24, 48, 48);
+
+    // Bordo dorato (facoltativo)
+    ctx.strokeStyle = "#ffd700";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 24, 0, Math.PI * 2);
+    ctx.stroke();
+
     ctx.restore();
   });
 }
@@ -7497,6 +7590,7 @@ window.startDuelGame = (function(orig){
     gameState.enemy = null;
     initDuelArena();
     duelSyncLoop();
+    startDuelEntryAnimation();
     startDuelLoop();
     updateDuelOpponentHealthBar();
   };
@@ -7510,6 +7604,16 @@ function startDuelLoop() {
     // Log per ogni frame!
     console.log('[duelLoop tick]', duelGameActive, window.gameState.currentScreen, window.gameState.gameMode, window.gameState.bullets.length);
 
+    
+      if (duelEntryAnimation.active) {
+    duelEntryAnimation.progress += 1 / duelEntryAnimation.duration;
+    if (duelEntryAnimation.progress >= 1) {
+      duelEntryAnimation.active = false;
+      duelEntryAnimation.progress = 1;
+    }
+  }
+    
+    
     if (!duelGameActive || window.gameState.currentScreen !== 'gameScreen' || window.gameState.gameMode !== 'duel1v1') return;
     updatePlayer(1); updatePlayerTrail(); updateObstacles(1); updateBullets(1); updateEnemyBullets(1); updateParticles(1);
     checkCollisionsDuel();
@@ -7751,6 +7855,51 @@ function showNextRoundOverlay(roundNum, maxRounds, seconds, cb) {
       if (typeof cb === "function") cb(); // <---- QUESTA RIGA!!
     }
   }, 1000);
+}
+
+
+
+function updateDuelScoreBar(p1Score, round, p2Score) {
+  document.getElementById('scorePlayer1').innerHTML = `👤 You: <b>${p1Score}</b>`;
+  document.getElementById('scorePlayer2').innerHTML = `Opponent: <b>${p2Score}</b>`;
+  document.getElementById('scoreRound').innerHTML = `Round: <b>${round}</b>/3`;
+}
+
+
+function startDuelEntryAnimation() {
+  duelEntryAnimation.active = true;
+  duelEntryAnimation.progress = 0;
+}
+
+
+function showDuelLoadingScreen(player1, ship1, elo1, player2, ship2, elo2, phrase) {
+  document.getElementById('duelLoadNick1').textContent = player1;
+  document.getElementById('duelLoadShip1').src = ship1;
+  document.getElementById('duelLoadElo1').textContent = elo1;
+  document.getElementById('duelLoadNick2').textContent = player2;
+  document.getElementById('duelLoadShip2').src = ship2;
+  document.getElementById('duelLoadElo2').textContent = elo2;
+  document.getElementById('duelLoadingPhrase').textContent = phrase || "Prepare for cosmic battle!";
+  document.getElementById('duelLoadingScreen').style.display = 'flex';
+
+  let count = 3;
+  document.getElementById('duelLoadingCountdown').textContent = count;
+  const interval = setInterval(() => {
+    count--;
+    if (count > 0) {
+      document.getElementById('duelLoadingCountdown').textContent = count;
+    } else if (count === 0) {
+      document.getElementById('duelLoadingCountdown').textContent = "GO!";
+    } else {
+      clearInterval(interval);
+      hideDuelLoadingScreen();
+      startDuelGame(); // Avvia la partita 1v1!
+    }
+  }, 1000);
+}
+
+function hideDuelLoadingScreen() {
+  document.getElementById('duelLoadingScreen').style.display = 'none';
 }
 
 
