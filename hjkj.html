@@ -2562,13 +2562,12 @@ function lerp(a, b, t) {
 let duelBotDifficulty = localStorage.getItem('duelBotDifficulty') || "normal";
 function getDuelBotParams() {
   return {
-    easy:    { speed: 2.1, fireRate: 0.017, aimError: 80 },
-    normal:  { speed: 2.8, fireRate: 0.024, aimError: 35 },
-    hard:    { speed: 4.0, fireRate: 0.036, aimError: 16 },
-    insane:  { speed: 5.2, fireRate: 0.045, aimError: 5 }
+    easy:    { speed: 2.1, fireRate: 1.8, aimError: 80, health: 300, damage: 12, bulletSpeed: 7, size: 8 },
+    normal:  { speed: 2.8, fireRate: 1.2, aimError: 35, health: 500, damage: 18, bulletSpeed: 10, size: 9 },
+    hard:    { speed: 4.0, fireRate: 0.8, aimError: 10, health: 750, damage: 27, bulletSpeed: 13, size: 10 },
+    insane:  { speed: 5.2, fireRate: 0.5, aimError: 4, health: 1100, damage: 40, bulletSpeed: 16, size: 12 }
   }[duelBotDifficulty];
 }
-
 
 
 const playerImage = new Image(); // <- AGGIUNGI QUESTA RIGA QUI!
@@ -8064,9 +8063,8 @@ function showGoOverlay(text = "GO!", duration = 900) {
 
 
 
-function updateDuelBot() {
-  // Bot si muove solo orizzontalmente in alto
-  const speed = getDuelBotParams().speed * 3; // regola il moltiplicatore a piacere
+const params = getDuelBotParams();
+const speed = params.speed * (duelBotDifficulty === "insane" ? 4 : 3);
   duelBot.y = 90; // sempre alto
   duelBot.x += speed * botDirection;
   if (duelBot.x < 100 || duelBot.x > canvas.width - 100) botDirection *= -1;
@@ -8075,64 +8073,31 @@ function updateDuelBot() {
 
   if (duelBot.cooldownShoot <= 0) {
     shootAsBot();
-    duelBot.cooldownShoot = 60 * getDuelBotParams().fireRate + Math.random()*16;
-  }
+duelBot.cooldownShoot = getDuelBotParams().fireRate * 60 + Math.random() * 16;  
 }
 
+
 function shootAsBot() {
-  const patterns = ['basic', 'spread', 'aimed'];
-  const pattern = patterns[Math.floor(Math.random() * patterns.length)];
-  const bulletSpeed = 10 + Math.random() * 3;
-  const botY = Math.max(40, Math.min(duelBot.y, canvas.height-60));
-  
-  switch (pattern) {
-    case 'basic':
-      for (let i = -1; i <= 1; i++) {
-        gameState.enemyBullets.push({
-          x: duelBot.x + i * 18,
-          y: botY + 40,
-          vx: i * 1.5,
-          vy: bulletSpeed,
-          color: "#ffd700",
-          size: 9,
-          damage: 18
-        });
-      }
-      break;
-    case 'spread':
-      for (let i = 0; i < 5; i++) {
-        const angle = (-0.6 + i * 0.3) + Math.PI/2;
-        gameState.enemyBullets.push({
-          x: duelBot.x,
-          y: botY + 40,
-          vx: Math.cos(angle) * bulletSpeed,
-          vy: Math.sin(angle) * bulletSpeed,
-          color: "#e91e63",
-          size: 8,
-          damage: 12
-        });
-      }
-      break;
-    case 'aimed':
-      const dx = gameState.player.x - duelBot.x;
-      const dy = gameState.player.y - (botY + 40);
-      const dist = Math.sqrt(dx*dx + dy*dy) || 1;
-      gameState.enemyBullets.push({
-        x: duelBot.x,
-        y: botY + 40,
-        vx: (dx / dist) * bulletSpeed,
-        vy: (dy / dist) * bulletSpeed,
-        color: "#9c27b0",
-        size: 10,
-        damage: 15
-      });
-      break;
+  const params = getDuelBotParams();
+  const dx = gameState.player.x - duelBot.x;
+  const dy = gameState.player.y - duelBot.y;
+  const dist = Math.sqrt(dx*dx + dy*dy) || 1;
+  const angle = Math.atan2(dy, dx) + (Math.random() - 0.5) * params.aimError * (Math.PI/180);
+
+  gameState.enemyBullets.push({
+    x: duelBot.x,
+    y: duelBot.y + 40,
+    vx: Math.cos(angle) * params.bulletSpeed,
+    vy: Math.sin(angle) * params.bulletSpeed,
+    color: "#ffd700",
+    size: params.size,
+    damage: params.damage
+  });
+
+  // Limita proiettili
+  if (gameState.enemyBullets.length > 12) {
+    gameState.enemyBullets = gameState.enemyBullets.slice(-12);
   }
-  if (gameState.enemyBullets.length > 30) {
-    gameState.enemyBullets = gameState.enemyBullets.slice(-30);
-  }
-  // Debug
-  console.log("Bot spara!", duelBot.x, botY, "Tot:", gameState.enemyBullets.length);
 }
 
 function renderDuelBot(ctx) {
@@ -8154,6 +8119,12 @@ function startDuelAIBoss() {
   gameState.player.maxHealth = 500;
   gameState.player.maxEnergy = 100;
 
+  
+  const params = getDuelBotParams();
+duelBot.health = params.health;
+duelBot.maxHealth = params.health;
+  
+  
   // Prendi un boss difficile dal LEVEL_DATA
   const levelIndex = 10; // Scegli il boss che vuoi, qui è livello 11 (indice 10)
   const bossData = LEVEL_DATA[levelIndex];
@@ -8215,7 +8186,21 @@ function checkDuelAICollisions() {
   }
 }
 
+function updateDuelBot() {
+  const params = getDuelBotParams();
+  // Movimento orizzontale intelligente
+  const speed = params.speed * (duelBotDifficulty === "insane" ? 4 : 3);
+  duelBot.y = 90; // sempre in alto
+  duelBot.x += speed * botDirection;
+  if (duelBot.x < 100 || duelBot.x > canvas.width - 100) botDirection *= -1;
 
+  // Sparo
+  duelBot.cooldownShoot = Math.max(0, duelBot.cooldownShoot - 1);
+  if (duelBot.cooldownShoot <= 0) {
+    shootAsBot();
+    duelBot.cooldownShoot = params.fireRate * 60 + Math.random() * 16;
+  }
+}
 
 </script>
   
