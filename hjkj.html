@@ -1706,9 +1706,17 @@ body.loading {
                   <button class="menu-btn" onclick="showScreen('mobileCustomizationMenu')">📱 MOBILE SETTINGS</button>
                   <button class="menu-btn" onclick="showDuelLeaderboard()">🏅 1v1 DUEL LEADERBOARD</button>
                 
-                
-                
-                </div>
+                   <div style="margin-bottom:1.2em;">
+  <label for="duelBotDifficultySelect" style="color:#00bcd4;font-weight:bold;margin-right:7px;">Bot Difficulty:</label>
+  <select id="duelBotDifficultySelect" class="menu-btn" style="padding:0.4em 1.3em; font-size:1.1em; width:auto;">
+    <option value="easy">Easy 😃</option>
+    <option value="normal" selected>Normal 😈</option>
+    <option value="hard">Hard 👾</option>
+    <option value="insane">Insane 💀</option>
+  </select>
+</div>
+                                      <button class="menu-btn" onclick="startDuelAIBoss()">🤖 1v1 DUEL vs BOT(beta)</button>
+</div>
               
               <div class="stats-display">
                   <div class="stat-item">
@@ -2387,7 +2395,7 @@ for (let key in POWERUP_IMAGES) {
 // Game State Management
 
 
-
+           
 
       let gameState = {
     
@@ -2463,8 +2471,22 @@ for (let key in POWERUP_IMAGES) {
 window.gameState = gameState;
       
       
+      let duelBot = {
+  x: 1000,
+  y: 90,
+  health: 500,
+  maxHealth: 500,
+  energy: 100,
+  maxEnergy: 100,
+  cooldownShoot: 0,
+  cooldownDodge: 0,
+  target: { x: 0, y: 0 }
+};
       
-      // Level Data Configuration
+let botDirection = 1; // <-- QUI!
+
+
+// Level Data Configuration
       const LEVEL_DATA = [
           {level: 1, enemy: "Scout Drone", difficulty: "Easy", health: 800, phases: 1, speed: 2, attackPatterns: ['basic'], bulletSpeed: 3, bulletCount: 1},
           {level: 2, enemy: "Fighter Ship", difficulty: "Easy", health: 1200, phases: 2, speed: 2.5, attackPatterns: ['basic', 'spread'], bulletSpeed: 3.5, bulletCount: 1.2},
@@ -2536,7 +2558,20 @@ function lerp(a, b, t) {
 }
       
       
-      const playerImage = new Image(); // <- AGGIUNGI QUESTA RIGA QUI!
+      // -- METTI QUESTE DUE RIGHE IN ALTO, subito dopo i let/var principali --
+let duelBotDifficulty = localStorage.getItem('duelBotDifficulty') || "normal";
+function getDuelBotParams() {
+  return {
+    easy:    { speed: 2.1, fireRate: 0.017, aimError: 80 },
+    normal:  { speed: 2.8, fireRate: 0.024, aimError: 35 },
+    hard:    { speed: 4.0, fireRate: 0.036, aimError: 16 },
+    insane:  { speed: 5.2, fireRate: 0.045, aimError: 5 }
+  }[duelBotDifficulty];
+}
+
+
+
+const playerImage = new Image(); // <- AGGIUNGI QUESTA RIGA QUI!
 
       
       const backgroundImage = new Image();
@@ -3317,11 +3352,32 @@ function gameLoop() {
 }
      // Sostituisci la funzione update con questa:
 function update(deltaTime) {
-    deltaTime *= gameState.timeScale;  // <--- QUESTA RIGA!
-    deltaTime *= gameState.globalSpeed;
-  
-  
+  deltaTime *= gameState.timeScale;
+  deltaTime *= gameState.globalSpeed;
+
   updatePlayer(deltaTime);
+
+  // SOLO in duelAI aggiorna il bot, i proiettili e la UI
+  if (gameState.gameMode === "duelAI") {
+    updateDuelBot();
+    updatePlayerTrail();
+    updateBullets(deltaTime);
+    updateEnemyBullets(deltaTime);
+    updateParticles(deltaTime);
+    
+      checkDuelAICollisions(); // <--- AGGIUNGI QUESTA RIGA QUI
+
+    
+    
+    if (gameState.player.specialCooldown > 0) gameState.player.specialCooldown--;
+    updateUI();
+    // Eventualmente aggiungi qui gestione fine partita vs bot
+    if (gameState.player.health <= 0) gameOver();
+    if (duelBot.health <= 0) levelComplete();
+    return; // NON aggiornare nulla della campagna!
+  }
+
+  // --- Tutto il resto SOLO se NON sei in duelAI ---
   updatePlayerTrail();
   updateObstacles(deltaTime);
   updateEnemy(deltaTime);
@@ -3333,27 +3389,6 @@ function update(deltaTime) {
   updateScreenShake();
   checkCollisions();
 
-if (gameState.bullets.length > 400) gameState.bullets.length = 400;
-if (gameState.enemyBullets.length > 400) gameState.enemyBullets.length = 400;
-if (gameState.particles.length > 300) gameState.particles.length = 300;
-if (gameState.obstacles.length > 100) gameState.obstacles.length = 100;
-if (typeof explosionParticles !== "undefined" && explosionParticles.length > 60) explosionParticles.length = 60;
-if (typeof ripples !== "undefined" && ripples.length > 20) ripples.length = 20;
-if (typeof playerTrail !== "undefined" && playerTrail.length > 10) playerTrail.length = 10;
-// (Opzionale) Log periodico per debug
-if (!gameState._frameCount) gameState._frameCount = 0;
-gameState._frameCount++;
-if (gameState._frameCount % 300 === 0) {
-  console.log("Bullets:", gameState.bullets.length,
-              "EnemyBullets:", gameState.enemyBullets.length,
-              "Particles:", gameState.particles.length,
-              "Obstacles:", gameState.obstacles.length,
-              "ExplosionParticles:", (typeof explosionParticles !== "undefined" ? explosionParticles.length : "n/a"),
-              "Ripples:", (typeof ripples !== "undefined" ? ripples.length : "n/a"),
-              "PlayerTrail:", (typeof playerTrail !== "undefined" ? playerTrail.length : "n/a"));
-}
- 
- 
   if (gameState.player.specialCooldown > 0) gameState.player.specialCooldown--;
 
   if (gameState.gameMode === 'chaos') updateChaosMode(deltaTime);
@@ -3375,15 +3410,20 @@ if (gameState._frameCount % 300 === 0) {
     const skills = gameState.player.skills;
     let speed = player.precisionMode ? 2 : 4; // valori più bassi!
 
+    if (gameState.gameMode === "duelAI") {
+  speed = 16; // o un valore ancora più alto
+}
+    
+    
     // <<< INCOLLA QUI >>>
     document.getElementById('coinCount').textContent = "Speed " + (window.gameState.mobileShipSpeed || localStorage.getItem('mobileShipSpeed'));
 
     if (skills.targeting_system && player.precisionMode) speed *= 0.7;
 
-    speed *= 2.3;
+    speed *= 3;
 
     // PATCH: velocità globale super bassa per tutti
-    speed *= 1.4; // Cambia 0.18 con quanto lento vuoi (0.1 = lentissimo, 1 = normale)
+    speed *= 2.5; // Cambia 0.18 con quanto lento vuoi (0.1 = lentissimo, 1 = normale)
 
     // Il resto come prima
     speed *= deltaTime;
@@ -3580,24 +3620,25 @@ function getMobileBulletParams(count, speed) {
       }
       break;
 
-    case 'tracking':
-      const dx = gameState.player.x - enemy.x;
-      const dy = gameState.player.y - enemy.y;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      for (let i = 0; i < Math.min(2 * bulletCount, 8); i++) {
-        gameState.enemyBullets.push({
-          x: enemy.x,
-          y: enemy.y + 50,
-          vx: (dx / dist) * bulletSpeed + (Math.random() - 0.5),
-          vy: (dy / dist) * bulletSpeed + (Math.random() - 0.5),
-          color: '#9c27b0',
-          size: 10,
-          damage: 18,
-          tracking: true,
-          trackingStrength: 0.03
-        });
-      }
-      break;
+    case 'tracking': {
+  const dx = gameState.player.x - enemy.x;
+  const dy = gameState.player.y - enemy.y;
+  const dist = Math.sqrt(dx * dx + dy * dy);
+  for (let i = 0; i < 1; i++) { // SOLO 1 proiettile!
+    gameState.enemyBullets.push({
+      x: enemy.x,
+      y: enemy.y + 50,
+      vx: (dx / dist) * bulletSpeed,
+      vy: (dy / dist) * bulletSpeed,
+      color: '#ff9800',
+      size: 10,
+      damage: 18,
+      tracking: true,
+      trackingStrength: 0.004 // lentissimo!
+    });
+  }
+  break;
+}
 
     case 'laser':
       for (let i = 0; i < Math.min(15, 12); i++) {
@@ -4060,27 +4101,40 @@ function eseguiSpecial() {
       }
 
       function updateEnemyBullets(deltaTime) {
-          gameState.enemyBullets = gameState.enemyBullets.filter(bullet => {
-              bullet.x += bullet.vx * deltaTime;
-              bullet.y += bullet.vy * deltaTime;
-              
-              if (bullet.tracking && Math.random() < 0.08) {
-                  const dx = gameState.player.x - bullet.x;
-                  const dy = gameState.player.y - bullet.y;
-                  const dist = Math.sqrt(dx * dx + dy * dy);
-                  
-                  bullet.vx += (dx / dist) * (bullet.trackingStrength || 0.2);
-                  bullet.vy += (dy / dist) * (bullet.trackingStrength || 0.2);
-              }
-              
-              if (bullet.wave) {
-                  bullet.x += Math.sin(Date.now() * 0.01 + bullet.waveOffset) * 1.5;
-              }
-              
-              return bullet.y > -50 && bullet.y < canvas.height + 50 &&
-                     bullet.x > -50 && bullet.x < canvas.width + 50;
-          });
-      }
+    const MAX_ENEMY_BULLETS = 45;
+    gameState.enemyBullets = gameState.enemyBullets.filter(bullet => {
+        bullet.x += bullet.vx * deltaTime;
+        bullet.y += bullet.vy * deltaTime;
+
+        // PATCH: tracking lentissimo e rarissimo!
+        if (bullet.tracking && Math.random() < 0.01) {
+            const dx = gameState.player.x - bullet.x;
+            const dy = gameState.player.y - bullet.y;
+            const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+            const ts = bullet.trackingStrength || 0.004;
+            bullet.vx += (dx / dist) * ts;
+            bullet.vy += (dy / dist) * ts;
+            // Clamp velocità massima
+            const maxSpeed = 4;
+            const vNorm = Math.sqrt(bullet.vx * bullet.vx + bullet.vy * bullet.vy);
+            if (vNorm > maxSpeed) {
+                bullet.vx = (bullet.vx / vNorm) * maxSpeed;
+                bullet.vy = (bullet.vy / vNorm) * maxSpeed;
+            }
+        }
+
+        if (bullet.wave) {
+            bullet.x += Math.sin(Date.now() * 0.01 + bullet.waveOffset) * 1.5;
+        }
+
+        return bullet.y > -50 && bullet.y < canvas.height + 50 &&
+               bullet.x > -50 && bullet.x < canvas.width + 50;
+    });
+
+    if (gameState.enemyBullets.length > MAX_ENEMY_BULLETS) {
+        gameState.enemyBullets = gameState.enemyBullets.slice(-MAX_ENEMY_BULLETS);
+    }
+}
 
       function updateParticles(deltaTime) {
           gameState.particles = gameState.particles.filter(particle => {
@@ -4435,33 +4489,32 @@ function forfeitMission() {
 
   renderSpaceBackground();
 
-  // PATCH: Powerup solo in 1v1, subito dopo lo sfondo
-  if (gameState.gameMode === "duel1v1") {
-    renderDuelPowerups(ctx, window.gameState.powerups);
+  // SOLO in duelAI: player, bot, bullets, particles
+  if (gameState.gameMode === "duelAI") {
+    renderPlayer();
+    renderDuelBot(ctx);
+    renderBullets();
+    renderEnemyBullets();
+    renderParticles();
+    if (gameState.slowTimeActive) renderSlowTimeOverlay();
+    if (gameState.screenShake > 0) ctx.restore();
+    return; // NON disegnare altro!
   }
 
+  // --- Tutto il resto SOLO se NON sei in duelAI ---
   renderPlayer();
+  if (gameState.gameMode === "duel1v1") renderOpponent(ctx);
+  else if (gameState.gameMode === "coop") renderOtherPlayers(ctx), renderEnemy();
+  else renderEnemy();
 
-  if (gameState.gameMode === "duel1v1") {
-    renderOpponent(ctx); // SOLO avversario
-  } else if (gameState.gameMode === "coop") {
-    renderOtherPlayers(ctx); // co-op
-    renderEnemy(); // Boss co-op
-  } else {
-    renderEnemy(); // Campagna/endless/chaos
-  }
   renderObstacles();
   renderBullets();
   renderEnemyBullets();
   renderParticles();
 
-  if (gameState.slowTimeActive) {
-    renderSlowTimeOverlay();
-  }
+  if (gameState.slowTimeActive) renderSlowTimeOverlay();
 
-  if (gameState.screenShake > 0) {
-    ctx.restore();
-  }
+  if (gameState.screenShake > 0) ctx.restore();
 }
       function renderSpaceBackground() {
           if (backgroundImage.complete) {
@@ -8005,6 +8058,164 @@ function showGoOverlay(text = "GO!", duration = 900) {
     setTimeout(() => { el.style.display = 'none'; }, 500);
   }, duration);
 }
+
+
+// ---- PATCH: DUEL BOT CON DIFFICOLTÀ E MOVIMENTO INTELLIGENTE ----
+
+
+
+function updateDuelBot() {
+  // Bot si muove solo orizzontalmente in alto
+  const speed = getDuelBotParams().speed * 3; // regola il moltiplicatore a piacere
+  duelBot.y = 90; // sempre alto
+  duelBot.x += speed * botDirection;
+  if (duelBot.x < 100 || duelBot.x > canvas.width - 100) botDirection *= -1;
+
+  duelBot.cooldownShoot = Math.max(0, duelBot.cooldownShoot-1);
+
+  if (duelBot.cooldownShoot <= 0) {
+    shootAsBot();
+    duelBot.cooldownShoot = 60 * getDuelBotParams().fireRate + Math.random()*16;
+  }
+}
+
+function shootAsBot() {
+  const patterns = ['basic', 'spread', 'aimed'];
+  const pattern = patterns[Math.floor(Math.random() * patterns.length)];
+  const bulletSpeed = 10 + Math.random() * 3;
+  const botY = Math.max(40, Math.min(duelBot.y, canvas.height-60));
+  
+  switch (pattern) {
+    case 'basic':
+      for (let i = -1; i <= 1; i++) {
+        gameState.enemyBullets.push({
+          x: duelBot.x + i * 18,
+          y: botY + 40,
+          vx: i * 1.5,
+          vy: bulletSpeed,
+          color: "#ffd700",
+          size: 9,
+          damage: 18
+        });
+      }
+      break;
+    case 'spread':
+      for (let i = 0; i < 5; i++) {
+        const angle = (-0.6 + i * 0.3) + Math.PI/2;
+        gameState.enemyBullets.push({
+          x: duelBot.x,
+          y: botY + 40,
+          vx: Math.cos(angle) * bulletSpeed,
+          vy: Math.sin(angle) * bulletSpeed,
+          color: "#e91e63",
+          size: 8,
+          damage: 12
+        });
+      }
+      break;
+    case 'aimed':
+      const dx = gameState.player.x - duelBot.x;
+      const dy = gameState.player.y - (botY + 40);
+      const dist = Math.sqrt(dx*dx + dy*dy) || 1;
+      gameState.enemyBullets.push({
+        x: duelBot.x,
+        y: botY + 40,
+        vx: (dx / dist) * bulletSpeed,
+        vy: (dy / dist) * bulletSpeed,
+        color: "#9c27b0",
+        size: 10,
+        damage: 15
+      });
+      break;
+  }
+  if (gameState.enemyBullets.length > 30) {
+    gameState.enemyBullets = gameState.enemyBullets.slice(-30);
+  }
+  // Debug
+  console.log("Bot spara!", duelBot.x, botY, "Tot:", gameState.enemyBullets.length);
+}
+
+function renderDuelBot(ctx) {
+  ctx.save();
+  ctx.globalAlpha = 0.9;
+  ctx.drawImage(playerImage, duelBot.x - 32, duelBot.y - 32, 64, 64);
+  ctx.restore();
+}
+
+
+
+function startDuelAIBoss() {
+  gameState.gameMode = "duelAI";
+  // Player come sempre
+  gameState.player.x = 100;
+  gameState.player.y = 600;
+  gameState.player.health = 500;
+  gameState.player.energy = 100;
+  gameState.player.maxHealth = 500;
+  gameState.player.maxEnergy = 100;
+
+  // Prendi un boss difficile dal LEVEL_DATA
+  const levelIndex = 10; // Scegli il boss che vuoi, qui è livello 11 (indice 10)
+  const bossData = LEVEL_DATA[levelIndex];
+  gameState.enemy = {
+    ...bossData,
+    x: canvas.width / 2,
+    y: 120,
+    health: bossData.health,
+    maxHealth: bossData.health,
+    speed: bossData.speed,
+    attackPatterns: bossData.attackPatterns,
+    phases: bossData.phases,
+    attackCooldown: 0,
+    moveDirection: 1,
+    angle: 0
+  };
+
+  gameState.bullets = [];
+  gameState.enemyBullets = [];
+  gameState.particles = [];
+
+  showScreen('gameScreen');
+  gameState.gameRunning = true;
+  gameLoop();
+}
+
+// (poi puoi chiamare startDuelAIBoss() dal menu)
+
+// Applica la difficoltà scelta dal menu
+document.getElementById('duelBotDifficultySelect').value = duelBotDifficulty;
+document.getElementById('duelBotDifficultySelect').addEventListener('change', function() {
+  duelBotDifficulty = this.value;
+  localStorage.setItem('duelBotDifficulty', duelBotDifficulty);
+});
+
+
+
+// --- FUNZIONE COLLISIONI DUEL BOT (1v1 BOT) ---
+function checkDuelAICollisions() {
+  // Player colpisce bot
+  for (let i = gameState.bullets.length - 1; i >= 0; i--) {
+    const b = gameState.bullets[i];
+    const dx = b.x - duelBot.x;
+    const dy = b.y - duelBot.y;
+    if (Math.sqrt(dx*dx + dy*dy) < 32) {
+      duelBot.health -= b.damage || 20;
+      gameState.bullets.splice(i, 1);
+    }
+  }
+  // Bot colpisce player
+  for (let i = gameState.enemyBullets.length - 1; i >= 0; i--) {
+    const b = gameState.enemyBullets[i];
+    const dx = b.x - gameState.player.x;
+    const dy = b.y - gameState.player.y;
+    if (Math.sqrt(dx*dx + dy*dy) < 32) {
+      gameState.player.health -= b.damage || 20;
+      gameState.enemyBullets.splice(i, 1);
+    }
+  }
+}
+
+
 
 </script>
   
