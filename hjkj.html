@@ -2162,7 +2162,28 @@ body.landscape-mode #gameCanvas {
   </div>
 
 
-
+  <!-- Overlay animato round duello 1v1 -->
+<div id="duelRoundOverlay" style="
+  display:none;
+  position:fixed;
+  top:50%; left:50%;
+  transform:translate(-50%,-50%);
+  background:rgba(0,0,0,0.90);
+  border-radius:24px;
+  box-shadow:0 0 80px #ffd700aa;
+  padding:2.2rem 3.2rem;
+  text-align:center;
+  z-index:9500;
+  min-width:260px;
+  font-family:'Orbitron',monospace;
+  font-size:2.1rem;
+">
+  <div id="duelRoundOverlayMsg"></div>
+  <div id="duelNextRoundCountdown" style="margin-top:12px;font-size:1.2rem;color:#ffd700;"></div>
+</div>
+  
+  
+  
   <div id="gameContainer">
   <!-- Main Menu Screen -->
   <div class="screen active" id="mainMenu">
@@ -2817,6 +2838,8 @@ body.landscape-mode #gameCanvas {
     <div style="margin-top:1.5rem; display:flex; gap:12px; justify-content:center;">
       <button class="menu-btn primary" onclick="applyMobileSettings()">💾 APPLICA</button>
       <button class="menu-btn" onclick="resetMobileSettings()">♻️ RESET</button>
+
+    
     </div>
   </div> <!-- fine .menu-content -->
 </div> <!-- fine #mobileCustomizationMenu -->
@@ -8816,6 +8839,68 @@ function resizeCanvas() {
 // Chiama resizeCanvas all'avvio e su ogni resize/rotate
 window.addEventListener('resize', resizeCanvas);
 window.addEventListener('orientationchange', resizeCanvas);
+
+
+function showDuelRoundOverlay(status, round) {
+  let msg = "";
+  let color = "#fff";
+  
+  // EFFETTI SPECIALI
+  if (status === "win") {
+    msg = "✅ HAI VINTO IL ROUND " + round + "!";
+    color = "#ffd700";
+    playDuelSound("win");        // SUONO VITTORIA
+    flashScreen("#ffe700", 0.35); // FLASH GIALLO
+    esplodiGiocatore(gameState.player); // PARTICELLE SULLA TUA NAVICELLA
+  }
+  else if (status === "lose") {
+    msg = "❌ HAI PERSO IL ROUND " + round + "!";
+    color = "#f44336";
+    playDuelSound("lose");        // SUONO SCONFITTA
+    flashScreen("#f44336", 0.35); // FLASH ROSSO
+    esplodiGiocatore(gameState.opponentState); // PARTICELLE SULL'AVVERSARIO
+  }
+  else if (status === "draw") {
+    msg = "🤝 PAREGGIO nel round " + round;
+    color = "#00bcd4";
+    playDuelSound("draw");        // SUONO PAREGGIO
+    flashScreen("#00bcd4", 0.35); // FLASH BLU
+  }
+  else {
+    msg = status;
+    color = "#fff";
+  }
+
+  document.getElementById("duelRoundOverlayMsg").textContent = msg;
+  document.getElementById("duelRoundOverlayMsg").style.color = color;
+  document.getElementById("duelRoundOverlay").style.display = "block";
+}
+
+function hideDuelRoundOverlay() {
+  document.getElementById("duelRoundOverlay").style.display = "none";
+}
+
+
+function playDuelSound(type) {
+  let audio;
+  if (type === "win") audio = document.getElementById('duelWinSound');
+  if (type === "lose") audio = document.getElementById('duelLoseSound');
+  if (type === "draw") audio = document.getElementById('duelDrawSound');
+  if (audio) { audio.currentTime = 0; audio.play(); }
+}
+
+function flashScreen(color = "#fff", strength = 0.4) {
+  const flash = document.createElement('div');
+  flash.style.position = 'fixed';
+  flash.style.top = '0'; flash.style.left = '0'; flash.style.width = '100vw'; flash.style.height = '100vh';
+  flash.style.background = color;
+  flash.style.opacity = strength;
+  flash.style.zIndex = 99999;
+  flash.style.transition = "opacity 0.7s";
+  document.body.appendChild(flash);
+  setTimeout(() => { flash.style.opacity = "0"; }, 400);
+  setTimeout(() => { flash.remove(); }, 900);
+}
 
 </script>
   
