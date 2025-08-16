@@ -1967,6 +1967,139 @@ body.landscape-mode #gameCanvas {
 
 /* === END === */
    
+   
+ /* === MIGLIORAMENTI UI DUEL 1V1 === */
+
+/* Lobby più bella */
+.duel-lobby {
+  background: linear-gradient(135deg, #0a0a2e 0%, #1a237e 40%, #00bcd4 100%) !important;
+  border: 3px solid transparent !important;
+  border-image: linear-gradient(45deg, #ffd700, #00bcd4, #ff00ff) 1 !important;
+  box-shadow: 0 0 100px #00bcd4aa, inset 0 0 50px #00bcd411 !important;
+  animation: duelLobbyPulse 3s ease-in-out infinite !important;
+}
+
+@keyframes duelLobbyPulse {
+  0%, 100% { transform: translate(-50%,-50%) scale(1); }
+  50% { transform: translate(-50%,-50%) scale(1.02); }
+}
+
+/* Navi animate nella lobby */
+.duel-ship {
+  filter: drop-shadow(0 0 20px #ffd700) !important;
+  animation: shipFloat 2s ease-in-out infinite !important;
+}
+.duel-ship:nth-child(1) { animation-delay: 0s; }
+.duel-ship:nth-child(2) { animation-delay: 1s; }
+
+@keyframes shipFloat {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-15px) rotate(2deg); }
+}
+
+/* VS più spettacolare */
+.duel-vs {
+  background: linear-gradient(45deg, #ffd700, #ff00ff, #00bcd4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 30px #ffd700);
+  animation: vsGlow 1s ease-in-out infinite alternate !important;
+}
+
+@keyframes vsGlow {
+  from { filter: drop-shadow(0 0 30px #ffd700); transform: scale(1); }
+  to { filter: drop-shadow(0 0 50px #ff00ff); transform: scale(1.1); }
+}
+
+/* Barra vita avversario migliorata */
+#duelOpponentHealthBar {
+  background: linear-gradient(135deg, rgba(20,20,40,0.95), rgba(40,0,60,0.95)) !important;
+  border: 2px solid #ffd700 !important;
+  box-shadow: 0 0 40px #ffd70088, inset 0 0 20px #ff00ff22 !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+#duelOpponentHealthBarFill {
+  background: linear-gradient(90deg, #ff0000, #ff6600, #ffaa00, #ffff00, #66ff00, #00ff00) !important;
+  box-shadow: 0 0 20px currentColor !important;
+  animation: healthShine 2s linear infinite !important;
+}
+
+@keyframes healthShine {
+  0% { filter: brightness(1); }
+  50% { filter: brightness(1.3); }
+  100% { filter: brightness(1); }
+}
+
+/* Score bar più stilosa */
+#duelScoreBar {
+  background: linear-gradient(135deg, rgba(30,30,50,0.95), rgba(50,20,80,0.95)) !important;
+  border: 2px solid transparent !important;
+  border-image: linear-gradient(90deg, #00bcd4, #ffd700, #ff00ff) 1 !important;
+  box-shadow: 0 0 50px #00bcd488, inset 0 0 30px #ffd70022 !important;
+  font-family: 'Orbitron', monospace !important;
+  animation: scoreBarGlow 3s ease-in-out infinite !important;
+}
+
+@keyframes scoreBarGlow {
+  0%, 100% { box-shadow: 0 0 50px #00bcd488; }
+  50% { box-shadow: 0 0 80px #ffd700aa; }
+}
+
+/* Emoji bar più moderna */
+#duelEmojiBar {
+  background: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(40,0,60,0.8)) !important;
+  border: 2px solid #00bcd4 !important;
+  box-shadow: 0 0 30px #00bcd466 !important;
+  backdrop-filter: blur(15px) !important;
+}
+
+#duelEmojiBar .menu-btn {
+  background: linear-gradient(45deg, #00bcd4, #2196f3) !important;
+  border: 2px solid #fff !important;
+  transition: all 0.3s !important;
+}
+
+#duelEmojiBar .menu-btn:hover {
+  transform: scale(1.2) rotate(5deg) !important;
+  box-shadow: 0 0 25px #ffd700 !important;
+}
+
+/* Countdown più epico */
+.duel-countdown {
+  background: radial-gradient(circle, rgba(255,215,0,0.2), transparent 70%) !important;
+  text-shadow: 0 0 80px #ffd700, 0 0 120px #ff00ff !important;
+  animation: countdownPulse 1s ease-in-out infinite !important;
+}
+
+@keyframes countdownPulse {
+  0%, 100% { transform: translate(-50%,-50%) scale(1); }
+  50% { transform: translate(-50%,-50%) scale(1.2); }
+}
+
+/* Loading screen animata */
+#duelLoadingScreen {
+  background: radial-gradient(ellipse at center, #1a237e 0%, #0a0a2e 50%, #000 100%) !important;
+  animation: loadingBgRotate 10s linear infinite !important;
+}
+
+@keyframes loadingBgRotate {
+  from { background-position: 0% 0%; }
+  to { background-position: 100% 100%; }
+}
+
+/* Overlay round migliorato */
+#duelRoundOverlay {
+  background: radial-gradient(circle, rgba(0,0,0,0.95), rgba(40,0,80,0.95)) !important;
+  backdrop-filter: blur(20px) !important;
+  border: 3px solid #ffd700 !important;
+  box-shadow: 0 0 100px #ffd70088 !important;
+}
+   
+   
+   
+   
    </style>
 </head>
 <body>
@@ -8617,6 +8750,63 @@ function updateDuelBot() {
     duelBot.cooldownShoot = params.fireRate * 60 + Math.random() * 16;
   }
 }
+
+// --- PATCH PERFORMANCE: riduci proiettili nemici su mobile ---
+function getMobileBulletParams(count, speed) {
+  // Se sei su mobile, riduci il numero di proiettili e la loro velocità per evitare lag
+  if (isMobileDevice()) {
+    return {
+      count: Math.max(1, Math.round(count * 0.6)),    // -40% proiettili
+      speed: speed * 1.1                              // +10% velocità per bilanciare
+    };
+  }
+  // Desktop: tutto normale
+  return { count, speed };
+}
+
+// Applica ovunque chiami pattern bullet nemici:
+// Sostituisci
+// for (let i = 0; i < enemy.bulletCount; i++) { ... }
+// con:
+const mobileParams = getMobileBulletParams(enemy.bulletCount, enemy.bulletSpeed || 4);
+for (let i = 0; i < mobileParams.count; i++) { /* ... usa mobileParams.speed ... */ }
+
+// --- PATCH PARTICELLE: riduci quantità su mobile ---
+function spawnSuperExplosion(x, y, opts = {}) {
+  const isMobile = isMobileDevice && isMobileDevice();
+  const colors = opts.colors || ["#fff", "#ff0044", "#14fc56", "#00cfff", "#ffd700"];
+  // Se mobile, max 12 particelle, desktop 70
+  const count = isMobile ? Math.min(opts.count || 18, 12) : Math.min(opts.count || 70, 18);
+  for (let i = 0; i < count; i++) {
+    // ... come tuo codice ...
+  }
+}
+// Stessa logica per altre funzioni di spawn particelle (hit, trail, ecc)
+
+
+// --- PATCH CANVAS RESPONSIVE RETINA ---
+function resizeCanvas() {
+  const container = document.getElementById('gameContainer');
+  const dpr = window.devicePixelRatio || 1;
+  let maxWidth = window.innerWidth;
+  let maxHeight = window.innerHeight;
+  // Mantieni ratio 16:9 o quello che preferisci
+  const aspect = 16 / 9;
+  if (maxWidth / maxHeight > aspect) {
+    maxWidth = Math.round(maxHeight * aspect);
+  } else {
+    maxHeight = Math.round(maxWidth / aspect);
+  }
+  canvas.width = maxWidth * dpr;
+  canvas.height = maxHeight * dpr;
+  canvas.style.width = maxWidth + 'px';
+  canvas.style.height = maxHeight + 'px';
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // Tutto scala perfetto retina
+}
+
+// Chiama resizeCanvas all'avvio e su ogni resize/rotate
+window.addEventListener('resize', resizeCanvas);
+window.addEventListener('orientationchange', resizeCanvas);
 
 </script>
   
