@@ -1554,7 +1554,418 @@ body.loading {
   }
 }
    
-   
+   /* === RESET BASE === */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Press Start 2P', 'Orbitron', monospace, Arial, sans-serif;
+    background: linear-gradient(135deg, #0a0a2e, #1a237e 50%, #00bcd4 100%);
+    background-size: 400% 400%;
+    animation: cosmicGradient 13s ease-in-out infinite;
+    color: #fff;
+}
+
+/* --- Animazione sfondo --- */
+@keyframes cosmicGradient {
+    0%,100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+/* === CANVAS === */
+#gameCanvas {
+    display: block;
+    margin: 0 auto;
+    border: 3px solid #00bcd4;
+    border-radius: 16px;
+    background: radial-gradient(circle at center, #1a237e, #0a0a2e 80%);
+    max-width: 100vw;
+    max-height: 100vh;
+    image-rendering: pixelated;
+    box-shadow: 0 0 32px #00bcd4cc;
+}
+
+/* === HUD === */
+.hud {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 84px;
+    background: linear-gradient(180deg, rgba(0,0,0,0.92), transparent);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+    padding: 0 18px;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.stat-box {
+    background: rgba(0,0,0,0.90);
+    border: 2px solid #00bcd4;
+    border-radius: 12px;
+    padding: 0.6em 1em;
+    min-width: 80px;
+    text-align: center;
+    box-shadow: 0 0 8px #00bcd455;
+}
+.stat-box.level { border-color: #ffd700; }
+.stat-box.lives { border-color: #00bcd4; }
+.stat-box.energy { border-color: #4caf50; }
+.stat-box.score { border-color: #9c27b0; }
+.stat-label { font-size: 0.9em; color: #00bcd4; font-weight: 700; }
+.stat-value { font-size: 1.2em; color: #ffd700; font-weight: bold; text-shadow: 0 0 8px #00bcd4; }
+
+/* === HEALTH BAR === */
+.health-bar-wrapper {
+    text-align: center;
+}
+.health-bar {
+    width: 160px;
+    height: 16px;
+    background: #222;
+    border-radius: 10px;
+    border: 2px solid #00bcd4;
+    overflow: hidden;
+}
+.health-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4caf50, #ffd700, #f44336);
+    transition: width 0.3s;
+}
+.health-text {
+    font-size: 0.93em;
+    font-weight: bold;
+    color: #00bcd4;
+}
+
+/* === ENERGY BAR === */
+.energy-meter {
+    position: absolute;
+    bottom: 22px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 240px;
+    height: 12px;
+    background: rgba(0,0,0,0.82);
+    border: 2px solid #00bcd4;
+    border-radius: 8px;
+    overflow: hidden;
+}
+.energy-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4caf50, #ffd700, #2196f3, #fff);
+    transition: width 0.3s;
+}
+
+/* === BUTTONS GENERIC === */
+.menu-btn, .mobile-action-btn, .orientation-btn {
+    font-family: 'Press Start 2P', 'Orbitron', monospace;
+    border: 3px solid #00bcd4;
+    border-radius: 12px;
+    background: linear-gradient(90deg, #00bcd4 0%, #ffe700 100%);
+    color: #222;
+    padding: 1em 2.2em;
+    font-size: 1.08em;
+    font-weight: bold;
+    box-shadow: 0 4px 0 #ffe700, 0 0 12px #00bcd4;
+    margin: 0.5em 0;
+    text-shadow: 1px 1px 0 #fff;
+    transition: all 0.18s;
+    cursor: pointer;
+    image-rendering: pixelated;
+}
+.menu-btn:active, .menu-btn:hover,
+.orientation-btn:active, .orientation-btn:hover,
+.mobile-action-btn:active, .mobile-action-btn:hover {
+    background: linear-gradient(90deg,#00bcd4 0%,#ffd700 100%);
+    color: #fff;
+    box-shadow: 0 2px 0 #ffe700, 0 0 16px #ffd700;
+    transform: scale(0.96);
+}
+
+/* === MENU === */
+.menu-content {
+    background: none !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 0 !important;
+    margin: 0 auto;
+    max-width: 100vw;
+    text-align: center;
+    font-family: 'Press Start 2P', monospace !important;
+}
+
+/* === GALAXY BACKGROUND === */
+.galaxy-bg {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 0;
+    pointer-events: none;
+    background: url('pixel-art-galaxy.png') repeat !important;
+    background-size: 900px 600px !important;
+    image-rendering: pixelated !important;
+    filter: saturate(1.15) brightness(0.97);
+    animation: menuGalaxyMove 16s linear infinite;
+}
+@keyframes menuGalaxyMove {
+    0% { background-position: 0% 0%; }
+    100% { background-position: 100% 100%; }
+}
+
+/* === TITLE === */
+.game-title {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 3.1em;
+    color: #ffe700;
+    text-shadow: 0 0 24px #00bcd4, 0 0 60px #ffd700;
+    letter-spacing: 0.08em;
+    border-bottom: 4px dashed #ffe700;
+    padding-bottom: 0.7rem;
+    filter: drop-shadow(0 0 12px #ffd700);
+}
+.game-subtitle {
+    font-size: 1.2em;
+    color: #00bcd4;
+    margin-bottom: 1.5em;
+    text-shadow: 0 0 18px #00bcd4, 0 0 16px #fff;
+    animation: stellarPulse 2.8s infinite;
+    font-family: 'Orbitron', sans-serif;
+}
+@keyframes stellarPulse {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.85; transform: scale(1.05);}
+}
+
+/* === STATISTICS === */
+.stats-display {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1.2em;
+    padding: 1em 0;
+}
+.stat-item {
+    background: url('pixel-dither.png') repeat, #222;
+    border: 2px solid #ffd700;
+    box-shadow: 0 0 16px #ffd70044;
+    font-family: 'Press Start 2P', monospace;
+    color: #ffe700;
+    image-rendering: pixelated;
+    border-radius: 12px;
+    padding: 1em;
+}
+
+/* === MOBILE CONTROLS === */
+.mobile-controls {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 85px;
+    background: linear-gradient(180deg, transparent, rgba(0,0,0,0.9));
+    display: none;
+    z-index: 1000;
+    pointer-events: none;
+    padding: 8px;
+}
+.mobile-controls.active { display: block; }
+.mobile-joystick {
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    width: 70px;
+    height: 70px;
+    background: rgba(0, 188, 212, 0.15);
+    border: 2px solid #00bcd4;
+    border-radius: 50%;
+    pointer-events: all;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.mobile-joystick-knob {
+    width: 26px; height: 26px;
+    background: rgba(0,188,212,0.93);
+    border: 2px solid #fff;
+    border-radius: 50%;
+    pointer-events: none;
+    box-shadow: 0 0 13px #00bcd4cc;
+}
+.mobile-action-buttons {
+    position: absolute;
+    bottom: 15px;
+    right: 16px;
+    display: flex;
+    gap: 10px;
+    pointer-events: all;
+}
+.mobile-action-btn {
+    width: 36px; height: 36px;
+    background: #00bcd4;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    color: white;
+    font-size: 1.1em;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.18s;
+    box-shadow: 0 2px 8px #00bcd444;
+}
+.mobile-action-btn.special {
+    background: #ffd700;
+    border-color: #ffd700;
+    color: #222;
+    box-shadow: 0 2px 8px #ffd70044;
+}
+.mobile-action-btn:active {
+    transform: scale(0.93);
+    box-shadow: 0 0 14px #ffd70088;
+}
+
+/* === PORTRAIT/LANDSCAPE === */
+body.portrait-mode #gameCanvas {
+    width: 100vw !important;
+    height: 82vh !important;
+}
+body.landscape-mode #gameCanvas {
+    width: 100vw !important;
+    height: 100vh !important;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 900px) {
+    .hud { height: 50px; padding: 0 8px; font-size: 0.95em; gap: 0.3em; }
+    .stat-box { min-width: 38px; padding: 0.25em 0.1em; font-size: 0.72em; }
+    .stat-value { font-size: 1em; }
+    .health-bar { height: 9px; width: 45px; }
+    .menu-btn.home-btn { font-size: 0.75em; padding: 0.4em 0.5em; }
+}
+@media (max-width: 600px) {
+    .game-title { font-size: 2.1em; }
+    .game-subtitle { font-size: 1em; }
+    .menu-btn { font-size: 0.97em; padding: 0.8em 1.4em; }
+    .health-bar { width: 90px; }
+    .stats-display { grid-template-columns: repeat(2,1fr); gap: 0.7em;}
+    .mobile-joystick { width: 90px; height: 90px; left: 10px; }
+    .mobile-joystick-knob { width: 36px; height: 36px;}
+    .mobile-action-btn { width: 32px; height: 32px;}
+}
+
+/* === ORIENTATION SELECTOR === */
+.orientation-selector {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+    background: rgba(0,0,0,0.97);
+    border-radius: 22px;
+    border: 3px solid #00bcd4;
+    padding: 2em 3em;
+    text-align: center;
+    z-index: 5000;
+    max-width: 90vw;
+    backdrop-filter: blur(13px);
+}
+.orientation-selector.active { display: block; }
+.orientation-buttons {
+    display: flex;
+    gap: 1.3em;
+    margin-top: 1.5em;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.orientation-btn {
+    padding: 1em 2em;
+    background: linear-gradient(45deg, #00bcd4, #2196f3);
+    border: none;
+    border-radius: 15px;
+    color: white;
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    cursor: pointer;
+    min-width: 140px;
+    font-size: 0.97em;
+    box-shadow: 0 0 18px #00bcd4cc;
+    transition: all 0.18s;
+}
+
+/* === NOTIFICATIONS === */
+.notification {
+    position: fixed;
+    top: 22px;
+    right: 22px;
+    background: linear-gradient(45deg, #00bcd4, #2196f3);
+    color: white;
+    padding: 1em 1.5em;
+    border-radius: 13px;
+    border: 2px solid #00bcd4;
+    box-shadow: 0 0 20px #00bcd4;
+    z-index: 3000;
+    animation: slideInRight 0.5s, fadeOut 0.5s 4.7s forwards;
+    font-size: 1em;
+    max-width: 80vw;
+    font-weight: bold;
+}
+@keyframes slideInRight {
+    from { transform: translateX(100%); opacity: 0;}
+    to { transform: translateX(0); opacity: 1;}
+}
+@keyframes fadeOut {
+    to { opacity: 0; transform: translateX(100%);}
+}
+
+/* === PARTICLES === */
+.particles {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; overflow: hidden;
+}
+.particle {
+    position: absolute;
+    width: 4px; height: 4px;
+    background: #00bcd4;
+    border-radius: 50%;
+    opacity: 0.8;
+    animation: stellarParticleFloat 4s linear infinite;
+}
+@keyframes stellarParticleFloat {
+    0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+    10%, 90% { opacity: 0.8;}
+    100% { transform: translateY(-10px) rotate(360deg); opacity: 0; }
+}
+
+/* === BUTTONS: MORE MOBILE/TABLET FINE-TUNING === */
+@media (pointer: coarse), (max-width: 800px) {
+    .mobile-controls { height: 54px; padding: 5px; }
+    .mobile-joystick { width: 54px; height: 54px; left: 8px;}
+    .mobile-joystick-knob { width: 18px; height: 18px; }
+    .mobile-action-btn { width: 27px; height: 27px; font-size: 0.98em;}
+    .menu-btn { min-width: 60px; font-size: 0.95em;}
+}
+
+/* === PIXEL ART SHIP === */
+.ship-image {
+    width: 100%;
+    max-width: 120px;
+    animation: floatShipMenu 3s ease-in-out infinite;
+    transition: transform 0.3s;
+}
+.ship-image:hover {
+    transform: scale(1.08) rotate(2deg);
+}
+@keyframes floatShipMenu {
+    0%,100% { transform: translateY(0);}
+    50% { transform: translateY(-13px);}
+}
+
+.menu-ship-anim img {
+    width: 110px;
+    filter: drop-shadow(0 0 32px #ffd700);
+}
+
+/* === END === */
    
    </style>
 </head>
@@ -3407,36 +3818,41 @@ function update(deltaTime) {
   function updatePlayer(deltaTime) {
     const player = gameState.player;
     const skills = gameState.player.skills;
-    let speed = player.precisionMode ? 2 : 4; // valori più bassi!
+    let speed = player.precisionMode ? 2 : 4;
 
-    if (gameState.gameMode === "duelAI") {
-  speed = 16; // o un valore ancora più alto
+if (gameState.gameMode === "duelAI") {
+  speed = 16;
 }
     
     
-    // <<< INCOLLA QUI >>>
+    // PATCH: rallenta TUTTO su mobile
+if (isMobileDevice && isMobileDevice()) {
+  speed = 2.1; // NAVICELLA ULTRA LENTA!
+} else {
+  speed = 1.9; // anche su desktop più lenta!
+}
+
+
+// <<< INCOLLA QUI >>>
     document.getElementById('coinCount').textContent = "Speed " + (window.gameState.mobileShipSpeed || localStorage.getItem('mobileShipSpeed'));
 
     if (skills.targeting_system && player.precisionMode) speed *= 0.7;
 
-    speed *= 3;
+speed *= 3; // lento!
 
     // PATCH: velocità globale super bassa per tutti
-    speed *= 2.5; // Cambia 0.18 con quanto lento vuoi (0.1 = lentissimo, 1 = normale)
+speed *= 2.5; // ancora più lento!
 
     // Il resto come prima
     speed *= deltaTime;
     speed *= gameState.globalSpeed; // puoi anche forzarlo a 1 se vuoi
 
-if (isMobileDevice && isMobileDevice()) {
-  // Applica runtime la velocità aggiornata senza reload
-  let custom = (window.gameState && window.gameState.mobileShipSpeed !== undefined)
-    ? window.gameState.mobileShipSpeed
-    : Number(localStorage.getItem('mobileShipSpeed')) || 0.7;
-       console.log("Valore custom di velocità (mobileShipSpeed) in updatePlayer:", custom);
-
-    speed *= custom;
-}
+// if (isMobileDevice && isMobileDevice()) {
+//   let custom = (window.gameState && window.gameState.mobileShipSpeed !== undefined)
+//     ? window.gameState.mobileShipSpeed
+//     : Number(localStorage.getItem('mobileShipSpeed')) || 0.7;
+//   speed *= custom;
+// }
 
 speed *= deltaTime;
 speed *= gameState.globalSpeed;
