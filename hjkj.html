@@ -5052,6 +5052,15 @@ function forfeitMission() {
   // --- Tutto il resto SOLO se NON sei in duelAI ---
   renderPlayer();
   if (gameState.gameMode === "duel1v1") renderOpponent(ctx);
+  
+   // PATCH: Render dei powerup visibili in modalità duel 1v1
+  if (gameState.gameMode === "duel1v1" && window.gameState.powerups) {
+    renderDuelPowerups(ctx, window.gameState.powerups);
+  }
+  
+  
+  
+  
   else if (gameState.gameMode === "coop") renderOtherPlayers(ctx), renderEnemy();
   else renderEnemy();
 
