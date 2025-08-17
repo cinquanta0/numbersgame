@@ -31,13 +31,50 @@ if (typeof sdk !== 'undefined' && sdk.showBanner !== 'undefined') {
 sdk.showBanner();
 }
 
+  
+    </script>
+      
+
+<script type="text/javascript">
+
+      window["GD_OPTIONS"] = {
+    "gameId": "68b9d83103d2484583d69df6c5f985e3",
+    "onEvent": function(event) {
+        switch (event.name) {
+            case "SDK_GAME_START":
+                // advertisement done, resume game logic and unmute audio
+                break;
+            case "SDK_GAME_PAUSE":
+                // pause game logic / mute audio
+                break;
+            case "SDK_GDPR_TRACKING":
+                // this event is triggered when your user doesn't want to be tracked
+                break;
+            case "SDK_GDPR_TARGETING":
+                // this event is triggered when your user doesn't want personalised targeting of ads and such
+                break;
+            case "SDK_REWARDED_WATCH_COMPLETE":
+                // this event is triggered when your user completely watched rewarded ad
+                break;
+        }
+    },
+};
+(function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = 'https://html5.api.gamedistribution.com/main.min.js';
+    fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'gamedistribution-jssdk'));
+
+
+
 
 </script>
-    
-    
-    
-    
-      <meta charset="UTF-8">
+
+
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">  
   
 <title>🌟 STELLAR GUARDIAN - COSMIC DEFENSE FORCE 🌟</title>
@@ -2161,8 +2198,26 @@ body:not(.in-game) #gameContainer {
   }
 }
    
+  
+.voice-indicator {
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #4caf50;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
    
-   </style>
+</style>
 </head>
 <body>
   
@@ -2955,27 +3010,74 @@ body:not(.in-game) #gameContainer {
       
        let firstGameAdShown = false;
       
-     function showAd() {
+     let teamComboMeter = 0;
+let lastTeamShot = {};
+     
+     
+       function showAd() {
   if (isDevEnv()) {
     console.log("DEV: showAd saltata (nessuna pubblicità in locale).");
     return;
   }
   
-  if (typeof sdk !== 'undefined' && typeof sdk.showAd === 'function') {
-    sdk.showAd();
-    console.log('Ad GameMonetize chiamata!');
+  // Prova GameDistribution
+  if (typeof gdsdk !== 'undefined' && typeof gdsdk.showAd === 'function') {
+    gdsdk.showAd();
+    console.log('Ad GameDistribution chiamata!');
     return;
   }
+  
+  // Altrimenti usa GameMonetize
   if (typeof sdk !== 'undefined' && typeof sdk.showBanner === 'function') {
     sdk.showBanner();
     console.log('Banner GameMonetize chiamato!');
     return;
   }
+  
   console.log('No ad function available, continuing without ad!');
 }
        
        
-       const BOSS_IMAGES_BY_DIFFICULTY = {
+ // Aggiungi dopo le variabili co-op esistenti
+let coopRole = null; // 'tank', 'healer', 'dps', 'support'
+let coopTeamBuffs = {
+  tankBonus: 0,
+  healBonus: 0,
+  damageBonus: 0
+};       
+
+
+
+function selectCoopRole(role) {
+  coopRole = role;
+  socket.emit('selectRole', { role });
+  
+  // Applica bonus del ruolo
+  switch(role) {
+    case 'tank':
+      gameState.player.maxHealth += 200;
+      gameState.player.health += 200;
+      showNotification("🛡️ Tank: +200 HP, attiri i proiettili!", "info");
+      break;
+    case 'healer':
+      gameState.player.healPower = true;
+      showNotification("💚 Healer: Puoi curare gli alleati!", "info");
+      break;
+    case 'dps':
+      gameState.player.damageMultiplier = 1.5;
+      showNotification("⚔️ DPS: +50% danni!", "info");
+      break;
+    case 'support':
+      gameState.player.supportAura = true;
+      showNotification("✨ Support: Buff di squadra attivi!", "info");
+      break;
+  }
+}
+
+
+
+
+const BOSS_IMAGES_BY_DIFFICULTY = {
   "Medium": "sabaa1.png",
   "Hard": "sabaa2.png",
   "Very Hard": "sabaa3.png",
@@ -5122,23 +5224,24 @@ function forfeitMission() {
       }
 
     function render() {
+  // Aggiorna lo sfondo animato
   backgroundY += 1;
   if (backgroundY >= canvas.height) backgroundY = 0;
 
+  // Sfondo base
   ctx.fillStyle = '#0a0a2e';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  if (gameState.screenShake > 0) {
-    ctx.save();
-    ctx.translate(
-      (Math.random() - 0.5) * gameState.screenShake,
-      (Math.random() - 0.5) * gameState.screenShake
-    );
-  }
+  // PATCH: Effetti visivi globali (SHAKE, FLASH, ESPLOSIONI, RIPPLE)
+  applyShake(ctx);
+  drawFlash(ctx, canvas);
+  updateAndDrawExplosions(ctx);
+  updateAndDrawRipples(ctx);
 
+  // Sfondo spazio (immagine e/o stelle animate)
   renderSpaceBackground();
 
-  // SOLO in duelAI: player, bot, bullets, particles
+  // --- MODALITÀ DUEL BOT (1v1 AI) ---
   if (gameState.gameMode === "duelAI") {
     renderPlayer();
     renderDuelBot(ctx);
@@ -5146,33 +5249,42 @@ function forfeitMission() {
     renderEnemyBullets();
     renderParticles();
     if (gameState.slowTimeActive) renderSlowTimeOverlay();
-    if (gameState.screenShake > 0) ctx.restore();
-    return; // NON disegnare altro!
+    endShake(ctx);
+    return;
   }
 
-  // --- Tutto il resto SOLO se NON sei in duelAI ---
+  // --- MODALITÀ DUEL 1v1 PLAYER ---
   renderPlayer();
-  if (gameState.gameMode === "duel1v1") renderOpponent(ctx);
-  
-   // PATCH: Render dei powerup visibili in modalità duel 1v1
-  if (gameState.gameMode === "duel1v1" && window.gameState.powerups) {
-    renderDuelPowerups(ctx, window.gameState.powerups);
+  if (gameState.gameMode === "duel1v1") {
+    renderOpponent(ctx);
+    if (window.gameState.powerups) renderDuelPowerups(ctx, window.gameState.powerups);
   }
-  
-  
-  
-  
-  else if (gameState.gameMode === "coop") renderOtherPlayers(ctx), renderEnemy();
-  else renderEnemy();
+  // --- MODALITÀ CO-OP ---
+  else if (gameState.gameMode === "coop") {
+    renderOtherPlayers(ctx);
+    renderEnemy();
+    // Voice indicator su altri giocatori co-op
+    for (let id in otherPlayers) {
+      renderVoiceIndicator(ctx, otherPlayers[id]);
+    }
+    // Minimap co-op
+    renderCoopMinimap();
+  }
+  // --- MODALITÀ SINGLEPLAYER ---
+  else {
+    renderEnemy();
+  }
 
+  // Ostacoli, proiettili, particelle (sempre)
   renderObstacles();
   renderBullets();
   renderEnemyBullets();
   renderParticles();
 
+  // Overlay slow-time
   if (gameState.slowTimeActive) renderSlowTimeOverlay();
 
-  if (gameState.screenShake > 0) ctx.restore();
+  endShake(ctx);
 }
       function renderSpaceBackground() {
           if (backgroundImage.complete) {
@@ -6627,16 +6739,61 @@ function showCoopLobby() {
   socket.emit('joinLobby', { nickname: getPlayerName() });
 }
 
+// Sostituisci renderCoopPlayers con questa versione:
 function renderCoopPlayers(data) {
   coopPlayers = data.players;
-  document.getElementById('coopPlayersList').innerHTML =
-    '<b>Giocatori connessi:</b><ul>' +
-    data.players.map(p => {
-      const voiceIcon = playerVoiceStatus[p.id] ? " <span title='Voce attiva' style='color:#ffd700;'>🎤</span>" : "";
-      return `<li>${p.nickname}${voiceIcon}</li>`;
-    }).join('') +
-    '</ul>' +
-    "<div style='margin-top:6px;font-size:0.97em;color:#00bcd4;'>Tip: clicca <b>🎤 Voice Chat</b> per parlare con la squadra!</div>";
+  let html = '<b>Giocatori connessi:</b><ul>';
+  
+  data.players.forEach(p => {
+    const voiceIcon = playerVoiceStatus[p.id] ? " 🎤" : "";
+    const readyIcon = p.ready ? " ✅" : " ⏳";
+    const roleIcon = getRoleIcon(p.role);
+    
+    html += `<li>
+      ${roleIcon} ${p.nickname}${voiceIcon}${readyIcon}
+      <span style="color:#ffd700;">[${p.wins || 0} wins]</span>
+    </li>`;
+  });
+  
+  html += '</ul>';
+  
+  // Aggiungi selezione ruolo
+  if (data.players.length >= 2) {
+    html += `
+      <div style="margin-top:1rem;">
+        <b>Scegli il tuo ruolo:</b><br>
+        <button class="menu-btn" onclick="selectCoopRole('tank')">🛡️ Tank</button>
+        <button class="menu-btn" onclick="selectCoopRole('healer')">💚 Healer</button>
+        <button class="menu-btn" onclick="selectCoopRole('dps')">⚔️ DPS</button>
+        <button class="menu-btn" onclick="selectCoopRole('support')">✨ Support</button>
+      </div>
+    `;
+  }
+  
+  // Pulsante ready
+  html += `
+    <button class="menu-btn primary" onclick="toggleReady()" style="margin-top:1rem;">
+      ${myReady ? '❌ Not Ready' : '✅ Ready'}
+    </button>
+  `;
+  
+  document.getElementById('coopPlayersList').innerHTML = html;
+}
+
+function getRoleIcon(role) {
+  const icons = {
+    tank: '🛡️',
+    healer: '💚',
+    dps: '⚔️',
+    support: '✨'
+  };
+  return icons[role] || '👤';
+}
+
+let myReady = false;
+function toggleReady() {
+  myReady = !myReady;
+  socket.emit('playerReady', { ready: myReady });
 }
 
 function startCoopRaid() {
@@ -6687,8 +6844,21 @@ function startCoopGameLoop() {
     checkCollisionsCoop();
     render();
     renderBossBar(); // <---- AGGIUNGI QUI!
+      renderCoopMinimap(); // <-- NUOVO
 
-    if (gameState.currentScreen === 'gameScreen' && gameState.gameMode === 'coop')
+      // Aggiungi questi check
+  checkTeamCombo();
+  tryReviveTeammate();
+  playerDown();
+    
+    
+      // Render indicatori voice
+  for (let id in otherPlayers) {
+    renderVoiceIndicator(ctx, otherPlayers[id]);
+  }
+    
+    
+      if (gameState.currentScreen === 'gameScreen' && gameState.gameMode === 'coop')
       requestAnimationFrame(coopLoop);
   }
   coopLoop();
@@ -9375,6 +9545,126 @@ function show2v2EndScreen(data) {
     <button class="menu-btn" onclick="backToMenu2v2()">Main Menu</button>
   `;
   document.body.appendChild(screen);
+}
+
+
+// Migliora la visualizzazione voice chat
+function renderVoiceIndicator(ctx, player) {
+  if (playerVoiceStatus[player.id]) {
+    ctx.save();
+    ctx.fillStyle = '#4caf50';
+    ctx.font = 'bold 12px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('🎤', player.x, player.y - 50);
+    
+    // Animazione onda sonora
+    ctx.strokeStyle = '#4caf50';
+    ctx.globalAlpha = 0.5;
+    ctx.beginPath();
+    ctx.arc(player.x, player.y, 40 + Math.sin(Date.now() * 0.01) * 5, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+}
+
+
+function checkTeamCombo() {
+  const now = Date.now();
+  let playersShootingNow = 0;
+  
+  // Conta quanti stanno sparando
+  for (let id in otherPlayers) {
+    if (lastTeamShot[id] && now - lastTeamShot[id] < 500) {
+      playersShootingNow++;
+    }
+  }
+  
+  // Se tutti sparano insieme, attiva combo!
+  if (playersShootingNow >= coopPlayers.length - 1) {
+    teamComboMeter = Math.min(100, teamComboMeter + 10);
+    
+    if (teamComboMeter >= 100) {
+      activateTeamUltimate();
+      teamComboMeter = 0;
+    }
+  }
+  
+  // Decadimento combo
+  teamComboMeter = Math.max(0, teamComboMeter - 0.5);
+}
+
+function activateTeamUltimate() {
+  showNotification("💥 TEAM ULTIMATE ATTIVATO!", "achievement");
+  
+  // Super attacco laser gigante
+  for (let i = 0; i < 50; i++) {
+    setTimeout(() => {
+      gameState.bullets.push({
+        x: gameState.player.x,
+        y: gameState.player.y,
+        vx: 0,
+        vy: -20,
+        color: '#ffd700',
+        size: 30,
+        damage: 100,
+        teamUltimate: true
+      });
+    }, i * 50);
+  }
+  
+  // Effetti visivi
+  startFlash(0.5);
+  startShake(20, 30);
+}
+
+
+function renderCoopMinimap() {
+  const minimapSize = 150;
+  const minimapX = canvas.width - minimapSize - 20;
+  const minimapY = 20;
+  
+  // Sfondo minimappa
+  ctx.save();
+  ctx.fillStyle = 'rgba(0,0,0,0.7)';
+  ctx.fillRect(minimapX, minimapY, minimapSize, minimapSize);
+  ctx.strokeStyle = '#00bcd4';
+  ctx.strokeRect(minimapX, minimapY, minimapSize, minimapSize);
+  
+  // Boss sulla minimappa
+  if (gameState.enemy) {
+    const bossX = minimapX + (gameState.enemy.x / canvas.width) * minimapSize;
+    const bossY = minimapY + (gameState.enemy.y / canvas.height) * minimapSize;
+    ctx.fillStyle = '#f44336';
+    ctx.beginPath();
+    ctx.arc(bossX, bossY, 5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  
+  // Tu sulla minimappa
+  const myX = minimapX + (gameState.player.x / canvas.width) * minimapSize;
+  const myY = minimapY + (gameState.player.y / canvas.height) * minimapSize;
+  ctx.fillStyle = '#00ff00';
+  ctx.beginPath();
+  ctx.arc(myX, myY, 3, 0, Math.PI * 2);
+  ctx.fill();
+  
+  // Alleati sulla minimappa
+  for (let id in otherPlayers) {
+    const ally = otherPlayers[id];
+    const allyX = minimapX + (ally.x / canvas.width) * minimapSize;
+    const allyY = minimapY + (ally.y / canvas.height) * minimapSize;
+    ctx.fillStyle = ally.isDown ? '#ff0000' : '#00bcd4';
+    ctx.beginPath();
+    ctx.arc(allyX, allyY, 3, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  
+  ctx.restore();
+}
+
+// Aggiungi in render() quando gameMode === 'coop':
+if (gameState.gameMode === 'coop') {
+  renderCoopMinimap();
 }
 
 
