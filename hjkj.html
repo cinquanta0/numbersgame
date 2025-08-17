@@ -410,11 +410,12 @@ body.loading {
           75% { background-position: 0% 100%; }
       }
 
-      #gameContainer {
-          width: 100vw;
-          height: 100vh;
-          position: relative;
-      }
+     #gameContainer {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
 
       /* Enhanced Mobile Controls */
       .mobile-controls {
@@ -1578,15 +1579,17 @@ body {
 
 /* === CANVAS === */
 #gameCanvas {
-    display: block;
-    margin: 0 auto;
-    border: 3px solid #00bcd4;
-    border-radius: 16px;
-    background: radial-gradient(circle at center, #1a237e, #0a0a2e 80%);
-    max-width: 100vw;
-    max-height: 100vh;
-    image-rendering: pixelated;
-    box-shadow: 0 0 32px #00bcd4cc;
+  display: block;
+  margin: 0 auto;
+  border: 3px solid #00bcd4;
+  border-radius: 16px;
+  background: radial-gradient(circle at center, #1a237e, #0a0a2e 80%);
+  width: 100%;
+  height: 100%;
+  max-width: 100vw;
+  max-height: 100vh;
+  image-rendering: pixelated;
+  box-shadow: 0 0 32px #00bcd4cc;
 }
 
 /* === HUD === */
@@ -2269,8 +2272,10 @@ body.landscape-mode #gameCanvas {
                   <button class="menu-btn primary" onclick="startDuelQueue()">⚔️ 1v1 DUELS</button>
                   <!-- Apri il Mobile Customization menu -->
                   <button class="menu-btn" onclick="showScreen('mobileCustomizationMenu')">📱 MOBILE SETTINGS</button>
-                
-                   <div style="margin-bottom:1.2em;">
+                  <button class="menu-btn primary" onclick="startDuel2v2Queue()">⚔️ 2v2 TEAM DUELS</button>
+
+                  
+                  <div style="margin-bottom:1.2em;">
   <label for="duelBotDifficultySelect" style="color:#00bcd4;font-weight:bold;margin-right:7px;">Bot Difficulty:</label>
   <select id="duelBotDifficultySelect" class="menu-btn" style="padding:0.4em 1.3em; font-size:1.1em; width:auto;">
     <option value="easy">Easy 😃</option>
@@ -3124,7 +3129,22 @@ function lerp(a, b, t) {
 }
       
       
-      // -- METTI QUESTE DUE RIGHE IN ALTO, subito dopo i let/var principali --
+      
+
+// Aggiungi dopo le variabili duel esistenti (circa riga 8900)
+let duel2v2Active = false;
+let duel2v2Team = null; // 'team1' o 'team2'
+let duel2v2Players = {
+  team1: [],
+  team2: []
+};
+let duel2v2TeamMate = null;
+let duel2v2Opponents = [];
+
+
+
+
+// -- METTI QUESTE DUE RIGHE IN ALTO, subito dopo i let/var principali --
 let duelBotDifficulty = localStorage.getItem('duelBotDifficulty') || "normal";
 function getDuelBotParams() {
   return {
@@ -8822,23 +8842,23 @@ function spawnSuperExplosion(x, y, opts = {}) {
 function resizeCanvas() {
   const container = document.getElementById('gameContainer');
   const dpr = window.devicePixelRatio || 1;
-  let maxWidth = window.innerWidth;
-  let maxHeight = window.innerHeight;
-  // Mantieni ratio 16:9 o quello che preferisci
-  const aspect = 16 / 9;
-  if (maxWidth / maxHeight > aspect) {
-    maxWidth = Math.round(maxHeight * aspect);
-  } else {
-    maxHeight = Math.round(maxWidth / aspect);
-  }
-  canvas.width = maxWidth * dpr;
-  canvas.height = maxHeight * dpr;
-  canvas.style.width = maxWidth + 'px';
-  canvas.style.height = maxHeight + 'px';
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // Tutto scala perfetto retina
-}
+  let width = container.offsetWidth;
+  let height = container.offsetHeight;
 
-// Chiama resizeCanvas all'avvio e su ogni resize/rotate
+  // Ratio 16:9
+  const aspect = 16 / 9;
+  if (width / height > aspect) {
+    width = height * aspect;
+  } else {
+    height = width / aspect;
+  }
+
+  canvas.width = width * dpr;
+  canvas.height = height * dpr;
+  canvas.style.width = width + "px";
+  canvas.style.height = height + "px";
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
 window.addEventListener('resize', resizeCanvas);
 window.addEventListener('orientationchange', resizeCanvas);
 
@@ -8914,6 +8934,391 @@ function submitDuelScore(username, elo) {
     .then(() => console.log("Duel 1v1 ELO aggiornato su Dreamlo!"))
     .catch(err => console.error("Dreamlo errore:", err));
 }
+
+
+// Aggiungi questo HTML dopo il duelLobby esistente
+function create2v2LobbyHTML() {
+  if (document.getElementById('duel2v2Lobby')) return;
+  
+  const lobby2v2 = document.createElement('div');
+  lobby2v2.id = 'duel2v2Lobby';
+  lobby2v2.className = 'duel-lobby hidden';
+  lobby2v2.innerHTML = `
+    <div class="duel-header">⚔️ 2v2 TEAM DUELS</div>
+    <div style="display:flex;justify-content:space-around;margin:1.5rem 0;">
+      <!-- Team 1 -->
+      <div style="text-align:center;">
+        <div style="color:#00bcd4;font-weight:bold;font-size:1.3rem;margin-bottom:0.8rem;">TEAM 1</div>
+        <div style="display:flex;gap:1rem;">
+          <div class="duel-player">
+            <img id="team1Ship1" class="duel-ship" src="navicella1.png"/>
+            <div id="team1Nick1" class="duel-nick">Waiting...</div>
+          </div>
+          <div class="duel-player">
+            <img id="team1Ship2" class="duel-ship" src="navicella1.png"/>
+            <div id="team1Nick2" class="duel-nick">Waiting...</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- VS -->
+      <div class="duel-vs" style="align-self:center;">VS</div>
+      
+      <!-- Team 2 -->
+      <div style="text-align:center;">
+        <div style="color:#ffd700;font-weight:bold;font-size:1.3rem;margin-bottom:0.8rem;">TEAM 2</div>
+        <div style="display:flex;gap:1rem;">
+          <div class="duel-player">
+            <img id="team2Ship1" class="duel-ship" src="navicella2.png"/>
+            <div id="team2Nick1" class="duel-nick">Waiting...</div>
+          </div>
+          <div class="duel-player">
+            <img id="team2Ship2" class="duel-ship" src="navicella2.png"/>
+            <div id="team2Nick2" class="duel-nick">Waiting...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="duel2v2Status" class="duel-status">Looking for players... (1/4)</div>
+    <button class="menu-btn" id="duel2v2CancelBtn">Cancel</button>
+  `;
+  
+  document.body.appendChild(lobby2v2);
+  
+  // IMPORTANTE: Collega l'evento DOPO aver creato l'elemento!
+  const cancelBtn = document.getElementById('duel2v2CancelBtn');
+  if (cancelBtn) {
+    cancelBtn.onclick = function() {
+      console.log("Cancel 2v2 clicked!"); // Debug
+      const lobby = document.getElementById('duel2v2Lobby');
+      if (lobby) {
+        lobby.classList.add('hidden');
+      }
+      if (window.socket) {
+        window.socket.emit("duel2v2_cancel");
+      }
+    };
+  }
+}
+
+// Chiama questa funzione all'avvio
+window.addEventListener('DOMContentLoaded', create2v2LobbyHTML);
+
+
+function startDuel2v2Queue() {
+  // CREA L'ELEMENTO SE NON ESISTE
+  if (!document.getElementById('duel2v2Lobby')) {
+    create2v2LobbyHTML();
+  }
+  
+  const lobby = document.getElementById('duel2v2Lobby');
+  if (!lobby) {
+    console.error("Impossibile creare lobby 2v2!");
+    return;
+  }
+  
+  // Ora puoi usarlo in sicurezza
+  lobby.classList.remove('hidden');
+  document.getElementById('duel2v2Status').textContent = "Looking for players... (1/4)";
+  
+  // Resto del codice...
+  if (location.protocol === 'file:') {
+    document.getElementById('duel2v2Status').textContent = "Demo Mode - No server";
+    // Simula matchmaking per test
+    setTimeout(() => {
+      update2v2Lobby({
+        players: [
+          { nickname: getPlayerName(), skin: getSelectedShipImage() },
+          { nickname: "Waiting...", skin: "navicella2.png" }
+        ],
+        count: 2
+      });
+    }, 1000);
+    return;
+  }
+  
+  if (!window.socket) {
+    window.socket = io();
+    setup2v2Listeners();
+  }
+  
+  window.socket.emit("duel2v2_queue", {
+    nickname: getPlayerName(),
+    skin: getSelectedShipImage(),
+    elo: gameState.elo || 1000
+  });
+}
+
+function setup2v2Listeners() {
+  if (!window.socket) return;
+  
+  // Pulizia listener precedenti
+  window.socket.off('duel2v2_update');
+  window.socket.off('duel2v2_ready');
+  window.socket.off('duel2v2_state');
+  window.socket.off('duel2v2_end');
+  
+  // Aggiornamento lobby
+  window.socket.on('duel2v2_update', (data) => {
+    update2v2Lobby(data);
+  });
+  
+  // Match pronto
+  window.socket.on('duel2v2_ready', (data) => {
+    duel2v2Team = data.yourTeam;
+    duel2v2Players = data.players;
+    duel2v2TeamMate = data.teammate;
+    duel2v2Opponents = data.opponents;
+    start2v2Countdown();
+  });
+  
+  // Stato di gioco
+  window.socket.on('duel2v2_state', (data) => {
+    update2v2GameState(data);
+  });
+  
+  // Fine partita
+  window.socket.on('duel2v2_end', (data) => {
+    show2v2EndScreen(data);
+  });
+}
+
+
+function update2v2Lobby(data) {
+  const { players, count } = data;
+  
+  // Reset all slots
+  ['team1Nick1', 'team1Nick2', 'team2Nick1', 'team2Nick2'].forEach(id => {
+    document.getElementById(id).textContent = 'Waiting...';
+  });
+  
+  // Fill slots with players
+  players.forEach((player, index) => {
+    const team = index < 2 ? 'team1' : 'team2';
+    const slot = index % 2 + 1;
+    document.getElementById(`${team}Nick${slot}`).textContent = player.nickname;
+    document.getElementById(`${team}Ship${slot}`).src = player.skin;
+  });
+  
+  document.getElementById('duel2v2Status').textContent = `Looking for players... (${count}/4)`;
+  
+  if (count === 4) {
+    document.getElementById('duel2v2Status').textContent = "Match starting!";
+  }
+}
+
+
+function init2v2Arena() {
+  // Posizioni iniziali per 4 giocatori
+  const positions = {
+    team1: [
+      { x: 100, y: canvas.height - 150 },  // Bottom left
+      { x: 250, y: canvas.height - 150 }   // Bottom left-center
+    ],
+    team2: [
+      { x: canvas.width - 250, y: 150 },   // Top right-center
+      { x: canvas.width - 100, y: 150 }    // Top right
+    ]
+  };
+  
+  // Setup del tuo player
+  if (duel2v2Team === 'team1') {
+    gameState.player.x = positions.team1[0].x;
+    gameState.player.y = positions.team1[0].y;
+  } else {
+    gameState.player.x = positions.team2[0].x;
+    gameState.player.y = positions.team2[0].y;
+  }
+  
+  gameState.player.health = 400; // Meno HP per bilanciare 2v2
+  gameState.player.maxHealth = 400;
+  gameState.player.energy = 100;
+  
+  // Inizializza stati degli altri 3 giocatori
+  gameState.teammates = [];
+  gameState.opponents = [];
+  
+  duel2v2Active = true;
+  gameState.gameMode = 'duel2v2';
+}
+
+
+function render2v2Players(ctx) {
+  // Render teammate
+  if (duel2v2TeamMate) {
+    renderTeammate(ctx, duel2v2TeamMate);
+  }
+  
+  // Render opponents
+  duel2v2Opponents.forEach(opp => {
+    renderOpponent2v2(ctx, opp);
+  });
+}
+
+function renderTeammate(ctx, teammate) {
+  ctx.save();
+  ctx.globalAlpha = 0.9;
+  
+  // Indicatore teammate (contorno verde)
+  ctx.strokeStyle = '#4caf50';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.arc(teammate.x, teammate.y, 40, 0, Math.PI * 2);
+  ctx.stroke();
+  
+  // Navicella
+  const img = new Image();
+  img.src = teammate.skin;
+  ctx.drawImage(img, teammate.x - 32, teammate.y - 32, 64, 64);
+  
+  // Nome e HP
+  ctx.font = "bold 14px Orbitron";
+  ctx.fillStyle = '#4caf50';
+  ctx.textAlign = 'center';
+  ctx.fillText(teammate.nickname, teammate.x, teammate.y - 45);
+  
+  // Barra vita
+  const hpPercent = teammate.health / 400;
+  ctx.fillStyle = hpPercent > 0.5 ? '#4caf50' : '#ffd700';
+  ctx.fillRect(teammate.x - 30, teammate.y - 55, 60 * hpPercent, 5);
+  
+  ctx.restore();
+}
+
+function renderOpponent2v2(ctx, opponent) {
+  ctx.save();
+  ctx.globalAlpha = 0.9;
+  
+  // Indicatore nemico (contorno rosso)
+  ctx.strokeStyle = '#f44336';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.arc(opponent.x, opponent.y, 40, 0, Math.PI * 2);
+  ctx.stroke();
+  
+  // Navicella
+  const img = new Image();
+  img.src = opponent.skin;
+  ctx.drawImage(img, opponent.x - 32, opponent.y - 32, 64, 64);
+  
+  // Nome e HP
+  ctx.font = "bold 14px Orbitron";
+  ctx.fillStyle = '#f44336';
+  ctx.textAlign = 'center';
+  ctx.fillText(opponent.nickname, opponent.x, opponent.y - 45);
+  
+  // Barra vita
+  const hpPercent = opponent.health / 400;
+  ctx.fillStyle = hpPercent > 0.5 ? '#4caf50' : '#f44336';
+  ctx.fillRect(opponent.x - 30, opponent.y - 55, 60 * hpPercent, 5);
+  
+  ctx.restore();
+}
+
+
+function sync2v2State() {
+  if (!duel2v2Active) return;
+  
+  window.socket.emit("duel2v2_update", {
+    room: duelRoomId,
+    player: {
+      x: gameState.player.x,
+      y: gameState.player.y,
+      health: gameState.player.health,
+      energy: gameState.player.energy,
+      angle: gameState.player.angle,
+      team: duel2v2Team
+    },
+    bullets: gameState.bullets.map(b => ({
+      x: b.x,
+      y: b.y,
+      vx: b.vx,
+      vy: b.vy,
+      damage: b.damage,
+      team: duel2v2Team
+    }))
+  });
+}
+
+function check2v2Collisions() {
+  // Collisioni con teammates (no friendly fire)
+  gameState.bullets.forEach((bullet, idx) => {
+    // Skip se è un proiettile del tuo team
+    if (bullet.team === duel2v2Team) return;
+    
+    // Check hit su di te
+    const dist = Math.sqrt((bullet.x - gameState.player.x) ** 2 + 
+                          (bullet.y - gameState.player.y) ** 2);
+    if (dist < 32) {
+      gameState.player.health -= bullet.damage;
+      gameState.bullets.splice(idx, 1);
+      createHitParticles(bullet.x, bullet.y, '#f44336');
+    }
+  });
+  
+  // Check vittoria condizioni
+  const team1Alive = duel2v2Players.team1.some(p => p.health > 0);
+  const team2Alive = duel2v2Players.team2.some(p => p.health > 0);
+  
+  if (!team1Alive || !team2Alive) {
+    window.socket.emit("duel2v2_victory", {
+      room: duelRoomId,
+      winningTeam: team1Alive ? 'team1' : 'team2'
+    });
+  }
+}
+
+
+function start2v2Loop() {
+  function loop2v2() {
+    if (!duel2v2Active) return;
+    
+    updatePlayer(1);
+    update2v2Players();
+    updateBullets(1);
+    check2v2Collisions();
+    sync2v2State();
+    
+    // Render
+    render();
+    render2v2Players(ctx);
+    render2v2UI();
+    
+    requestAnimationFrame(loop2v2);
+  }
+  loop2v2();
+}
+
+function render2v2UI() {
+  // Team scores in alto
+  ctx.save();
+  ctx.font = "bold 20px Orbitron";
+  ctx.fillStyle = '#00bcd4';
+  ctx.fillText(`TEAM 1: ${duel2v2Players.team1.filter(p => p.health > 0).length}/2`, 50, 30);
+  ctx.fillStyle = '#ffd700';
+  ctx.fillText(`TEAM 2: ${duel2v2Players.team2.filter(p => p.health > 0).length}/2`, canvas.width - 150, 30);
+  ctx.restore();
+}
+
+
+function show2v2EndScreen(data) {
+  const won = data.winningTeam === duel2v2Team;
+  const screen = document.createElement('div');
+  screen.className = 'duel-end';
+  screen.innerHTML = `
+    <div style="font-size:3rem;color:${won ? '#ffd700' : '#f44336'};">
+      ${won ? '🏆 TEAM VICTORY!' : '😵 TEAM DEFEAT'}
+    </div>
+    <div style="margin:1.5rem 0;">
+      <div>Your Team: ${data.stats[duel2v2Team].kills} kills</div>
+      <div>Enemy Team: ${data.stats[data.winningTeam === 'team1' ? 'team2' : 'team1'].kills} kills</div>
+    </div>
+    <button class="menu-btn" onclick="queue2v2Again()">Play Again</button>
+    <button class="menu-btn" onclick="backToMenu2v2()">Main Menu</button>
+  `;
+  document.body.appendChild(screen);
+}
+
 
 </script>
   
