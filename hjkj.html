@@ -2269,7 +2269,6 @@ body.landscape-mode #gameCanvas {
                   <button class="menu-btn primary" onclick="startDuelQueue()">⚔️ 1v1 DUELS</button>
                   <!-- Apri il Mobile Customization menu -->
                   <button class="menu-btn" onclick="showScreen('mobileCustomizationMenu')">📱 MOBILE SETTINGS</button>
-                  <button class="menu-btn" onclick="showDuelLeaderboard()">🏅 1v1 DUEL LEADERBOARD</button>
                 
                    <div style="margin-bottom:1.2em;">
   <label for="duelBotDifficultySelect" style="color:#00bcd4;font-weight:bold;margin-right:7px;">Bot Difficulty:</label>
@@ -7563,7 +7562,10 @@ gameState.elo = newElo;
 saveGameData(); // <--- assicurati che sia qui!
 updateUI();
 
-  duelEndStats.innerHTML = `
+  // <<< AGGIUNGI QUI >>>
+  submitDuelScore(getPlayerName(), gameState.elo);
+
+duelEndStats.innerHTML = `
     <b>You:</b> ${stats?.[myId]?.kills ?? 0} kills, ${stats?.[myId]?.damage ?? 0} damage<br>
     <b>${duelOpponent?.nickname || "Opponent"}:</b> ${stats?.[oppId]?.kills ?? 0} kills, ${stats?.[oppId]?.damage ?? 0} damage
     <br><span style="color:#ffd700;">ELO change: ${delta > 0 ? "+" : ""}${delta} (ELO: ${newElo})</span>
@@ -8384,21 +8386,21 @@ function fetchDuelLeaderboard(callback) {
     });
 }
 
+// PATCH: Leaderboard 1v1 Duel mostra ELO invece di "score"
+
 function showDuelLeaderboard() {
   showScreen('duelLeaderboardScreen');
   document.getElementById('duelLeaderboardList').innerHTML = 'Loading...';
   fetchDuelLeaderboard(leaderboard => {
     let html = '<ol style="font-size:1.2rem;">';
     leaderboard.forEach(entry => {
-      html += `<li><b>${entry.name}</b> — <span style="color:#ffd700;">${entry.score}</span></li>`;
+      html += `<li><b>${entry.name}</b> — <span style="color:#ffd700;">ELO: ${entry.score}</span></li>`;
     });
-    if (leaderboard.length === 0) html += "<li>No duel scores yet!</li>";
+    if (leaderboard.length === 0) html += "<li>Nessun ELO ancora!</li>";
     html += '</ol>';
     document.getElementById('duelLeaderboardList').innerHTML = html;
   });
 }
-
-
 
 /* startFirstMission: prova a chiamare le funzioni esistenti (startMission / startGame),
    con fallback non distruttivi se non trovate. */
@@ -8900,6 +8902,17 @@ function flashScreen(color = "#fff", strength = 0.4) {
   document.body.appendChild(flash);
   setTimeout(() => { flash.style.opacity = "0"; }, 400);
   setTimeout(() => { flash.remove(); }, 900);
+}
+
+
+function submitDuelScore(username, elo) {
+  const dreamloKey = "5z7d7N8IBkSwrhJdyZAXxAYn3Jv1KyTEm6GJZoIALRBw";
+  const tag = "duel1v1";
+  // 🔥 Usa /update/ per forzare l'aggiornamento (anche se l'ELO scende)
+  const url = `https://dreamlo.com/lb/${dreamloKey}/update/${encodeURIComponent(username)}/${elo}/${tag}`;
+  fetch(url)
+    .then(() => console.log("Duel 1v1 ELO aggiornato su Dreamlo!"))
+    .catch(err => console.error("Dreamlo errore:", err));
 }
 
 </script>
