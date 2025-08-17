@@ -524,7 +524,27 @@ io.on('connection', (socket) => {
 });
   
   
-  socket.on('duel_join', ({ roomId, role, nickname }) => {
+  
+// PATCH: Handler per READY in lobby co-op
+socket.on('playerReady', ({ ready }) => {
+  if (players[socket.id]) {
+    players[socket.id].ready = !!ready;
+    inviaLobbyAggiornata();
+  }
+});
+
+
+
+// PATCH: Handler per RUOLO in lobby co-op
+socket.on('selectRole', ({ role }) => {
+  if (players[socket.id]) {
+    players[socket.id].role = role;
+    inviaLobbyAggiornata();
+  }
+});
+
+
+socket.on('duel_join', ({ roomId, role, nickname }) => {
     if (!roomId || !duelRooms[roomId]) {
       socket.emit('error', { message: 'Room not found' });
       return;
