@@ -2112,6 +2112,56 @@ body:not(.in-game) #gameContainer {
   overflow: visible !important;
 }
    
+   
+   @media (pointer: coarse), (max-width: 700px) {
+  html, body {
+    font-size: 18px !important;
+    zoom: 1 !important;
+    touch-action: manipulation !important;
+    overscroll-behavior: none !important;
+    -webkit-text-size-adjust: 100% !important;
+    background: #000 !important;
+  }
+  #gameCanvas {
+    width: 100vw !important;
+    height: 85vh !important;
+    max-width: 100vw !important;
+    max-height: 85vh !important;
+    margin: 0 !important;
+    display: block !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+  .hud {
+    height: 42px !important;
+    padding: 0 4px !important;
+    font-size: 1em !important;
+    gap: 0.2em !important;
+    background: linear-gradient(180deg, rgba(0,0,0,0.89), transparent) !important;
+  }
+  .stat-box {
+    min-width: 30px !important;
+    padding: 2px 5px !important;
+    font-size: 0.75em !important;
+  }
+  .stat-value {
+    font-size: 1em !important;
+  }
+  .menu-btn, .mobile-action-btn, .orientation-btn, #duelEmojiBar .menu-btn {
+    font-size: 1em !important;
+    min-width: 24px !important;
+    padding: 0.2em 0.4em !important;
+    border-radius: 6px !important;
+  }
+  #duelEmojiBar {
+    min-height: 34px !important;
+    padding: 0.2em 0.7em !important;
+    font-size: 1em !important;
+    gap: 7px !important;
+  }
+}
+   
+   
    </style>
 </head>
 <body>
@@ -8855,28 +8905,21 @@ function spawnSuperExplosion(x, y, opts = {}) {
 
 // --- PATCH CANVAS RESPONSIVE RETINA ---
 function resizeCanvas() {
-  const container = document.getElementById('gameContainer');
-  const dpr = window.devicePixelRatio || 1;
-  let width = container.offsetWidth;
-  let height = container.offsetHeight;
-
-  // Ratio 16:9
-  const aspect = 16 / 9;
-  if (width / height > aspect) {
-    width = height * aspect;
+  const canvas = document.getElementById('gameCanvas');
+  if (window.innerWidth < 700) {
+    // MOBILE: usa viewport
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight * 0.85; // 85% della viewport
+    canvas.style.width = '100vw';
+    canvas.style.height = '85vh';
   } else {
-    height = width / aspect;
+    // DESKTOP: mantieni proporzioni 16:9
+    canvas.width = 1280;
+    canvas.height = 720;
+    canvas.style.width = '1280px';
+    canvas.style.height = '720px';
   }
-
-  canvas.width = width * dpr;
-  canvas.height = height * dpr;
-  canvas.style.width = width + "px";
-  canvas.style.height = height + "px";
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
-window.addEventListener('resize', resizeCanvas);
-window.addEventListener('orientationchange', resizeCanvas);
-
 
 function showDuelRoundOverlay(status, round) {
   let msg = "";
