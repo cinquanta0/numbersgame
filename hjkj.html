@@ -3127,6 +3127,8 @@ for (let key in POWERUP_IMAGES) {
         score: 0,
         energy: 100,
         maxEnergy: 100,
+        reviveCount: 0,
+        maxRevives: 1,
         skills: {},
         emergencyShields: 1,
         slowTimeEnergy: 100,
@@ -6762,6 +6764,8 @@ function startCoopRaid() {
 }
 
 function startCoopRaidGame(data) {
+   gameState.player.reviveCount = 0; // Resetta le resurrezioni
+  gameState.player.maxRevives = 1;  // (opzionale, se vuoi forzare il limite ogni partita)
   resetBossVisualState(); // <--- AGGIUNGI QUESTA RIGA!!!
   gameState.currentLevel = 20;
   initializeCampaignEnemy();
@@ -6959,6 +6963,11 @@ function startCoopGameLoop() {
     interpolateBoss();
     interpolateBossHealth();
     render();
+    
+        tryReviveTeammate(); // <--- aggiungi qui!
+
+    
+    
     if (gameState.currentScreen === 'gameScreen' && gameState.gameMode === 'coop')
       requestAnimationFrame(coopLoop);
   }
@@ -9626,6 +9635,20 @@ function renderCoopMinimap() {
 // Aggiungi in render() quando gameMode === 'coop':
 if (gameState.gameMode === 'coop') {
   renderCoopMinimap();
+}
+
+
+function tryReviveTeammate() {
+  if (
+    gameState.gameMode === "coop" &&
+    gameState.player.health <= 0 &&
+    gameState.player.reviveCount < gameState.player.maxRevives
+  ) {
+    // Resuscita il giocatore
+    gameState.player.health = Math.floor(gameState.player.maxHealth * 0.5); // Torna con metà vita
+    gameState.player.reviveCount++;
+    showNotification("💚 Sei stato resuscitato dal team! (max 1 volta)", "achievement");
+  }
 }
 
 
