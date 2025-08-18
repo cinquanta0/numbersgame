@@ -2348,7 +2348,7 @@ body:not(.in-game) #gameContainer {
                   <!-- Apri il Mobile Customization menu -->
                   <button class="menu-btn" onclick="showScreen('mobileCustomizationMenu')">📱 MOBILE SETTINGS</button>
                   <button class="menu-btn primary" onclick="startDuel2v2Queue()">⚔️ 2v2 TEAM DUELS</button>
-
+                  <button class="menu-btn" onclick="showTeam2v2Leaderboard()">🏆 2v2 TEAM LEADERBOARD</button>
                   
                   <div style="margin-bottom:1.2em;">
   <label for="duelBotDifficultySelect" style="color:#00bcd4;font-weight:bold;margin-right:7px;">Bot Difficulty:</label>
@@ -2965,6 +2965,16 @@ body:not(.in-game) #gameContainer {
 </div>
   
   
+  <div class="screen" id="team2v2LeaderboardScreen">
+  <button class="menu-btn home-btn" onclick="showScreen('mainMenu')">🏠 HOME</button>
+  <div class="menu-content">
+    <h2 class="game-subtitle">2v2 Team Leaderboard</h2>
+    <div id="team2v2LeaderboardList">Loading...</div>
+    <button class="menu-btn" onclick="showTeam2v2Leaderboard()">Update</button>
+    <button class="menu-btn" onclick="showScreen('mainMenu')">Back</button>
+  </div>
+</div>
+  
   
   <script>
        
@@ -3265,6 +3275,11 @@ let duel2v2Players = {
 let duel2v2TeamMate = null;
 let duel2v2Opponents = [];
 
+
+
+// JS globale
+let teamElo = 1000; // ELO iniziale del team
+let currentSeason = "2025-S1"; // cambia ogni stagione
 
 
 
@@ -6050,9 +6065,10 @@ function renderPlayerTrail(ctx) {
  
   
   
-  
-  function renderObstacles() {
-    gameState.obstacles.forEach(ob => {
+function renderObstacles() {
+    // PATCH: sempre array!
+    const obstacles = Array.isArray(gameState.obstacles) ? gameState.obstacles : [];
+    obstacles.forEach(ob => {
         ctx.save();
         ctx.translate(ob.x, ob.y);
         ctx.rotate(ob.angle);
@@ -6089,7 +6105,8 @@ function renderPlayerTrail(ctx) {
         }
         ctx.restore();
     });
-}
+}  
+  
   
 function selectShip(shipId) {
     localStorage.setItem('selectedShip', shipId);
@@ -9366,7 +9383,18 @@ function renderTeammate(ctx, teammate) {
   
   // Navicella
   const img = new Image();
-  img.src = teammate.skin;
+img.src = getShipImageFromId(teammate.skin); // ⬅️ GIUSTO!
+
+  function getShipImageFromId(id) {
+  switch (id) {
+    case "ship1": return "navicella1.png";
+    case "ship2": return "navicella2.png";
+    case "ship3": return "navicella3.png";
+    case "ship4": return "navicella4.png";
+    case "summer": return "navicella-summer.png";
+    default: return "navicella1.png";
+  }
+}
   ctx.drawImage(img, teammate.x - 32, teammate.y - 32, 64, 64);
   
   // Nome e HP
@@ -9396,8 +9424,8 @@ function renderOpponent2v2(ctx, opponent) {
   
   // Navicella
   const img = new Image();
-  img.src = opponent.skin;
-  ctx.drawImage(img, opponent.x - 32, opponent.y - 32, 64, 64);
+img.src = getShipImageFromId(opponent.skin);  
+ctx.drawImage(img, opponent.x - 32, opponent.y - 32, 64, 64);
   
   // Nome e HP
   ctx.font = "bold 14px Orbitron";
@@ -9439,11 +9467,12 @@ function sync2v2State() {
 }
 
 function check2v2Collisions() {
+  console.log('duel2v2Players:', duel2v2Players);
   // Collisioni con teammates (no friendly fire)
   gameState.bullets.forEach((bullet, idx) => {
     // Skip se è un proiettile del tuo team
     if (bullet.team === duel2v2Team) return;
-    
+
     // Check hit su di te
     const dist = Math.sqrt((bullet.x - gameState.player.x) ** 2 + 
                           (bullet.y - gameState.player.y) ** 2);
@@ -9453,11 +9482,15 @@ function check2v2Collisions() {
       createHitParticles(bullet.x, bullet.y, '#f44336');
     }
   });
-  
+
+  // PATCH: Safe fallback se assenti
+  const team1Arr = Array.isArray(duel2v2Players.team1) ? duel2v2Players.team1 : [];
+  const team2Arr = Array.isArray(duel2v2Players.team2) ? duel2v2Players.team2 : [];
+
   // Check vittoria condizioni
-  const team1Alive = duel2v2Players.team1.some(p => p.health > 0);
-  const team2Alive = duel2v2Players.team2.some(p => p.health > 0);
-  
+  const team1Alive = team1Arr.some(p => p.health > 0);
+  const team2Alive = team2Arr.some(p => p.health > 0);
+
   if (!team1Alive || !team2Alive) {
     window.socket.emit("duel2v2_victory", {
       room: duelRoomId,
@@ -9488,13 +9521,15 @@ function start2v2Loop() {
 }
 
 function render2v2UI() {
-  // Team scores in alto
   ctx.save();
   ctx.font = "bold 20px Orbitron";
+  // PATCH robusto!
+  const team1Arr = Array.isArray(duel2v2Players?.team1) ? duel2v2Players.team1 : [];
+  const team2Arr = Array.isArray(duel2v2Players?.team2) ? duel2v2Players.team2 : [];
   ctx.fillStyle = '#00bcd4';
-  ctx.fillText(`TEAM 1: ${duel2v2Players.team1.filter(p => p.health > 0).length}/2`, 50, 30);
+  ctx.fillText(`TEAM 1: ${team1Arr.filter(p => p.health > 0).length}/2`, 50, 30);
   ctx.fillStyle = '#ffd700';
-  ctx.fillText(`TEAM 2: ${duel2v2Players.team2.filter(p => p.health > 0).length}/2`, canvas.width - 150, 30);
+  ctx.fillText(`TEAM 2: ${team2Arr.filter(p => p.health > 0).length}/2`, canvas.width - 150, 30);
   ctx.restore();
 }
 
@@ -9650,6 +9685,114 @@ function tryReviveTeammate() {
     showNotification("💚 Sei stato resuscitato dal team! (max 1 volta)", "achievement");
   }
 }
+
+
+// Quando termina una partita 2v2
+function on2v2MatchEnd(winningTeam, team1Elo, team2Elo) {
+  // Calcola ELO
+  const K = 32;
+  const expected1 = 1 / (1 + Math.pow(10, (team2Elo - team1Elo) / 400));
+  const expected2 = 1 / (1 + Math.pow(10, (team1Elo - team2Elo) / 400));
+  const score1 = winningTeam === 'team1' ? 1 : 0;
+  const score2 = 1 - score1;
+
+  const newTeam1Elo = Math.round(team1Elo + K * (score1 - expected1));
+  const newTeam2Elo = Math.round(team2Elo + K * (score2 - expected2));
+
+  // Salva i nuovi valori (Dreamlo, DB, localStorage, ecc)
+  saveTeamElo('team1', newTeam1Elo, currentSeason);
+  saveTeamElo('team2', newTeam2Elo, currentSeason);
+
+  // Mostra in HUD e leaderboards
+}
+
+
+function fetchTeam2v2Leaderboard(season, callback) {
+  const dreamloKey = "5z7d7N8IBkSwrhJdyZAXxAYn3Jv1KyTEm6GJZoIALRBw";
+  const tag = `${season}_team2v2`;
+  fetch(`https://dreamlo.com/lb/${dreamloKey}/pipe-get/${tag}`)
+    .then(res => res.text())
+    .then(txt => {
+      // Esempio parsing e callback
+      const rows = txt.trim().split('\n');
+      const leaderboard = rows
+        .map(row => {
+          const [team, elo] = row.split('|');
+          if (!team || isNaN(parseInt(elo))) return null;
+          return { team, elo: parseInt(elo) };
+        })
+        .filter(entry => entry !== null)
+        .sort((a, b) => b.elo - a.elo);
+      if (typeof callback === "function") callback(leaderboard);
+    });
+}
+
+
+function checkSeasonReset() {
+  const now = Date.now();
+  const seasonStart = localStorage.getItem("seasonStart") || now;
+  if (now - seasonStart > SEASON_LENGTH_MS) {
+    // Nuova stagione!
+    currentSeason = getNextSeason(currentSeason);
+    localStorage.setItem("seasonStart", now);
+    resetAllTeamElo();
+    showNotification("Nuova stagione iniziata!", "achievement");
+  }
+}
+
+
+function showTeam2v2Leaderboard() {
+  showScreen('team2v2LeaderboardScreen');
+  document.getElementById('team2v2LeaderboardList').innerHTML = 'Loading...';
+  fetchTeam2v2Leaderboard(currentSeason, leaderboard => {
+    let html = '<ol style="font-size:1.2rem;">';
+    leaderboard.forEach(entry => {
+      html += `<li><b>${entry.team.replace(/_/g, " / ")}</b> — <span style="color:#ffd700;">ELO: ${entry.elo}</span></li>`;
+    });
+    if (leaderboard.length === 0) html += "<li>No team scores yet!</li>";
+    html += '</ol>';
+    document.getElementById('team2v2LeaderboardList').innerHTML = html;
+  });
+}
+
+
+function start2v2Countdown() {
+  let count = 3;
+  const lobby = document.getElementById('duel2v2Lobby');
+  const status = document.getElementById('duel2v2Status');
+  status.textContent = "Match starting in " + count + "...";
+  const interval = setInterval(() => {
+    count--;
+    if (count > 0) {
+      status.textContent = "Match starting in " + count + "...";
+    } else {
+      status.textContent = "Battle!";
+    }
+    if (count <= 0) {
+      clearInterval(interval);
+      lobby.classList.add('hidden');
+      init2v2Arena();
+      start2v2Loop();
+    }
+  }, 1000);
+}
+
+
+function update2v2Players() {
+  if (duel2v2TeamMate && duel2v2TeamMate.targetX !== undefined && duel2v2TeamMate.targetY !== undefined) {
+    duel2v2TeamMate.x += (duel2v2TeamMate.targetX - duel2v2TeamMate.x) * 0.2;
+    duel2v2TeamMate.y += (duel2v2TeamMate.targetY - duel2v2TeamMate.y) * 0.2;
+  }
+  duel2v2Opponents.forEach(opponent => {
+    if (opponent.targetX !== undefined && opponent.targetY !== undefined) {
+      opponent.x += (opponent.targetX - opponent.x) * 0.2;
+      opponent.y += (opponent.targetY - opponent.y) * 0.2;
+    }
+  });
+}
+
+
+
 
 
 </script>
