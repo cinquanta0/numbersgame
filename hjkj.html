@@ -35,45 +35,6 @@ sdk.showBanner();
     </script>
       
 
-<script type="text/javascript">
-
-      window["GD_OPTIONS"] = {
-    "gameId": "68b9d83103d2484583d69df6c5f985e3",
-    "onEvent": function(event) {
-        switch (event.name) {
-            case "SDK_GAME_START":
-                // advertisement done, resume game logic and unmute audio
-                break;
-            case "SDK_GAME_PAUSE":
-                // pause game logic / mute audio
-                break;
-            case "SDK_GDPR_TRACKING":
-                // this event is triggered when your user doesn't want to be tracked
-                break;
-            case "SDK_GDPR_TARGETING":
-                // this event is triggered when your user doesn't want personalised targeting of ads and such
-                break;
-            case "SDK_REWARDED_WATCH_COMPLETE":
-                // this event is triggered when your user completely watched rewarded ad
-                break;
-        }
-    },
-};
-(function(d, s, id) {
-    var js, fjs = d.getElementsByTagName(s)[0];
-    if (d.getElementById(id)) return;
-    js = d.createElement(s);
-    js.id = id;
-    js.src = 'https://html5.api.gamedistribution.com/main.min.js';
-    fjs.parentNode.insertBefore(js, fjs);
-}(document, 'script', 'gamedistribution-jssdk'));
-
-
-
-
-</script>
-
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">  
   
