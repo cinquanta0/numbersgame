@@ -2336,7 +2336,7 @@ body:not(.in-game) #gameContainer {
                   <button class="menu-btn" onclick="showScreen('inventoryScreen')">🛸 SPACESHIP INVENTORY</button>
                   <button class="menu-btn" onclick="showGlobalLeaderboard()">🌍 GLOBAL LEADERBOARD</button>
                   <button class="menu-btn primary" onclick="showCoopLobby()">🌐 Raid Co-op Online</button>
-                  <button class="menu-btn" onclick="window.open('https://site-stellarguardian999.onrender.com','_blank')">🌐 Sito Ufficiale</button>
+                  <button class="menu-btn" onclick="window.open('https://stellarguardian72.onrender.com','_blank')">🌐 Sito Ufficiale</button>
                   <button class="menu-btn" onclick="showDailyChallengeMenu()">🌟 DAILY CHALLENGE</button>
                   <button class="menu-btn" onclick="showLocalLeaderboard()">🌟 LOCAL LEADERBOARD</button>
                   <button class="menu-btn" onclick="showScreen('skillTree')">⭐ UPGRADES</button>
@@ -2347,7 +2347,7 @@ body:not(.in-game) #gameContainer {
                   <button class="menu-btn primary" onclick="startDuelQueue()">⚔️ 1v1 DUELS</button>
                   <!-- Apri il Mobile Customization menu -->
                   <button class="menu-btn" onclick="showScreen('mobileCustomizationMenu')">📱 MOBILE SETTINGS</button>
-                  <button class="menu-btn primary" onclick="startDuel2v2Queue()">⚔️ 2v2 TEAM DUELS(BETA)</button>
+                  <button class="menu-btn primary" onclick="startDuel2v2Queue()">⚔️ 2v2 TEAM DUELS</button>
                   <button class="menu-btn" onclick="showTeam2v2Leaderboard()">🏆 2v2 TEAM LEADERBOARD</button>
                   
                   <div style="margin-bottom:1.2em;">
@@ -8352,8 +8352,16 @@ function renderDuelPowerups(ctx, powerups) {
     ctx.globalAlpha = 1;
 
     // Disegna sprite
-    const img = POWERUP_SPRITES[p.type] || POWERUP_SPRITES['heal'];
-    ctx.drawImage(img, p.x - 24, p.y - 24, 48, 48);
+   const img = POWERUP_SPRITES[p.type] || POWERUP_SPRITES['heal'];
+if (img && img.complete && img.naturalWidth !== 0) {
+  ctx.drawImage(img, p.x - 24, p.y - 24, 48, 48);
+} else {
+  // fallback visual (cerchio dorato)
+  ctx.fillStyle = "#ffd700";
+  ctx.beginPath();
+  ctx.arc(p.x, p.y, 24, 0, Math.PI * 2);
+  ctx.fill();
+}
 
     // Bordo dorato (facoltativo)
     ctx.strokeStyle = "#ffd700";
