@@ -2273,7 +2273,7 @@ body:not(.in-game) #gameContainer {
     </div>
     <div class="menu-content">
       <h1 class="game-title">STELLAR GUARDIAN</h1>
-      <p class="game-subtitle">COSMIC DEFENSE FORCE - Protect the Galaxy(Don't click retreat when playing multiplayer games!)</p>
+      <p class="game-subtitle">COSMIC DEFENSE FORCE - Protect the Galaxy</p>
       <p style="color:#ffd700; font-size:1.1rem; margin-bottom:1.5rem; text-shadow: 0 0 8px #00bcd4;">
         🔔  For a better experience activate the <strong>fullscreen</strong>. Without it, it could lag!
       </p>
@@ -2828,6 +2828,19 @@ body:not(.in-game) #gameContainer {
     </div>
   </div>
   <div id="duelStatus" class="duel-status">Looking for opponent...</div>
+  
+  <div id="duelSpecialAbilitySelector" style="margin-top:1.2em;">
+  <label style="color:#00bcd4;font-weight:bold;">Special Ability:</label>
+  <select id="duelSpecialAbilitySelect" class="menu-btn" style="margin-left:8px;">
+    <option value="stun">Stun</option>
+    <option value="heal">Heal</option>
+    <option value="teleport">Teleport</option>
+    <option value="double">Double Shot</option>
+    <option value="shield">Shield</option>
+  </select>
+</div>
+<div id="duelAbilityDesc" style="color:#ffd700; font-size:0.96em; margin-top:4px;"></div>
+  
   <button class="menu-btn" id="duelCancelBtn">Cancel</button>
 </div>
 
@@ -7753,6 +7766,42 @@ function openDuelLobby() {
   
 }
 
+
+const ABILITY_DESCS = {
+  stun: "Stun: Immobilizza l'avversario per 2 secondi.",
+  heal: "Heal: Recupera 40 HP istantaneamente.",
+  teleport: "Teleport: Ti sposti in un punto casuale.",
+  double: "Double Shot: Il prossimo colpo fa doppio danno.",
+  shield: "Shield: Immunità ai danni per 1.5 secondi."
+};
+
+function selectSpecialAbilityFromMenu() {
+  const select = document.getElementById('duelSpecialAbilitySelect');
+  if (!select) return;
+  window.gameState.player.specialAbility = select.value;
+  window.gameState.player.specialCooldown = 0;
+  localStorage.setItem('duelSpecialAbility', select.value); // salva scelta
+  document.getElementById('duelAbilityDesc').textContent = ABILITY_DESCS[select.value] || "";
+  showNotification("Special Ability Selected: " + select.value);
+}
+
+document.getElementById('duelSpecialAbilitySelect').addEventListener('change', selectSpecialAbilityFromMenu);
+
+// All'apertura della lobby, imposta la select alla scelta precedente o default
+function openDuelLobby() {
+  duelLobby.classList.remove('hidden');
+  duelStatus.textContent = "Looking for opponent...";
+  duelNick1.textContent = getPlayerName();
+  duelShip1.src = getSelectedShipImage();
+  duelNick2.textContent = "Searching...";
+  duelShip2.src = "navicella2.png";
+  // Setta la select
+  const select = document.getElementById('duelSpecialAbilitySelect');
+  select.value = localStorage.getItem('duelSpecialAbility') || "stun";
+  selectSpecialAbilityFromMenu();
+}
+
+
 function startDuelQueue() {
   if (!window.socket) {
     window.socket = io();
@@ -10069,5 +10118,3 @@ function checkPlayerDeaths() {
   
 </body>
 </html>
-
-
