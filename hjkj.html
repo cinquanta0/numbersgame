@@ -2347,7 +2347,7 @@ body:not(.in-game) #gameContainer {
                   <button class="menu-btn primary" onclick="startDuelQueue()">⚔️ 1v1 DUELS</button>
                   <!-- Apri il Mobile Customization menu -->
                   <button class="menu-btn" onclick="showScreen('mobileCustomizationMenu')">📱 MOBILE SETTINGS</button>
-                  <button class="menu-btn primary" onclick="startDuel2v2Queue()">⚔️ 2v2 TEAM DUELS</button>
+                  <button class="menu-btn primary" onclick="startDuel2v2Queue()">⚔️ 2v2 TEAM DUELS(BETA)</button>
                   <button class="menu-btn" onclick="showTeam2v2Leaderboard()">🏆 2v2 TEAM LEADERBOARD</button>
                   
                   <div style="margin-bottom:1.2em;">
@@ -2664,9 +2664,7 @@ body:not(.in-game) #gameContainer {
               <div class="energy-fill" id="energyFill"></div>
           </div>
           
-          <div class="difficulty-warning" id="difficultyWarning" style="display: none;">
-              ⚠️ ADAPTIVE DIFFICULTY ENGAGED ⚠️
-          </div>
+         
           
           <div class="transformation-overlay" id="transformationOverlay"></div>
           
@@ -3145,10 +3143,10 @@ for (let key in POWERUP_IMAGES) {
         precisionMode: false,
         invulnerabilityFrames: 0,
         angle: 0,
-        // --- AGGIUNGI QUESTE DUE RIGHE QUI ---
         specialCooldown: 0,
-        specialReady: false
-    },
+        specialReady: false,
+        isSpectator: false // <--- INCOLLA QUI!
+},
     enemy: null,
     bullets: [],
     enemyBullets: [],
@@ -4130,6 +4128,9 @@ function update(deltaTime) {
 }
 
   function updatePlayer(deltaTime) {
+        if (gameState.player.isSpectator) return; // <--- AGGIUNGI QUI
+
+    
     const player = gameState.player;
     const skills = gameState.player.skills;
     let speed = player.precisionMode ? 2 : 4;
@@ -4469,7 +4470,11 @@ function getMobileBulletParams(count, speed) {
 
 
       function shoot() {
-  // COOP: invia evento al server, non aggiungere subito il proiettile locale!
+           if (gameState.player.isSpectator) return;
+
+  
+  
+        // COOP: invia evento al server, non aggiungere subito il proiettile locale!
   if (gameState.gameMode === "coop" && socket) {
     let player = gameState.player;
     let skills = player.skills || {};
@@ -4529,7 +4534,8 @@ function getMobileBulletParams(count, speed) {
     color: '#00bcd4',
     size: gameState.chaosBullets === "big" ? 28 : 6,
     damage,
-    owner: mySocketId
+    owner: mySocketId,
+    team: duel2v2Team // <--- AGGIUNGI QUESTA RIGA QUI!
   });
 
   createMuzzleFlash(player.x, player.y - 20);
@@ -5342,30 +5348,42 @@ function renderOtherPlayers(ctx) {
 }
 
      
-     
-  
-      function renderBullets() {
-    gameState.bullets.forEach(bullet => {
-        ctx.save();
-        ctx.translate(bullet.x, bullet.y);
-        ctx.rotate(Math.atan2(bullet.vy, bullet.vx));
+     function renderBullets() {
+  gameState.bullets.forEach(bullet => {
+    ctx.save();
+    ctx.translate(bullet.x, bullet.y);
+    ctx.rotate(Math.atan2(bullet.vy, bullet.vx));
 
-        // Scegli quale missile mostrare in base al tipo
-        let sx = 0; // default: primo missile
-        let sy = 0;
-        let sw = 192; // larghezza missile (adatta se necessario)
-        let sh = 384; // altezza missile (adatta se necessario)
-        // Se vuoi cambiare missile in base al tipo, esempio:
-        // if (bullet.type === "blu") sx = 192;
-        // if (bullet.type === "doppio") sx = 384;
-        // if (bullet.type === "verde") sx = 576;
+    // --- DISTINGUI PROIETTILE IN BASE AL TEAM ---
+    let isMyTeam = bullet.team === duel2v2Team;
+    // Glow: blu per il tuo team, rosso per avversari
+    ctx.shadowColor = isMyTeam ? "#00bcd4" : "#f44336";
+    ctx.shadowBlur = 18;
 
-        // Disegna il missile (scalato più piccolo se vuoi)
-        ctx.drawImage(missileSprite, sx, sy, sw, sh, -16, -32, 32, 64);
+    // Cambia sprite se vuoi (opzionale)
+    // let sx = isMyTeam ? 0 : 192; // esempio, cambia sprite per team
+    let sx = 0, sy = 0, sw = 192, sh = 384;
 
-        ctx.restore();
-    });
+    // Opzionale: dimensione più grande per il tuo team
+    let drawW = isMyTeam ? 34 : 28;
+    let drawH = isMyTeam ? 68 : 52;
+
+    // Disegna missile
+    ctx.drawImage(missileSprite, sx, sy, sw, sh, -drawW/2, -drawH/2, drawW, drawH);
+
+    // Bordo colorato opzionale
+    ctx.globalAlpha = 0.6;
+    ctx.beginPath();
+    ctx.arc(0, 0, drawW * 0.55, 0, Math.PI * 2);
+    ctx.strokeStyle = isMyTeam ? "#00bcd4" : "#f44336";
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    ctx.restore();
+  });
 }
+  
+    
       function renderEnemyBullets() {
           gameState.enemyBullets.forEach(bullet => {
               ctx.save();
@@ -9588,15 +9606,10 @@ function sync2v2State() {
 
 
 function check2v2Collisions() {
-  console.log('duel2v2Players:', duel2v2Players);
-  // Collisioni con teammates (no friendly fire)
+    // Tu prendi danno SOLO dai proiettili del team avversario!
   gameState.bullets.forEach((bullet, idx) => {
-    // Skip se è un proiettile del tuo team
     if (bullet.team === duel2v2Team) return;
-
-    // Check hit su di te
-    const dist = Math.sqrt((bullet.x - gameState.player.x) ** 2 + 
-                          (bullet.y - gameState.player.y) ** 2);
+    const dist = Math.sqrt((bullet.x - gameState.player.x) ** 2 + (bullet.y - gameState.player.y) ** 2);
     if (dist < 32) {
       gameState.player.health -= bullet.damage;
       gameState.bullets.splice(idx, 1);
@@ -9604,11 +9617,37 @@ function check2v2Collisions() {
     }
   });
 
-  // PATCH: Safe fallback se assenti
+  // 2. Il tuo compagno prende danno SOLO dai proiettili del team avversario
+  if (duel2v2TeamMate) {
+    gameState.bullets.forEach((bullet, idx) => {
+      if (bullet.team === duel2v2Team) return; // ignora i proiettili del tuo team
+      const dist = Math.sqrt((bullet.x - duel2v2TeamMate.x) ** 2 + (bullet.y - duel2v2TeamMate.y) ** 2);
+      if (dist < 32) {
+        duel2v2TeamMate.health -= bullet.damage;
+        gameState.bullets.splice(idx, 1);
+        createHitParticles(bullet.x, bullet.y, '#f44336');
+      }
+    });
+  }
+
+  // 3. Gli avversari prendono danno SOLO dai tuoi proiettili
+  (Array.isArray(duel2v2Opponents) ? duel2v2Opponents : []).forEach(opponent => {
+    gameState.bullets.forEach((bullet, idx) => {
+      if (bullet.team !== duel2v2Team) return; // solo i proiettili del tuo team
+      const dist = Math.sqrt((bullet.x - opponent.x) ** 2 + (bullet.y - opponent.y) ** 2);
+      if (dist < 32) {
+        opponent.health -= bullet.damage;
+        gameState.bullets.splice(idx, 1);
+        createHitParticles(bullet.x, bullet.y, '#ffd700');
+      }
+    });
+  });
+
+  // 4. PATCH: Safe fallback se assenti
   const team1Arr = Array.isArray(duel2v2Players.team1) ? duel2v2Players.team1 : [];
   const team2Arr = Array.isArray(duel2v2Players.team2) ? duel2v2Players.team2 : [];
 
-  // Check vittoria condizioni
+  // 5. Check vittoria condizioni
   const team1Alive = team1Arr.some(p => p.health > 0);
   const team2Alive = team2Arr.some(p => p.health > 0);
 
@@ -9628,6 +9667,8 @@ function start2v2Loop() {
     if (!duel2v2Active) return;
     updatePlayer(1);
     update2v2Players();
+        checkPlayerDeaths(); // <-- CHIAMA QUI SUBITO DOPO!
+
     updateBullets(1);
     check2v2Collisions();
     sync2v2State();
@@ -9693,32 +9734,34 @@ function renderVoiceIndicator(ctx, player) {
 function checkTeamCombo() {
   const now = Date.now();
   let playersShootingNow = 0;
-  
-  // Conta quanti stanno sparando
+
+  // Conta gli altri
   for (let id in otherPlayers) {
     if (lastTeamShot[id] && now - lastTeamShot[id] < 500) {
       playersShootingNow++;
     }
   }
-  
+  // Conta anche te stesso
+  if (gameState.keys['shoot'] || gameState.touchControls.shooting) {
+    playersShootingNow++;
+    lastTeamShot[mySocketId] = now;
+  }
+
   // Se tutti sparano insieme, attiva combo!
-  if (playersShootingNow >= coopPlayers.length - 1) {
+  if (playersShootingNow >= coopPlayers.length) {
     teamComboMeter = Math.min(100, teamComboMeter + 10);
-    
     if (teamComboMeter >= 100) {
       activateTeamUltimate();
       teamComboMeter = 0;
     }
   }
-  
+
   // Decadimento combo
   teamComboMeter = Math.max(0, teamComboMeter - 0.5);
 }
 
 function activateTeamUltimate() {
   showNotification("💥 TEAM ULTIMATE ATTIVATO!", "achievement");
-  
-  // Super attacco laser gigante
   for (let i = 0; i < 50; i++) {
     setTimeout(() => {
       gameState.bullets.push({
@@ -9733,8 +9776,6 @@ function activateTeamUltimate() {
       });
     }, i * 50);
   }
-  
-  // Effetti visivi
   startFlash(0.5);
   startShake(20, 30);
 }
@@ -9928,13 +9969,14 @@ function update2v2Players() {
 
 
 // 2. Ricezione e aggiornamento dello stato degli altri player
+// PATCH: Update SOLO teammate e avversari, MAI la tua health locale!
 function update2v2GameState(data) {
   if (!data) return;
   const myId = mySocketId || (window.socket && window.socket.id);
   const myTeamArr = duel2v2Team === "team1" ? data.team1 : data.team2;
   const oppTeamArr = duel2v2Team === "team1" ? data.team2 : data.team1;
 
-  // Trova e aggiorna il compagno (teammate)
+  // Aggiorna solo il compagno (teammate)
   let teammate = myTeamArr.find(p => p.id !== myId);
   if (teammate) {
     duel2v2TeamMate = {
@@ -9946,7 +9988,7 @@ function update2v2GameState(data) {
     };
   }
 
-  // Aggiorna gli avversari
+  // Aggiorna solo gli AVVERSARI
   duel2v2Opponents = oppTeamArr.map(opp => ({
     ...opp,
     targetX: opp.x,
@@ -9954,12 +9996,68 @@ function update2v2GameState(data) {
     targetHealth: opp.health,
     targetEnergy: opp.energy
   }));
+
+  // NON aggiornare la tua health qui!
+  // gameState.player.health = ... // <--- NON mettere questa riga!
 }
 
+
+// Effetto di morte per un player (esplosione, scritta KO)
+function showDeathEffect(x, y, nickname) {
+  // Esplosione colorata
+  spawnSuperExplosion(x, y, {
+    colors: ["#f44336", "#ffd700", "#fff", "#00bcd4"],
+    count: 22,
+    sparkle: true
+  });
+  startShake(18, 22);
+  startFlash(0.4);
+
+  // Scritta KO temporanea
+  const div = document.createElement('div');
+  div.style.position = 'fixed';
+  div.style.left = (x - 60) + 'px';
+  div.style.top = (y - 60) + 'px';
+  div.style.fontSize = '3.7rem';
+  div.style.color = '#f44336';
+  div.style.fontWeight = 'bold';
+  div.style.zIndex = 99999;
+  div.style.textShadow = '0 0 14px #ffd700, 0 0 45px #f44336';
+  div.textContent = 'KO!';
+  document.body.appendChild(div);
+  setTimeout(() => div.remove(), 900);
+
+  // Suono opzionale (se hai un audio KO)
+  // document.getElementById('koSound')?.play();
+}
+
+
+// Esempio dentro update2v2Players(), oppure dopo ricezione stato da server
+function checkPlayerDeaths() {
+  // Teammate
+  if (duel2v2TeamMate && duel2v2TeamMate._prevHealth > 0 && duel2v2TeamMate.health <= 0) {
+    showDeathEffect(duel2v2TeamMate.x, duel2v2TeamMate.y, duel2v2TeamMate.nickname);
+  }
+  duel2v2TeamMate._prevHealth = duel2v2TeamMate.health;
+
+  // Opponenti
+  duel2v2Opponents.forEach(opp => {
+    if (opp._prevHealth > 0 && opp.health <= 0) {
+      showDeathEffect(opp.x, opp.y, opp.nickname);
+    }
+    opp._prevHealth = opp.health;
+  });
+
+  // Puoi farlo anche per te stesso:
+  if (gameState.player._prevHealth > 0 && gameState.player.health <= 0) {
+    showDeathEffect(gameState.player.x, gameState.player.y, getPlayerName());
+        gameState.player.isSpectator = true; // <--- AGGIUNGI QUI
+  }
+  gameState.player._prevHealth = gameState.player.health;
+}
 
 
 </script>
   
 </body>
 </html>
-
