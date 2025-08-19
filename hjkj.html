@@ -2336,7 +2336,7 @@ body:not(.in-game) #gameContainer {
                   <button class="menu-btn" onclick="showScreen('inventoryScreen')">🛸 SPACESHIP INVENTORY</button>
                   <button class="menu-btn" onclick="showGlobalLeaderboard()">🌍 GLOBAL LEADERBOARD</button>
                   <button class="menu-btn primary" onclick="showCoopLobby()">🌐 Raid Co-op Online</button>
-                  <button class="menu-btn" onclick="window.open('https://site-stellarguardian999.onrender.com','_blank')">🌐 Sito Ufficiale</button>
+                  <button class="menu-btn" onclick="window.open('https://stellarguardian72.onrender.com','_blank')">🌐 Sito Ufficiale</button>
                   <button class="menu-btn" onclick="showDailyChallengeMenu()">🌟 DAILY CHALLENGE</button>
                   <button class="menu-btn" onclick="showLocalLeaderboard()">🌟 LOCAL LEADERBOARD</button>
                   <button class="menu-btn" onclick="showScreen('skillTree')">⭐ UPGRADES</button>
@@ -6034,22 +6034,43 @@ function esplodiBoss(boss) {
   
   let playerTrail = [];
 
-function updatePlayerTrail() {
+
+const rainbowColors = [
+  "#ff0000", // rosso
+  "#ff8000", // arancione
+  "#ffff00", // giallo
+  "#00ff00", // verde
+  "#00ffff", // azzurro
+  "#0000ff", // blu
+  "#8000ff", // viola
+  "#ff00ff"  // fucsia
+];
+
+
+  function updatePlayerTrail() {
     playerTrail.push({
         x: gameState.player.x,
         y: gameState.player.y,
         alpha: 0.45
     });
-    if (playerTrail.length > 7) playerTrail.shift();
-    for (let t of playerTrail) t.alpha *= 0.8;
+    if (playerTrail.length > 35) playerTrail.shift(); // <-- da 7 a 35!
+    for (let t of playerTrail) t.alpha *= 0.95; // meno fading così rimane visibile
 }
 
+
+
 function renderPlayerTrail(ctx) {
-    for (let t of playerTrail) {
+    const colors = rainbowColors;
+    for (let i = 0; i < playerTrail.length; i++) {
+        let t = playerTrail[i];
         ctx.save();
-        ctx.globalAlpha = t.alpha;
-        ctx.fillStyle = "#ffe700";
-        ctx.fillRect(t.x - 4, t.y - 2, 8, 4); // piccoli rettangoli gialli
+        ctx.globalAlpha = 0.7 * (1 - i / playerTrail.length); // fading lungo la scia
+        ctx.fillStyle = colors[i % colors.length];
+        ctx.shadowColor = colors[i % colors.length];
+        ctx.shadowBlur = 24;
+        ctx.beginPath();
+        ctx.arc(t.x, t.y, 12 - i/4, 0, Math.PI * 2); // più piccola verso la fine
+        ctx.fill();
         ctx.restore();
     }
 }
@@ -9941,4 +9962,3 @@ function update2v2GameState(data) {
   
 </body>
 </html>
-
