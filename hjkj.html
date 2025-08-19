@@ -2347,7 +2347,7 @@ body:not(.in-game) #gameContainer {
                   <button class="menu-btn primary" onclick="startDuelQueue()">⚔️ 1v1 DUELS</button>
                   <!-- Apri il Mobile Customization menu -->
                   <button class="menu-btn" onclick="showScreen('mobileCustomizationMenu')">📱 MOBILE SETTINGS</button>
-                  <button class="menu-btn primary" onclick="start2v2()">⚔️ 2v2 TEAM DUELS</button>
+                  <button class="menu-btn primary" onclick="startDuel2v2Queue()">⚔️ 2v2 TEAM DUELS</button>
                   <button class="menu-btn" onclick="showTeam2v2Leaderboard()">🏆 2v2 TEAM LEADERBOARD</button>
                   
                   <div style="margin-bottom:1.2em;">
@@ -2659,24 +2659,6 @@ body:not(.in-game) #gameContainer {
                   </button>
               </div>
           </div>
-          
-          <!-- HUD 2v2, nascosta all'inizio -->
-<div id="hud2v2" class="hud" style="display: none;">
-  <div class="hud-section">
-    <div class="stat-box level">
-      <div class="stat-label">TEAM</div>
-      <div class="stat-value" id="hud2v2Team">1</div>
-    </div>
-    <div class="stat-box lives">
-      <div class="stat-label">TEAM LIVES</div>
-      <div class="stat-value" id="hud2v2Lives">2</div>
-    </div>
-  </div>
-  <div class="hud-section" id="hud2v2Players">
-    <!-- Barre giocatori 2v2 generate da JS -->
-  </div>
-</div>
-          
           
           <div class="energy-meter" id="energyMeter">
               <div class="energy-fill" id="energyFill"></div>
@@ -3003,18 +2985,7 @@ body:not(.in-game) #gameContainer {
 let lastTeamShot = {};
      
      
-       
-// --- VARIABILI GLOBALI 2v2 ---
-let socket2v2 = null;
-let my2v2Id = null;
-let my2v2Team = null;
-let my2v2Nickname = null;
-let lobby2v2Players = { team1: [], team2: [] };
-let game2v2Active = false;
-let game2v2State = { players: [], bullets: [] };
-
-
-function showAd() {
+       function showAd() {
   if (isDevEnv()) {
     console.log("DEV: showAd saltata (nessuna pubblicità in locale).");
     return;
@@ -4496,7 +4467,43 @@ function getMobileBulletParams(count, speed) {
   gameState.bulletHellIntensity = Math.min(100, gameState.bulletHellIntensity + 2);
 }
 
-function shoot() {
+
+      function shoot() {
+  // COOP: invia evento al server, non aggiungere subito il proiettile locale!
+  if (gameState.gameMode === "coop" && socket) {
+    let player = gameState.player;
+    let skills = player.skills || {};
+    let damage = 25;
+    if (skills.targeting_system && player.precisionMode) damage *= 1.5;
+
+    let targetX = gameState.mouse.x;
+    let targetY = gameState.mouse.y;
+    if (gameState.isMobile && gameState.enemy) {
+      targetX = gameState.enemy.x;
+      targetY = gameState.enemy.y;
+    }
+    const dx = targetX - player.x;
+    const dy = targetY - player.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const speed = 15;
+    const vx = dist > 0 ? (dx / dist) * speed : 0;
+    const vy = dist > 0 ? (dy / dist) * speed : -speed;
+
+    socket.emit('shoot', {
+      x: player.x,
+      y: player.y - 20,
+      vx, vy,
+      color: '#00bcd4',
+      size: gameState.chaosBullets === "big" ? 28 : 6,
+      damage,
+      owner: mySocketId // identifica chi ha sparato
+    });
+
+    createMuzzleFlash(player.x, player.y - 20);
+    return; // NON aggiungere il proiettile localmente!
+  }
+
+  // SINGLE PLAYER: come prima
   let player = gameState.player;
   let skills = player.skills || {};
   let damage = 25;
@@ -4515,38 +4522,6 @@ function shoot() {
   const vx = dist > 0 ? (dx / dist) * speed : 0;
   const vy = dist > 0 ? (dy / dist) * speed : -speed;
 
-  // PATCH: 2v2 - aggiungi SOLO ai newBullets!
-  if (gameState.gameMode === "duel2v2") {
-    if (!gameState.newBullets) gameState.newBullets = [];
-    gameState.newBullets.push({
-      x: player.x,
-      y: player.y - 20,
-      vx, vy,
-      color: '#00bcd4',
-      size: gameState.chaosBullets === "big" ? 28 : 6,
-      damage,
-      team: duel2v2Team // <-- importante per il server!
-    });
-    createMuzzleFlash(player.x, player.y - 20);
-    return; // NON aggiungere a gameState.bullets!
-  }
-
-  // CO-OP: invia al server, non aggiungere localmente
-  if (gameState.gameMode === "coop" && socket) {
-    socket.emit('shoot', {
-      x: player.x,
-      y: player.y - 20,
-      vx, vy,
-      color: '#00bcd4',
-      size: gameState.chaosBullets === "big" ? 28 : 6,
-      damage,
-      owner: mySocketId
-    });
-    createMuzzleFlash(player.x, player.y - 20);
-    return;
-  }
-
-  // SINGLE PLAYER: aggiungi normalmente
   gameState.bullets.push({
     x: player.x,
     y: player.y - 20,
@@ -4556,9 +4531,9 @@ function shoot() {
     damage,
     owner: mySocketId
   });
+
   createMuzzleFlash(player.x, player.y - 20);
 }
-     
       function chargedShot() {
     const player = gameState.player;
     const skills = gameState.player.skills;
@@ -5265,6 +5240,7 @@ function forfeitMission() {
   
   // PATCH: solo player e alleati/avversari in 2v2
   if (gameState.gameMode === "duel2v2") {
+    renderPlayer();
     render2v2Players(ctx);
     renderBullets();
     renderParticles();
@@ -5595,19 +5571,22 @@ eloDisplay.innerHTML =
 }
     
     function updateObstacles(deltaTime) {
-      if (!gameState.obstacles) gameState.obstacles = [];
+  if (!gameState.obstacles) gameState.obstacles = [];
 
-  if (gameState.gameMode === "coop") return; // <-- AGGIUNGI QUESTA RIGA!
+  // DISABILITA ostacoli in tutte le modalità multiplayer
+  if (
+    gameState.gameMode === "duel1v1" ||
+    gameState.gameMode === "duel2v2" ||
+    gameState.gameMode === "coop"
+  ) return;
 
-if (isMobileDevice && isMobileDevice()) {
-  // Su mobile: asteroidi molto meno frequenti!
-  if (Math.random() < 0.014) spawnObstacle();
-} else {
-  // Desktop: come prima
-  if (Math.random() < 0.035) spawnObstacle();
-}
-  
-gameState.obstacles = gameState.obstacles.filter(o => {
+  if (isMobileDevice && isMobileDevice()) {
+    if (Math.random() < 0.014) spawnObstacle();
+  } else {
+    if (Math.random() < 0.035) spawnObstacle();
+  }
+
+  gameState.obstacles = gameState.obstacles.filter(o => {
     o.x += o.vx * (deltaTime || 1);
     o.y += o.vy * (deltaTime || 1);
     o.angle += o.spin;
@@ -7139,19 +7118,21 @@ function showAdAndStartGame() {
   startGame(true);
 }
   
-  function showScreen(screenId) {
+  
+function showScreen(screenId) {
     console.log("showScreen chiamata con:", screenId);
-
+    
     if (screenId === 'mobileCustomizationMenu') {
-        loadMobileSettings();
-    }
-
-    if (screenId === 'gameScreen') {
-        document.body.classList.add('in-game');
-    } else {
-        document.body.classList.remove('in-game');
-    }
-
+  loadMobileSettings();
+}
+    
+    
+     if (screenId === 'gameScreen') {
+    document.body.classList.add('in-game');
+  } else {
+    document.body.classList.remove('in-game');
+  }
+    
     // Cancella eventuali timeout attivi per evitare salti di livello
     if (window.levelTimeout) {
         clearTimeout(window.levelTimeout);
@@ -7183,19 +7164,14 @@ function showAdAndStartGame() {
         }
     }
 
-    // PATCH 2v2: NON avviare la campagna quando sei in 2v2!
+    // Gestione logica specifica per schermate
     if (screenId === 'gameScreen') {
-        // Solo se NON sei in duel2v2 (quindi solo singleplayer/campagna)
-        if (
-            !gameState.gameRunning &&
-            !gameState.pendingStart &&
-            gameState.gameMode !== 'duel2v2'
-        ) {
-            showAdAndStartGame(); // Mostra adv, poi avvia partita (solo singleplayer/campagna)
+        // PATCH: se pendingStart è true, NON fare showAdAndStartGame()
+        if (!gameState.gameRunning && !gameState.pendingStart) {
+            showAdAndStartGame(); // Mostra adv, poi avvia partita
         } else if (gameState.gameRunning) {
             resumeGame();
         }
-        // In 2v2, la logica multiplayer parte altrove (es: requestAnimationFrame(game2v2Loop)), NON qui!
     } else {
         if (gameState.gameRunning) {
             pauseGame();
@@ -9317,14 +9293,24 @@ function setup2v2Listeners() {
   });
   
   // Match pronto
-  window.socket.on('duel2v2_ready', (data) => {
-    duel2v2Team = data.yourTeam;
-    duel2v2Players = data.players;
-    duel2v2TeamMate = data.teammate;
-    duel2v2Opponents = data.opponents;
-    start2v2Countdown();
-  });
-  
+window.socket.on('duel2v2_ready', (data) => {
+  console.log('[duel2v2_ready]', data);
+
+  duel2v2Team = data.yourTeam;
+  duel2v2Players = data.players;
+
+  // PATCH: trasforma array [p1,p2,p3,p4] in {team1: [p1,p2], team2: [p3,p4]} se serve
+  if (Array.isArray(duel2v2Players) && duel2v2Players.length === 4) {
+    duel2v2Players = {
+      team1: [duel2v2Players[0], duel2v2Players[1]],
+      team2: [duel2v2Players[2], duel2v2Players[3]],
+    };
+  }
+
+  duel2v2TeamMate = data.teammate;
+  duel2v2Opponents = data.opponents;
+  start2v2Countdown();
+});
   // Stato di gioco
   window.socket.on('duel2v2_state', (data) => {
     update2v2GameState(data);
@@ -9361,8 +9347,19 @@ function update2v2Lobby(data) {
 }
 
 
+
 // PATCH: Nascondi la lobby e mostra la partita quando parte il 2v2
 function init2v2Arena() {
+  // Forza la modalità 2v2!
+  gameState.gameMode = 'duel2v2';
+
+  // DEBUG: mostra i dati ricevuti
+  console.log("[init2v2Arena] mode:", gameState.gameMode, 
+              "duel2v2Team:", duel2v2Team, 
+              "duel2v2Players:", duel2v2Players,
+              "duel2v2TeamMate:", duel2v2TeamMate,
+              "duel2v2Opponents:", duel2v2Opponents);
+
   // Nascondi la lobby 2v2 se ancora visibile
   const lobby = document.getElementById('duel2v2Lobby');
   if (lobby) lobby.classList.add('hidden');
@@ -9373,12 +9370,12 @@ function init2v2Arena() {
   // --- POSIZIONI INIZIALI ---
   const positions = {
     team1: [
-      { x: 100, y: canvas.height - 150 },  // Bottom left
-      { x: 250, y: canvas.height - 150 }   // Bottom left-center
+      { x: 100, y: canvas.height - 150 },
+      { x: 250, y: canvas.height - 150 }
     ],
     team2: [
-      { x: canvas.width - 250, y: 150 },   // Top right-center
-      { x: canvas.width - 100, y: 150 }    // Top right
+      { x: canvas.width - 250, y: 150 },
+      { x: canvas.width - 100, y: 150 }
     ]
   };
 
@@ -9391,23 +9388,86 @@ function init2v2Arena() {
     gameState.player.y = positions.team2[0].y;
   }
 
-  gameState.player.health = 400; // Meno HP per bilanciare 2v2
+  gameState.player.health = 400;
   gameState.player.maxHealth = 400;
   gameState.player.energy = 100;
 
-  // Inizializza stati degli altri 3 giocatori
+  // Inizializza array teammates/opponents
   gameState.teammates = [];
   gameState.opponents = [];
 
-  duel2v2Active = true;
-  gameState.gameMode = 'duel2v2';
+  let myId = mySocketId || (window.socket && window.socket.id);
 
-  // Avvia il loop della partita (se non già partito)
+  // PATCH: fallback array vuoto se non definito
+  let teamArr = [];
+  let oppArr = [];
+
+  // Compatibilità: se il server invia un array, patcha subito
+  if (Array.isArray(duel2v2Players) && duel2v2Players.length === 4) {
+    duel2v2Players = {
+      team1: [duel2v2Players[0], duel2v2Players[1]],
+      team2: [duel2v2Players[2], duel2v2Players[3]],
+    };
+  }
+
+  if (duel2v2Players && typeof duel2v2Players === "object") {
+    teamArr = Array.isArray(duel2v2Players.team1) && duel2v2Team === "team1" ? duel2v2Players.team1 : 
+              Array.isArray(duel2v2Players.team2) && duel2v2Team === "team2" ? duel2v2Players.team2 : [];
+    oppArr = Array.isArray(duel2v2Players.team1) && duel2v2Team === "team2" ? duel2v2Players.team1 : 
+             Array.isArray(duel2v2Players.team2) && duel2v2Team === "team1" ? duel2v2Players.team2 : [];
+  }
+
+  // Trova il compagno (non tu)
+  let teammate = teamArr.find && teamArr.length ? teamArr.find(p => p.id !== myId) : null;
+  if (teammate) {
+    teammate.x = duel2v2Team === 'team1' ? positions.team1[1].x : positions.team2[1].x;
+    teammate.y = duel2v2Team === 'team1' ? positions.team1[1].y : positions.team2[1].y;
+    gameState.teammates = [teammate];
+  } else {
+    gameState.teammates = [];
+    console.warn("init2v2Arena: teammate not found!", { teamArr, myId });
+  }
+
+  // Opponenti: entrambi gli avversari
+  if (Array.isArray(oppArr) && oppArr.length) {
+    oppArr.forEach((opp, idx) => {
+      opp.x = positions.team2[idx].x;
+      opp.y = positions.team2[idx].y;
+    });
+    gameState.opponents = oppArr;
+  } else {
+    gameState.opponents = [];
+    console.warn("init2v2Arena: opponents not found!", { oppArr });
+  }
+
+  duel2v2Active = true;
+
+  // Log finale dei player per debug
+  console.log("[init2v2Arena] teammates:", gameState.teammates, "opponents:", gameState.opponents);
+
   start2v2Loop();
 }
 
 
+function render2v2Players(ctx) {
+  // PATCH: debug - mostra lo stato dei dati
+  console.log("render2v2Players:", {
+    duel2v2TeamMate,
+    duel2v2Opponents
+  });
 
+  // Render teammate (se esiste)
+  if (duel2v2TeamMate && typeof duel2v2TeamMate === "object") {
+    renderTeammate(ctx, duel2v2TeamMate);
+  }
+
+  // Render opponents (array, fallback vuoto)
+  (Array.isArray(duel2v2Opponents) ? duel2v2Opponents : []).forEach(opp => {
+    if (opp && typeof opp === "object") {
+      renderOpponent2v2(ctx, opp);
+    }
+  });
+}
 
 function renderTeammate(ctx, teammate) {
   ctx.save();
@@ -9481,15 +9541,12 @@ ctx.drawImage(img, opponent.x - 32, opponent.y - 32, 64, 64);
 }
 
 
-// Funzione da chiamare OGNI FRAME per inviare posizione e SOLO i proiettili nuovi
+// 1. Invio della posizione e stato al server ogni frame
 function sync2v2State() {
   if (!duel2v2Active || !window.socket) return;
-  // Raccogli i nuovi proiettili creati in questo frame
-  const newBullets = gameState.newBullets || [];
   window.socket.emit("duel2v2_update", {
     room: duelRoomId,
     player: {
-      id: mySocketId,
       x: gameState.player.x,
       y: gameState.player.y,
       health: gameState.player.health,
@@ -9497,10 +9554,17 @@ function sync2v2State() {
       angle: gameState.player.angle,
       team: duel2v2Team
     },
-    newBullets // SOLO quelli nuovi!
+    bullets: gameState.bullets.map(b => ({
+      x: b.x,
+      y: b.y,
+      vx: b.vx,
+      vy: b.vy,
+      damage: b.damage,
+      team: duel2v2Team
+    }))
   });
-  gameState.newBullets = []; // Svuota dopo invio
 }
+
 
 function check2v2Collisions() {
   console.log('duel2v2Players:', duel2v2Players);
@@ -9537,14 +9601,16 @@ function check2v2Collisions() {
 
 
 function start2v2Loop() {
+  showScreen('gameScreen'); // Forza la schermata di gioco ogni volta
+
   function loop2v2() {
     if (!duel2v2Active) return;
     updatePlayer(1);
     update2v2Players();
     updateBullets(1);
     check2v2Collisions();
-    sync2v2State(); // <--- QUESTA RIGA: invia posizione + nuovi proiettili!
-    render();
+    sync2v2State();
+    render(); // <-- render fa già tutto!
     requestAnimationFrame(loop2v2);
   }
   loop2v2();
@@ -9810,337 +9876,65 @@ function start2v2Countdown() {
 }
 
 
+// 3. Interpolazione della posizione di compagno e avversari (smooth movement)
 function update2v2Players() {
+  // Interpola teammate
   if (duel2v2TeamMate && duel2v2TeamMate.targetX !== undefined && duel2v2TeamMate.targetY !== undefined) {
-    duel2v2TeamMate.x += (duel2v2TeamMate.targetX - duel2v2TeamMate.x) * 0.2;
-    duel2v2TeamMate.y += (duel2v2TeamMate.targetY - duel2v2TeamMate.y) * 0.2;
+    duel2v2TeamMate.x += (duel2v2TeamMate.targetX - duel2v2TeamMate.x) * 0.3;
+    duel2v2TeamMate.y += (duel2v2TeamMate.targetY - duel2v2TeamMate.y) * 0.3;
+    // Interpola anche health/energy se vuoi effetti smooth sulle barre
+    if (duel2v2TeamMate.health !== undefined && duel2v2TeamMate.targetHealth !== undefined) {
+      duel2v2TeamMate.health += (duel2v2TeamMate.targetHealth - duel2v2TeamMate.health) * 0.3;
+    }
+    if (duel2v2TeamMate.energy !== undefined && duel2v2TeamMate.targetEnergy !== undefined) {
+      duel2v2TeamMate.energy += (duel2v2TeamMate.targetEnergy - duel2v2TeamMate.energy) * 0.3;
+    }
   }
+  // Interpola opponents
   duel2v2Opponents.forEach(opponent => {
     if (opponent.targetX !== undefined && opponent.targetY !== undefined) {
-      opponent.x += (opponent.targetX - opponent.x) * 0.2;
-      opponent.y += (opponent.targetY - opponent.y) * 0.2;
+      opponent.x += (opponent.targetX - opponent.x) * 0.3;
+      opponent.y += (opponent.targetY - opponent.y) * 0.3;
+    }
+    if (opponent.health !== undefined && opponent.targetHealth !== undefined) {
+      opponent.health += (opponent.targetHealth - opponent.health) * 0.3;
+    }
+    if (opponent.energy !== undefined && opponent.targetEnergy !== undefined) {
+      opponent.energy += (opponent.targetEnergy - opponent.energy) * 0.3;
     }
   });
 }
 
 
-
+// 2. Ricezione e aggiornamento dello stato degli altri player
 function update2v2GameState(data) {
-  // Aggiorna teammate e opponents
-  const myId = mySocketId;
-  const myTeam = duel2v2Team;
-  let myTeamArr = myTeam === 'team1' ? data.team1 : data.team2;
-  let oppTeamArr = myTeam === 'team1' ? data.team2 : data.team1;
+  if (!data) return;
+  const myId = mySocketId || (window.socket && window.socket.id);
+  const myTeamArr = duel2v2Team === "team1" ? data.team1 : data.team2;
+  const oppTeamArr = duel2v2Team === "team1" ? data.team2 : data.team1;
 
-  // Trova il compagno (diverso da me)
-  duel2v2TeamMate = myTeamArr.find(p => p.id !== myId);
-  // Trova gli avversari
-  duel2v2Opponents = oppTeamArr;
-
-  // Aggiorna le posizioni "target" per interpolazione
-  if (duel2v2TeamMate) {
-    if (!duel2v2TeamMate.x || !duel2v2TeamMate.y) {
-      duel2v2TeamMate.x = duel2v2TeamMate.targetX;
-      duel2v2TeamMate.y = duel2v2TeamMate.targetY;
-    }
-    // Interpolazione nell’update2v2Players()
-  }
-
-  // Aggiorna la lista GLOBALE dei proiettili
-  gameState.bullets = data.bullets;
-}
-
-// === FIX BOTTONE 2V2 - VERSIONE PULITA ===
-
-// Rimuovi completamente sg2v2_init() - non serve
-// sg2v2_init(); // <-- ELIMINA QUESTA RIGA
-
-// Funzione unica per collegare il bottone 2v2
-function setup2v2Button() {
-  const btn = document.getElementById('sg2v2Btn');
-  if (btn) {
-    // Rimuovi tutti i listener precedenti
-    btn.onclick = null;
-    btn.removeEventListener('click', startDuel2v2Queue);
-    
-    // Aggiungi il nuovo listener
-    btn.addEventListener('click', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      console.log("🎮 2v2 Team Duels clicked!");
-      
-      // Verifica che la funzione esista
-      if (typeof startDuel2v2Queue === 'function') {
-        startDuel2v2Queue();
-      } else {
-        console.error("❌ startDuel2v2Queue non trovata!");
-      }
-    });
-    
-    console.log("✅ Bottone 2v2 configurato correttamente");
-    return true;
-  } else {
-    console.warn("⚠️ Bottone 2v2 non ancora nel DOM");
-    return false;
-  }
-}
-
-// Setup iniziale quando il DOM è pronto
-window.addEventListener('DOMContentLoaded', function() {
-  // Prova subito
-  if (!setup2v2Button()) {
-    // Se non trova il bottone, riprova dopo un attimo
-    setTimeout(setup2v2Button, 500);
-  }
-});
-
-// Setup quando torni al menu principale
-const originalShowScreen = window.showScreen;
-window.showScreen = function(screenId) {
-  if (typeof originalShowScreen === 'function') {
-    originalShowScreen(screenId);
-  }
-  
-  // Quando mostri il mainMenu, ricollega il bottone
-  if (screenId === 'mainMenu') {
-    setTimeout(setup2v2Button, 100);
-  }
-};
-
-// === FINE FIX BOTTONE 2V2 ===
-
-
-// Funzione globale super semplice
-function start2v2() {
-  console.log("start2v2 chiamata");
-  if (typeof startDuel2v2Queue === 'function') {
-    startDuel2v2Queue();
-  } else {
-    console.error("Funzione non trovata!");
-  }
-}
-
-// Rendi globale
-window.start2v2 = start2v2;
-
-
-
-// === CLIENT 2v2 ===
-
-// Avvia la lobby 2v2 (chiama questa funzione dal menu)
-function start2v2() {
-  if (!socket2v2) {
-    socket2v2 = io();
-    setup2v2Socket();
-  }
-  my2v2Nickname = getPlayerName ? getPlayerName() : "Player" + Math.floor(Math.random() * 9999);
-  socket2v2.emit('join2v2', { nickname: my2v2Nickname });
-  show2v2Lobby();
-}
-
-function setup2v2Socket() {
-  socket2v2.on('lobby2v2', data => {
-    lobby2v2Players.team1 = data.team1;
-    lobby2v2Players.team2 = data.team2;
-    my2v2Team = data.team;
-    show2v2Lobby(); // aggiorna la UI
-    if (data.team1.length + data.team2.length === 4 && my2v2Team === 'team1' && lobby2v2Players.team1[0].id === socket2v2.id) {
-      // L'host può avviare la partita
-      showStart2v2Button();
-    }
-  });
-
-  socket2v2.on('startGame2v2', players => {
-    game2v2Active = true;
-    game2v2State.players = players;
-    game2v2State.bullets = [];
-    show2v2GameScreen();
-    requestAnimationFrame(game2v2Loop);
-  });
-
-  socket2v2.on('state2v2', ({ players, bullets }) => {
-    game2v2State.players = players;
-    game2v2State.bullets = bullets;
-  });
-
-  socket2v2.on('end2v2', ({ winner }) => {
-    game2v2Active = false;
-    show2v2EndScreen(winner);
-    if (socket2v2) { socket2v2.close(); socket2v2 = null; }
-  });
-}
-
-// UI: Lobby 2v2
-function show2v2Lobby() {
-  let html = `<h2>2v2 Lobby</h2>
-    <div><b>Team 1:</b> ${lobby2v2Players.team1.map(p=>p.nickname).join(', ')}</div>
-    <div><b>Team 2:</b> ${lobby2v2Players.team2.map(p=>p.nickname).join(', ')}</div>
-    <div>In attesa di altri giocatori...</div>
-    <button id="cancel2v2Btn" class="menu-btn" style="margin-top:2em;">Cancel</button>
-  `;
-  if (document.getElementById('menu2v2')) {
-    document.getElementById('menu2v2').innerHTML = html;
-  } else {
-    let div = document.createElement('div');
-    div.id = 'menu2v2';
-    div.style.position = 'fixed';
-    div.style.top = '40%'; div.style.left = '50%';
-    div.style.transform = 'translate(-50%,-50%)';
-    div.style.background = '#222'; div.style.color = '#fff'; div.style.padding = '2em';
-    div.style.borderRadius = '18px'; div.style.zIndex = 9999;
-    div.innerHTML = html;
-    document.body.appendChild(div);
-  }
-  // Collega il click
-  const cancelBtn = document.getElementById('cancel2v2Btn');
-  if (cancelBtn) {
-    cancelBtn.onclick = function() {
-      document.getElementById('menu2v2')?.remove();
-      if (socket2v2) socket2v2.disconnect();
-      socket2v2 = null;
-      showScreen('mainMenu');
-    }
-  }
-}
-
-function showStart2v2Button() {
-  let lobbyDiv = document.getElementById('menu2v2');
-  if (lobbyDiv && !document.getElementById('start2v2Btn')) {
-    let btn = document.createElement('button');
-    btn.id = 'start2v2Btn';
-    btn.innerText = "Start Match!";
-    btn.style.margin = '1em';
-    btn.onclick = () => {
-      socket2v2.emit('start2v2');
-      btn.disabled = true;
+  // Trova e aggiorna il compagno (teammate)
+  let teammate = myTeamArr.find(p => p.id !== myId);
+  if (teammate) {
+    duel2v2TeamMate = {
+      ...teammate,
+      targetX: teammate.x,
+      targetY: teammate.y,
+      targetHealth: teammate.health,
+      targetEnergy: teammate.energy
     };
-    lobbyDiv.appendChild(btn);
   }
+
+  // Aggiorna gli avversari
+  duel2v2Opponents = oppTeamArr.map(opp => ({
+    ...opp,
+    targetX: opp.x,
+    targetY: opp.y,
+    targetHealth: opp.health,
+    targetEnergy: opp.energy
+  }));
 }
 
-// UI: Schermata gioco
-function show2v2GameScreen() {
-  let lobbyDiv = document.getElementById('menu2v2');
-  if (lobbyDiv) lobbyDiv.remove();
-  // QUI devi settare il gameMode e avviare SOLO il ciclo multiplayer!
-  gameState.gameMode = 'duel2v2';
-  game2v2Active = true;
-  showScreen('gameScreen');
-  toggleHud2v2(true);
-  requestAnimationFrame(game2v2Loop); // oppure start2v2Loop()
-}
-
-// UI: Fine partita
-function show2v2EndScreen(winner) {
-  alert("Match over! Winner: " + winner);
-}
-
-// GAME LOOP - minimal, da adattare alla tua logica/canvas
-function game2v2Loop() {
-  if (!game2v2Active) return;
-  // Qui aggiorna le posizioni locali e invia update al server
-  let me = game2v2State.players.find(p => p.id === socket2v2.id);
-  if (me) {
-    // input da tastiera, esempio WASD per muoverti
-    let dx=0, dy=0;
-    if (window.gameState && window.gameState.keys) {
-      if (gameState.keys['w']||gameState.keys['ArrowUp']) dy -= 6;
-      if (gameState.keys['s']||gameState.keys['ArrowDown']) dy += 6;
-      if (gameState.keys['a']||gameState.keys['ArrowLeft']) dx -= 6;
-      if (gameState.keys['d']||gameState.keys['ArrowRight']) dx += 6;
-    }
-    me.x += dx; me.y += dy;
-    // Limiti schermo
-    me.x = Math.max(40, Math.min(1200, me.x));
-    me.y = Math.max(40, Math.min(560, me.y));
-    // Spara con barra spaziatrice
-    let shoot = (gameState && (gameState.keys[" "]||gameState.keys["Space"])) ? true : false;
-    socket2v2.emit('update2v2', { player: { x: me.x, y: me.y }, shoot });
-  }
-  // Renderizza (sostituisci con la tua grafica)
-  // esempio: console.log(game2v2State);
-  requestAnimationFrame(game2v2Loop);
-}
-
-
-
-function update2v2Hud(players, myTeam) {
-  document.getElementById('hud2v2').style.display = 'flex';
-  document.getElementById('hud2v2Team').textContent = myTeam === 'team1' ? '1' : '2';
-  // Calcola le vite totali del team (puoi adattare in base alla tua logica)
-  const teamLives = players.filter(p => p.team === myTeam && p.health > 0).length;
-  document.getElementById('hud2v2Lives').textContent = teamLives;
-
-  // Costruisci l'HTML delle barre
-  let html = '';
-  players.forEach(p => {
-    html += `<div style="margin:0 14px;text-align:center;">
-      <div style="color:${p.team==='team1'?'#00bcd4':'#ffd700'};font-weight:700;">${p.nickname}</div>
-      <div style="width:70px;height:10px;background:#222;border-radius:5px;margin:2px auto;">
-        <div style="width:${Math.max(0,p.health/p.maxHealth*100)}%;height:100%;background:${p.team==='team1'?'#4caf50':'#f44336'};border-radius:5px;"></div>
-      </div>
-      <div style="font-size:0.9em;color:#fff;">${p.health} / ${p.maxHealth} HP</div>
-    </div>`;
-  });
-  document.getElementById('hud2v2Players').innerHTML = html;
-}
-
-
-
-/**
- * Mostra o nasconde la HUD 2v2 e la HUD classica.
- * @param {boolean} show2v2 - true per mostrare la HUD 2v2, false per tornare a quella classica.
- */
-function toggleHud2v2(show2v2) {
-  const hud2v2 = document.getElementById('hud2v2');
-  const hudClassic = document.querySelector('#gameScreen > .hud');
-
-  if (show2v2) {
-    if (hud2v2) hud2v2.style.display = 'flex';
-    if (hudClassic) hudClassic.style.display = 'none';
-  } else {
-    if (hud2v2) hud2v2.style.display = 'none';
-    if (hudClassic) hudClassic.style.display = 'flex';
-  }
-}
-
-
-function render2v2Players(ctx) {
-    console.log("render2v2Players:", game2v2State.players);
-
-  
-  if (!game2v2State.players) return;
-  game2v2State.players.forEach(player => {
-    ctx.save();
-
-    // Cerchio contorno (verde/blu per alleati, rosso/giallo per avversari)
-    ctx.beginPath();
-    ctx.arc(player.x, player.y, 37, 0, Math.PI * 2);
-    ctx.strokeStyle = (player.team === my2v2Team) ? '#00bcd4' : '#ffd700';
-    ctx.lineWidth = 3.5;
-    ctx.stroke();
-
-    // Navicella (immagine)
-    const img = new Image();
-    img.src = getShipImageFromId(player.skin);
-    ctx.drawImage(img, player.x - 32, player.y - 32, 64, 64);
-
-    // Nickname
-    ctx.font = "bold 16px Orbitron";
-    ctx.fillStyle = (player.team === my2v2Team) ? '#00bcd4' : '#ffd700';
-    ctx.textAlign = "center";
-    ctx.fillText(player.nickname, player.x, player.y - 43);
-
-    // Barra HP sopra la nave
-    const hpPercent = player.health / player.maxHealth;
-    ctx.fillStyle = hpPercent > 0.5 ? "#4caf50" : "#f44336";
-    ctx.fillRect(player.x - 30, player.y - 55, 60 * hpPercent, 6);
-    ctx.strokeStyle = "#fff";
-    ctx.strokeRect(player.x - 30, player.y - 55, 60, 6);
-
-    ctx.restore();
-  });
-}
 
 
 </script>
