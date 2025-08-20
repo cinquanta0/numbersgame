@@ -10114,6 +10114,155 @@ function checkPlayerDeaths() {
 }
 
 
+// 1. Bottone HUD: aggiungi dopo il canvas (o dentro la HUD)
+(function() {
+  if (!document.getElementById('specialAbilityBtn')) {
+    const btn = document.createElement('button');
+    btn.id = 'specialAbilityBtn';
+    btn.className = 'menu-btn special';
+    btn.style.position = 'fixed';
+    btn.style.right = '38px';
+    btn.style.bottom = '130px';
+    btn.style.zIndex = 9010;
+    btn.innerHTML = '🌟 Activate Special';
+    btn.onclick = activateSpecialAbility;
+    document.body.appendChild(btn);
+  }
+})();
+
+// 2. Listener tasto "E" (e mobile)
+document.addEventListener('keydown', function(e){
+  if ((e.key || e.code).toLowerCase() === 'e' && gameState.currentScreen === 'gameScreen' && gameState.gameMode === 'duel1v1') {
+    activateSpecialAbility();
+  }
+});
+
+// 3. Funzione centrale con tutti gli effetti
+function activateSpecialAbility() {
+  if (gameState.player.specialCooldown > 0) {
+    showNotification('Special on cooldown!', 'info');
+    return;
+  }
+  // Solo in 1v1
+  if (gameState.gameMode !== 'duel1v1') return;
+
+  const ab = gameState.player.specialAbility || "stun";
+  // Cooldown universale (6 sec)
+  gameState.player.specialCooldown = 360; // 6 sec a 60fps
+
+  // --- EFFETTI ---
+  switch(ab) {
+    case 'stun':
+      if (window.socket && duelRoomId) {
+        window.socket.emit('duel_update', { room: duelRoomId, action: 'stun', target: 'opponent' });
+      }
+      stunOpponent();
+      showNotification("Opponent stunned!", "achievement");
+      flashScreen("#ffd700", 0.22);
+      break;
+    case 'heal':
+      gameState.player.health = Math.min(gameState.player.maxHealth, gameState.player.health + 40);
+      showNotification("Healed +40 HP!", "achievement");
+      spawnSuperExplosion(gameState.player.x, gameState.player.y, { colors: ['#4caf50','#fff'], count: 12 });
+      break;
+    case 'teleport':
+      const tx = Math.random() * (canvas.width - 100) + 50;
+      const ty = Math.random() * (canvas.height - 120) + 80;
+      gameState.player.x = tx;
+      gameState.player.y = ty;
+      showNotification("Teleported!", "achievement");
+      spawnRipple(tx, ty, "#00bcd4");
+      break;
+    case 'double':
+      gameState.player.doubleShotActive = true;
+      showNotification("Next shot is DOUBLE!", "achievement");
+      flashScreen("#ffd700", 0.14);
+      break;
+    case 'shield':
+      gameState.player.invulnerabilityFrames = 90; // 1.5 sec
+      showNotification("Shield: Immunity!", "achievement");
+      createShieldEffect();
+      break;
+    default:
+      showNotification("No ability selected!", "info");
+      break;
+  }
+}
+
+// 4. Funzione effetto STUN (applica immobilità per 2s all’avversario)
+function stunOpponent() {
+  if (window.gameState.opponentState) {
+    window.gameState.opponentState.stunned = true;
+    setTimeout(() => {
+      if (window.gameState.opponentState) window.gameState.opponentState.stunned = false;
+    }, 2000);
+  }
+}
+
+// 5. Patch loop di movimento avversario per effetto stun
+window._origRenderOpponent = window._origRenderOpponent || renderOpponent;
+window.renderOpponent = function(ctx) {
+  const opp = gameState.opponentState;
+  if (!opp) return;
+  // Se stunnato, mostra effetto
+  if (opp.stunned) {
+    ctx.save();
+    ctx.globalAlpha = 0.8;
+    ctx.drawImage(new Image(), opp.x-32, opp.y-32, 64, 64); // puoi mettere sprite diverso
+    ctx.font = "bold 22px Orbitron";
+    ctx.fillStyle = "#ffd700";
+    ctx.textAlign = "center";
+    ctx.fillText("😵 STUNNED!", opp.x, opp.y-70);
+    ctx.restore();
+    // Blocca movimento: non aggiornare opp.x/opp.y altrove!
+  } else {
+    window._origRenderOpponent(ctx);
+  }
+};
+
+// 6. Patch SHOOT per Double Shot
+window._origShoot = window._origShoot || shoot;
+window.shoot = function() {
+  window._origShoot();
+  if (gameState.player.doubleShotActive) {
+    setTimeout(() => window._origShoot(), 80);
+    gameState.player.doubleShotActive = false;
+  }
+};
+
+// 7. Animazioni e feedback
+function flashScreen(color = "#ffd700", strength = 0.22) {
+  const flash = document.createElement('div');
+  flash.style.position = 'fixed';
+  flash.style.top = '0'; flash.style.left = '0'; flash.style.width = '100vw'; flash.style.height = '100vh';
+  flash.style.background = color;
+  flash.style.opacity = strength;
+  flash.style.zIndex = 99999;
+  flash.style.transition = "opacity 0.7s";
+  document.body.appendChild(flash);
+  setTimeout(() => { flash.style.opacity = "0"; }, 400);
+  setTimeout(() => { flash.remove(); }, 900);
+}
+
+// 8. Cooldown visuale bottone
+setInterval(() => {
+  if (gameState.currentScreen === 'gameScreen' && gameState.gameMode === 'duel1v1') {
+    const btn = document.getElementById('specialAbilityBtn');
+    if (!btn) return;
+    if (gameState.player.specialCooldown > 0) {
+      btn.disabled = true;
+      btn.innerHTML = '🌟 Cooldown...';
+      btn.style.opacity = '0.5';
+    } else {
+      btn.disabled = false;
+      btn.innerHTML = '🌟 Activate Special';
+      btn.style.opacity = '1';
+    }
+  }
+}, 200);
+
+
+
 </script>
   
 </body>
