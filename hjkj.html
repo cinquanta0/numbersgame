@@ -10125,7 +10125,13 @@ function checkPlayerDeaths() {
     btn.style.bottom = '130px';
     btn.style.zIndex = 9010;
     btn.innerHTML = '🌟 Activate Special';
-    btn.onclick = activateSpecialAbility;
+    btn.onclick = function(){
+      if (gameState.currentScreen === 'gameScreen' && gameState.gameMode === 'duel1v1') {
+        activateSpecialAbility();
+      } else {
+        alert('Special può essere attivata solo in modalità 1v1!');
+      }
+    };
     document.body.appendChild(btn);
   }
 })();
