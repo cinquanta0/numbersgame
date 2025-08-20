@@ -7230,6 +7230,32 @@ function showScreen(screenId) {
         }
     }
 
+     // PATCH: Bottone special solo in 1v1
+  setTimeout(() => {
+    const btn = document.getElementById('specialAbilityBtn');
+    if (screenId === 'gameScreen' && gameState.gameMode === 'duel1v1') {
+      if (!btn) {
+        const newBtn = document.createElement('button');
+        newBtn.id = 'specialAbilityBtn';
+        newBtn.className = 'menu-btn special';
+        newBtn.style.position = 'fixed';
+        newBtn.style.right = '38px';
+        newBtn.style.bottom = '130px';
+        newBtn.style.zIndex = 9010;
+        newBtn.innerHTML = '🌟 Activate Special';
+        newBtn.onclick = function(){
+          activateSpecialAbility();
+        };
+        document.body.appendChild(newBtn);
+      } else {
+        btn.style.display = 'block';
+      }
+    } else if (btn) {
+      btn.style.display = 'none';
+    }
+  }, 50);
+    
+    
     // RICHIAMA INVENTARIO NAVICELLE OGNI VOLTA CHE ENTRI NELLA SCHERMATA
     if (screenId === 'inventoryScreen') {
         if (typeof generaInventarioNavicelle === 'function') {
