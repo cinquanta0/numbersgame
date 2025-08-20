@@ -396,6 +396,22 @@ io.on('connection', (socket) => {
   // --- PATCH BEST OF 3 CORRETTO ---
   socket.on('duel_update', (data) => {
 
+     // --- PATCH: Special Ability Transmission ---
+  if (data.action === 'special_ability' && data.type) {
+    const duel = duelRooms[data.room];
+    if (!duel || duel.ended) return;
+
+    // Trova l’avversario
+    const opponentId = getOpponent(data.room, socket.id)?.id;
+    if (opponentId && io.sockets.sockets.get(opponentId)) {
+      io.to(opponentId).emit('duel_special', { type: data.type });
+      console.log(`[DUEL] Special ability '${data.type}' sent from ${socket.id} to ${opponentId}`);
+    }
+    return;
+  }
+    
+    
+    
     
     const { room, player, action } = data;
     const duel = duelRooms[room];
