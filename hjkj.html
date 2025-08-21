@@ -2990,7 +2990,13 @@ body:not(.in-game) #gameContainer {
 let lastTeamShot = {};
      
      
-       // Connetti al server Socket.io
+       // Variabili globali per reaction multiplayer
+let reactionSocket = null;
+let reactionRoomCode = null;
+let reactionPlayerData = null;
+
+
+// Connetti al server Socket.io
 // Cambia l'URL se non è localhost!
 window.socket = io("http://localhost:3100");
 
@@ -2998,7 +3004,14 @@ window.socket = io("http://localhost:3100");
 window.myNickname = localStorage.getItem('playerName') || "Player";
        
        
-       function createMiniGameRoom(roomCode) {
+         // Connetti al server reaction se non connesso
+  if (!reactionSocket) {
+    reactionSocket = io("http://localhost:3200");
+    setupReactionListeners();
+  }
+
+
+function createMiniGameRoom(roomCode) {
   if (!window.socket) window.socket = io("http://localhost:3100");
   window.socket.emit('create_minigame_room', { roomCode, nickname: window.myNickname });
    minigameRoomCode = roomCode;
@@ -10511,7 +10524,7 @@ function showMiniGameRoomPanel() {
   panel.innerHTML = `
     <h2 style="color:#ffd700; font-size:2rem; margin-bottom:1.5rem;">🎮 MINIGIOCHI 🎮</h2>
     <div style="display:flex; flex-direction:column; gap:1rem;">
-      <button class="menu-btn" onclick="startLocalReaction()">⚡ Click Reaction</button>
+      <button class="menu-btn" onclick="startReactionMultiplayer()">⚡ Click Reaction (Online)</button>
       <button class="menu-btn" onclick="startLocalMemory()">🧠 Memory Game</button>
       <button class="menu-btn" onclick="startLocalDodge()">💨 Dodge Game</button>
       <button class="menu-btn" onclick="startLocalSnake()">🐍 Snake</button>
@@ -10530,9 +10543,306 @@ function hideMiniGameRoomPanel() {
   if (panel) panel.style.display = 'none';
 }
 
-// ===== 1. CLICK REACTION (LOCALE) =====
-function startLocalReaction() {
+// ============= CLICK REACTION MULTIPLAYER CLIENT =============
+// Funzione principale - mostra menu iniziale
+function startReactionMultiplayer() {
   hideMiniGameRoomPanel();
+  
+  // Inizializza socket se non esiste
+  if (!reactionSocket) {
+    reactionSocket = io('/reaction');
+    setupReactionListeners();
+  }
+  
+  // Crea UI menu
+  const menuDiv = document.createElement('div');
+  menuDiv.id = 'reactionMenu';
+  menuDiv.style.cssText = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #0a0a2e, #1a237e);
+    padding: 2.5rem;
+    border-radius: 20px;
+    box-shadow: 0 0 50px #00bcd4;
+    z-index: 99999;
+    text-align: center;
+    min-width: 400px;
+  `;
+  
+  menuDiv.innerHTML = `
+    <h2 style="color:#ffd700; font-size:2.5rem; margin-bottom:1.5rem;">⚡ CLICK REACTION ⚡</h2>
+    <h3 style="color:#00bcd4; margin-bottom:2rem;">Multiplayer Mode</h3>
+    
+    <div style="margin-bottom:2rem;">
+      <input type="text" id="reactionNickname" placeholder="Il tuo nickname" 
+             value="${localStorage.getItem('playerName') || ''}"
+             style="padding:0.8rem; border-radius:10px; border:2px solid #00bcd4; 
+                    font-size:1.1rem; width:250px; text-align:center;">
+    </div>
+    
+    <div style="display:flex; flex-direction:column; gap:1rem;">
+      <button class="menu-btn primary" onclick="createReactionRoom()">🏠 Crea Room</button>
+      <div style="display:flex; gap:1rem; align-items:center; justify-content:center;">
+        <input type="text" id="reactionJoinCode" placeholder="Codice Room" 
+               style="padding:0.8rem; border-radius:10px; border:2px solid #00bcd4; 
+                      font-size:1.1rem; width:150px; text-align:center; text-transform:uppercase;">
+        <button class="menu-btn" onclick="joinReactionRoom()">🚪 Entra</button>
+      </div>
+      <button class="menu-btn" style="background:#f44336;" onclick="closeReactionMenu()">❌ Chiudi</button>
+    </div>
+  `;
+  
+  document.body.appendChild(menuDiv);
+}
+
+// Setup tutti i listener Socket.io - SOLO UNA VOLTA
+function setupReactionListeners() {
+  if (!reactionSocket) return;
+  
+  // Rimuovi listener precedenti per evitare duplicati
+  reactionSocket.off('reaction_room_created');
+  reactionSocket.off('reaction_room_joined');
+  reactionSocket.off('reaction_player_joined');
+  reactionSocket.off('reaction_player_left');
+  reactionSocket.off('reaction_ready_update');
+  reactionSocket.off('reaction_game_start');
+  reactionSocket.off('reaction_round_prepare');
+  reactionSocket.off('reaction_show_target');
+  reactionSocket.off('reaction_round_winner');
+  reactionSocket.off('reaction_game_over');
+  reactionSocket.off('reaction_chat_message');
+  reactionSocket.off('reaction_error');
+  
+  // Room creata (per chi crea)
+  reactionSocket.on('reaction_room_created', ({ roomCode, players }) => {
+    reactionRoomCode = roomCode;
+    showReactionLobby(roomCode, players);
+  });
+  
+  // Room joined (per chi entra) - QUESTO MANCAVA!
+  reactionSocket.on('reaction_room_joined', ({ roomCode, players }) => {
+    reactionRoomCode = roomCode;
+    showReactionLobby(roomCode, players);
+  });
+  
+  // Player entrato (notifica per tutti gli altri)
+  reactionSocket.on('reaction_player_joined', ({ player, players }) => {
+    updateReactionLobby(players);
+    showReactionNotification(`${player.nickname} è entrato!`, '#00bcd4');
+  });
+  
+  // Player uscito
+  reactionSocket.on('reaction_player_left', ({ nickname, players }) => {
+    updateReactionLobby(players);
+    showReactionNotification(`${nickname} è uscito (${players.length}/4)`, '#f44336');
+  });
+  
+  // Update ready status
+  reactionSocket.on('reaction_ready_update', ({ players }) => {
+    updateReactionLobby(players);
+  });
+  
+  // Game start
+  reactionSocket.on('reaction_game_start', ({ message, maxRounds }) => {
+    startReactionGame(maxRounds);
+  });
+  
+  // Round prepare
+  reactionSocket.on('reaction_round_prepare', ({ round, maxRounds, message }) => {
+    showRoundPrepare(round, maxRounds);
+  });
+  
+  // Show target
+  reactionSocket.on('reaction_show_target', ({ x, y, round }) => {
+    showReactionTarget(x, y);
+  });
+  
+  // Round winner
+  reactionSocket.on('reaction_round_winner', ({ winner, scores }) => {
+    showRoundWinner(winner, scores);
+  });
+  
+  // Game over
+  reactionSocket.on('reaction_game_over', ({ winner, stats, message }) => {
+    showGameOver(winner, stats);
+  });
+  
+  // Chat message
+  reactionSocket.on('reaction_chat_message', ({ nickname, message }) => {
+    addChatMessage(nickname, message);
+  });
+  
+  // Error
+  reactionSocket.on('reaction_error', ({ message }) => {
+    alert(message);
+    // Se errore durante join, torna al menu
+    if (message.includes('non trovata') || message.includes('piena')) {
+      const lobby = document.getElementById('reactionLobby');
+      if (lobby) lobby.remove();
+      startReactionMultiplayer();
+    }
+  });
+}
+
+// Crea una nuova room
+function createReactionRoom() {
+  if (!reactionSocket) {
+    alert('Errore di connessione! Riprova.');
+    return;
+  }
+  const nickname = document.getElementById('reactionNickname').value.trim() || 'Player';
+  reactionPlayerNickname = nickname;
+  localStorage.setItem('playerName', nickname);
+  reactionSocket.emit('reaction_create_room', { nickname });
+}
+
+// Entra in una room esistente
+function joinReactionRoom() {
+  if (!reactionSocket) {
+    alert('Errore di connessione! Riprova.');
+    return;
+  }
+  const nickname = document.getElementById('reactionNickname').value.trim() || 'Player';
+  const code = document.getElementById('reactionJoinCode').value.toUpperCase();
+  
+  if (!code) {
+    alert('Inserisci il codice della room!');
+    return;
+  }
+  
+  reactionPlayerNickname = nickname;
+  localStorage.setItem('playerName', nickname);
+  reactionSocket.emit('reaction_join_room', { roomCode: code, nickname });
+}
+
+// Mostra lobby di attesa
+function showReactionLobby(roomCode, players) {
+  // Rimuovi menu se esiste
+  const menu = document.getElementById('reactionMenu');
+  if (menu) menu.remove();
+  
+  // Rimuovi lobby precedente se esiste
+  const oldLobby = document.getElementById('reactionLobby');
+  if (oldLobby) oldLobby.remove();
+  
+  const lobbyDiv = document.createElement('div');
+  lobbyDiv.id = 'reactionLobby';
+  lobbyDiv.style.cssText = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #0a0a2e, #1a237e);
+    padding: 2.5rem;
+    border-radius: 20px;
+    box-shadow: 0 0 50px #00bcd4;
+    z-index: 99999;
+    text-align: center;
+    min-width: 500px;
+  `;
+  
+  lobbyDiv.innerHTML = `
+    <h2 style="color:#ffd700; font-size:2.5rem; margin-bottom:1rem;">⚡ REACTION LOBBY ⚡</h2>
+    <div style="background:rgba(0,0,0,0.5); padding:1rem; border-radius:10px; margin-bottom:1.5rem;">
+      <h3 style="color:#00bcd4; font-size:1.8rem;">Room Code: <span style="color:#ffd700;">${roomCode}</span></h3>
+      <p style="color:#fff; margin-top:0.5rem;">Condividi questo codice con gli amici!</p>
+    </div>
+    
+    <div id="reactionPlayersList" style="margin:2rem 0;">
+      <!-- Players list here -->
+    </div>
+    
+    <button id="reactionReadyBtn" class="menu-btn primary" onclick="toggleReactionReady()">
+      🎮 PRONTO
+    </button>
+    
+    <button class="menu-btn" style="background:#f44336; margin-top:1rem;" onclick="leaveReactionRoom()">
+      🚪 Esci
+    </button>
+    
+    <!-- Mini chat -->
+    <div style="margin-top:2rem; background:rgba(0,0,0,0.3); padding:1rem; border-radius:10px;">
+      <div id="reactionChat" style="max-height:100px; overflow-y:auto; text-align:left; margin-bottom:0.5rem;">
+        <!-- Chat messages -->
+      </div>
+      <div style="display:flex; gap:0.5rem;">
+        <input type="text" id="reactionChatInput" placeholder="Scrivi..." 
+               style="flex:1; padding:0.5rem; border-radius:5px; border:1px solid #00bcd4;"
+               onkeypress="if(event.key==='Enter') sendReactionChat()">
+        <button class="menu-btn" onclick="sendReactionChat()">📤</button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(lobbyDiv);
+  updateReactionLobby(players);
+}
+
+// Aggiorna lista giocatori
+function updateReactionLobby(players) {
+  const listDiv = document.getElementById('reactionPlayersList');
+  if (!listDiv) return;
+  
+  let html = '<div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:1rem;">';
+  
+  players.forEach(p => {
+    const readyColor = p.ready ? '#4caf50' : '#666';
+    const readyText = p.ready ? '✅ PRONTO' : '⏳ In attesa';
+    const isCurrentPlayer = p.nickname === reactionPlayerNickname;
+    
+    html += `
+      <div style="background:rgba(0,0,0,0.5); padding:1rem; border-radius:10px; 
+                  border:2px solid ${readyColor}; ${isCurrentPlayer ? 'box-shadow: 0 0 20px #ffd700;' : ''}">
+        <div style="color:#ffd700; font-size:1.3rem; margin-bottom:0.5rem;">
+          ${p.nickname} ${isCurrentPlayer ? '(Tu)' : ''}
+        </div>
+        <div style="color:${readyColor}; font-size:0.9rem;">${readyText}</div>
+        <div style="color:#00bcd4; margin-top:0.5rem;">Score: ${p.score || 0}</div>
+      </div>
+    `;
+  });
+  
+  // Aggiungi slot vuoti
+  for (let i = players.length; i < 4; i++) {
+    html += `
+      <div style="background:rgba(0,0,0,0.2); padding:1rem; border-radius:10px; border:2px dashed #333;">
+        <div style="color:#666; font-size:1.3rem; margin-bottom:0.5rem;">Vuoto</div>
+        <div style="color:#333; font-size:0.9rem;">In attesa...</div>
+      </div>
+    `;
+  }
+  
+  html += '</div>';
+  html += `<p style="color:#00bcd4; margin-top:1rem;">Giocatori: ${players.length}/4</p>`;
+  
+  listDiv.innerHTML = html;
+  
+  // Aggiorna stato del bottone ready
+  const readyBtn = document.getElementById('reactionReadyBtn');
+  if (readyBtn) {
+    const currentPlayer = players.find(p => p.nickname === reactionPlayerNickname);
+    if (currentPlayer && currentPlayer.ready) {
+      readyBtn.textContent = '❌ NON PRONTO';
+      readyBtn.style.background = '#f44336';
+    } else {
+      readyBtn.textContent = '🎮 PRONTO';
+      readyBtn.style.background = '';
+    }
+  }
+}
+
+// Toggle ready status
+function toggleReactionReady() {
+  if (!reactionSocket || !reactionRoomCode) return;
+  reactionSocket.emit('reaction_player_ready', { roomCode: reactionRoomCode });
+}
+
+// Inizia il gioco
+function startReactionGame(maxRounds) {
+  const lobbyDiv = document.getElementById('reactionLobby');
+  if (lobbyDiv) lobbyDiv.remove();
   
   const gameDiv = document.createElement('div');
   gameDiv.id = 'reactionGame';
@@ -10542,24 +10852,352 @@ function startLocalReaction() {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: #0a0a2e;
+    background: linear-gradient(135deg, #0a0a2e, #000);
     z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
   `;
   
-  let score = 0;
-  let round = 0;
-  let startTime = 0;
-  
   gameDiv.innerHTML = `
-    <div style="text-align:center; padding:2rem;">
-      <h1 style="color:#ffd700;">⚡ REACTION TEST ⚡</h1>
-      <div id="reactionScore" style="color:#00bcd4; font-size:2rem;">Score: 0</div>
-      <div id="reactionArea" style="position:relative; width:80vw; height:60vh; margin:2rem auto; border:3px solid #00bcd4;"></div>
-      <button class="menu-btn" onclick="document.getElementById('reactionGame').remove()">Esci</button>
+    <div id="reactionGameArea" style="position:relative; width:90vw; height:70vh; 
+                                       border:3px solid #00bcd4; border-radius:20px; 
+                                       background:rgba(0,0,0,0.5);">
+      <!-- Target appears here -->
+    </div>
+    
+    <div id="reactionInfo" style="margin-top:2rem; text-align:center;">
+      <div id="reactionRoundInfo" style="color:#ffd700; font-size:2rem;">Preparati!</div>
+      <div id="reactionScores" style="color:#00bcd4; font-size:1.2rem; margin-top:1rem;"></div>
     </div>
   `;
   
   document.body.appendChild(gameDiv);
+}
+
+// Mostra preparazione round
+function showRoundPrepare(round, maxRounds) {
+  const infoDiv = document.getElementById('reactionRoundInfo');
+  if (infoDiv) {
+    infoDiv.innerHTML = `
+      <div style="animation: pulse 1s infinite;">
+        Round ${round}/${maxRounds}<br>
+        <span style="font-size:1.5rem; color:#fff;">Preparati...</span>
+      </div>
+    `;
+  }
+  
+  // Rimuovi vecchio target
+  const oldTarget = document.getElementById('reactionTarget');
+  if (oldTarget) oldTarget.remove();
+}
+
+// Mostra il target da cliccare
+function showReactionTarget(xPercent, yPercent) {
+  const area = document.getElementById('reactionGameArea');
+  if (!area) return;
+  
+  const target = document.createElement('button');
+  target.id = 'reactionTarget';
+  target.style.cssText = `
+    position: absolute;
+    left: ${xPercent}%;
+    top: ${yPercent}%;
+    transform: translate(-50%, -50%);
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, #ffd700, #ff6600);
+    border: none;
+    border-radius: 50%;
+    font-size: 3rem;
+    cursor: pointer;
+    animation: targetPulse 0.3s ease-out, targetGlow 0.5s infinite alternate;
+    box-shadow: 0 0 50px #ffd700;
+    z-index: 1000;
+  `;
+  target.innerHTML = '💥';
+  
+  target.onclick = () => {
+    if (!target.disabled) {
+      reactionSocket.emit('reaction_click', { roomCode: reactionRoomCode });
+      target.disabled = true;
+      target.style.background = '#4caf50';
+      target.innerHTML = '✅';
+    }
+  };
+  
+  area.appendChild(target);
+  
+  // Aggiungi CSS animazioni
+  if (!document.getElementById('reactionStyles')) {
+    const style = document.createElement('style');
+    style.id = 'reactionStyles';
+    style.innerHTML = `
+      @keyframes targetPulse {
+        from { transform: translate(-50%, -50%) scale(0); }
+        to { transform: translate(-50%, -50%) scale(1); }
+      }
+      @keyframes targetGlow {
+        from { box-shadow: 0 0 30px #ffd700; }
+        to { box-shadow: 0 0 60px #ffd700, 0 0 100px #ff6600; }
+      }
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+}
+
+// Mostra vincitore del round
+function showRoundWinner(winner, scores) {
+  const target = document.getElementById('reactionTarget');
+  if (target) {
+    target.disabled = true;
+    target.style.pointerEvents = 'none';
+  }
+  
+  // Mostra messaggio vincitore
+  const area = document.getElementById('reactionGameArea');
+  const winnerDiv = document.createElement('div');
+  winnerDiv.style.cssText = `
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.9);
+    padding: 2rem;
+    border-radius: 20px;
+    border: 3px solid #ffd700;
+    text-align: center;
+    z-index: 2000;
+  `;
+  
+  winnerDiv.innerHTML = `
+    <div style="color:#ffd700; font-size:2.5rem; margin-bottom:1rem;">🏆 Round Winner!</div>
+    <div style="color:#00bcd4; font-size:1.8rem;">${winner.nickname}</div>
+    <div style="color:#fff; font-size:1.2rem; margin-top:0.5rem;">Tempo: ${winner.time}ms</div>
+  `;
+  
+  area.appendChild(winnerDiv);
+  
+  // Aggiorna punteggi
+  const scoresDiv = document.getElementById('reactionScores');
+  if (scoresDiv) {
+    let scoresHtml = '<div style="display:flex; justify-content:center; gap:2rem;">';
+    scores.forEach(s => {
+      const isCurrentPlayer = s.nickname === reactionPlayerNickname;
+      scoresHtml += `
+        <div style="background:rgba(0,0,0,0.5); padding:0.5rem 1.5rem; border-radius:10px;
+                    ${isCurrentPlayer ? 'border: 2px solid #ffd700;' : ''}">
+          <span style="color:#ffd700;">${s.nickname}:</span>
+          <span style="color:#00bcd4; font-size:1.3rem; margin-left:0.5rem;">${s.score}</span>
+        </div>
+      `;
+    });
+    scoresHtml += '</div>';
+    scoresDiv.innerHTML = scoresHtml;
+  }
+  
+  // Rimuovi dopo 2 secondi
+  setTimeout(() => winnerDiv.remove(), 2000);
+}
+
+// Mostra fine partita
+function showGameOver(winner, stats) {
+  const gameDiv = document.getElementById('reactionGame');
+  if (gameDiv) gameDiv.remove();
+  
+  const overDiv = document.createElement('div');
+  overDiv.id = 'reactionGameOver';
+  overDiv.style.cssText = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #1a237e, #0a0a2e);
+    padding: 3rem;
+    border-radius: 30px;
+    box-shadow: 0 0 100px #ffd700;
+    z-index: 99999;
+    text-align: center;
+    min-width: 600px;
+  `;
+  
+  // Ordina stats per punteggio
+  stats.sort((a, b) => b.score - a.score);
+  
+  let statsHtml = '';
+  stats.forEach((s, index) => {
+    const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '👤';
+    const isCurrentPlayer = s.nickname === reactionPlayerNickname;
+    statsHtml += `
+      <div style="background:rgba(0,0,0,0.5); padding:1rem; border-radius:10px; margin:0.5rem 0; 
+                  border:2px solid ${index === 0 ? '#ffd700' : isCurrentPlayer ? '#00bcd4' : '#333'};">
+        <span style="font-size:1.5rem;">${medal}</span>
+        <span style="color:#ffd700; font-size:1.3rem; margin:0 1rem;">
+          ${s.nickname} ${isCurrentPlayer ? '(Tu)' : ''}
+        </span>
+        <span style="color:#00bcd4; font-size:1.2rem;">Score: ${s.score}</span>
+        ${s.avgTime ? `<span style="color:#fff; margin-left:1rem;">Avg: ${s.avgTime}ms</span>` : ''}
+      </div>
+    `;
+  });
+  
+  overDiv.innerHTML = `
+    <div style="color:#ffd700; font-size:3rem; margin-bottom:1rem;">🏆 GAME OVER! 🏆</div>
+    <div style="color:#fff; font-size:2rem; margin-bottom:2rem;">
+      Vincitore: <span style="color:#ffd700;">${winner.nickname}</span>
+    </div>
+    
+    <div style="margin:2rem 0;">
+      ${statsHtml}
+    </div>
+    
+    <div style="display:flex; gap:1rem; justify-content:center; margin-top:2rem;">
+      <button class="menu-btn primary" onclick="reactionRematch()">🔄 Rivincita</button>
+      <button class="menu-btn" onclick="leaveReactionRoom()">🚪 Esci</button>
+    </div>
+  `;
+  
+  document.body.appendChild(overDiv);
+}
+
+// Funzioni utility
+function reactionRematch() {
+  document.getElementById('reactionGameOver').remove();
+  reactionSocket.emit('reaction_rematch', { roomCode: reactionRoomCode });
+  // Non ricreare la lobby qui, aspetta l'evento dal server
+}
+
+function leaveReactionRoom() {
+  if (reactionSocket && reactionRoomCode) {
+    reactionSocket.emit('reaction_leave_room', { roomCode: reactionRoomCode });
+  }
+  
+  // Pulisci UI
+  ['reactionLobby', 'reactionGame', 'reactionGameOver'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.remove();
+  });
+  
+  // Reset variabili
+  reactionRoomCode = null;
+  reactionPlayerNickname = null;
+  
+  // Torna al menu
+  startReactionMultiplayer();
+}
+
+function closeReactionMenu() {
+  const menu = document.getElementById('reactionMenu');
+  if (menu) menu.remove();
+  
+  if (reactionSocket) {
+    reactionSocket.disconnect();
+    reactionSocket = null;
+  }
+  
+  reactionRoomCode = null;
+  reactionPlayerNickname = null;
+}
+
+function sendReactionChat() {
+  const input = document.getElementById('reactionChatInput');
+  if (!input || !input.value.trim()) return;
+  
+  reactionSocket.emit('reaction_chat', {
+    roomCode: reactionRoomCode,
+    message: input.value.trim(),
+    nickname: reactionPlayerNickname
+  });
+  
+  input.value = '';
+}
+
+function addChatMessage(nickname, message) {
+  const chatDiv = document.getElementById('reactionChat');
+  if (!chatDiv) return;
+  
+  const msgDiv = document.createElement('div');
+  msgDiv.style.cssText = 'margin:0.3rem 0; color:#fff;';
+  msgDiv.innerHTML = `<span style="color:#ffd700;">${nickname}:</span> ${message}`;
+  
+  chatDiv.appendChild(msgDiv);
+  chatDiv.scrollTop = chatDiv.scrollHeight;
+}
+
+function showReactionNotification(message, color = '#00bcd4') {
+  const notif = document.createElement('div');
+  notif.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(0,0,0,0.9);
+    color: ${color};
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    border: 2px solid ${color};
+    box-shadow: 0 0 20px ${color};
+    z-index: 100000;
+    animation: slideIn 0.3s ease-out;
+  `;
+  notif.textContent = message;
+  
+  document.body.appendChild(notif);
+  setTimeout(() => notif.remove(), 3000);
+}
+
+// CSS per menu buttons (se non già presente)
+if (!document.getElementById('reactionMenuStyles')) {
+  const style = document.createElement('style');
+  style.id = 'reactionMenuStyles';
+  style.innerHTML = `
+    .menu-btn {
+      padding: 0.8rem 1.5rem;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #2196f3, #1976d2);
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: bold;
+    }
+    
+    .menu-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 5px 20px rgba(33, 150, 243, 0.5);
+    }
+    
+    .menu-btn.primary {
+      background: linear-gradient(135deg, #4caf50, #388e3c);
+    }
+    
+    .menu-btn.primary:hover {
+      box-shadow: 0 5px 20px rgba(76, 175, 80, 0.5);
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+// ============= FINE CLIENT REACTION MULTIPLAYER =============
+  
+  
+  
   
   function spawnTarget() {
     round++;
@@ -10604,7 +11242,7 @@ function startLocalReaction() {
   }
   
   spawnTarget();
-}
+
 
 // ===== 2. MEMORY GAME (LOCALE) =====
 function startLocalMemory() {
