@@ -15,8 +15,7 @@ const io = socketIo(server, {
   } 
 });
 
-// Serve file statici (opzionale)
-app.use(express.static(__dirname + '/public'));
+
 
 // ===== STRUTTURA DATI =====
 let gameRooms = {};
@@ -379,4 +378,5 @@ setInterval(() => {
       console.log(`[Cleanup] Room ${roomCode} eliminata`);
     }
   });
+
 }, 10 * 60 * 1000);
