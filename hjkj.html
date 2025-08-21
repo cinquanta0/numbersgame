@@ -2178,6 +2178,7 @@ body:not(.in-game) #gameContainer {
   50% { opacity: 1; }
 }
    
+
 </style>
 </head>
 <body>
@@ -2349,6 +2350,9 @@ body:not(.in-game) #gameContainer {
                   <button class="menu-btn" onclick="showScreen('mobileCustomizationMenu')">📱 MOBILE SETTINGS</button>
                   <button class="menu-btn primary" onclick="startDuel2v2Queue()">⚔️ 2v2 TEAM DUELS</button>
                   <button class="menu-btn" onclick="showTeam2v2Leaderboard()">🏆 2v2 TEAM LEADERBOARD</button>
+                  <button class="menu-btn primary" onclick="showClickReactionMenu()">⚡ CLICK REACTION (ONLINE DESKTOP ONLY)</button>
+                  
+                  
                   
                   <div style="margin-bottom:1.2em;">
   <label for="duelBotDifficultySelect" style="color:#00bcd4;font-weight:bold;margin-right:7px;">Bot Difficulty:</label>
@@ -2987,9 +2991,39 @@ body:not(.in-game) #gameContainer {
 </div>
   
   
+  <div id="clickReactionLobby" class="duel-lobby hidden">
+  <div class="duel-header">⚡ Click Reaction Online</div>
+  <div>
+    <label>Nickname: <input id="cr_nick" type="text" maxlength="15" /></label>
+  </div>
+  <div style="margin:10px 0;">
+    <button class="menu-btn" onclick="createClickReactionRoom()">🆕 Crea Stanza</button>
+    <input id="cr_roomcode" type="text" maxlength="6" placeholder="Codice stanza" style="width:85px;" />
+    <button class="menu-btn" onclick="joinClickReactionRoom()">🔑 Entra</button>
+  </div>
+  <div id="cr_lobby_status" style="margin:10px 0;color:#00bcd4;"></div>
+  <div id="cr_lobby_players"></div>
+<button class="menu-btn" onclick="hideClickReactionLobby()">Chiudi</button>
+<button class="menu-btn" onclick="goToHomeFromClickReaction()">🏠 HOME</button>
+<button>vai qui per giocare su mobile: https://minigames-ecux.onrender.com</button>
+
+</div>
+  
+  
+  <div id="clickReactionGame" class="duel-lobby hidden" style="background:rgba(0,0,0,0.98); text-align:center;">
+  <div id="cr_game_status" style="font-size:1.4rem;color:#ffd700;margin-bottom:10px;">Preparati...</div>
+  <div id="cr_reaction_target" style="position:relative;width:100%;height:260px;"></div>
+  <div id="cr_scores"></div>
+  <button class="menu-btn" onclick="leaveClickReactionRoom()">Esci</button>
+</div>
+  
+  
   <script>
        
-      
+      // === CLICK REACTION MINI GAME ===
+let cr_socket = null, cr_room = null, cr_players = [], cr_state = "idle", cr_me = null, cr_targetTimeout = null;
+
+       
        let firstGameAdShown = false;
       
      let teamComboMeter = 0;
@@ -7256,6 +7290,13 @@ function showScreen(screenId) {
   }, 50);
     
     
+    if (screenId === 'gameScreen') {
+    setTimeout(() => {
+        if (typeof resizeCanvas === "function") resizeCanvas();
+    }, 80);
+}
+    
+    
     // RICHIAMA INVENTARIO NAVICELLE OGNI VOLTA CHE ENTRI NELLA SCHERMATA
     if (screenId === 'inventoryScreen') {
         if (typeof generaInventarioNavicelle === 'function') {
@@ -7859,21 +7900,34 @@ function startDuelCountdown() {
 }
 
 function startDuelGame() {
+  console.log('[DEBUG] startDuelGame chiamata');
   duelGameActive = true;
+  window.gameState.gameRunning = true;
+  window.gameState.gamePaused = false;
   showScreen('gameScreen');
+  setTimeout(function() {
+    if (typeof resizeCanvas === "function") resizeCanvas();
+  }, 80);
+
   window.gameState.gameMode = 'duel1v1';
   window.gameState.duelRoomId = duelRoomId;
   window.gameState.opponent = duelOpponent;
   gameState.enemy = null;
-
-  // ... setup arena ...
   initDuelArena();
-
-  // Avvia loop di sincronizzazione
+  console.log('[DEBUG] dopo initDuelArena', gameState.player, gameState.opponentState);
   duelSyncLoop();
-
-  // AVVIA IL GAMELOOP DEDICATO AL 1v1!
   startDuelLoop();
+}
+
+function startDuelLoop() {
+  console.log('[DEBUG] startDuelLoop CHIAMATA');
+  function duelLoop() {
+    console.log('[DEBUG] duelLoop tick', duelGameActive, window.gameState.currentScreen, window.gameState.gameMode);
+    if (!duelGameActive || window.gameState.currentScreen !== 'gameScreen' || window.gameState.gameMode !== 'duel1v1') return;
+    // ... il resto ...
+    requestAnimationFrame(duelLoop);
+  }
+  duelLoop();
 }
 
 function duelSyncLoop() {
@@ -10294,6 +10348,183 @@ setInterval(() => {
 }, 200);
 
 
+
+// Mostra menu lobby
+function showClickReactionMenu() {
+  hideAllScreens();
+  document.getElementById('clickReactionLobby').classList.remove('hidden');
+  document.getElementById('cr_nick').value = getPlayerName();
+  document.getElementById('cr_lobby_status').textContent = '';
+  document.getElementById('cr_lobby_players').innerHTML = '';
+}
+
+// Chiudi lobby
+function hideClickReactionLobby() {
+  document.getElementById('clickReactionLobby').classList.add('hidden');
+}
+
+// Crea stanza
+function createClickReactionRoom() {
+  connectClickReactionSocket();
+  cr_socket.emit('reaction_create_room', { nickname: document.getElementById('cr_nick').value || "Player" });
+  document.getElementById('cr_lobby_status').textContent = 'Creazione stanza...';
+}
+
+// Unisciti a stanza
+function joinClickReactionRoom() {
+  connectClickReactionSocket();
+  cr_socket.emit('reaction_join_room', {
+    roomCode: document.getElementById('cr_roomcode').value.trim().toUpperCase(),
+    nickname: document.getElementById('cr_nick').value || "Player"
+  });
+  document.getElementById('cr_lobby_status').textContent = 'Richiesta di accesso...';
+}
+
+// Connessione socket (solo 1 volta)
+function connectClickReactionSocket() {
+  if (cr_socket) return;
+  cr_socket = io('', { path: '/socket.io' }); // Assicurati sia corretto il path se su hosting diverso!
+  // Eventi socket
+  cr_socket.on('reaction_room_created', ({ roomCode, players }) => {
+    cr_room = roomCode;
+    cr_players = players;
+    crUpdateLobby();
+    document.getElementById('cr_lobby_status').textContent = `Stanza creata: Codice ${roomCode}`;
+  });
+  cr_socket.on('reaction_room_joined', ({ roomCode, players }) => {
+    cr_room = roomCode;
+    cr_players = players;
+    crUpdateLobby();
+    document.getElementById('cr_lobby_status').textContent = `Entrato nella stanza: ${roomCode}`;
+  });
+  cr_socket.on('reaction_player_joined', ({ player, players }) => {
+    cr_players = players;
+    crUpdateLobby();
+  });
+  cr_socket.on('reaction_ready_update', ({ players }) => {
+    cr_players = players;
+    crUpdateLobby();
+  });
+  cr_socket.on('reaction_game_start', ({ message }) => {
+    cr_state = "playing";
+    document.getElementById('clickReactionLobby').classList.add('hidden');
+    document.getElementById('clickReactionGame').classList.remove('hidden');
+    document.getElementById('cr_game_status').textContent = message || "Via!";
+    document.getElementById('cr_reaction_target').innerHTML = '';
+    crUpdateScores();
+  });
+  cr_socket.on('reaction_round_prepare', ({ round, message }) => {
+    document.getElementById('cr_game_status').textContent = message || `Round ${round}`;
+    document.getElementById('cr_reaction_target').innerHTML = '';
+  });
+  cr_socket.on('reaction_show_target', ({ x, y, size, startTime }) => {
+    crShowTarget(x, y, size, startTime);
+  });
+  cr_socket.on('reaction_round_winner', ({ winner, scores, round }) => {
+    document.getElementById('cr_game_status').textContent = `${winner.nickname} ha vinto il round in ${winner.time} ms!`;
+    crUpdateScores(scores);
+    document.getElementById('cr_reaction_target').innerHTML = '';
+  });
+  cr_socket.on('reaction_game_over', ({ winner, message, stats }) => {
+    cr_state = "ended";
+    document.getElementById('cr_game_status').textContent = message;
+    crUpdateScores(stats);
+    document.getElementById('cr_reaction_target').innerHTML = '';
+    setTimeout(crReturnToLobby, 3500);
+  });
+  cr_socket.on('reaction_error', ({ message }) => {
+    document.getElementById('cr_lobby_status').textContent = message;
+  });
+  cr_socket.on('reaction_player_left', ({ players }) => {
+    cr_players = players;
+    crUpdateLobby();
+  });
+}
+
+// Aggiorna lista giocatori
+function crUpdateLobby() {
+  let html = "<b>Giocatori:</b><ul>";
+  cr_players.forEach(p => {
+    html += `<li>${p.nickname} ${p.ready ? "✅" : "⏳"}</li>`;
+  });
+  html += "</ul>";
+  if (cr_players.length >= 2) {
+    html += `<button class="menu-btn" onclick="crReady()">Pronto!</button>`;
+  }
+  document.getElementById('cr_lobby_players').innerHTML = html;
+}
+
+// Click "Pronto!"
+function crReady() {
+  if (cr_socket && cr_room) cr_socket.emit('reaction_player_ready', { roomCode: cr_room });
+}
+
+// Mostra target da cliccare
+function crShowTarget(x, y, size, startTime) {
+  const targetDiv = document.getElementById('cr_reaction_target');
+  targetDiv.innerHTML = '';
+  const btn = document.createElement('div');
+  btn.style.position = 'absolute';
+  btn.style.left = `${x}%`;
+  btn.style.top = `${y}%`;
+  btn.style.width = `${size.width}px`;
+  btn.style.height = `${size.height}px`;
+  btn.style.background = "radial-gradient(circle,#ffd700 60%,#00bcd4 100%)";
+  btn.style.border = "3px solid #00bcd4";
+  btn.style.borderRadius = "50%";
+  btn.style.cursor = "pointer";
+  btn.style.transform = "translate(-50%,-50%) scale(1.15)";
+  btn.style.boxShadow = "0 0 24px #ffd700";
+  btn.onclick = function () {
+    if (cr_socket && cr_room) {
+      cr_socket.emit('reaction_click', {
+        roomCode: cr_room,
+        timestamp: Date.now()
+      });
+      btn.style.filter = "brightness(0.7)";
+      btn.style.pointerEvents = "none";
+    }
+  };
+  targetDiv.appendChild(btn);
+}
+
+// Aggiorna tabellone punteggi
+function crUpdateScores(scores) {
+  scores = scores || cr_players;
+  let html = "<b>Punteggi:</b><ul>";
+  scores.forEach(p => {
+    html += `<li>${p.nickname}: ${p.score || 0} pts ${p.lastTime ? `(${p.lastTime} ms)` : ""}</li>`;
+  });
+  html += "</ul>";
+  document.getElementById('cr_scores').innerHTML = html;
+}
+
+// Torna in lobby dopo partita
+function crReturnToLobby() {
+  document.getElementById('clickReactionGame').classList.add('hidden');
+  document.getElementById('clickReactionLobby').classList.remove('hidden');
+  crUpdateLobby();
+}
+
+// Lascia stanza
+function leaveClickReactionRoom() {
+  if (cr_socket && cr_room) cr_socket.emit('reaction_leave_room', { roomCode: cr_room });
+  document.getElementById('clickReactionGame').classList.add('hidden');
+  document.getElementById('clickReactionLobby').classList.add('hidden');
+  cr_room = null;
+  cr_players = [];
+}
+
+// Utility: nasconde tutte le schermate principali (opzionale)
+function hideAllScreens() {
+  document.querySelectorAll('.screen, .duel-lobby').forEach(s => s.classList.add('hidden'));
+}
+
+function goToHomeFromClickReaction() {
+  document.getElementById('clickReactionLobby').classList.add('hidden');
+  document.getElementById('clickReactionGame').classList.add('hidden');
+  showScreen('mainMenu');
+}
 
 </script>
   
