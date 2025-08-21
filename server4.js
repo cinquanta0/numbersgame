@@ -16,6 +16,16 @@ const io = socketIo(server, {
 });
 
 
+// ===== CONFIGURA EXPRESS PER SERVIRE FILE STATICI =====
+// Serve tutti i file dalla directory corrente (dove sono i tuoi HTML, CSS, JS)
+app.use(express.static(__dirname));
+
+// Route per la pagina principale - serve index.html o il tuo file HTML principale
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html')); // Cambia 'index.html' con il nome del tuo file HTML principale
+});
+
+
 
 // ===== STRUTTURA DATI =====
 let gameRooms = {};
@@ -380,3 +390,4 @@ setInterval(() => {
   });
 
 }, 10 * 60 * 1000);
+
