@@ -4,35 +4,96 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.min.js"></script>
     
-     <script type="text/javascript">
-   window.SDK_OPTIONS = {
-      gameId: "unnmh9hjtru4a1sfxm7sjqcxiv69e1s4",
-      onEvent: function (a) {
-         switch (a.name) {
-            case "SDK_GAME_PAUSE":
-               // pause game logic / mute audio
-               break;
-            case "SDK_GAME_START":
-               // advertisement done, resume game logic and unmute audio
-               break;
-            case "SDK_READY":
-               // when sdk is ready
-               break;
-         }
-      }
-   };
-(function (a, b, c) {
-   var d = a.getElementsByTagName(b)[0];
-   a.getElementById(c) || (a = a.createElement(b), a.id = c, a.src = "https://api.gamemonetize.com/sdk.js", d.parentNode.insertBefore(a, d))
-})(document, "script", "gamemonetize-sdk"); 
+<script src="https://sdk.crazygames.com/crazygames-sdk-v3.js"></script>
+
+ <script>
+    // 1. INIZIALIZZA SDK CORRETTAMENTE
+    window.CrazyGames.SDK.init().then(() => {
+        console.log("CrazyGames SDK initialized!");
+        
+        // 2. ORA puoi usare le funzioni SDK
+        initGame();
+    }).catch(error => {
+        console.error("SDK init failed:", error);
+        // Inizia comunque il gioco anche se SDK fallisce (per test locale)
+        initGame();
+    });
+
+    // 3. FUNZIONE PER MOSTRARE ADS
+    async function showAd() {
+        try {
+            await window.CrazyGames.SDK.ad.requestAd("midgame");
+            console.log("Ad completed");
+        } catch (error) {
+            console.log("Ad error:", error);
+        }
+    }
+
+    // 4. FUNZIONE PER OTTENERE USER (opzionale)
+    async function getUserInfo() {
+        try {
+            const user = await window.CrazyGames.SDK.user.getUser();
+            if (user) {
+                console.log("User logged in:", user.username);
+                // Salva il nickname
+                localStorage.setItem('playerName', user.username);
+            }
+        } catch (error) {
+            console.log("User not logged in");
+        }
+    }
+
+    // 5. TRACKING EVENTI GAMEPLAY
+    function trackGameEvent(eventName, data) {
+        window.CrazyGames.SDK.game.gameplayStart();
+        
+        // Esempi di tracking:
+        // Quando inizia un livello
+        if (eventName === 'levelStart') {
+            window.CrazyGames.SDK.game.gameplayStart();
+        }
+        // Quando finisce
+        if (eventName === 'gameOver') {
+            window.CrazyGames.SDK.game.gameplayStop();
+        }
+    }
+
+    // 6. HAPPY TIME (quando succede qualcosa di bello)
+    function triggerHappyTime() {
+        window.CrazyGames.SDK.game.happytime();
+    }
+
+    // 7. IL TUO GIOCO INIZIA QUI
+    function initGame() {
+        // Ottieni info user se loggato
+        getUserInfo();
+        
+        // Inizia il tuo gioco
+        console.log("Starting Stellar Guardian...");
+        
+        // Il tuo codice esistente
+        canvas = document.getElementById('gameCanvas');
+        ctx = canvas.getContext('2d');
+        
+        // Mostra ad prima di iniziare il gioco
+        showAdAndStartGame();
+    }
+
+    // 8. SOSTITUISCI LA TUA VECCHIA showAd()
+    async function showAdAndStartGame() {
+        try {
+            // Mostra ad
+            await window.CrazyGames.SDK.ad.requestAd("midgame");
+        } catch (error) {
+            console.log("Ad skipped or failed");
+        } finally {
+            // Inizia SEMPRE il gioco dopo l'ad
+            startGame(true);
+        }
+    }
 
 
-if (typeof sdk !== 'undefined' && sdk.showBanner !== 'undefined') {
-sdk.showBanner();
-}
-
-  
-    </script>
+</script>
       
 
 <meta charset="UTF-8">
