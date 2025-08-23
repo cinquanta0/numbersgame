@@ -214,24 +214,24 @@ setInterval(() => {
     if (Math.random() < 0.012) spawnDuelObstacle(room);
 
     [duel.p1, duel.p2].forEach(playerSocket => {
-  if (!playerSocket.connected) return;
-  const oppId = getOpponent(room, playerSocket.id)?.id;
-  let oppState = duel.states[oppId] || {};
-  let meta = duel.playerMeta[oppId] || {};
-  if (typeof oppState.maxHealth !== "number") oppState.maxHealth = 100;
+      if (!playerSocket.connected) return;
+      const oppId = getOpponent(room, playerSocket.id)?.id;
+      let oppState = duel.states[oppId] || {};
+      let meta = duel.playerMeta[oppId] || {};
+      if (typeof oppState.maxHealth !== "number") oppState.maxHealth = 100;
 
-  // PATCH: aggiungi self con lo stato del player stesso!
-  let selfState = duel.states[playerSocket.id] || {};
-  if (typeof selfState.maxHealth !== "number") selfState.maxHealth = 100;
+      // PATCH: aggiungi self con lo stato del player stesso!
+      let selfState = duel.states[playerSocket.id] || {};
+      if (typeof selfState.maxHealth !== "number") selfState.maxHealth = 100;
 
-  playerSocket.emit('duel_state', {
-    opponent: { ...oppState, skin: meta.skin, nickname: meta.nickname },
-    self: selfState, // <--- AGGIUNGI QUESTO!
-    powerups: duel.powerups,
-    obstacles: duel.obstacles,
-    events: duel.events
-  });
-});
+      playerSocket.emit('duel_state', {
+        opponent: { ...oppState, skin: meta.skin, nickname: meta.nickname },
+        self: selfState, // <--- AGGIUNGI QUESTO!
+        powerups: duel.powerups,
+        obstacles: duel.obstacles,
+        events: duel.events
+      });
+    });
 
     if (duelSpectators[room]) {
       const playerStates = [
@@ -396,23 +396,22 @@ io.on('connection', (socket) => {
   // --- PATCH BEST OF 3 CORRETTO ---
   socket.on('duel_update', (data) => {
 
-     // --- PATCH: Special Ability Transmission ---
-  if (data.action === 'special_ability' && data.type) {
-    const duel = duelRooms[data.room];
-    if (!duel || duel.ended) return;
+    // --- PATCH: Special Ability Transmission ---
+    if (data.action === 'special_ability' && data.type) {
+      const duel = duelRooms[data.room];
+      if (!duel || duel.ended) return;
+      // BLOCCA LE SPECIAL SE SEI MORTO
+      if (duel.states[socket.id]?.health <= 0) return;
 
-    // Trova l’avversario
-    const opponentId = getOpponent(data.room, socket.id)?.id;
-    if (opponentId && io.sockets.sockets.get(opponentId)) {
-      io.to(opponentId).emit('duel_special', { type: data.type });
-      console.log(`[DUEL] Special ability '${data.type}' sent from ${socket.id} to ${opponentId}`);
+      // Trova l’avversario
+      const opponentId = getOpponent(data.room, socket.id)?.id;
+      if (opponentId && io.sockets.sockets.get(opponentId)) {
+        io.to(opponentId).emit('duel_special', { type: data.type });
+        console.log(`[DUEL] Special ability '${data.type}' sent from ${socket.id} to ${opponentId}`);
+      }
+      return;
     }
-    return;
-  }
-    
-    
-    
-    
+
     const { room, player, action } = data;
     const duel = duelRooms[room];
     if (!duel || duel.ended) return;
@@ -432,10 +431,33 @@ io.on('connection', (socket) => {
     } else {
       duel.states[socket.id] = { ...player, id: socket.id, maxHealth: (typeof player.maxHealth === "number" ? player.maxHealth : 100) };
     }
-    if (action === "shoot") {
-      duel.events.push({ type: "shoot", player: socket.id, ...player });
+
+    // PATCH: BLOCCA TUTTE LE AZIONI SE IL PLAYER È MORTO
+    if (duel.states[socket.id]?.health <= 0) {
+      // Consenti solo cose "safe" tipo chat/emote, ma non shoot/special/powerup/obstacle
+      if (action === "shoot" || action === "powerup_pick" || action === "obstacle_hit" || action === "special_ability") return;
+    }
+
+    // --- PATCH: INOLTRA I COLPI ALL'AVVERSARIO IN 1v1 DUEL ---
+    if (action === "shoot" && typeof data.x === "number" && typeof data.y === "number" && typeof data.vx === "number" && typeof data.vy === "number") {
+      // PATCH: blocca i morti
+      if (duel.states[socket.id]?.health <= 0) return; // IGNORA SPARI SE SEI MORTO
+
+      // Trova l’avversario
+      const opponent = getOpponent(room, socket.id);
+      if (opponent && io.sockets.sockets.get(opponent.id)) {
+        io.to(opponent.id).emit('duel_opponent_shoot', {
+          x: data.x,
+          y: data.y,
+          vx: data.vx,
+          vy: data.vy
+        });
+      }
+      // Inoltre mantieni anche stats/events se vuoi
+      duel.events.push({ type: "shoot", player: socket.id, x: data.x, y: data.y, vx: data.vx, vy: data.vy });
       duel.stats[socket.id].damage += 25;
     }
+
     if (action === "emote" && data.emote) {
       duel.events.push({ type: "emote", player: socket.id, emote: data.emote });
       io.in(room).emit('duel_emote', { player: socket.id, emote: data.emote });
@@ -444,6 +466,9 @@ io.on('connection', (socket) => {
       });
     }
     if (action === "powerup_pick" && data.powerupId) {
+      // PATCH: blocca i morti
+      if (duel.states[socket.id]?.health <= 0) return;
+
       const idx = duel.powerups.findIndex(p => p.id === data.powerupId);
       if (idx >= 0) {
         duel.powerups[idx].active = false;
@@ -455,6 +480,9 @@ io.on('connection', (socket) => {
       }
     }
     if (action === "obstacle_hit" && data.obstacleId) {
+      // PATCH: blocca i morti
+      if (duel.states[socket.id]?.health <= 0) return;
+
       const idx = duel.obstacles.findIndex(o => o.id === data.obstacleId);
       if (idx >= 0) {
         duel.obstacles[idx].hit = true;
@@ -521,46 +549,40 @@ io.on('connection', (socket) => {
     }
   });
 
-  
   socket.on('duel_hit', ({ room, damage }) => {
-  const duel = duelRooms[room];
-  if (!duel || duel.ended) return;
+    const duel = duelRooms[room];
+    if (!duel || duel.ended) return;
 
-  // Chi ha mandato il messaggio è l’attaccante, l’altro subisce danno
-  const attackerId = socket.id;
-  const defenderId = getOpponent(room, attackerId)?.id;
-  if (!defenderId) return;
+    // Chi ha mandato il messaggio è l’attaccante, l’altro subisce danno
+    const attackerId = socket.id;
+    const defenderId = getOpponent(room, attackerId)?.id;
+    if (!defenderId) return;
 
-  // Applica danno solo se entrambi sono vivi
-  if (duel.states[defenderId] && duel.states[defenderId].health > 0) {
-    duel.states[defenderId].health -= damage || 20;
-    if (duel.states[defenderId].health < 0) duel.states[defenderId].health = 0;
-    duel.stats[attackerId].damage += damage || 20;
-  }
-});
-  
-  
-  
-// PATCH: Handler per READY in lobby co-op
-socket.on('playerReady', ({ ready }) => {
-  if (players[socket.id]) {
-    players[socket.id].ready = !!ready;
-    inviaLobbyAggiornata();
-  }
-});
+    // Applica danno solo se entrambi sono vivi
+    if (duel.states[defenderId] && duel.states[defenderId].health > 0 && duel.states[attackerId] && duel.states[attackerId].health > 0) {
+      duel.states[defenderId].health -= damage || 20;
+      if (duel.states[defenderId].health < 0) duel.states[defenderId].health = 0;
+      duel.stats[attackerId].damage += damage || 20;
+    }
+  });
 
+  // PATCH: Handler per READY in lobby co-op
+  socket.on('playerReady', ({ ready }) => {
+    if (players[socket.id]) {
+      players[socket.id].ready = !!ready;
+      inviaLobbyAggiornata();
+    }
+  });
 
+  // PATCH: Handler per RUOLO in lobby co-op
+  socket.on('selectRole', ({ role }) => {
+    if (players[socket.id]) {
+      players[socket.id].role = role;
+      inviaLobbyAggiornata();
+    }
+  });
 
-// PATCH: Handler per RUOLO in lobby co-op
-socket.on('selectRole', ({ role }) => {
-  if (players[socket.id]) {
-    players[socket.id].role = role;
-    inviaLobbyAggiornata();
-  }
-});
-
-
-socket.on('duel_join', ({ roomId, role, nickname }) => {
+  socket.on('duel_join', ({ roomId, role, nickname }) => {
     if (!roomId || !duelRooms[roomId]) {
       socket.emit('error', { message: 'Room not found' });
       return;
@@ -588,10 +610,6 @@ socket.on('duel_join', ({ roomId, role, nickname }) => {
   });
   // Rematch: il client fa semplicemente startDuelQueue di nuovo
 });
-
-
-
-
 
 // === PORT ===
 const PORT = process.env.PORT || 3000;
