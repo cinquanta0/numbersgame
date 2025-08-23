@@ -12,9 +12,8 @@ const http = require('http').Server(app);
 const io = require('socket.io')(http, { cors: { origin: "*" } });
 const PORT = process.env.PORT || 3003;
 
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
+app.use(express.static(path.join(__dirname))); // o app.use(express.static(__dirname));
+
 
 
 let queue2v2 = []; // [{ id, nickname, skin, elo }]
@@ -265,3 +264,4 @@ http.listen(PORT, () => {
   console.log(`File serviti da: ${path.join(__dirname, 'public')}`);
 
 });
+
