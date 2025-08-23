@@ -2240,6 +2240,326 @@ body:not(.in-game) #gameContainer {
 }
    
 
+/* ========== PATCH CSS 2v2 ULTRA GRAPHICS ========== */
+
+/* LOBBY 2v2 ANIMATA */
+.duel-lobby#duel2v2Lobby {
+  background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab) !important;
+  background-size: 400% 400% !important;
+  animation: gradient2v2 10s ease infinite !important;
+  border: 3px solid transparent !important;
+  border-image: linear-gradient(45deg, #ffd700, #ff00ff, #00ffff, #ffd700) 1 !important;
+  box-shadow: 
+    0 0 100px rgba(255, 215, 0, 0.5),
+    inset 0 0 50px rgba(255, 0, 255, 0.2),
+    0 10px 40px rgba(0, 255, 255, 0.3) !important;
+}
+
+@keyframes gradient2v2 {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* SHIPS NELLA LOBBY CON GLOW TEAM */
+#duel2v2Lobby .duel-ship {
+  filter: drop-shadow(0 0 30px #ffd700) brightness(1.2) !important;
+  animation: shipFloat2v2 2s ease-in-out infinite !important;
+  border: 2px solid rgba(255, 215, 0, 0.5) !important;
+  border-radius: 50% !important;
+  padding: 5px !important;
+  background: radial-gradient(circle, rgba(255,215,0,0.1), transparent) !important;
+}
+
+@keyframes shipFloat2v2 {
+  0%, 100% { transform: translateY(0) rotate(-5deg) scale(1); }
+  50% { transform: translateY(-20px) rotate(5deg) scale(1.1); }
+}
+
+/* TEAM 1 BLU NEON */
+#duel2v2Lobby div:has(#team1Nick1) {
+  background: linear-gradient(135deg, rgba(0,188,212,0.2), rgba(33,150,243,0.2)) !important;
+  border-radius: 20px !important;
+  padding: 15px !important;
+  border: 2px solid #00bcd4 !important;
+  box-shadow: 
+    0 0 40px rgba(0,188,212,0.5),
+    inset 0 0 20px rgba(0,188,212,0.1) !important;
+  animation: pulseTeam1 2s infinite !important;
+}
+
+@keyframes pulseTeam1 {
+  0%, 100% { box-shadow: 0 0 40px rgba(0,188,212,0.5); }
+  50% { box-shadow: 0 0 60px rgba(0,188,212,0.8), 0 0 100px rgba(0,188,212,0.3); }
+}
+
+/* TEAM 2 ROSSO FUOCO */
+#duel2v2Lobby div:has(#team2Nick1) {
+  background: linear-gradient(135deg, rgba(244,67,54,0.2), rgba(255,152,0,0.2)) !important;
+  border-radius: 20px !important;
+  padding: 15px !important;
+  border: 2px solid #ff5722 !important;
+  box-shadow: 
+    0 0 40px rgba(244,67,54,0.5),
+    inset 0 0 20px rgba(244,67,54,0.1) !important;
+  animation: pulseTeam2 2s infinite !important;
+}
+
+@keyframes pulseTeam2 {
+  0%, 100% { box-shadow: 0 0 40px rgba(244,67,54,0.5); }
+  50% { box-shadow: 0 0 60px rgba(244,67,54,0.8), 0 0 100px rgba(255,152,0,0.3); }
+}
+
+/* VS CENTRALE EPICO */
+#duel2v2Lobby .duel-vs {
+  font-size: 4rem !important;
+  background: linear-gradient(45deg, #ffd700, #ff00ff, #00ffff, #ffd700) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  animation: vsRotate 3s linear infinite !important;
+  filter: drop-shadow(0 0 40px #ffd700) drop-shadow(0 0 60px #ff00ff) !important;
+  position: relative !important;
+}
+
+@keyframes vsRotate {
+  0% { transform: scale(1) rotate(0deg); filter: hue-rotate(0deg); }
+  50% { transform: scale(1.2) rotate(180deg); filter: hue-rotate(180deg); }
+  100% { transform: scale(1) rotate(360deg); filter: hue-rotate(360deg); }
+}
+
+/* NICKNAMES CON EFFETTO NEON */
+.duel-nick {
+  font-size: 1.3rem !important;
+  font-weight: bold !important;
+  text-transform: uppercase !important;
+  letter-spacing: 2px !important;
+  animation: textGlow 2s ease-in-out infinite alternate !important;
+}
+
+#team1Nick1, #team1Nick2 {
+  color: #00ffff !important;
+  text-shadow: 
+    0 0 10px #00bcd4,
+    0 0 20px #00bcd4,
+    0 0 30px #00bcd4,
+    0 0 40px #00bcd4 !important;
+}
+
+#team2Nick1, #team2Nick2 {
+  color: #ff5722 !important;
+  text-shadow: 
+    0 0 10px #f44336,
+    0 0 20px #f44336,
+    0 0 30px #f44336,
+    0 0 40px #ff5722 !important;
+}
+
+@keyframes textGlow {
+  from { filter: brightness(1); }
+  to { filter: brightness(1.3); }
+}
+
+/* STATUS BAR ANIMATA */
+#duel2v2Status {
+  background: linear-gradient(90deg, #00bcd4, #ffd700, #ff00ff, #00bcd4) !important;
+  background-size: 400% 100% !important;
+  animation: statusSlide 3s linear infinite !important;
+  padding: 15px 30px !important;
+  border-radius: 30px !important;
+  font-size: 1.2rem !important;
+  font-weight: bold !important;
+  color: #000 !important;
+  text-shadow: 0 0 5px rgba(255,255,255,0.5) !important;
+  margin-top: 20px !important;
+  box-shadow: 
+    0 5px 20px rgba(0,0,0,0.3),
+    inset 0 0 20px rgba(255,255,255,0.2) !important;
+}
+
+@keyframes statusSlide {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+/* BOTTONE CANCEL CON HOVER EFFECT */
+#duel2v2CancelBtn {
+  background: linear-gradient(45deg, #f44336, #e91e63) !important;
+  border: 2px solid #fff !important;
+  transition: all 0.3s !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+#duel2v2CancelBtn:before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: -100% !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent) !important;
+  transition: left 0.5s !important;
+}
+
+#duel2v2CancelBtn:hover:before {
+  left: 100% !important;
+}
+
+#duel2v2CancelBtn:hover {
+  transform: scale(1.1) !important;
+  box-shadow: 0 0 30px rgba(244,67,54,0.8) !important;
+}
+
+/* ULTIMATE BUTTON STYLE */
+#team2v2UltimateBtn {
+  background: linear-gradient(45deg, #ffd700, #ff6b6b, #4ecdc4, #45b7d1) !important;
+  background-size: 400% 400% !important;
+  animation: ultimateGradient 3s ease infinite !important;
+  border: 3px solid #fff !important;
+  box-shadow: 
+    0 0 20px rgba(255,215,0,0.5),
+    0 0 40px rgba(255,107,107,0.3),
+    0 0 60px rgba(78,205,196,0.2) !important;
+  font-size: 1.1rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  transition: all 0.3s !important;
+}
+
+@keyframes ultimateGradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+#team2v2UltimateBtn:hover {
+  transform: scale(1.15) rotate(2deg) !important;
+  box-shadow: 
+    0 0 40px rgba(255,215,0,0.8),
+    0 0 80px rgba(255,107,107,0.5),
+    0 0 120px rgba(78,205,196,0.3) !important;
+}
+
+/* IN-GAME 2v2 HUD STYLE */
+body[data-mode="duel2v2"] .hud,
+.screen.active#gameScreen[data-mode="duel2v2"] .hud {
+  background: linear-gradient(180deg, 
+    rgba(0,0,0,0.9), 
+    rgba(75,0,130,0.3), 
+    transparent) !important;
+  border-bottom: 2px solid rgba(255,215,0,0.5) !important;
+  box-shadow: 0 10px 40px rgba(138,43,226,0.3) !important;
+}
+
+/* HEALTH BARS TEAM COLORED */
+body[data-mode="duel2v2"] .health-bar {
+  border-width: 3px !important;
+  box-shadow: 0 0 20px currentColor !important;
+  position: relative !important;
+  overflow: visible !important;
+}
+
+body[data-mode="duel2v2"] .health-bar:before {
+  content: '' !important;
+  position: absolute !important;
+  top: -5px !important;
+  left: -5px !important;
+  right: -5px !important;
+  bottom: -5px !important;
+  background: linear-gradient(45deg, #00bcd4, #ffd700, #ff00ff, #00bcd4) !important;
+  border-radius: 12px !important;
+  opacity: 0.5 !important;
+  animation: healthGlow 2s linear infinite !important;
+  z-index: -1 !important;
+}
+
+@keyframes healthGlow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* PARTICELLE BACKGROUND ANIMATE */
+body[data-mode="duel2v2"]:before {
+  content: '' !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background-image: 
+    radial-gradient(circle at 20% 50%, rgba(0,188,212,0.3) 0%, transparent 50%),
+    radial-gradient(circle at 80% 50%, rgba(244,67,54,0.3) 0%, transparent 50%),
+    radial-gradient(circle at 50% 20%, rgba(255,215,0,0.2) 0%, transparent 40%) !important;
+  animation: particleFloat 20s ease-in-out infinite !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
+
+@keyframes particleFloat {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -30px) scale(1.1); }
+  66% { transform: translate(-30px, 30px) scale(0.9); }
+}
+
+/* COMBO COUNTER STYLE */
+.combo-display {
+  position: fixed !important;
+  top: 100px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  font-size: 3rem !important;
+  font-weight: bold !important;
+  color: #ffd700 !important;
+  text-shadow: 
+    0 0 20px #ffd700,
+    0 0 40px #ff6b6b,
+    0 0 60px #4ecdc4 !important;
+  animation: comboShake 0.5s infinite !important;
+  z-index: 10000 !important;
+  pointer-events: none !important;
+  font-family: 'Orbitron', monospace !important;
+}
+
+@keyframes comboShake {
+  0%, 100% { transform: translateX(-50%) scale(1) rotate(0deg); }
+  25% { transform: translateX(-48%) scale(1.1) rotate(-2deg); }
+  75% { transform: translateX(-52%) scale(1.1) rotate(2deg); }
+}
+
+/* VICTORY SCREEN 2v2 */
+.duel-end[data-mode="2v2"] {
+  background: conic-gradient(from 0deg at 50% 50%, 
+    #ffd700, #ff6b6b, #4ecdc4, #45b7d1, #ffd700) !important;
+  animation: victoryRotate 10s linear infinite !important;
+  border: 5px solid #fff !important;
+  box-shadow: 
+    0 0 100px rgba(255,215,0,0.8),
+    inset 0 0 50px rgba(255,255,255,0.3) !important;
+}
+
+@keyframes victoryRotate {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* FLOATING MEDALS */
+.team-medal {
+  position: fixed !important;
+  font-size: 5rem !important;
+  animation: floatMedal 3s ease-in-out infinite !important;
+  z-index: 9999 !important;
+  pointer-events: none !important;
+}
+
+@keyframes floatMedal {
+  0%, 100% { transform: translateY(0) rotate(-5deg); }
+  50% { transform: translateY(-30px) rotate(5deg); }
+}
+
+/* ========== FINE PATCH CSS 2v2 ========== */
+
+
 </style>
 </head>
 <body>
