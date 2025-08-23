@@ -15,7 +15,7 @@ const PORT = process.env.PORT || 3003;
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
-app.use(express.static(path.join(__dirname, 'public')));
+
 
 let queue2v2 = []; // [{ id, nickname, skin, elo }]
 let activeRooms = {}; // roomId: { ... }
@@ -263,4 +263,5 @@ http.listen(PORT, () => {
   console.log(`Stellar Guardian 2v2 Server PATCHED online on port ${PORT}`);
   console.log(`Apri http://localhost:${PORT} nel browser`);
   console.log(`File serviti da: ${path.join(__dirname, 'public')}`);
+
 });
