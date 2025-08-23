@@ -4901,7 +4901,30 @@ function getMobileBulletParams(count, speed) {
            if (gameState.player.isSpectator) return;
 
   
-  
+            // AGGIUNGI QUESTO BLOCCO:
+  if (gameState.gameMode === "duel1v1" && window.socket && duelRoomId) {
+    // Calcola la direzione del colpo
+    const dx = gameState.mouse.x - gameState.player.x;
+    const dy = gameState.mouse.y - gameState.player.y;
+    const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+    const speed = 15;
+    const vx = (dx / dist) * speed;
+    const vy = (dy / dist) * speed;
+
+    // Avvisa il server che hai sparato
+    window.socket.emit("duel_update", {
+      room: duelRoomId,
+      player: { ...gameState.player },
+      action: "shoot",
+      x: gameState.player.x,
+      y: gameState.player.y,
+      vx,
+      vy
+    });
+  }
+        
+        
+        
         // COOP: invia evento al server, non aggiungere subito il proiettile locale!
   if (gameState.gameMode === "coop" && socket) {
     let player = gameState.player;
@@ -8510,6 +8533,23 @@ window.socket.on('duel_obstacle_hit', function({ obstacle }) {
   showNotification(`Opponent: ${emote}`);
 });
 
+
+// Ricevi e mostra il colpo dell’avversario:
+window.socket.on('duel_opponent_shoot', function(data) {
+  if (gameState.gameMode !== "duel1v1") return;
+  // Aggiungi il proiettile ai tuoi bullets, con un colore diverso (es: rosso)
+  gameState.bullets.push({
+    x: data.x,
+    y: data.y,
+    vx: data.vx,
+    vy: data.vy,
+    color: "#f44336", // rosso, così li distingui
+    size: 8,
+    isOpponent: true  // campo opzionale per distinguere
+  });
+});
+
+
 function sendDuelEmote(emote) {
   window.socket.emit('duel_update', { room: duelRoomId, player: {...window.gameState.player}, action: 'emote', emote });
   showDuelEmoteOnScreen(emote, true);
@@ -9087,30 +9127,40 @@ function startNextDuelRound() {
   // Puoi riavviare il loop se serve (startDuelLoop();)
 }
 
-// 6. Modifica la funzione checkCollisionsDuel per gestire i round
 function checkCollisionsDuel() {
-  console.log('[CHECK COLLISIONS] Player HP:', gameState.player.health, 'Opponent HP:', gameState.opponentState?.health);
-
   if (!duelGameActive || !gameState.opponentState) return;
+
   for (let i = gameState.bullets.length - 1; i >= 0; i--) {
     const bullet = gameState.bullets[i];
-    const opp = gameState.opponentState;
-    const dist = Math.sqrt((bullet.x - opp.x) ** 2 + (bullet.y - opp.y) ** 2);
     const hitbox = 32;
-    if (dist < hitbox && opp.health > 0) {
-      // NON MODIFICARE la health qui!
-      gameState.bullets.splice(i, 1);
-      createHitParticles(bullet.x, bullet.y, bullet.color || "#ffd700");
-      if (window.socket && duelRoomId) {
-        window.socket.emit("duel_hit", {
-          room: duelRoomId,
-          damage: bullet.damage || 20
-        });
+
+    if (bullet.isOpponent) {
+      // Questo proiettile è stato sparato dall'avversario: colpisce TE!
+      const dist = Math.sqrt((bullet.x - gameState.player.x) ** 2 + (bullet.y - gameState.player.y) ** 2);
+      if (dist < hitbox && gameState.player.health > 0) {
+        // Togli vita a te stesso, NON mandare duel_hit!
+        gameState.player.health -= bullet.damage || 20;
+        gameState.bullets.splice(i, 1);
+        createHitParticles(bullet.x, bullet.y, bullet.color || "#ffd700");
+      }
+    } else {
+      // Questo proiettile l'hai sparato TU: colpisce solo l'avversario!
+      const opp = gameState.opponentState;
+      const dist = Math.sqrt((bullet.x - opp.x) ** 2 + (bullet.y - opp.y) ** 2);
+      if (dist < hitbox && opp.health > 0) {
+        gameState.bullets.splice(i, 1);
+        createHitParticles(bullet.x, bullet.y, bullet.color || "#ffd700");
+        if (window.socket && duelRoomId) {
+          window.socket.emit("duel_hit", {
+            room: duelRoomId,
+            damage: bullet.damage || 20
+          });
+        }
       }
     }
   }
+
   updateDuelOpponentHealthBar();
-  // Patch: round end
   // La fine round va gestita SOLO quando ricevi la health aggiornata dal server nella socket 'duel_state'
 }
 
