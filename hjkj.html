@@ -2559,6 +2559,462 @@ body[data-mode="duel2v2"]:before {
 
 /* ========== FINE PATCH CSS 2v2 ========== */
 
+/* ========== PATCH ULTRA 2D PIXEL ART STYLE (MODIFICATA) ========== */
+
+/* RIMUOVI TUTTI GLI EFFETTI 3D E BLUR */
+* {
+  text-shadow: none !important;
+  filter: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* CANVAS FULL PIXEL */
+#gameCanvas {
+  image-rendering: pixelated !important;
+  image-rendering: -moz-crisp-edges !important;
+  image-rendering: crisp-edges !important;
+  border: 4px solid #00bcd4 !important;
+  border-radius: 0 !important;
+  box-shadow:
+    4px 4px 0 #000,
+    8px 8px 0 #00bcd4 !important;
+  background: #000 !important;
+}
+
+/* FONT SOLO PIXEL */
+body, .menu-btn, .stat-box, .game-title, .game-subtitle,
+.duel-nick, .stat-label, .stat-value, .health-text {
+  font-family: 'Press Start 2P', monospace !important;
+  text-rendering: optimizeSpeed !important;
+  -webkit-font-smoothing: none !important;
+  -moz-osx-font-smoothing: unset !important;
+}
+
+/* HUD FLAT PIXEL */
+.hud {
+  background: #000 !important;
+  border-bottom: 4px solid #00bcd4 !important;
+  box-shadow: none !important;
+}
+
+.stat-box {
+  background: #111 !important;
+  border: 2px solid !important;
+  border-radius: 0 !important;
+  box-shadow:
+    2px 2px 0 #000 !important;
+  text-shadow: none !important;
+}
+
+/* HEALTH BAR PIXEL STYLE */
+.health-bar, .energy-meter {
+  border-radius: 0 !important;
+  border: 2px solid #fff !important;
+  background: #000 !important;
+  box-shadow:
+    2px 2px 0 #000 !important;
+}
+
+.health-fill, .energy-fill {
+  background: repeating-linear-gradient(
+    90deg,
+    #0f0 0px,
+    #0f0 4px,
+    #0a0 4px,
+    #0a0 8px
+  ) !important;
+  image-rendering: pixelated !important;
+}
+
+/* BOTTONI PIXEL FLAT */
+.menu-btn, .mobile-action-btn, .orientation-btn {
+  background: #00bcd4 !important;
+  border: 2px solid #000 !important;
+  border-radius: 0 !important;
+  box-shadow:
+    2px 2px 0 #000,
+    4px 4px 0 #005060 !important;
+  text-shadow: none !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  transition: none !important;
+  image-rendering: pixelated !important;
+  color: #111 !important;
+}
+
+.menu-btn:hover, .menu-btn:active {
+  transform: translate(2px, 2px) !important;
+  box-shadow:
+    0 0 0 #000,
+    2px 2px 0 #005060 !important;
+  background: #00ffff !important;
+  color: #000 !important;
+}
+
+/* TITOLO PIXEL - PIU' VISIBILE */
+.game-title {
+  color: #ffe700 !important;
+  font-size: 2.8em !important;
+  text-shadow:
+    0 0 8px #000,
+    2px 2px 0 #000,
+    4px 4px 0 #aa9500 !important;
+  letter-spacing: 2px !important;
+  border-bottom: 4px dashed #ffe700 !important;
+  animation: none !important;
+  filter: none !important;
+  background: none !important;
+  -webkit-text-fill-color: #ffe700 !important;
+  text-align: center !important;
+  margin-top: 32px !important;
+}
+
+.game-subtitle {
+  color: #00bcd4 !important;
+  text-shadow:
+    1px 1px 0 #000 !important;
+  animation: pixelBlink 1s steps(2) infinite !important;
+  text-align: center !important;
+  font-size: 1.3em !important;
+}
+
+@keyframes pixelBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+/* MENU ULTRA FLAT */
+.menu-content {
+  background: #000 !important;
+  border: 4px solid #00bcd4 !important;
+  box-shadow:
+    4px 4px 0 #000,
+    8px 8px 0 #005060 !important;
+  padding: 20px !important;
+  border-radius: 0 !important;
+}
+
+/* STAT ITEMS PIXEL */
+.stat-item {
+  background: #111 !important;
+  border: 2px solid #ffd700 !important;
+  border-radius: 0 !important;
+  box-shadow:
+    2px 2px 0 #000 !important;
+  transition: none !important;
+}
+
+.stat-item:hover {
+  transform: translate(-2px, -2px) !important;
+  box-shadow:
+    4px 4px 0 #000 !important;
+}
+
+/* MOBILE CONTROLS PIXEL */
+.mobile-joystick {
+  background: #000 !important;
+  border: 3px solid #00bcd4 !important;
+  border-radius: 0 !important;
+  box-shadow:
+    3px 3px 0 #000 !important;
+}
+
+.mobile-joystick-knob {
+  background: #00bcd4 !important;
+  border: 2px solid #000 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.mobile-action-btn {
+  border-radius: 0 !important;
+  background: #00bcd4 !important;
+  border: 2px solid #000 !important;
+  box-shadow:
+    2px 2px 0 #000 !important;
+}
+
+.mobile-action-btn:active {
+  transform: translate(1px, 1px) !important;
+  box-shadow:
+    1px 1px 0 #000 !important;
+}
+
+/* LOBBY DUEL PIXEL */
+.duel-lobby {
+  background: #000 !important;
+  border: 4px solid #ffd700 !important;
+  border-radius: 0 !important;
+  box-shadow:
+    4px 4px 0 #000,
+    8px 8px 0 #aa9500 !important;
+  animation: none !important;
+}
+
+.duel-ship {
+  border: 2px solid #00bcd4 !important;
+  border-radius: 0 !important;
+  background: #111 !important;
+  box-shadow:
+    2px 2px 0 #000 !important;
+  animation: pixelFloat 2s steps(4) infinite !important;
+  filter: none !important;
+  image-rendering: pixelated !important;
+}
+
+@keyframes pixelFloat {
+  0%, 100% { transform: translateY(0); }
+  25% { transform: translateY(-4px); }
+  50% { transform: translateY(-8px); }
+  75% { transform: translateY(-4px); }
+}
+
+.duel-vs {
+  color: #fff !important;
+  text-shadow:
+    2px 2px 0 #000,
+    4px 4px 0 #ff0000 !important;
+  animation: pixelPulse 0.5s steps(2) infinite !important;
+  background: none !important;
+  -webkit-text-fill-color: #fff !important;
+  filter: none !important;
+}
+
+@keyframes pixelPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+/* NOTIFICATION PIXEL */
+.notification {
+  background: #00bcd4 !important;
+  border: 2px solid #000 !important;
+  border-radius: 0 !important;
+  box-shadow:
+    3px 3px 0 #000 !important;
+  animation: pixelSlideIn 0.3s steps(8) !important;
+  color: #111 !important;
+}
+
+@keyframes pixelSlideIn {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+/* ORIENTATION SELECTOR PIXEL */
+.orientation-selector {
+  background: #000 !important;
+  border: 4px solid #00bcd4 !important;
+  border-radius: 0 !important;
+  box-shadow:
+    4px 4px 0 #000,
+    8px 8px 0 #005060 !important;
+  backdrop-filter: none !important;
+}
+
+/* LOADING SCREEN PIXEL - PIU' VISIBILE */
+.loading-screen {
+  background: #111 !important;
+  color: #ffe700 !important;
+  z-index: 99999 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.loading-content {
+  color: #ffe700 !important;
+  text-align: center !important;
+  z-index: 100000 !important;
+}
+
+.loading-text {
+  color: #ffe700 !important;
+  text-shadow: 2px 2px 0 #000 !important;
+  font-size: 1.3em !important;
+  margin-top: 16px !important;
+}
+
+.loading-bar {
+  border-radius: 0 !important;
+  border: 2px solid #00bcd4 !important;
+  background: #222 !important;
+}
+
+.loading-bar-fill {
+  background: repeating-linear-gradient(
+    90deg,
+    #00bcd4 0px,
+    #00bcd4 8px,
+    #ffd700 8px,
+    #ffd700 16px
+  ) !important;
+  animation: pixelLoad 1s steps(8) infinite !important;
+  height: 100% !important;
+}
+
+@keyframes pixelLoad {
+  to { background-position: 16px 0; }
+}
+
+/* LEVEL CARDS PIXEL */
+.level-card {
+  background: #111 !important;
+  border: 3px solid #00bcd4 !important;
+  border-radius: 0 !important;
+  box-shadow:
+    3px 3px 0 #000 !important;
+  transition: none !important;
+}
+
+.level-card:hover {
+  transform: translate(-3px, -3px) !important;
+  box-shadow:
+    6px 6px 0 #000 !important;
+  background: #222 !important;
+}
+
+.level-card.locked {
+  background: #000 !important;
+  border-color: #444 !important;
+  opacity: 1 !important;
+}
+
+/* EMOJI BAR PIXEL */
+#duelEmojiBar {
+  background: #000 !important;
+  border: 2px solid #00bcd4 !important;
+  border-radius: 0 !important;
+  box-shadow:
+    2px 2px 0 #000 !important;
+  backdrop-filter: none !important;
+}
+
+/* SCORE BAR PIXEL */
+#duelScoreBar, #duelOpponentHealthBar {
+  background: #000 !important;
+  border: 2px solid #ffd700 !important;
+  border-radius: 0 !important;
+  box-shadow:
+    2px 2px 0 #000 !important;
+  animation: none !important;
+  color: #ffd700 !important;
+}
+
+/* COUNTDOWN PIXEL */
+.duel-countdown {
+  background: #000 !important;
+  border: 4px solid #ffd700 !important;
+  border-radius: 0 !important;
+  color: #ffd700 !important;
+  text-shadow:
+    3px 3px 0 #000 !important;
+  animation: none !important;
+}
+
+/* DUEL END SCREEN PIXEL */
+.duel-end {
+  background: #000 !important;
+  border: 4px solid #ffd700 !important;
+  border-radius: 0 !important;
+  box-shadow:
+    4px 4px 0 #000,
+    8px 8px 0 #aa9500 !important;
+  animation: none !important;
+}
+
+/* REMOVE ALL GRADIENTS */
+.menu-btn, .stat-box, .health-fill, .energy-fill,
+.duel-lobby, #duelScoreBar, #duelEmojiBar,
+body, .hud, .menu-content {
+  background-image: none !important;
+}
+
+/* PIXELATED BACKGROUNDS */
+body {
+  background: #000 !important;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      #000 0px,
+      #000 2px,
+      #111 2px,
+      #111 4px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      #000 0px,
+      #000 2px,
+      #111 2px,
+      #111 4px
+    ) !important;
+  color: #ffe700 !important;
+}
+
+/* NO ANIMATIONS SMOSSE */
+* {
+  transition-timing-function: steps(4) !important;
+  animation-timing-function: steps(4) !important;
+}
+
+/* DISABLE TUTTI I BORDER RADIUS */
+*, *::before, *::after {
+  border-radius: 0 !important;
+}
+
+/* PIXELATED IMAGES */
+img, .ship-image, .duel-ship img {
+  image-rendering: pixelated !important;
+  image-rendering: -moz-crisp-edges !important;
+  image-rendering: crisp-edges !important;
+  filter: none !important;
+}
+
+/* Migliora overlay loading (testo centrato e visibile su ogni device) */
+.loading-screen,
+.loading-content,
+.loading-bar,
+.loading-bar-fill,
+.loading-text {
+  z-index: 99999 !important;
+}
+
+/* ========== FINE PATCH ULTRA 2D PIXEL ART (MODIFICATA) ========== */
+
+
+.game-title {
+  color: #ffe700 !important;
+  font-size: 2.8em !important;
+  text-shadow:
+    0 0 8px #000,
+    2px 2px 0 #000,
+    4px 4px 0 #aa9500 !important;
+  letter-spacing: 2px !important;
+  border-bottom: 4px dashed #ffe700 !important;
+  animation: none !important;
+  filter: none !important;
+  background: none !important;
+  -webkit-text-fill-color: #ffe700 !important;
+  text-align: center !important;
+  margin-top: 32px !important;
+  z-index: 1001 !important;
+  position: relative !important;
+  display: block !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+
+.loading-screen {
+  background: rgba(17,17,17,0.85) !important;
+  color: #ffe700 !important;
+  z-index: 99999 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
 
 </style>
 </head>
