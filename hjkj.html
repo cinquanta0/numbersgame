@@ -11089,17 +11089,22 @@ function checkPlayerDeaths() {
 }
 
 
-// 1. Bottone HUD: aggiungi dopo il canvas (o dentro la HUD)
 (function() {
   if (!document.getElementById('specialAbilityBtn')) {
     const btn = document.createElement('button');
     btn.id = 'specialAbilityBtn';
     btn.className = 'menu-btn special';
+    // PATCH SIZE & POSITION
     btn.style.position = 'fixed';
-    btn.style.right = '38px';
-    btn.style.bottom = '130px';
+    btn.style.right = '32px';
+    btn.style.bottom = '22px'; // più in basso
     btn.style.zIndex = 9010;
-    btn.innerHTML = '🌟 Activate Special';
+    btn.style.fontSize = "0.98em"; // più piccolo
+    btn.style.padding = "0.3em 1.1em";
+    btn.style.minWidth = "unset";
+    btn.style.width = "auto";
+    btn.style.height = "38px";
+    btn.innerHTML = '🌟 Special';
     btn.onclick = function(){
       if (gameState.currentScreen === 'gameScreen' && gameState.gameMode === 'duel1v1') {
         activateSpecialAbility();
