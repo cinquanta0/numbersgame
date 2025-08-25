@@ -8042,16 +8042,13 @@ function savePlayerName() {
 });
   
   
-function isDevEnv() {
-  // Se l'hostname contiene render.com, è produzione
-  if (location.hostname.includes('render.com')) {
-    return false;
-  }
-  
+  function isDevEnv() {
+  // File://, localhost, 127.0.0.1, o qualsiasi dominio di test che vuoi
   return (
     location.protocol === "file:" ||
     location.hostname === "localhost" ||
     location.hostname === "127.0.0.1"
+    // || location.hostname.endsWith(".ngrok-free.app") // aggiungi altri domini di test se vuoi
   );
 }
 
