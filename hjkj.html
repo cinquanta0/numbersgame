@@ -3016,6 +3016,31 @@ img, .ship-image, .duel-ship img {
 }
 
 
+/* CERCA #fullscreenAdvicePopup (circa riga 300) e SOSTITUISCI CON: */
+#fullscreenAdvicePopup {
+  display: none;
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(45deg, #00bcd4, #2196f3);
+  color: #fff;
+  padding: 1.5rem 2rem;
+  border-radius: 20px;
+  box-shadow: 0 0 40px #00bcd488;
+  z-index: 100000;
+  font-size: 1.1rem;
+  text-align: center;
+  animation: bounceIn 0.5s;
+}
+
+@keyframes bounceIn {
+  0% { transform: translateX(-50%) scale(0.8); opacity: 0; }
+  50% { transform: translateX(-50%) scale(1.05); }
+  100% { transform: translateX(-50%) scale(1); opacity: 1; }
+}
+
+
 </style>
 </head>
 <body>
@@ -3513,28 +3538,7 @@ img, .ship-image, .duel-ship img {
 
           
       
-  <!-- Inserisci questo sopra il canvas o sopra la HUD, visibile solo in modalità 1v1 -->
-<div id="duelScoreBar" style="
-  position: absolute;
-  top: 18px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 9001;
-  display: flex;
-  gap: 44px;
-  background: rgba(20,30,40,0.94);
-  border-radius: 18px;
-  box-shadow: 0 0 24px #00bcd4a8;
-  padding: 0.9em 2.4em;
-  font-family: 'Orbitron', monospace;
-  font-size: 1.25em;
-  font-weight: 700;
-  color: #ffd700;
-">
-  <span id="scorePlayer1">👤 You: <b>0</b></span>
-  <span id="scoreRound">Round: <b>1</b>/3</span>
-  <span id="scorePlayer2">Opponent: <b>0</b></span>
-</div>
+
          
          
         
@@ -3600,11 +3604,9 @@ img, .ship-image, .duel-ship img {
     <h2 class="game-subtitle">Raid Co-op - Wait for other players...</h2>
     <div id="coopPlayersList">Loading...</div>
     
-    <div class="chat-container" id="chatContainer" style="margin-top:2rem;">
-  <div id="chatMessages" style="max-height:180px;overflow-y:auto;background:#111;border-radius:10px;padding:0.7rem 1rem;font-size:1rem;color:#fff;margin-bottom:0.7rem;"></div>
-  <input id="chatInput" type="text" maxlength="80" placeholder="Type a message..." style="width:70%;padding:0.3rem;border-radius:8px;">
-  <button class="menu-btn" onclick="sendChatMessage()" style="padding:0.5rem 1.2rem;margin-left:0.6rem;">Send</button>
-</div>
+    
+    
+  
   
     
     
@@ -3613,8 +3615,9 @@ img, .ship-image, .duel-ship img {
       <button class="menu-btn" onclick="showCoopLeaderboard()">🤝 CO-OP LEADERBOARD</button>
       <button class="menu-btn primary" onclick="startCoopRaid()">Start (test host)</button>
       <button class="menu-btn" onclick="showScreen('mainMenu')">Back</button>
-      <button class="menu-btn" id="dailyBtn" onclick="toggleDaily()">🎤 Voice Chat (Daily.co)</button>    
-</div>
+      <!-- <button class="menu-btn" id="dailyBtn" onclick="toggleDaily()">🎤 Voice Chat (Daily.co)</button> -->
+
+    </div>
   </div>
 </div>
 
@@ -8011,8 +8014,20 @@ function setupPeerVoice(peerId) {
 }
   
   
- function savePlayerName() {
-  const val = document.getElementById('nicknameInput').value.trim();
+// SOSTITUISCI CON:
+function filterBadWords(text) {
+  const badWords = ['fuck', 'shit', 'ass', 'dick', 'cock', 'pussy', 'nigger', 'faggot'];
+  let filtered = text;
+  badWords.forEach(word => {
+    const regex = new RegExp(word, 'gi');
+    filtered = filtered.replace(regex, '***');
+  });
+  return filtered.substring(0, 15);
+}
+
+function savePlayerName() {
+  let val = document.getElementById('nicknameInput').value.trim();
+  val = filterBadWords(val); // FILTRA PAROLACCE
   if (val.length >= 2) {
     localStorage.setItem('playerName', val);
     showNotification('Nickname updated!', 'info');
@@ -8027,13 +8042,16 @@ function setupPeerVoice(peerId) {
 });
   
   
-  function isDevEnv() {
-  // File://, localhost, 127.0.0.1, o qualsiasi dominio di test che vuoi
+function isDevEnv() {
+  // Se l'hostname contiene render.com, è produzione
+  if (location.hostname.includes('render.com')) {
+    return false;
+  }
+  
   return (
     location.protocol === "file:" ||
     location.hostname === "localhost" ||
     location.hostname === "127.0.0.1"
-    // || location.hostname.endsWith(".ngrok-free.app") // aggiungi altri domini di test se vuoi
   );
 }
 
@@ -8627,7 +8645,10 @@ document.getElementById('chatInput')?.addEventListener('keydown', function(e){
  
  
  function toggleDaily() {
-  const cont = document.getElementById('dailyContainer');
+  showNotification("Voice chat not available in this version", "info");
+  return;
+  
+  /*const cont = document.getElementById('dailyContainer');
   const frame = document.getElementById('dailyFrame');
   const roomName = "StellarGuardianCoopRoom"; // oppure dinamico se vuoi
   const dailyURL = "https://stellarguardian.daily.co/" + roomName;
@@ -8641,7 +8662,9 @@ document.getElementById('chatInput')?.addEventListener('keydown', function(e){
   }
 }
  
- 
+ */
+}
+
  // ========== SOCKET.IO CONNECTION ==========
 
 // ========== UI ELEMENTS ==========
