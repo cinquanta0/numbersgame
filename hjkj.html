@@ -3852,9 +3852,12 @@ img, .ship-image, .duel-ship img {
   <script>
        
       const SERVER_URL = "https://stellarguardian114.onrender.com"; // <-- metti il TUO vero URL qui
+      const SERVER_2V2_URL = "https://stellarguardian2v2.onrender.com";         // 2v2
+      const SERVER_CLICK_URL = "https://minigames-ecux2.onrender.com";           // Click Reaction
       
       
-       // === CLICK REACTION MINI GAME ===
+      
+      // === CLICK REACTION MINI GAME ===
 let cr_socket = null, cr_room = null, cr_players = [], cr_state = "idle", cr_me = null, cr_targetTimeout = null;
 
        
@@ -10337,8 +10340,10 @@ function startDuel2v2Queue() {
     return;
   }
   
-  if (!window.socket) {
-    window.socket = io();
+  // PATCH: usa sempre il server 2v2
+  if (!window.socket || window.socket.io.uri !== SERVER_2V2_URL) {
+    if (window.socket) window.socket.disconnect();
+    window.socket = io(SERVER_2V2_URL);
     setup2v2Listeners();
   }
   
@@ -11283,7 +11288,7 @@ function joinClickReactionRoom() {
 // Connessione socket (solo 1 volta)
 function connectClickReactionSocket() {
   if (cr_socket) return;
-  cr_socket = io('', { path: '/socket.io' }); // Assicurati sia corretto il path se su hosting diverso!
+cr_socket = io(SERVER_CLICK_URL);
   // Eventi socket
   cr_socket.on('reaction_room_created', ({ roomCode, players }) => {
     cr_room = roomCode;
