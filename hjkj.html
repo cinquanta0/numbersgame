@@ -10196,11 +10196,10 @@ for (let i = 0; i < mobileParams.count; i++) { /* ... usa mobileParams.speed ...
 // --- PATCH PARTICELLE: riduci quantità su mobile ---
 function spawnSuperExplosion(x, y, opts = {}) {
   const isMobile = isMobileDevice && isMobileDevice();
-  const colors = opts.colors || ["#fff", "#ff0044", "#14fc56", "#00cfff", "#ffd700"];
-  // Se mobile, max 12 particelle, desktop 70
-  const count = isMobile ? Math.min(opts.count || 18, 12) : Math.min(opts.count || 70, 18);
+  const colors = opts.colors || ["#fff", "#ff0044", "#14fc56", "#00cfff", "#ffd700", "#ff7f00", "#e91e63"];
+  const count = isMobile ? Math.min(opts.count || 18, 10) : Math.min(opts.count || 70, 18);
   for (let i = 0; i < count; i++) {
-    // ... come tuo codice ...
+    // ...
   }
 }
 // Stessa logica per altre funzioni di spawn particelle (hit, trail, ecc)
