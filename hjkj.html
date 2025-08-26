@@ -6,6 +6,9 @@
     
 <script src="https://sdk.crazygames.com/crazygames-sdk-v3.js"></script>
 
+    <script src="audio.js"></script>
+ 
+ 
  <script>
     // 1. INIZIALIZZA SDK CORRETTAMENTE
     window.CrazyGames.SDK.init().then(() => {
@@ -3856,18 +3859,6 @@ img, .ship-image, .duel-ship img {
       const SERVER_CLICK_URL = "https://minigames-ecux2.onrender.com";           // Click Reaction
       
       
-      // Carica i suoni dalla root
-const playerShootSound = new Audio('lasersmall-000_hQ3EaFMr.mp3'); // sparo player
-const bossShootSound   = new Audio('laserlarge-000_m1pLl5OY.mp3'); // sparo boss
-const explosionSound   = new Audio('explosionCrunch_001.mp3');     // esplosione boss/navicella
-const playerHitSound   = new Audio('hitHurt.mp3');                 // danno alla navicella
-
-// Puoi regolare i volumi qui (0 = muto, 1 = max)
-playerShootSound.volume = 0.5;
-bossShootSound.volume   = 0.65;
-explosionSound.volume   = 0.7;
-playerHitSound.volume   = 0.7;
-      
       
       // === CLICK REACTION MINI GAME ===
 let cr_socket = null, cr_room = null, cr_players = [], cr_state = "idle", cr_me = null, cr_targetTimeout = null;
@@ -5208,8 +5199,8 @@ function getMobileBulletParams(count, speed) {
       
       function executeAttackPattern(pattern) {
            if (pattern === 'basic') {
-    playSound(bossShootSound);
-  }
+            playSound('bossShoot', 0.65);
+          }
         const enemy = gameState.enemy;
   const levelData = LEVEL_DATA[gameState.currentLevel - 1] || LEVEL_DATA[0];
   const mobileParams = getMobileBulletParams(enemy.bulletCount, levelData.bulletSpeed || 4);
@@ -5369,7 +5360,7 @@ function getMobileBulletParams(count, speed) {
 
 
       function shoot() {
-             playSound(playerShootSound);
+             playSound('playerShoot', 0.5);
 
         
         if (gameState.player.isSpectator) return;
@@ -5836,11 +5827,11 @@ function eseguiSpecial() {
             createHitParticles(bullet.x, bullet.y, bullet.color);
 
             // SUONO HIT BOSS/NEMICO (puoi anche crearne uno apposito)
-            playSound(playerShootSound);
+                  playSound('playerShoot', 0.5);
 
             // Se la vita va a zero, suona esplosione
             if (enemy.health <= 0) {
-                playSound(explosionSound);
+               playSound('explosion', 0.7);
             }
 
             updateUI();
@@ -5889,8 +5880,7 @@ function eseguiSpecial() {
             createHitParticles(bullet.x, bullet.y, '#f44336');
 
             // SUONO HIT PLAYER (navicella prende danno)
-            playSound(playerHitSound);
-
+                 playSound('playerHit', 0.7);
             updateUI();
 
             if (navigator.vibrate && gameState.isMobile) {
@@ -5925,8 +5915,7 @@ function eseguiSpecial() {
                     startShake(10, 6);
 
                     // SUONO ESPLOSIONE ASTEROIDE/MINA
-                    playSound(explosionSound);
-
+                         playSound('explosion', 0.7);
                 } else {
                     // Effetto "colpo" (piccole particelle)
                     createHitParticles(bullet.x, bullet.y, "#ffd700");
@@ -6956,8 +6945,7 @@ function drawFlash(ctx, canvas) {
 
 // FUNZIONI PRONTE DA USARE
 function esplodiGiocatore(player) {
-      playSound(explosionSound);
-
+     playSound('explosion', 0.7);
   
   spawnSuperExplosion(player.x, player.y, {
         colors: ["#00bcd4", "#fff", "#2196f3", "#14fc56"],
@@ -6970,8 +6958,7 @@ function esplodiGiocatore(player) {
 }
 
 function esplodiBoss(boss) {
-      playSound(explosionSound);
-
+playSound('explosion', 0.7);
   
   // Super esplosione centrale
     spawnSuperExplosion(boss.x, boss.y, {
@@ -10196,10 +10183,11 @@ for (let i = 0; i < mobileParams.count; i++) { /* ... usa mobileParams.speed ...
 // --- PATCH PARTICELLE: riduci quantità su mobile ---
 function spawnSuperExplosion(x, y, opts = {}) {
   const isMobile = isMobileDevice && isMobileDevice();
-  const colors = opts.colors || ["#fff", "#ff0044", "#14fc56", "#00cfff", "#ffd700", "#ff7f00", "#e91e63"];
-  const count = isMobile ? Math.min(opts.count || 18, 10) : Math.min(opts.count || 70, 18);
+  const colors = opts.colors || ["#fff", "#ff0044", "#14fc56", "#00cfff", "#ffd700"];
+  // Se mobile, max 12 particelle, desktop 70
+  const count = isMobile ? Math.min(opts.count || 18, 12) : Math.min(opts.count || 70, 18);
   for (let i = 0; i < count; i++) {
-    // ...
+    // ... come tuo codice ...
   }
 }
 // Stessa logica per altre funzioni di spawn particelle (hit, trail, ecc)
@@ -11489,11 +11477,7 @@ function goToHomeFromClickReaction() {
 }
 
 
-// Utility (evita sovrapposizioni fastidiose)
-function playSound(sound) {
-  sound.currentTime = 0;
-  sound.play();
-}
+
 
 
 </script>
