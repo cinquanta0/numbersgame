@@ -3856,6 +3856,18 @@ img, .ship-image, .duel-ship img {
       const SERVER_CLICK_URL = "https://minigames-ecux2.onrender.com";           // Click Reaction
       
       
+      // Carica i suoni dalla root
+const playerShootSound = new Audio('lasersmall-000_hQ3EaFMr.mp3'); // sparo player
+const bossShootSound   = new Audio('laserlarge-000_m1pLl5OY.mp3'); // sparo boss
+const explosionSound   = new Audio('explosionCrunch_001.mp3');     // esplosione boss/navicella
+const playerHitSound   = new Audio('hitHurt.mp3');                 // danno alla navicella
+
+// Puoi regolare i volumi qui (0 = muto, 1 = max)
+playerShootSound.volume = 0.5;
+bossShootSound.volume   = 0.65;
+explosionSound.volume   = 0.7;
+playerHitSound.volume   = 0.7;
+      
       
       // === CLICK REACTION MINI GAME ===
 let cr_socket = null, cr_room = null, cr_players = [], cr_state = "idle", cr_me = null, cr_targetTimeout = null;
@@ -5195,7 +5207,10 @@ function getMobileBulletParams(count, speed) {
 }
       
       function executeAttackPattern(pattern) {
-  const enemy = gameState.enemy;
+           if (pattern === 'basic') {
+    playSound(bossShootSound);
+  }
+        const enemy = gameState.enemy;
   const levelData = LEVEL_DATA[gameState.currentLevel - 1] || LEVEL_DATA[0];
   const mobileParams = getMobileBulletParams(enemy.bulletCount, levelData.bulletSpeed || 4);
 
@@ -5354,7 +5369,10 @@ function getMobileBulletParams(count, speed) {
 
 
       function shoot() {
-           if (gameState.player.isSpectator) return;
+             playSound(playerShootSound);
+
+        
+        if (gameState.player.isSpectator) return;
 
   
             // AGGIUNGI QUESTO BLOCCO:
@@ -5789,101 +5807,132 @@ function eseguiSpecial() {
           });
       }
 
-      function checkCollisions() {
+    function checkCollisions() {
     // Player bullets hitting enemy
     gameState.bullets.forEach((bullet, bulletIndex) => {
         const enemy = gameState.enemy;
         if (!enemy) return;
-        
+
         const dist = Math.sqrt(
             Math.pow(bullet.x - enemy.x, 2) + 
             Math.pow(bullet.y - enemy.y, 2)
         );
-        
+
         if (dist < 60) {
             let damage = bullet.damage;
-            
+
             if (gameState.player.skills.galaxy_buster && enemy.health < enemy.maxHealth * 0.1) {
                 damage = enemy.health;
             }
-            
+
             if (gameState.player.skills.weapon_overdrive && enemy.currentPhase >= enemy.phases - 1) {
                 damage *= 2;
             }
-            
+
             gameState.player.score += Math.floor(damage);
             enemy.health -= damage;
             gameState.bullets.splice(bulletIndex, 1);
-            
+
             createHitParticles(bullet.x, bullet.y, bullet.color);
+
+            // SUONO HIT BOSS/NEMICO (puoi anche crearne uno apposito)
+            playSound(playerShootSound);
+
+            // Se la vita va a zero, suona esplosione
+            if (enemy.health <= 0) {
+                playSound(explosionSound);
+            }
+
             updateUI();
         }
-    });
-
-    // Player bullets hitting mines (distruggibili)
-    gameState.bullets.forEach((bullet, bulletIndex) => {
-        gameState.obstacles.forEach((ob, obIndex) => {
-            if (ob.hit) return;
-            if (ob.type !== "mine") return; // Solo mine sono distruttibili
-            const dx = ob.x - bullet.x;
-            const dy = ob.y - bullet.y;
-            const dist = Math.sqrt(dx*dx + dy*dy);
-            const hitbox = ob.size / 2 + bullet.size;
-            if (dist < hitbox) {
-                ob.hit = true; // elimina la mina
-                spawnSuperExplosion(ob.x, ob.y, {colors:["#ffe700","#ff9800","#fff"],count:18});
-                startShake(10, 6);
-                gameState.bullets.splice(bulletIndex, 1); // elimina proiettile
-            }
-        });
     });
 
     // Enemy bullets hitting player
     gameState.enemyBullets.forEach((bullet, bulletIndex) => {
         const player = gameState.player;
-        
+
         if (player.invulnerabilityFrames > 0) return;
-        
+
         let hitboxSize = player.precisionMode ? 15 : 25;
         if (player.skills.targeting_system && player.precisionMode) {
             hitboxSize = 10;
         }
-        
+
         if (player.skills.mobile_optimizer && gameState.isMobile) {
             hitboxSize *= 0.9;
         }
-        
+
         const dist = Math.sqrt(
             Math.pow(bullet.x - player.x, 2) + 
             Math.pow(bullet.y - player.y, 2)
         );
-        
+
         if (dist < hitboxSize) {
             let damage = bullet.damage || 15;
-            
+
             if (gameState.currentLevel <= 5) {
                 damage *= 0.8;
             } else if (gameState.currentLevel <= 10) {
                 damage *= 0.9;
             }
-            
+
             if (gameState.player.skills.hull_armor) {
                 damage *= (1 - gameState.player.skills.hull_armor * 0.2);
             }
-            
+
             player.health -= damage;
             gameState.enemyBullets.splice(bulletIndex, 1);
             player.invulnerabilityFrames = 60;
-            
+
             gameState.screenShake = 4;
-            
+
             createHitParticles(bullet.x, bullet.y, '#f44336');
+
+            // SUONO HIT PLAYER (navicella prende danno)
+            playSound(playerHitSound);
+
             updateUI();
-            
+
             if (navigator.vibrate && gameState.isMobile) {
                 navigator.vibrate(100);
             }
         }
+    });
+
+    // Player bullets hitting obstacles (asteroids & mines distruttibili)
+    gameState.bullets.forEach((bullet, bulletIndex) => {
+        gameState.obstacles.forEach((ob, obIndex) => {
+            if (ob.hit) return;
+            // PATCH: asteroidi E mine sono distruttibili!
+            if (ob.type !== "asteroid" && ob.type !== "mine") return;
+            const dx = ob.x - bullet.x;
+            const dy = ob.y - bullet.y;
+            const dist = Math.sqrt(dx*dx + dy*dy);
+            const hitbox = ob.size / 2 + bullet.size;
+            if (dist < hitbox) {
+                // Se non ha health, fallback a 30
+                ob.health = (typeof ob.health === "number") ? ob.health : 30;
+                ob.maxHealth = (typeof ob.maxHealth === "number") ? ob.maxHealth : 30;
+                ob.health -= bullet.damage || 15;
+
+                // Elimina il proiettile SEMPRE
+                gameState.bullets.splice(bulletIndex, 1);
+
+                // Se vita finita, distruggi!
+                if (ob.health <= 0) {
+                    ob.hit = true;
+                    spawnSuperExplosion(ob.x, ob.y, {colors:["#ffe700","#ff9800","#fff"],count:18});
+                    startShake(10, 6);
+
+                    // SUONO ESPLOSIONE ASTEROIDE/MINA
+                    playSound(explosionSound);
+
+                } else {
+                    // Effetto "colpo" (piccole particelle)
+                    createHitParticles(bullet.x, bullet.y, "#ffd700");
+                }
+            }
+        });
     });
 
     if (gameState.enemyBullets.length >= 500) {
@@ -6471,28 +6520,31 @@ eloDisplay.innerHTML =
   gameState.elo = savedData.elo || 1000; // <-- AGGIUNGI QUI!
 }
 
-   function spawnObstacle() {
-    if (!gameState.obstacles) gameState.obstacles = [];
-    const types = ["asteroid"];
-    const type = types[Math.floor(Math.random() * types.length)];
-    const x = Math.random() * canvas.width;
-    const size = 32 + Math.random() * 32;
+  function spawnObstacle() {
+  if (!gameState.obstacles) gameState.obstacles = [];
+  const types = ["asteroid"];
+  const type = types[Math.floor(Math.random() * types.length)];
+  const x = Math.random() * canvas.width;
+  const size = 32 + Math.random() * 32;
 
-    // PATCH: velocità più bassa su mobile
-    let vy = 2 + Math.random() * 2;
-    if (isMobileDevice()) vy *= 0.55; // circa metà velocità su mobile
+  // PATCH: velocità più bassa su mobile
+  let vy = 2 + Math.random() * 2;
+  if (isMobileDevice()) vy *= 0.55; // circa metà velocità su mobile
 
-    gameState.obstacles.push({
-        x: x,
-        y: -size,
-        vx: (Math.random() - 0.5) * 1.5,
-        vy: vy, // usa la velocità modificata!
-        size: size,
-        type: type,
-        angle: 0,
-        spin: (Math.random() - 0.5) * 0.07,
-        hit: false
-    });
+  gameState.obstacles.push({
+    x: x,
+    y: -size,
+    vx: (Math.random() - 0.5) * 1.5,
+    vy: vy,
+    size: size,
+    type: type,
+    angle: 0,
+    spin: (Math.random() - 0.5) * 0.07,
+    hit: false,
+    // AGGIUNGI QUI:
+    health: Math.round(size * 1.2),     // ad esempio vita proporzionale alla dimensione
+    maxHealth: Math.round(size * 1.2)
+  });
 }
     
     function updateObstacles(deltaTime) {
@@ -6904,7 +6956,10 @@ function drawFlash(ctx, canvas) {
 
 // FUNZIONI PRONTE DA USARE
 function esplodiGiocatore(player) {
-    spawnSuperExplosion(player.x, player.y, {
+      playSound(explosionSound);
+
+  
+  spawnSuperExplosion(player.x, player.y, {
         colors: ["#00bcd4", "#fff", "#2196f3", "#14fc56"],
         count: 80,
         sparkle: true
@@ -6915,7 +6970,10 @@ function esplodiGiocatore(player) {
 }
 
 function esplodiBoss(boss) {
-    // Super esplosione centrale
+      playSound(explosionSound);
+
+  
+  // Super esplosione centrale
     spawnSuperExplosion(boss.x, boss.y, {
         colors: ["#f00", "#fff", "#ffd700", "#9c27b0", "#ff7f00"],
         count: 140,
@@ -11430,6 +11488,14 @@ function goToHomeFromClickReaction() {
   document.getElementById('clickReactionGame').classList.add('hidden');
   showScreen('mainMenu');
 }
+
+
+// Utility (evita sovrapposizioni fastidiose)
+function playSound(sound) {
+  sound.currentTime = 0;
+  sound.play();
+}
+
 
 </script>
   
