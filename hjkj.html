@@ -5950,7 +5950,15 @@ function eseguiSpecial() {
 }
 
       function updateParticles(deltaTime) {
-          gameState.particles = gameState.particles.filter(particle => {
+          if (isMobileDevice() && window.innerWidth > window.innerHeight) {
+  // PATCH: limita particelle e proiettili su mobile landscape
+  if (gameState.particles.length > 38) gameState.particles = gameState.particles.slice(-38);
+  if (gameState.bullets.length > 22) gameState.bullets = gameState.bullets.slice(-22);
+  if (gameState.enemyBullets.length > 22) gameState.enemyBullets = gameState.enemyBullets.slice(-22);
+}
+        
+        
+        gameState.particles = gameState.particles.filter(particle => {
               particle.x += particle.vx * deltaTime;
               particle.y += particle.vy * deltaTime;
               particle.life -= deltaTime;
@@ -10358,19 +10366,27 @@ function spawnSuperExplosion(x, y, opts = {}) {
 // --- PATCH CANVAS RESPONSIVE RETINA ---
 function resizeCanvas() {
   const canvas = document.getElementById('gameCanvas');
-  if (window.innerWidth < 700) {
-    // MOBILE: usa viewport
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight * 0.85; // 85% della viewport
+  // Landscape mobile: limita canvas!
+  if (isMobileDevice() && window.innerWidth > window.innerHeight) {
+    canvas.width = 640;   // max larghezza
+    canvas.height = 360;  // max altezza
     canvas.style.width = '100vw';
-    canvas.style.height = '85vh';
+    canvas.style.height = '100vh';
+  } else if (isMobileDevice()) {
+    // Portrait mobile
+    canvas.width = 420;
+    canvas.height = 720;
+    canvas.style.width = '100vw';
+    canvas.style.height = '80vh';
   } else {
-    // DESKTOP: mantieni proporzioni 16:9
+    // Desktop
     canvas.width = 1280;
     canvas.height = 720;
     canvas.style.width = '1280px';
     canvas.style.height = '720px';
   }
+  canvas.style.display = "block";
+  canvas.style.margin = "auto";
 }
 
 function showDuelRoundOverlay(status, round) {
