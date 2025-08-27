@@ -3188,10 +3188,11 @@ img, .ship-image, .duel-ship img {
                 </div>
 
 <!-- PULSANTE GIOCA ORA: mettilo all'inizio di .menu-buttons -->
-<button id="playNowBtn" class="menu-btn primary" style="font-size:1.4rem; padding:1.4rem 2.5rem;" onclick="startFirstMission()">
+<button id="playNowBtn" class="menu-btn primary"
+  style="font-size:1.4rem; padding:1.4rem 2.5rem;"
+  onclick="window.startGameAudio(); startFirstMission();">
   🚀 GIOCA ORA
 </button>
-
 
 <audio id="musicaGioco" src="musica.mp3" loop></audio>        
                   <div class="menu-buttons">
