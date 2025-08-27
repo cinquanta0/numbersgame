@@ -3137,6 +3137,64 @@ img, .ship-image, .duel-ship img {
 }
 
 
+
+/* PATCH RETREAT MINI E IN BASSO A DESTRA - SOLO ICONA, TESTO NASCOSTO */
+@media (max-width: 900px), (pointer: coarse) {
+  .menu-btn.home-btn[style*="RETREAT"],
+  .menu-btn[style*="RETREAT"],
+  .menu-btn.home-btn.retreat-btn,
+  .menu-btn.retreat-btn {
+    position: fixed !important;
+    bottom: 18px !important;
+    right: 18px !important;
+    font-size: 0.67em !important;
+    padding: 0.22em 0.55em !important;
+    min-width: 18px !important;
+    height: 19px !important;
+    border-radius: 5px !important;
+    z-index: 1300 !important;
+    opacity: 0.97 !important;
+    box-shadow: 0 0 12px #00bcd499 !important;
+    background: #ffd700 !important;
+    color: transparent !important; /* Nasconde il testo */
+    border: 2px solid #222 !important;
+    line-height: 1 !important;
+    margin: 0 !important;
+    text-indent: -9999px !important; /* Nasconde testo anche se rimane renderizzato */
+    overflow: hidden !important;
+  }
+  /* Mostra solo icona 🏠 sul pulsante RETREAT */
+  .menu-btn[style*="RETREAT"]::after,
+  .menu-btn.home-btn[style*="RETREAT"]::after,
+  .menu-btn.home-btn.retreat-btn::after,
+  .menu-btn.retreat-btn::after {
+    content: "🏠";
+    font-size: 1.1em;
+    margin-left: 0;
+    vertical-align: middle;
+    display: inline-block;
+    color: #222;
+    text-indent: 0;
+    position: static;
+  }
+}
+/* Ancora più piccolo su telefoni piccoli */
+@media (max-width: 600px) {
+  .menu-btn.home-btn[style*="RETREAT"],
+  .menu-btn[style*="RETREAT"],
+  .menu-btn.home-btn.retreat-btn,
+  .menu-btn.retreat-btn {
+    bottom: 8px !important;
+    right: 8px !important;
+    font-size: 0.6em !important;
+    padding: 0.14em 0.38em !important;
+    min-width: 13px !important;
+    height: 15px !important;
+    border-radius: 3px !important;
+  }
+}
+
+
 </style>
 </head>
 <body>
