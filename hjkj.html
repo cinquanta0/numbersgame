@@ -3195,6 +3195,17 @@ img, .ship-image, .duel-ship img {
 }
 
 
+#mobileHome {
+  background: #ffd700 !important;
+  color: #222 !important;
+  border: 2px solid #222 !important;
+  font-size: 1.1em !important;
+  box-shadow: 0 0 10px #ffd70099 !important;
+}
+@media (min-width: 900px) {
+  #mobileHome { display: none !important; }
+}
+
 </style>
 </head>
 <body>
@@ -3675,9 +3686,7 @@ img, .ship-image, .duel-ship img {
                       <div class="stat-label">SCORE</div>
                       <div class="stat-value" id="playerScore">0</div>
                   </div>
-                  <button class="menu-btn home-btn" onclick="forfeitMission()" style="position: relative; top: 0; left: 0; background: linear-gradient(45deg, #f44336, #e91e63); padding: clamp(0.8rem, 3vw, 1.2rem);">
-                      🏠 RETREAT
-                  </button>
+                 
               </div>
           </div>
           
@@ -3933,6 +3942,7 @@ img, .ship-image, .duel-ship img {
     <div class="mobile-action-btn" id="mobileShoot">🔫</div>
     <div class="mobile-action-btn" id="mobileShield">🛡️</div>
     <div class="mobile-action-btn" id="mobileSpecial">💥</div>
+      <div class="mobile-action-btn" id="mobileHome" onclick="showScreen('mainMenu')">🏠</div>
   </div>
 </div>
 
