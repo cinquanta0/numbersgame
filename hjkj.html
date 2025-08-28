@@ -8,8 +8,11 @@
 
     <script src="audio.js"></script>
  
- 
- <script>
+      <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8408236896469396"
+     crossorigin="anonymous"></script>
+
+
+<script>
     // 1. INIZIALIZZA SDK CORRETTAMENTE
     window.CrazyGames.SDK.init().then(() => {
         console.log("CrazyGames SDK initialized!");
@@ -3333,6 +3336,17 @@ img, .ship-image, .duel-ship img {
   © 2024-2025 Luka. All rights reserved.
 </div>
 
+<div style="text-align:center; margin:18px 0;">
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-XXXXXXXXXXXXXX"
+       data-ad-slot="YYYYYYYYYY"
+       data-ad-format="auto"></ins>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+
 
 <div class="stat-item">
     <div class="stat-value" id="coinCount">0</div>
@@ -3378,6 +3392,7 @@ img, .ship-image, .duel-ship img {
                   <button class="menu-btn" onclick="showScreen('mobileCustomizationMenu')">📱 MOBILE SETTINGS</button>
                   <button class="menu-btn primary" onclick="startDuel2v2Queue()">⚔️ 2v2 TEAM DUELS</button>
                   <button class="menu-btn" onclick="showTeam2v2Leaderboard()">🏆 2v2 TEAM LEADERBOARD</button>
+                  <button class="menu-btn primary" onclick="showClickReactionMenu()">⚡ CLICK REACTION test:https://minigames-ecux.onrender.com</button>
                   
                   
                   
@@ -3700,7 +3715,17 @@ img, .ship-image, .duel-ship img {
          <canvas id="gameCanvas" width="960" height="540" style="width:100vw;height:100vh;"></canvas>      
 
           
-      
+         <div id="adsenseBanner" style="text-align:center; margin:14px 0;">
+  <!-- AdSense banner code qui -->
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-XXXXXXXXXXXXXX"
+       data-ad-slot="YYYYYYYYYY"
+       data-ad-format="auto"></ins>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
 
          
          
@@ -3928,6 +3953,19 @@ img, .ship-image, .duel-ship img {
       <button class="menu-btn" onclick="resetMobileSettings()">♻️ RESET</button>
 
     
+    <!-- Nel div .menu-content, dopo i pulsanti principali -->
+<div style="text-align:center; margin:16px 0;">
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-XXXXXXXXXXXXXX"
+       data-ad-slot="YYYYYYYYYY"
+       data-ad-format="auto"></ins>
+  <script>
+    (adsbygoogle = window.adsbygoogle || []).push({});
+  </script>
+</div>
+    
+    
     </div>
   </div> <!-- fine .menu-content -->
 </div> <!-- fine #mobileCustomizationMenu -->
@@ -3986,23 +4024,7 @@ img, .ship-image, .duel-ship img {
 </div>
   
   
-  <div id="clickReactionLobby" class="duel-lobby hidden">
-  <div class="duel-header">⚡ Click Reaction Online</div>
-  <div>
-    <label>Nickname: <input id="cr_nick" type="text" maxlength="15" /></label>
-  </div>
-  <div style="margin:10px 0;">
-    <button class="menu-btn" onclick="createClickReactionRoom()">🆕 Crea Stanza</button>
-    <input id="cr_roomcode" type="text" maxlength="6" placeholder="Codice stanza" style="width:85px;" />
-    <button class="menu-btn" onclick="joinClickReactionRoom()">🔑 Entra</button>
-  </div>
-  <div id="cr_lobby_status" style="margin:10px 0;color:#00bcd4;"></div>
-  <div id="cr_lobby_players"></div>
-<button class="menu-btn" onclick="hideClickReactionLobby()">Chiudi</button>
-<button class="menu-btn" onclick="goToHomeFromClickReaction()">🏠 HOME</button>
-<button>vai qui per giocare su mobile: https://minigames-ecux.onrender.com</button>
 
-</div>
   
   
   <div id="clickReactionGame" class="duel-lobby hidden" style="background:rgba(0,0,0,0.98); text-align:center;">
@@ -11661,4 +11683,3 @@ function goToHomeFromClickReaction() {
   
 </body>
 </html>
-
