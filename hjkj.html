@@ -3434,7 +3434,11 @@ img, .ship-image, .duel-ship img {
                   <button class="menu-btn" onclick="showOrientationSelector()">📱 ORIENTATION</button>
                   <button class="menu-btn primary" onclick="startDuelQueue()">⚔️ 1v1 DUELS</button>
                   <!-- Apri il Mobile Customization menu -->
-                  <button class="menu-btn" onclick="showScreen('mobileCustomizationMenu')">📱 MOBILE SETTINGS</button>
+                  <button class="menu-btn"
+    onclick="showScreen('mobileCustomizationMenu')"
+    ontouchstart="event.preventDefault(); showScreen('mobileCustomizationMenu')">
+    📱 MOBILE SETTINGS
+</button>
                   <button class="menu-btn primary" onclick="startDuel2v2Queue()">⚔️ 2v2 TEAM DUELS</button>
                   <button class="menu-btn" onclick="showTeam2v2Leaderboard()">🏆 2v2 TEAM LEADERBOARD</button>
                   <button class="menu-btn primary" onclick="showClickReactionMenu()">⚡ CLICK REACTION test:https://minigames-ecux.onrender.com</button>
