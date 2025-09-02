@@ -3212,6 +3212,48 @@ img, .ship-image, .duel-ship img {
   #mobileHome { display: none !important; }
 }
 
+
+/* Mobile Controls Editor */
+.mobile-control-editor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.95);
+  z-index: 20000;
+  display: none;
+}
+
+.mobile-control-editor.active {
+  display: block;
+}
+
+.editor-panel {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.9);
+  border: 2px solid #00bcd4;
+  border-radius: 10px;
+  padding: 15px;
+  z-index: 20001;
+}
+
+.draggable-control {
+  position: fixed !important;
+  cursor: move;
+  border: 2px solid #ffd700 !important;
+  box-shadow: 0 0 20px #ffd700 !important;
+  z-index: 20002;
+}
+
+.draggable-control.dragging {
+  opacity: 0.7;
+  transform: scale(1.1);
+}
+
 </style>
 </head>
 <body>
@@ -3392,8 +3434,7 @@ img, .ship-image, .duel-ship img {
                   <button class="menu-btn" onclick="showOrientationSelector()">📱 ORIENTATION</button>
                   <button class="menu-btn primary" onclick="startDuelQueue()">⚔️ 1v1 DUELS</button>
                   <!-- Apri il Mobile Customization menu -->
-                  <!-- Pulsante di apertura menu (metti dove vuoi) -->
-                  <button id="openMobileCustomBtn" onclick="openMobileCustomMenu()" style="position:fixed;bottom:16px;right:16px;z-index:9000;background:#00bcd4;color:#222;padding:0.7em 1.6em;border-radius:12px;font-weight:bold;">📱 Personalizza Mobile</button>
+                  <button class="menu-btn" onclick="showScreen('mobileCustomizationMenu')">📱 MOBILE SETTINGS</button>
                   <button class="menu-btn primary" onclick="startDuel2v2Queue()">⚔️ 2v2 TEAM DUELS</button>
                   <button class="menu-btn" onclick="showTeam2v2Leaderboard()">🏆 2v2 TEAM LEADERBOARD</button>
                   <button class="menu-btn primary" onclick="showClickReactionMenu()">⚡ CLICK REACTION test:https://minigames-ecux.onrender.com</button>
@@ -3912,49 +3953,61 @@ img, .ship-image, .duel-ship img {
 </div>
   
   
-<!-- MOBILE CUSTOMIZATION MENU -->
+<!-- Mobile Customization Menu -->
 <div class="screen" id="mobileCustomizationMenu">
   <button class="menu-btn home-btn" onclick="showScreen('mainMenu')">🏠 HOME</button>
   <div class="menu-content">
-    <h2 class="game-subtitle">📱 Mobile Controls & Ship Settings</h2>
-
-    <!-- Pulsanti selezionabili -->
-    <div>
-      <h3 style="color:#00bcd4;">Select Action Buttons</h3>
-      <button class="menu-btn" onclick="toggleMobileButton('shoot')">🔫 Shoot</button>
-      <button class="menu-btn" onclick="toggleMobileButton('special')">💥 Special</button>
-      <button class="menu-btn" onclick="toggleMobileButton('shield')">🛡 Shield</button>
+    <h2 class="game-subtitle">📱 Mobile Controls Settings</h2>
+    
+    <!-- Pulsanti principali -->
+    <div class="menu-buttons">
+      <button class="menu-btn primary" onclick="openMobileEditor()">🎮 CUSTOMIZE LAYOUT</button>
+      <button class="menu-btn" onclick="resetMobileControls()">🔄 RESET DEFAULT</button>
     </div>
 
-    <!-- Velocità navicella -->
-    <div style="margin-top:1.5rem;">
-      <h3 style="color:#00bcd4;">Ship Speed</h3>
-      <input type="range" id="shipSpeedSlider" min="0.4" max="1.2" step="0.02" value="0.7" 
-             oninput="updateShipSpeedValue(this.value)">
-      <span id="shipSpeedValue" style="color:#ffd700;font-weight:bold;">0.70x</span>
+    <!-- Settings rapidi -->
+    <div style="margin-top: 2rem;">
+      <h3 style="color:#00bcd4;">Quick Settings</h3>
+      
+      <!-- Size -->
+      <div style="margin: 1rem 0;">
+        <label style="color:#fff;">Button Size: </label>
+        <input type="range" id="quickSizeSlider" min="30" max="100" value="60" 
+               oninput="quickUpdateSize(this.value)">
+        <span id="quickSizeValue" style="color:#ffd700;">60px</span>
+      </div>
+      
+      <!-- Opacity -->
+      <div style="margin: 1rem 0;">
+        <label style="color:#fff;">Opacity: </label>
+        <input type="range" id="quickOpacitySlider" min="20" max="100" value="80"
+               oninput="quickUpdateOpacity(this.value)">
+        <span id="quickOpacityValue" style="color:#ffd700;">80%</span>
+      </div>
     </div>
+  </div>
+</div>
 
-    <!-- Dimensione e colore pulsanti -->
-    <div style="margin-top:1.5rem;">
-      <h3 style="color:#00bcd4;">Button Size</h3>
-      <input type="range" id="buttonSizeSlider" min="40" max="120" value="80" oninput="updateButtonSize(this.value)">
-      <span id="buttonSizeValue" style="color:#ffd700;font-weight:bold;">80px</span>
-
-      <h3 style="color:#00bcd4; margin-top:1rem;">Button Color</h3>
-      <input type="color" id="buttonColorPicker" value="#00bcd4" onchange="updateButtonColor(this.value)">
-    </div>
-
-    <!-- Nickname sopra navicella -->
-    <div style="margin-top:1.5rem;">
-      <h3 style="color:#00bcd4;">Nickname Display</h3>
-      <input type="text" id="nicknameAboveShip" placeholder="Your nickname">
-      <input type="color" id="nicknameColorPicker" value="#ffffff" onchange="updateNicknameColor(this.value)">
-    </div>
-
-    <!-- Pulsanti Salva/Reset -->
-    <div style="margin-top:1.5rem; display:flex; gap:12px; justify-content:center;">
-      <button class="menu-btn primary" onclick="applyMobileSettings()">💾 APPLICA</button>
-      <button class="menu-btn" onclick="resetMobileSettings()">♻️ RESET</button>
+<!-- Editor overlay (nascosto di default) -->
+<div id="mobileControlEditor" class="mobile-control-editor">
+  <div class="editor-panel">
+    <h3 style="color:#ffd700;">Drag controls to position</h3>
+    <button class="menu-btn primary" onclick="saveMobilePositions()">💾 SAVE</button>
+    <button class="menu-btn" onclick="closeMobileEditor()">❌ CANCEL</button>
+  </div>
+  
+  <!-- Preview controls -->
+  <div id="editorJoystick" class="mobile-joystick draggable-control" style="left:20px;bottom:30px;">
+    <div class="mobile-joystick-knob"></div>
+  </div>
+  
+  <div id="editorButtons" style="position:fixed;right:20px;bottom:30px;">
+    <div id="editorShoot" class="mobile-action-btn draggable-control" data-type="shoot">🔫</div>
+    <div id="editorShield" class="mobile-action-btn draggable-control" data-type="shield">🛡️</div>
+    <div id="editorSpecial" class="mobile-action-btn draggable-control" data-type="special">💥</div>
+    <div id="editorHome" class="mobile-action-btn draggable-control" data-type="home">🏠</div>
+  </div>
+</div>
 
     
     <!-- Nel div .menu-content, dopo i pulsanti principali -->
@@ -4039,61 +4092,251 @@ img, .ship-image, .duel-ship img {
 </div>
   
   
-  <!-- MENU PERSONALIZZAZIONE MOBILE -->
-<div id="mobileCustomMenu" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; z-index:9000; background:rgba(0,0,0,0.94); color:#fff; padding:2.5rem 1.2rem; overflow:auto;">
-  <h2 style="color:#ffd700; margin-bottom:1.1rem;">Personalizza Controlli Mobile</h2>
-
-  <!-- Dimensione bottoni -->
-  <label for="customBtnSize" style="font-weight:bold;">Dimensione Bottoni:</label>
-  <input type="range" id="customBtnSize" min="35" max="120" value="80" style="width:180px;">
-  <span id="customBtnSizeVal" style="color:#ffd700;">80px</span>
-  <br><br>
-
-  <!-- Colore bottoni -->
-  <label for="customBtnColor" style="font-weight:bold;">Colore Bottoni:</label>
-  <input type="color" id="customBtnColor" value="#00bcd4">
-  <span id="customBtnColorVal" style="color:#00bcd4;">#00bcd4</span>
-  <br><br>
-
-  <!-- Dimensione Joystick -->
-  <label for="customJoySize" style="font-weight:bold;">Dimensione Joystick:</label>
-  <input type="range" id="customJoySize" min="40" max="140" value="90" style="width:180px;">
-  <span id="customJoySizeVal" style="color:#ffd700;">90px</span>
-  <br><br>
-
-  <!-- Posizione bottoni -->
-  <label style="font-weight:bold;">Posizione Bottoni:</label>
-  <select id="customBtnPos">
-    <option value="right-bottom">Destra-Basso</option>
-    <option value="right-top">Destra-Alto</option>
-    <option value="left-bottom">Sinistra-Basso</option>
-    <option value="left-top">Sinistra-Alto</option>
-  </select>
-  <br><br>
-
-  <!-- Anteprima -->
-  <h3 style="margin:1.5em 0 0.7em 0; color:#ffd700;">Anteprima</h3>
-  <div id="mobileCustomPreview" style="width:320px; height:200px; background:#222; border-radius:18px; margin-bottom:1.2em; position:relative;">
-    <!-- Joystick e bottoni si aggiornano live -->
-    <div id="previewJoystick" style="position:absolute; left:24px; bottom:24px; width:90px; height:90px; background:#00bcd4; border-radius:50%; opacity:0.7; border:2px solid #fff;"></div>
-    <div id="previewButtons" style="position:absolute; right:24px; bottom:24px; display:flex; gap:12px;">
-      <div class="previewBtn" style="width:80px;height:80px;background:#00bcd4;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;box-shadow:0 0 12px #00bcd4;">🔫</div>
-      <div class="previewBtn" style="width:80px;height:80px;background:#00bcd4;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;box-shadow:0 0 12px #00bcd4;">🛡️</div>
-      <div class="previewBtn" style="width:80px;height:80px;background:#00bcd4;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;box-shadow:0 0 12px #00bcd4;">💥</div>
-    </div>
-  </div>
-
-  <!-- Azioni -->
-  <button onclick="applyMobileCustomization()" style="background:#ffd700;color:#222;padding:0.7em 2em;border:none;border-radius:12px;font-weight:bold;margin-right:18px;">Salva</button>
-  <button onclick="closeMobileCustomMenu()" style="background:#222;color:#fff;padding:0.7em 2em;border:none;border-radius:12px;font-weight:bold;">Annulla</button>
-</div>
-  
-  
   <script>
        
       const SERVER_URL = "https://stellarguardian114.onrender.com"; // <-- metti il TUO vero URL qui
       const SERVER_2V2_URL = "https://stellarguardian2v2.onrender.com";         // 2v2
       const SERVER_CLICK_URL = "https://minigames-ecux2.onrender.com";           // Click Reaction
+      
+      
+      // ========== MOBILE CONTROLS CUSTOMIZATION SYSTEM ==========
+
+// Configurazione salvata
+let mobileControlsConfig = {
+  joystick: { x: 20, y: 30 },
+  buttons: {
+    shoot: { x: null, y: null, visible: true },
+    shield: { x: null, y: null, visible: true },
+    special: { x: null, y: null, visible: true },
+    home: { x: null, y: null, visible: true }
+  },
+  buttonSize: 60,
+  opacity: 0.8
+};
+
+// Carica configurazione all'avvio
+function loadMobileControls() {
+  const saved = localStorage.getItem('stellarMobileControls');
+  if (saved) {
+    try {
+      mobileControlsConfig = JSON.parse(saved);
+      applyMobileControls();
+    } catch(e) {
+      console.log('Error loading mobile controls:', e);
+    }
+  }
+}
+
+// Applica configurazione ai controlli reali
+function applyMobileControls() {
+  // Applica al joystick
+  const joystick = document.getElementById('mobileJoystick');
+  if (joystick) {
+    joystick.style.left = mobileControlsConfig.joystick.x + 'px';
+    joystick.style.bottom = mobileControlsConfig.joystick.y + 'px';
+    joystick.style.width = mobileControlsConfig.buttonSize + 40 + 'px';
+    joystick.style.height = mobileControlsConfig.buttonSize + 40 + 'px';
+    joystick.style.opacity = mobileControlsConfig.opacity;
+  }
+  
+  // Applica ai bottoni
+  const buttonContainer = document.getElementById('mobileActionButtons');
+  if (buttonContainer) {
+    // Se ci sono posizioni custom salvate
+    if (mobileControlsConfig.buttons.shoot.x !== null) {
+      // Riposiziona ogni bottone individualmente
+      ['shoot', 'shield', 'special', 'home'].forEach(btnType => {
+        const btnId = 'mobile' + btnType.charAt(0).toUpperCase() + btnType.slice(1);
+        const btn = document.getElementById(btnId);
+        if (btn && mobileControlsConfig.buttons[btnType].x !== null) {
+          btn.style.position = 'fixed';
+          btn.style.left = mobileControlsConfig.buttons[btnType].x + 'px';
+          btn.style.bottom = mobileControlsConfig.buttons[btnType].y + 'px';
+        }
+      });
+    }
+  }
+  
+  // Applica size e opacity a tutti i bottoni
+  document.querySelectorAll('.mobile-action-btn').forEach(btn => {
+    btn.style.width = mobileControlsConfig.buttonSize + 'px';
+    btn.style.height = mobileControlsConfig.buttonSize + 'px';
+    btn.style.opacity = mobileControlsConfig.opacity;
+    btn.style.fontSize = (mobileControlsConfig.buttonSize / 60) + 'rem';
+  });
+}
+
+// Quick updates
+function quickUpdateSize(value) {
+  mobileControlsConfig.buttonSize = parseInt(value);
+  document.getElementById('quickSizeValue').textContent = value + 'px';
+  applyMobileControls();
+  localStorage.setItem('stellarMobileControls', JSON.stringify(mobileControlsConfig));
+}
+
+function quickUpdateOpacity(value) {
+  mobileControlsConfig.opacity = value / 100;
+  document.getElementById('quickOpacityValue').textContent = value + '%';
+  applyMobileControls();
+  localStorage.setItem('stellarMobileControls', JSON.stringify(mobileControlsConfig));
+}
+
+// Editor functions
+function openMobileEditor() {
+  const editor = document.getElementById('mobileControlEditor');
+  editor.classList.add('active');
+  
+  // Posiziona i controlli dell'editor secondo la config salvata
+  const editorJoystick = document.getElementById('editorJoystick');
+  editorJoystick.style.left = mobileControlsConfig.joystick.x + 'px';
+  editorJoystick.style.bottom = mobileControlsConfig.joystick.y + 'px';
+  
+  // Setup drag and drop
+  setupEditorDragging();
+}
+
+function closeMobileEditor() {
+  document.getElementById('mobileControlEditor').classList.remove('active');
+}
+
+function saveMobilePositions() {
+  // Salva posizione joystick
+  const editorJoystick = document.getElementById('editorJoystick');
+  mobileControlsConfig.joystick.x = parseInt(editorJoystick.style.left);
+  mobileControlsConfig.joystick.y = parseInt(editorJoystick.style.bottom);
+  
+  // Salva posizioni bottoni
+  ['shoot', 'shield', 'special', 'home'].forEach(btnType => {
+    const btnId = 'editor' + btnType.charAt(0).toUpperCase() + btnType.slice(1);
+    const btn = document.getElementById(btnId);
+    if (btn) {
+      mobileControlsConfig.buttons[btnType].x = parseInt(btn.style.left || btn.offsetLeft);
+      mobileControlsConfig.buttons[btnType].y = parseInt(btn.style.bottom || 
+        (window.innerHeight - btn.offsetTop - btn.offsetHeight));
+    }
+  });
+  
+  // Salva in localStorage
+  localStorage.setItem('stellarMobileControls', JSON.stringify(mobileControlsConfig));
+  
+  // Applica ai controlli reali
+  applyMobileControls();
+  
+  // Chiudi editor
+  closeMobileEditor();
+  
+  showNotification('Mobile controls saved!', 'info');
+}
+
+function resetMobileControls() {
+  mobileControlsConfig = {
+    joystick: { x: 20, y: 30 },
+    buttons: {
+      shoot: { x: null, y: null, visible: true },
+      shield: { x: null, y: null, visible: true },
+      special: { x: null, y: null, visible: true },
+      home: { x: null, y: null, visible: true }
+    },
+    buttonSize: 60,
+    opacity: 0.8
+  };
+  
+  localStorage.removeItem('stellarMobileControls');
+  applyMobileControls();
+  
+  // Reset sliders
+  document.getElementById('quickSizeSlider').value = 60;
+  document.getElementById('quickOpacitySlider').value = 80;
+  document.getElementById('quickSizeValue').textContent = '60px';
+  document.getElementById('quickOpacityValue').textContent = '80%';
+  
+  showNotification('Controls reset to default!', 'info');
+}
+
+// Drag and drop nell'editor
+function setupEditorDragging() {
+  const draggables = document.querySelectorAll('.draggable-control');
+  
+  draggables.forEach(element => {
+    let isDragging = false;
+    let startX, startY, initialLeft, initialBottom;
+    
+    // Mouse events
+    element.addEventListener('mousedown', startDrag);
+    document.addEventListener('mousemove', drag);
+    document.addEventListener('mouseup', endDrag);
+    
+    // Touch events
+    element.addEventListener('touchstart', startDrag);
+    document.addEventListener('touchmove', drag);
+    document.addEventListener('touchend', endDrag);
+    
+    function startDrag(e) {
+      isDragging = true;
+      element.classList.add('dragging');
+      
+      const touch = e.touches ? e.touches[0] : e;
+      startX = touch.clientX;
+      startY = touch.clientY;
+      
+      initialLeft = parseInt(element.style.left) || element.offsetLeft;
+      initialBottom = parseInt(element.style.bottom) || 
+        (window.innerHeight - element.offsetTop - element.offsetHeight);
+      
+      e.preventDefault();
+    }
+    
+    function drag(e) {
+      if (!isDragging) return;
+      
+      const touch = e.touches ? e.touches[0] : e;
+      const deltaX = touch.clientX - startX;
+      const deltaY = startY - touch.clientY;
+      
+      let newLeft = initialLeft + deltaX;
+      let newBottom = initialBottom + deltaY;
+      
+      // Limiti schermo
+      newLeft = Math.max(0, Math.min(window.innerWidth - element.offsetWidth, newLeft));
+      newBottom = Math.max(0, Math.min(window.innerHeight - element.offsetHeight, newBottom));
+      
+      element.style.left = newLeft + 'px';
+      element.style.bottom = newBottom + 'px';
+      
+      e.preventDefault();
+    }
+    
+    function endDrag() {
+      if (!isDragging) return;
+      isDragging = false;
+      element.classList.remove('dragging');
+    }
+  });
+}
+
+// Inizializza quando il DOM è pronto
+window.addEventListener('DOMContentLoaded', function() {
+  loadMobileControls();
+  
+  // Aggiorna sliders con valori salvati
+  if (document.getElementById('quickSizeSlider')) {
+    document.getElementById('quickSizeSlider').value = mobileControlsConfig.buttonSize;
+    document.getElementById('quickSizeValue').textContent = mobileControlsConfig.buttonSize + 'px';
+  }
+  if (document.getElementById('quickOpacitySlider')) {
+    document.getElementById('quickOpacitySlider').value = mobileControlsConfig.opacity * 100;
+    document.getElementById('quickOpacityValue').textContent = (mobileControlsConfig.opacity * 100) + '%';
+  }
+});
+
+// Applica configurazione quando entri nel gioco
+const originalShowScreen = window.showScreen;
+window.showScreen = function(screenId) {
+  originalShowScreen(screenId);
+  if (screenId === 'gameScreen') {
+    setTimeout(applyMobileControls, 100);
+  }
+};
       
       
       
@@ -11774,142 +12017,6 @@ function goToHomeFromClickReaction() {
   document.getElementById('clickReactionGame').classList.add('hidden');
   showScreen('mainMenu');
 }
-
-
-// PATCH: Sposta i tasti mobile-action-btn più in alto su tablet e telefoni
-
-function adjustMobileButtonsPosition() {
-  // Trova contenitore dei pulsanti
-  const mobileButtons = document.getElementById('mobileActionButtons');
-  const mobileHome = document.getElementById('mobileHome');
-  const mobileShoot = document.getElementById('mobileShoot');
-  const mobileShield = document.getElementById('mobileShield');
-  const mobileSpecial = document.getElementById('mobileSpecial');
-
-  // Calcola altezza superiore (più alto del solito)
-  let newBottom = '68px'; // default più alto, puoi regolare
-
-  // Se schermo molto alto (tablet verticale), sposta ancora più su
-  if (window.innerHeight >= 900 && window.innerWidth < 900) newBottom = '110px';
-
-  // Se landscape ma schermo basso (tablet orizzontale, smartphone largo)
-  if (window.innerWidth > window.innerHeight && window.innerHeight < 600) newBottom = '38px';
-
-  // Applica a tutti i pulsanti e contenitore
-  if (mobileButtons) mobileButtons.style.bottom = newBottom;
-  [mobileHome, mobileShoot, mobileShield, mobileSpecial].forEach(btn => {
-    if (btn) btn.style.bottom = newBottom;
-  });
-}
-
-// Applica subito e ad ogni resize/orientamento
-window.addEventListener('DOMContentLoaded', adjustMobileButtonsPosition);
-window.addEventListener('resize', adjustMobileButtonsPosition);
-window.addEventListener('orientationchange', adjustMobileButtonsPosition);
-
-
-// Funzioni menu personalizzazione mobile
-
-function openMobileCustomMenu() {
-  document.getElementById('mobileCustomMenu').style.display = 'block';
-  updateMobileCustomPreview();
-}
-
-function closeMobileCustomMenu() {
-  document.getElementById('mobileCustomMenu').style.display = 'none';
-}
-
-// Aggiorna anteprima live
-function updateMobileCustomPreview() {
-  // Dimensione bottoni
-  const btnSize = document.getElementById('customBtnSize').value;
-  document.getElementById('customBtnSizeVal').textContent = btnSize + "px";
-  const previewBtns = document.querySelectorAll('#previewButtons .previewBtn');
-  previewBtns.forEach(btn => {
-    btn.style.width = btn.style.height = btnSize + "px";
-    btn.style.fontSize = Math.max(22, btnSize / 2) + "px";
-  });
-
-  // Colore bottoni
-  const btnColor = document.getElementById('customBtnColor').value;
-  document.getElementById('customBtnColorVal').textContent = btnColor;
-  previewBtns.forEach(btn => btn.style.background = btnColor);
-
-  // Dimensione joystick
-  const joySize = document.getElementById('customJoySize').value;
-  document.getElementById('customJoySizeVal').textContent = joySize + "px";
-  const previewJoy = document.getElementById('previewJoystick');
-  previewJoy.style.width = previewJoy.style.height = joySize + "px";
-  previewJoy.style.background = btnColor;
-
-  // Posizione bottoni
-  const pos = document.getElementById('customBtnPos').value;
-  const previewBtnsCont = document.getElementById('previewButtons');
-  previewBtnsCont.style.left = previewBtnsCont.style.right = '';
-  previewBtnsCont.style.top = previewBtnsCont.style.bottom = '';
-  if (pos === "right-bottom") { previewBtnsCont.style.right = "24px"; previewBtnsCont.style.bottom = "24px"; }
-  if (pos === "right-top")    { previewBtnsCont.style.right = "24px"; previewBtnsCont.style.top = "24px"; }
-  if (pos === "left-bottom")  { previewBtnsCont.style.left = "24px";  previewBtnsCont.style.bottom = "24px"; }
-  if (pos === "left-top")     { previewBtnsCont.style.left = "24px";  previewBtnsCont.style.top = "24px"; }
-}
-
-// Listeners live
-['customBtnSize','customBtnColor','customJoySize','customBtnPos'].forEach(id => {
-  document.getElementById(id).addEventListener('input', updateMobileCustomPreview);
-});
-
-// Applica le modifiche ai controlli reali
-function applyMobileCustomization() {
-  const btnSize = document.getElementById('customBtnSize').value;
-  const btnColor = document.getElementById('customBtnColor').value;
-  const joySize = document.getElementById('customJoySize').value;
-  const pos = document.getElementById('customBtnPos').value;
-
-  // Salva su localStorage
-  localStorage.setItem('mobileBtnSize', btnSize);
-  localStorage.setItem('mobileBtnColor', btnColor);
-  localStorage.setItem('mobileJoySize', joySize);
-  localStorage.setItem('mobileBtnPos', pos);
-
-  // Applica alle classi reali (modifica #mobileActionButtons e #mobileJoystick)
-  const btns = document.querySelectorAll('#mobileActionButtons .mobile-action-btn');
-  btns.forEach(btn => {
-    btn.style.width = btn.style.height = btnSize + "px";
-    btn.style.background = btnColor;
-    btn.style.fontSize = Math.max(22, btnSize / 2) + "px";
-  });
-
-  const joystick = document.getElementById('mobileJoystick');
-  if (joystick) {
-    joystick.style.width = joystick.style.height = joySize + "px";
-    joystick.style.background = btnColor;
-  }
-
-  const actionBtnsCont = document.getElementById('mobileActionButtons');
-  actionBtnsCont.style.left = actionBtnsCont.style.right = '';
-  actionBtnsCont.style.top = actionBtnsCont.style.bottom = '';
-  if (pos === "right-bottom") { actionBtnsCont.style.right = "24px"; actionBtnsCont.style.bottom = "24px"; }
-  if (pos === "right-top")    { actionBtnsCont.style.right = "24px"; actionBtnsCont.style.top = "24px"; }
-  if (pos === "left-bottom")  { actionBtnsCont.style.left = "24px";  actionBtnsCont.style.bottom = "24px"; }
-  if (pos === "left-top")     { actionBtnsCont.style.left = "24px";  actionBtnsCont.style.top = "24px"; }
-
-  closeMobileCustomMenu();
-  alert("Personalizzazione salvata!"); // O usa la tua showNotification()
-}
-
-// All'avvio, carica le impostazioni salvate
-window.addEventListener('DOMContentLoaded', () => {
-  const btnSize = localStorage.getItem('mobileBtnSize');
-  if (btnSize) document.getElementById('customBtnSize').value = btnSize;
-  const btnColor = localStorage.getItem('mobileBtnColor');
-  if (btnColor) document.getElementById('customBtnColor').value = btnColor;
-  const joySize = localStorage.getItem('mobileJoySize');
-  if (joySize) document.getElementById('customJoySize').value = joySize;
-  const pos = localStorage.getItem('mobileBtnPos');
-  if (pos) document.getElementById('customBtnPos').value = pos;
-
-  updateMobileCustomPreview();
-});
 
 
 </script>
