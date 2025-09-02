@@ -11725,7 +11725,36 @@ function goToHomeFromClickReaction() {
 }
 
 
+// PATCH: Sposta i tasti mobile-action-btn più in alto su tablet e telefoni
 
+function adjustMobileButtonsPosition() {
+  // Trova contenitore dei pulsanti
+  const mobileButtons = document.getElementById('mobileActionButtons');
+  const mobileHome = document.getElementById('mobileHome');
+  const mobileShoot = document.getElementById('mobileShoot');
+  const mobileShield = document.getElementById('mobileShield');
+  const mobileSpecial = document.getElementById('mobileSpecial');
+
+  // Calcola altezza superiore (più alto del solito)
+  let newBottom = '68px'; // default più alto, puoi regolare
+
+  // Se schermo molto alto (tablet verticale), sposta ancora più su
+  if (window.innerHeight >= 900 && window.innerWidth < 900) newBottom = '110px';
+
+  // Se landscape ma schermo basso (tablet orizzontale, smartphone largo)
+  if (window.innerWidth > window.innerHeight && window.innerHeight < 600) newBottom = '38px';
+
+  // Applica a tutti i pulsanti e contenitore
+  if (mobileButtons) mobileButtons.style.bottom = newBottom;
+  [mobileHome, mobileShoot, mobileShield, mobileSpecial].forEach(btn => {
+    if (btn) btn.style.bottom = newBottom;
+  });
+}
+
+// Applica subito e ad ogni resize/orientamento
+window.addEventListener('DOMContentLoaded', adjustMobileButtonsPosition);
+window.addEventListener('resize', adjustMobileButtonsPosition);
+window.addEventListener('orientationchange', adjustMobileButtonsPosition);
 
 
 </script>
