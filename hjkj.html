@@ -12,6 +12,9 @@
      crossorigin="anonymous"></script>
 
 
+
+
+
 <script>
     // 1. INIZIALIZZA SDK CORRETTAMENTE
     window.CrazyGames.SDK.init().then(() => {
@@ -4633,70 +4636,71 @@ enemyImage.src = 'alien-enemy2.png'; // Senza /
       }
 
       // Event Listeners Setup
-      function setupEventListeners() {
-          document.addEventListener('keydown', (e) => {
-              gameState.keys[e.key.toLowerCase()] = true;
-              gameState.keys[e.code] = true;
-              
-              if (gameState.currentScreen === 'gameScreen' && gameState.gameRunning) {
-                  switch(e.key.toLowerCase()) {
-                      case 'escape':
-                          forfeitMission();
-                          break;
-                      case 'r':
-                          restartCurrentLevel();
-                          break;
-                      case 'e':
-                          useEmergencyShield();
-                          break;
-                      case 'c':
-                          specialAttack();
-                          break;
-                      case 'shift':
-                          gameState.player.precisionMode = true;
-                          break;
-                  
-                  
-                  }
-              }
-          });
-          
-          document.addEventListener('keyup', (e) => {
-              gameState.keys[e.key.toLowerCase()] = false;
-              gameState.keys[e.code] = false;
-              
-              if (e.key.toLowerCase() === 'shift') {
-                  gameState.player.precisionMode = false;
-              }
-          });
-          
-          if (!gameState.isMobile) {
-              canvas.addEventListener('mousemove', (e) => {
-                  const rect = canvas.getBoundingClientRect();
-                  gameState.mouse.x = e.clientX - rect.left;
-                  gameState.mouse.y = e.clientY - rect.top;
-              });
-              
-              canvas.addEventListener('mousedown', (e) => {
-                  if (e.button === 0) {
-                      gameState.keys['shoot'] = true;
-                  } else if (e.button === 2) {
-                      gameState.keys['charged_shot'] = true;
-                  }
-              });
-              
-              canvas.addEventListener('mouseup', (e) => {
-                  if (e.button === 0) {
-                      gameState.keys['shoot'] = false;
-                  } else if (e.button === 2) {
-                      gameState.keys['charged_shot'] = false;
-                  }
-              });
-              
-              canvas.addEventListener('contextmenu', (e) => e.preventDefault());
-          }
-      }
+      // Funzione completa con tasto R disabilitato (nessun restart da tastiera)
+function setupEventListeners() {
+    document.addEventListener('keydown', (e) => {
+        // Disabilita il tasto R per il restart!
+        if (e.key && e.key.toLowerCase() === 'r') return;
 
+        gameState.keys[e.key.toLowerCase()] = true;
+        gameState.keys[e.code] = true;
+
+        if (gameState.currentScreen === 'gameScreen' && gameState.gameRunning) {
+            switch(e.key.toLowerCase()) {
+                case 'escape':
+                    forfeitMission();
+                    break;
+                // case 'r':
+                //     restartCurrentLevel(); // <-- RIMOSSO!
+                //     break;
+                case 'e':
+                    useEmergencyShield();
+                    break;
+                case 'c':
+                    specialAttack();
+                    break;
+                case 'shift':
+                    gameState.player.precisionMode = true;
+                    break;
+            }
+        }
+    });
+
+    document.addEventListener('keyup', (e) => {
+        gameState.keys[e.key.toLowerCase()] = false;
+        gameState.keys[e.code] = false;
+
+        if (e.key.toLowerCase() === 'shift') {
+            gameState.player.precisionMode = false;
+        }
+    });
+
+    if (!gameState.isMobile) {
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            gameState.mouse.x = e.clientX - rect.left;
+            gameState.mouse.y = e.clientY - rect.top;
+        });
+
+        canvas.addEventListener('mousedown', (e) => {
+            if (e.button === 0) {
+                gameState.keys['shoot'] = true;
+            } else if (e.button === 2) {
+                gameState.keys['charged_shot'] = true;
+            }
+        });
+
+        canvas.addEventListener('mouseup', (e) => {
+            if (e.button === 0) {
+                gameState.keys['shoot'] = false;
+            } else if (e.button === 2) {
+                gameState.keys['charged_shot'] = false;
+            }
+        });
+
+        canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+    }
+}
       // Level Grid Generation
       function generateLevelGrid() {
           const levelGrid = document.getElementById('levelGrid');
@@ -5320,54 +5324,53 @@ speed *= gameState.globalSpeed;
     updateUI();
 }
       function updateEnemy(deltaTime) {
-              if (gameState.gameMode === "duel1v1") return; // Non aggiornare boss in 1v1!
+    if (gameState.gameMode === "duel1v1") return; // Non aggiornare boss in 1v1!
+    if (gameState.gameMode === "coop") return; // In co-op, posizione boss solo da server!
 
-            if (gameState.gameMode === "coop") return; // In co-op, posizione boss solo da server!
+    const enemy = gameState.enemy;
+    if (!enemy) return;
 
-const enemy = gameState.enemy;
-          if (!enemy) return;
-          
-          const levelData = LEVEL_DATA[gameState.currentLevel - 1] || LEVEL_DATA[0];
-          
-          // Enemy movement
-          if (enemy.currentPhase >= 3) {
-              enemy.x += enemy.moveDirection * enemy.speed * deltaTime * (1 + Math.sin(Date.now() * 0.01) * 0.5);
-              enemy.angle += 0.02;
-              if (Math.random() < 0.02) {
-                  enemy.moveDirection *= -1;
-              }
-          } else {
-              enemy.x += enemy.moveDirection * enemy.speed * deltaTime;
-              enemy.angle += 0.01;
-          }
-          
-          if (enemy.x <= 100 || enemy.x >= canvas.width - 100) {
-              enemy.moveDirection *= -1;
-          }
-          
-          // Enemy attacks
-          if (enemy.attackCooldown <= 0) {
-              const pattern = enemy.attackPatterns[Math.floor(Math.random() * enemy.attackPatterns.length)];
-              executeAttackPattern(pattern);
-              
-              let baseSpeed = 60;
-              if (gameState.currentLevel <= 5) {
-                  baseSpeed = 90;
-              } else if (gameState.currentLevel <= 10) {
-                  baseSpeed = 70;
-              } else if (gameState.currentLevel <= 15) {
-                  baseSpeed = 50;
-              } else {
-                  baseSpeed = 35;
-              }
-              
-              enemy.attackCooldown = baseSpeed / (enemy.attackSpeed * gameState.adaptiveDifficulty);
-          } else {
-              enemy.attackCooldown -= deltaTime;
-          }
-      }
-      
-      // --- PATCH: funzione mancante per parametri proiettili mobile ---
+    const levelData = LEVEL_DATA[gameState.currentLevel - 1] || LEVEL_DATA[0];
+
+    // Enemy movement
+    if (enemy.currentPhase >= 3) {
+        enemy.x += enemy.moveDirection * enemy.speed * deltaTime * (1 + Math.sin(Date.now() * 0.01) * 0.5);
+        enemy.angle += 0.02;
+        if (Math.random() < 0.02) {
+            enemy.moveDirection *= -1;
+        }
+    } else {
+        enemy.x += enemy.moveDirection * enemy.speed * deltaTime;
+        enemy.angle += 0.01;
+    }
+
+    // PATCH: Clamp posizione boss per evitare che sparisca
+    if (enemy.x <= 100 || enemy.x >= canvas.width - 100) {
+        enemy.moveDirection *= -1;
+        enemy.x = Math.max(100, Math.min(canvas.width - 100, enemy.x)); // <-- CLAMP
+    }
+
+    // Enemy attacks
+    if (enemy.attackCooldown <= 0) {
+        const pattern = enemy.attackPatterns[Math.floor(Math.random() * enemy.attackPatterns.length)];
+        executeAttackPattern(pattern);
+
+        let baseSpeed = 60;
+        if (gameState.currentLevel <= 5) {
+            baseSpeed = 90;
+        } else if (gameState.currentLevel <= 10) {
+            baseSpeed = 70;
+        } else if (gameState.currentLevel <= 15) {
+            baseSpeed = 50;
+        } else {
+            baseSpeed = 35;
+        }
+
+        enemy.attackCooldown = baseSpeed / (enemy.attackSpeed * gameState.adaptiveDifficulty);
+    } else {
+        enemy.attackCooldown -= deltaTime;
+    }
+}
 function getMobileBulletParams(count, speed) {
   // Se sei su mobile, riduci il numero di proiettili e la loro velocità per evitare lag
   if (isMobileDevice && typeof isMobileDevice === "function" && isMobileDevice()) {
@@ -6320,15 +6323,61 @@ function forfeitMission() {
   showScreen('mainMenu');
 }
 
-     function restartGame() {
-        resetBossVisualState(); // <--- AGGIUNGI QUI!!!
+// Funzione completa: disabilita il tasto R per restart da tastiera
+function restartGame() {
+    // Ferma eventuali timeout di avanzamento livello
+    if (window.levelTimeout) {
+        clearTimeout(window.levelTimeout);
+        window.levelTimeout = null;
+    }
 
-        gameState.gameRunning = false;
+    resetBossVisualState();
+
+    // Ferma il game loop
+    gameState.gameRunning = false;
     if (animationId) {
         cancelAnimationFrame(animationId);
+        animationId = null;
     }
+
+    // Prepara il prossimo livello (se serve)
+    pendingLevelToStart = gameState.currentLevel;
+
+    // Mostra la schermata di gioco
     showScreen('gameScreen');
+
+    // AVVIA SUBITO LA PARTITA!
+    startGame(true); // <--- aggiungi questa riga!
+
+    // Non serve altro!
 }
+
+// --- DISABILITA IL TASTO R PER SEMPRE ---
+document.addEventListener('keydown', function(e) {
+    // Se premi R, non fare nulla!
+    if (e.key && e.key.toLowerCase() === 'r') return; // Ignora il tasto R
+
+    gameState.keys[e.key.toLowerCase()] = true;
+    gameState.keys[e.code] = true;
+
+    if (gameState.currentScreen === 'gameScreen' && gameState.gameRunning) {
+        switch(e.key.toLowerCase()) {
+            case 'escape':
+                forfeitMission();
+                break;
+            // TOLTO 'r'!
+            case 'e':
+                useEmergencyShield();
+                break;
+            case 'c':
+                specialAttack();
+                break;
+            case 'shift':
+                gameState.player.precisionMode = true;
+                break;
+        }
+    }
+});
 
       function restartCurrentLevel() {
           restartGame();
