@@ -3392,7 +3392,8 @@ img, .ship-image, .duel-ship img {
                   <button class="menu-btn" onclick="showOrientationSelector()">📱 ORIENTATION</button>
                   <button class="menu-btn primary" onclick="startDuelQueue()">⚔️ 1v1 DUELS</button>
                   <!-- Apri il Mobile Customization menu -->
-                  <button class="menu-btn" onclick="showScreen('mobileCustomizationMenu')">📱 MOBILE SETTINGS</button>
+                  <!-- Pulsante di apertura menu (metti dove vuoi) -->
+                  <button id="openMobileCustomBtn" onclick="openMobileCustomMenu()" style="position:fixed;bottom:16px;right:16px;z-index:9000;background:#00bcd4;color:#222;padding:0.7em 1.6em;border-radius:12px;font-weight:bold;">📱 Personalizza Mobile</button>
                   <button class="menu-btn primary" onclick="startDuel2v2Queue()">⚔️ 2v2 TEAM DUELS</button>
                   <button class="menu-btn" onclick="showTeam2v2Leaderboard()">🏆 2v2 TEAM LEADERBOARD</button>
                   <button class="menu-btn primary" onclick="showClickReactionMenu()">⚡ CLICK REACTION test:https://minigames-ecux.onrender.com</button>
@@ -4035,6 +4036,56 @@ img, .ship-image, .duel-ship img {
   <div id="cr_reaction_target" style="position:relative;width:100%;height:260px;"></div>
   <div id="cr_scores"></div>
   <button class="menu-btn" onclick="leaveClickReactionRoom()">Esci</button>
+</div>
+  
+  
+  <!-- MENU PERSONALIZZAZIONE MOBILE -->
+<div id="mobileCustomMenu" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; z-index:9000; background:rgba(0,0,0,0.94); color:#fff; padding:2.5rem 1.2rem; overflow:auto;">
+  <h2 style="color:#ffd700; margin-bottom:1.1rem;">Personalizza Controlli Mobile</h2>
+
+  <!-- Dimensione bottoni -->
+  <label for="customBtnSize" style="font-weight:bold;">Dimensione Bottoni:</label>
+  <input type="range" id="customBtnSize" min="35" max="120" value="80" style="width:180px;">
+  <span id="customBtnSizeVal" style="color:#ffd700;">80px</span>
+  <br><br>
+
+  <!-- Colore bottoni -->
+  <label for="customBtnColor" style="font-weight:bold;">Colore Bottoni:</label>
+  <input type="color" id="customBtnColor" value="#00bcd4">
+  <span id="customBtnColorVal" style="color:#00bcd4;">#00bcd4</span>
+  <br><br>
+
+  <!-- Dimensione Joystick -->
+  <label for="customJoySize" style="font-weight:bold;">Dimensione Joystick:</label>
+  <input type="range" id="customJoySize" min="40" max="140" value="90" style="width:180px;">
+  <span id="customJoySizeVal" style="color:#ffd700;">90px</span>
+  <br><br>
+
+  <!-- Posizione bottoni -->
+  <label style="font-weight:bold;">Posizione Bottoni:</label>
+  <select id="customBtnPos">
+    <option value="right-bottom">Destra-Basso</option>
+    <option value="right-top">Destra-Alto</option>
+    <option value="left-bottom">Sinistra-Basso</option>
+    <option value="left-top">Sinistra-Alto</option>
+  </select>
+  <br><br>
+
+  <!-- Anteprima -->
+  <h3 style="margin:1.5em 0 0.7em 0; color:#ffd700;">Anteprima</h3>
+  <div id="mobileCustomPreview" style="width:320px; height:200px; background:#222; border-radius:18px; margin-bottom:1.2em; position:relative;">
+    <!-- Joystick e bottoni si aggiornano live -->
+    <div id="previewJoystick" style="position:absolute; left:24px; bottom:24px; width:90px; height:90px; background:#00bcd4; border-radius:50%; opacity:0.7; border:2px solid #fff;"></div>
+    <div id="previewButtons" style="position:absolute; right:24px; bottom:24px; display:flex; gap:12px;">
+      <div class="previewBtn" style="width:80px;height:80px;background:#00bcd4;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;box-shadow:0 0 12px #00bcd4;">🔫</div>
+      <div class="previewBtn" style="width:80px;height:80px;background:#00bcd4;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;box-shadow:0 0 12px #00bcd4;">🛡️</div>
+      <div class="previewBtn" style="width:80px;height:80px;background:#00bcd4;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;box-shadow:0 0 12px #00bcd4;">💥</div>
+    </div>
+  </div>
+
+  <!-- Azioni -->
+  <button onclick="applyMobileCustomization()" style="background:#ffd700;color:#222;padding:0.7em 2em;border:none;border-radius:12px;font-weight:bold;margin-right:18px;">Salva</button>
+  <button onclick="closeMobileCustomMenu()" style="background:#222;color:#fff;padding:0.7em 2em;border:none;border-radius:12px;font-weight:bold;">Annulla</button>
 </div>
   
   
@@ -11755,6 +11806,110 @@ function adjustMobileButtonsPosition() {
 window.addEventListener('DOMContentLoaded', adjustMobileButtonsPosition);
 window.addEventListener('resize', adjustMobileButtonsPosition);
 window.addEventListener('orientationchange', adjustMobileButtonsPosition);
+
+
+// Funzioni menu personalizzazione mobile
+
+function openMobileCustomMenu() {
+  document.getElementById('mobileCustomMenu').style.display = 'block';
+  updateMobileCustomPreview();
+}
+
+function closeMobileCustomMenu() {
+  document.getElementById('mobileCustomMenu').style.display = 'none';
+}
+
+// Aggiorna anteprima live
+function updateMobileCustomPreview() {
+  // Dimensione bottoni
+  const btnSize = document.getElementById('customBtnSize').value;
+  document.getElementById('customBtnSizeVal').textContent = btnSize + "px";
+  const previewBtns = document.querySelectorAll('#previewButtons .previewBtn');
+  previewBtns.forEach(btn => {
+    btn.style.width = btn.style.height = btnSize + "px";
+    btn.style.fontSize = Math.max(22, btnSize / 2) + "px";
+  });
+
+  // Colore bottoni
+  const btnColor = document.getElementById('customBtnColor').value;
+  document.getElementById('customBtnColorVal').textContent = btnColor;
+  previewBtns.forEach(btn => btn.style.background = btnColor);
+
+  // Dimensione joystick
+  const joySize = document.getElementById('customJoySize').value;
+  document.getElementById('customJoySizeVal').textContent = joySize + "px";
+  const previewJoy = document.getElementById('previewJoystick');
+  previewJoy.style.width = previewJoy.style.height = joySize + "px";
+  previewJoy.style.background = btnColor;
+
+  // Posizione bottoni
+  const pos = document.getElementById('customBtnPos').value;
+  const previewBtnsCont = document.getElementById('previewButtons');
+  previewBtnsCont.style.left = previewBtnsCont.style.right = '';
+  previewBtnsCont.style.top = previewBtnsCont.style.bottom = '';
+  if (pos === "right-bottom") { previewBtnsCont.style.right = "24px"; previewBtnsCont.style.bottom = "24px"; }
+  if (pos === "right-top")    { previewBtnsCont.style.right = "24px"; previewBtnsCont.style.top = "24px"; }
+  if (pos === "left-bottom")  { previewBtnsCont.style.left = "24px";  previewBtnsCont.style.bottom = "24px"; }
+  if (pos === "left-top")     { previewBtnsCont.style.left = "24px";  previewBtnsCont.style.top = "24px"; }
+}
+
+// Listeners live
+['customBtnSize','customBtnColor','customJoySize','customBtnPos'].forEach(id => {
+  document.getElementById(id).addEventListener('input', updateMobileCustomPreview);
+});
+
+// Applica le modifiche ai controlli reali
+function applyMobileCustomization() {
+  const btnSize = document.getElementById('customBtnSize').value;
+  const btnColor = document.getElementById('customBtnColor').value;
+  const joySize = document.getElementById('customJoySize').value;
+  const pos = document.getElementById('customBtnPos').value;
+
+  // Salva su localStorage
+  localStorage.setItem('mobileBtnSize', btnSize);
+  localStorage.setItem('mobileBtnColor', btnColor);
+  localStorage.setItem('mobileJoySize', joySize);
+  localStorage.setItem('mobileBtnPos', pos);
+
+  // Applica alle classi reali (modifica #mobileActionButtons e #mobileJoystick)
+  const btns = document.querySelectorAll('#mobileActionButtons .mobile-action-btn');
+  btns.forEach(btn => {
+    btn.style.width = btn.style.height = btnSize + "px";
+    btn.style.background = btnColor;
+    btn.style.fontSize = Math.max(22, btnSize / 2) + "px";
+  });
+
+  const joystick = document.getElementById('mobileJoystick');
+  if (joystick) {
+    joystick.style.width = joystick.style.height = joySize + "px";
+    joystick.style.background = btnColor;
+  }
+
+  const actionBtnsCont = document.getElementById('mobileActionButtons');
+  actionBtnsCont.style.left = actionBtnsCont.style.right = '';
+  actionBtnsCont.style.top = actionBtnsCont.style.bottom = '';
+  if (pos === "right-bottom") { actionBtnsCont.style.right = "24px"; actionBtnsCont.style.bottom = "24px"; }
+  if (pos === "right-top")    { actionBtnsCont.style.right = "24px"; actionBtnsCont.style.top = "24px"; }
+  if (pos === "left-bottom")  { actionBtnsCont.style.left = "24px";  actionBtnsCont.style.bottom = "24px"; }
+  if (pos === "left-top")     { actionBtnsCont.style.left = "24px";  actionBtnsCont.style.top = "24px"; }
+
+  closeMobileCustomMenu();
+  alert("Personalizzazione salvata!"); // O usa la tua showNotification()
+}
+
+// All'avvio, carica le impostazioni salvate
+window.addEventListener('DOMContentLoaded', () => {
+  const btnSize = localStorage.getItem('mobileBtnSize');
+  if (btnSize) document.getElementById('customBtnSize').value = btnSize;
+  const btnColor = localStorage.getItem('mobileBtnColor');
+  if (btnColor) document.getElementById('customBtnColor').value = btnColor;
+  const joySize = localStorage.getItem('mobileJoySize');
+  if (joySize) document.getElementById('customJoySize').value = joySize;
+  const pos = localStorage.getItem('mobileBtnPos');
+  if (pos) document.getElementById('customBtnPos').value = pos;
+
+  updateMobileCustomPreview();
+});
 
 
 </script>
