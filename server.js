@@ -258,40 +258,89 @@ setInterval(() => {
   }
 }, 50);
 
-// === SOCKET.IO HANDLERS ===
+// === SOCKET.IO HANDLERS (COOP RAID PATCHED) ===
 io.on('connection', (socket) => {
+
+  io.on('connection', (socket) => {
+  // --- JOIN LOBBY: aggiunge health, vite, dead ---
   socket.on('joinLobby', (data) => {
     players[socket.id] = {
       id: socket.id,
       x: 200 + Math.random() * 400,
       y: 400 + Math.random() * 120,
       nickname: data.nickname || 'Player',
-      angle: 0
+      angle: 0,
+      health: 100,
+      maxHealth: 100,
+      role: "dps",
+      ready: false,
+      lives: 3,        // <-- aggiungi vite
+      dead: false      // <-- stato di morte
     };
     playerVoiceStatus[socket.id] = false;
     if (!hostId) hostId = socket.id;
     inviaLobbyAggiornata();
   });
 
+  // --- PLAYER MOVE: solo se non morto ---
   socket.on('playerMove', (data) => {
-    if (players[socket.id]) {
+    if (players[socket.id] && !players[socket.id].dead) {
       players[socket.id].x = data.x;
       players[socket.id].y = data.y;
       players[socket.id].angle = data.angle || 0;
-      players[socket.id].nickname = data.nickname;
+      if (data.nickname) players[socket.id].nickname = data.nickname;
     }
   });
 
+  // --- READY IN LOBBY ---
+  socket.on('playerReady', ({ ready }) => {
+    if (players[socket.id]) {
+      players[socket.id].ready = !!ready;
+      inviaLobbyAggiornata();
+    }
+  });
+
+  // --- RUOLO IN LOBBY ---
+  socket.on('selectRole', ({ role }) => {
+    if (players[socket.id] && typeof role === 'string') {
+      players[socket.id].role = role;
+      inviaLobbyAggiornata();
+    }
+  });
+
+  // --- AVVIO RAID: solo host, tutti ready ---
   socket.on('startCoopRaid', () => {
     if (socket.id !== hostId) return;
+    const allReady = Object.values(players).every(p => p.ready);
+    if (!allReady) {
+      socket.emit('error', { message: "Non tutti sono pronti!" });
+      return;
+    }
+    // Resetta vite e stato di tutti all'avvio
+    Object.values(players).forEach(p => {
+      p.health = 100;
+      p.lives = 3;
+      p.dead = false;
+    });
     resetGame();
     gameInProgress = true;
     io.emit('gameStart', { boss: { ...coopBoss }, players: Object.values(players) });
   });
 
+  // --- DANNO AL BOSS: ruoli, validazione, anti-cheat ---
   socket.on('bossDamage', ({ damage }) => {
     if (!gameInProgress || coopBoss.health <= 0) return;
-    coopBoss.health -= damage;
+    if (typeof damage !== "number" || damage <= 0 || damage > 300) return; // Limita danno
+    if (players[socket.id]?.dead) return; // Player morto non può fare danno
+    // Bonus ruolo
+    const role = players[socket.id]?.role;
+    let finalDamage = damage;
+    if (role === "dps") finalDamage *= 1.25;
+    if (role === "tank") finalDamage *= 0.75;
+    if (role === "support") finalDamage *= 1.05;
+    if (role === "healer") finalDamage *= 0.9;
+
+    coopBoss.health -= finalDamage;
     if (coopBoss.health < 0) coopBoss.health = 0;
     io.emit('bossUpdate', { ...coopBoss });
     if (coopBoss.health <= 0) {
@@ -302,28 +351,73 @@ io.on('connection', (socket) => {
     }
   });
 
+  // --- DANNO AL PLAYER (esempio: boss colpisce player) ---
+  socket.on('playerHit', ({ damage }) => {
+    if (!gameInProgress || typeof damage !== "number" || damage <= 0 || damage > 100) return;
+    const player = players[socket.id];
+    if (!player || player.dead) return;
+    player.health -= damage;
+    if (player.health <= 0) {
+      player.health = 0;
+      player.lives -= 1;
+      if (player.lives <= 0) {
+        player.dead = true;
+        io.to(socket.id).emit('playerDead', { lives: 0 });
+      } else {
+        io.to(socket.id).emit('playerCanRetry', { lives: player.lives });
+      }
+      inviaLobbyAggiornata();
+    } else {
+      io.to(socket.id).emit('playerHit', { health: player.health, lives: player.lives });
+    }
+  });
+
+  // --- PLAYER RETRY: solo se ha vite rimaste ---
+  socket.on('playerRetry', () => {
+    const player = players[socket.id];
+    if (!player || !player.dead) return;
+    if (player.lives <= 0) {
+      io.to(socket.id).emit('playerDead', { lives: 0 });
+      return;
+    }
+    // Resuscita
+    player.health = 100;
+    player.dead = false;
+    io.to(socket.id).emit('playerRespawn', { health: player.health, lives: player.lives });
+    inviaLobbyAggiornata();
+  });
+
+  // --- VOICE STATUS ---
   socket.on('voiceActive', (data) => {
     playerVoiceStatus[socket.id] = !!data.active;
     io.emit('voiceActive', { id: socket.id, active: !!data.active });
   });
 
+  // --- CHAT ---
   socket.on('chatMessage', (data) => {
     if (typeof data.text === "string" && data.text.length <= 200) {
       io.emit('chatMessage', {
-        nickname: data.nickname || 'Player',
+        nickname: data.nickname || players[socket.id]?.nickname || 'Player',
         text: data.text
       });
     }
   });
 
-  socket.on('shoot', (data) => io.emit('spawnBullet', data));
+  // --- SHOOT/BULLET: solo se non morto ---
+  socket.on('shoot', (data) => {
+    if (players[socket.id] && !players[socket.id].dead) {
+      io.emit('spawnBullet', data);
+    }
+  });
+
+  // --- OSTACOLO COLPITO ---
   socket.on('obstacleHit', (obstacleId) => {
     const ob = coopObstacles.find(o => o.id === obstacleId);
     if (ob) ob.hit = true;
     io.emit('obstaclesUpdate', coopObstacles);
   });
 
-  // --- DISCONNECTION: COOP + DUEL + SPECTATOR ---
+  // --- DISCONNECTION: gestisce host, lobby, voice ---
   socket.on('disconnect', () => {
     delete players[socket.id];
     delete playerVoiceStatus[socket.id];
@@ -334,44 +428,23 @@ io.on('connection', (socket) => {
     }
     inviaLobbyAggiornata();
     io.emit('voiceActive', { id: socket.id, active: false });
-
-    duelQueue = duelQueue.filter(p => p.socket.id !== socket.id);
-
-    for (const [room, duel] of Object.entries(duelRooms)) {
-      if (duel.ended) continue;
-      if (duel.p1.id === socket.id || duel.p2.id === socket.id) {
-        duel.ended = true;
-        const winner = (duel.p1.id === socket.id) ? duel.p2.id : duel.p1.id;
-        if (io.sockets.sockets.get(winner))
-          io.to(winner).emit('duel_opponent_left');
-        io.to(duel.p1.id).emit('duel_end', {
-          winner: (duel.p1.id === winner ? duel.p1.id : duel.p2.id),
-          stats: duel.stats
-        });
-        io.to(duel.p2.id).emit('duel_end', {
-          winner: (duel.p2.id === winner ? duel.p2.id : duel.p1.id),
-          stats: duel.stats
-        });
-        delete duelRooms[room];
-        duelSpectators[room]?.forEach(sid => io.to(sid).emit('duel_end', { winner, stats: duel.stats }));
-        delete duelSpectators[room];
-      }
-      if (duelSpectators[room]) {
-        duelSpectators[room] = duelSpectators[room].filter(sid => sid !== socket.id);
-      }
-    }
   });
 
   function inviaLobbyAggiornata() {
     io.emit('lobbyUpdate', { players: Object.values(players) });
   }
 
+  // --- WEBRTC (voice/video) ---
   socket.on('webrtc-offer', (data) =>
     socket.to(data.targetId).emit('webrtc-offer', { fromId: socket.id, sdp: data.sdp }));
   socket.on('webrtc-answer', (data) =>
     socket.to(data.targetId).emit('webrtc-answer', { fromId: socket.id, sdp: data.sdp }));
   socket.on('webrtc-ice', (data) =>
     socket.to(data.targetId).emit('webrtc-ice', { fromId: socket.id, candidate: data.candidate }));
+
+  });
+  // --- FUTURE: healing, shield, buff handler ---
+  // es: socket.on('playerHeal', ...) ecc
 
   // --- 1v1 DUEL PvP MODE ---
   socket.on('duel_queue', (data) => {
