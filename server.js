@@ -375,17 +375,17 @@ io.on('connection', (socket) => {
 
   // --- PLAYER RETRY: solo se ha vite rimaste ---
   socket.on('playerRetry', () => {
-    const player = players[socket.id];
-    if (!player || !player.dead) return;
-    if (player.lives <= 0) {
-      io.to(socket.id).emit('playerDead', { lives: 0 });
-      return;
-    }
-    player.health = 100;
-    player.dead = false;
-    io.to(socket.id).emit('playerRespawn', { health: player.health, lives: player.lives });
-    inviaLobbyAggiornata();
-  });
+  const player = players[socket.id];
+  if (!player) return;
+  if (player.lives <= 0) {
+    io.to(socket.id).emit('playerDead', { lives: 0 });
+    return;
+  }
+  player.health = 100;
+  player.dead = false;
+  io.to(socket.id).emit('playerRespawn', { health: player.health, lives: player.lives });
+  inviaLobbyAggiornata();
+});
 
   // --- VOICE STATUS ---
   socket.on('voiceActive', (data) => {
