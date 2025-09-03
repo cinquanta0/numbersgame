@@ -8558,6 +8558,11 @@ function interpolateBossHealth() {
 
 // 5. CoopLoop con deltaTime e patch smooth
 function startCoopGameLoop() {
+  // AGGIUNGI QUESTE RIGHE ALL'INIZIO
+  gameState.player.health = 850;
+  gameState.player.maxHealth = 850;
+  
+  
   if (coopPositionInterval) clearInterval(coopPositionInterval);
   coopPositionInterval = setInterval(sendMyPosition, 40);
   lastFrameTime = performance.now();
