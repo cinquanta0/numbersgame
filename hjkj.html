@@ -8385,6 +8385,12 @@ function startCoopRaidGame(data) {
   resetBossVisualState(); // <--- AGGIUNGI QUESTA RIGA!!!
   gameState.currentLevel = 20;
   initializeCampaignEnemy();
+  // AGGIUNGI QUESTE DUE RIGHE PER 850 HP:
+  gameState.player.health = 850;
+  gameState.player.maxHealth = 850;
+  
+  
+  
   gameState.enemy.health = data.boss.health;
   gameState.enemy.maxHealth = data.boss.maxHealth;
   gameState.enemy.x = data.boss.x || gameState.enemy.x;
