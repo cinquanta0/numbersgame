@@ -5254,18 +5254,6 @@ initGame();
       
    function startGame(skipAd) {
   resetBossVisualState();
-
-  
-    // Cerca dove imposta la salute del player e aggiungi:
-  if (gameState.gameMode === 'coop') {
-    gameState.player.health = 850;
-    gameState.player.maxHealth = 850;
-  } else {
-    gameState.player.health = playerStats.maxHealth;
-    gameState.player.maxHealth = playerStats.maxHealth;
-  }
-  
-  
   
   if (pendingLevelToStart !== null) {
           console.log("🔵 CAMBIO LIVELLO da", gameState.currentLevel, "a", pendingLevelToStart);
