@@ -4395,8 +4395,8 @@ function selectCoopRole(role) {
   // Applica bonus del ruolo
   switch(role) {
     case 'tank':
-      gameState.player.maxHealth += 200;
-      gameState.player.health += 200;
+      gameState.player.maxHealth += 850;
+      gameState.player.health += 850;
       showNotification("🛡️ Tank: +200 HP, attiri i proiettili!", "info");
       break;
     case 'healer':
@@ -5255,6 +5255,18 @@ initGame();
    function startGame(skipAd) {
   resetBossVisualState();
 
+  
+    // Cerca dove imposta la salute del player e aggiungi:
+  if (gameState.gameMode === 'coop') {
+    gameState.player.health = 850;
+    gameState.player.maxHealth = 850;
+  } else {
+    gameState.player.health = playerStats.maxHealth;
+    gameState.player.maxHealth = playerStats.maxHealth;
+  }
+  
+  
+  
   if (pendingLevelToStart !== null) {
           console.log("🔵 CAMBIO LIVELLO da", gameState.currentLevel, "a", pendingLevelToStart);
 
