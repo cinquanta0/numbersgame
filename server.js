@@ -259,9 +259,12 @@ setInterval(() => {
 }, 50);
 
 // === SOCKET.IO HANDLERS (COOP RAID PATCHED) ===
-io.on('connection', (socket) => {
+// Funzione visibile a tutto il file
+function inviaLobbyAggiornata() {
+  io.emit('lobbyUpdate', { players: Object.values(players) });
+}
 
-  io.on('connection', (socket) => {
+io.on('connection', (socket) => {
   // --- JOIN LOBBY: aggiunge health, vite, dead ---
   socket.on('joinLobby', (data) => {
     players[socket.id] = {
@@ -274,8 +277,8 @@ io.on('connection', (socket) => {
       maxHealth: 100,
       role: "dps",
       ready: false,
-      lives: 3,        // <-- aggiungi vite
-      dead: false      // <-- stato di morte
+      lives: 3,
+      dead: false
     };
     playerVoiceStatus[socket.id] = false;
     if (!hostId) hostId = socket.id;
@@ -316,7 +319,6 @@ io.on('connection', (socket) => {
       socket.emit('error', { message: "Non tutti sono pronti!" });
       return;
     }
-    // Resetta vite e stato di tutti all'avvio
     Object.values(players).forEach(p => {
       p.health = 100;
       p.lives = 3;
@@ -330,9 +332,8 @@ io.on('connection', (socket) => {
   // --- DANNO AL BOSS: ruoli, validazione, anti-cheat ---
   socket.on('bossDamage', ({ damage }) => {
     if (!gameInProgress || coopBoss.health <= 0) return;
-    if (typeof damage !== "number" || damage <= 0 || damage > 300) return; // Limita danno
-    if (players[socket.id]?.dead) return; // Player morto non può fare danno
-    // Bonus ruolo
+    if (typeof damage !== "number" || damage <= 0 || damage > 300) return;
+    if (players[socket.id]?.dead) return;
     const role = players[socket.id]?.role;
     let finalDamage = damage;
     if (role === "dps") finalDamage *= 1.25;
@@ -380,7 +381,6 @@ io.on('connection', (socket) => {
       io.to(socket.id).emit('playerDead', { lives: 0 });
       return;
     }
-    // Resuscita
     player.health = 100;
     player.dead = false;
     io.to(socket.id).emit('playerRespawn', { health: player.health, lives: player.lives });
@@ -430,10 +430,6 @@ io.on('connection', (socket) => {
     io.emit('voiceActive', { id: socket.id, active: false });
   });
 
-  function inviaLobbyAggiornata() {
-    io.emit('lobbyUpdate', { players: Object.values(players) });
-  }
-
   // --- WEBRTC (voice/video) ---
   socket.on('webrtc-offer', (data) =>
     socket.to(data.targetId).emit('webrtc-offer', { fromId: socket.id, sdp: data.sdp }));
@@ -442,7 +438,6 @@ io.on('connection', (socket) => {
   socket.on('webrtc-ice', (data) =>
     socket.to(data.targetId).emit('webrtc-ice', { fromId: socket.id, candidate: data.candidate }));
 
-  });
   // --- FUTURE: healing, shield, buff handler ---
   // es: socket.on('playerHeal', ...) ecc
 
