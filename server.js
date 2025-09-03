@@ -273,8 +273,8 @@ io.on('connection', (socket) => {
       y: 400 + Math.random() * 120,
       nickname: data.nickname || 'Player',
       angle: 0,
-      health: 100,
-      maxHealth: 100,
+      health: 850,
+      maxHealth: 850,
       role: "dps",
       ready: false,
       lives: 3,
@@ -320,10 +320,11 @@ io.on('connection', (socket) => {
       return;
     }
     Object.values(players).forEach(p => {
-      p.health = 100;
-      p.lives = 3;
-      p.dead = false;
-    });
+  p.health = 850;
+  p.maxHealth = 850;
+  p.lives = 3;
+  p.dead = false;
+});
     resetGame();
     gameInProgress = true;
     io.emit('gameStart', { boss: { ...coopBoss }, players: Object.values(players) });
@@ -381,7 +382,7 @@ io.on('connection', (socket) => {
     io.to(socket.id).emit('playerDead', { lives: 0 });
     return;
   }
-  player.health = 100;
+  player.health = 850;
   player.dead = false;
   io.to(socket.id).emit('playerRespawn', { health: player.health, lives: player.lives });
   inviaLobbyAggiornata();
