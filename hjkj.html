@@ -6627,7 +6627,9 @@ function forfeitMission() {
 // Funzione completa: disabilita il tasto R per restart da tastiera
 function restartGame() {
     if (gameState.gameMode === 'coop') {
-    showNotification('Retry non disponibile in co-op!', 'info');
+    // Invia richiesta di retry al server
+    socket.emit('playerRetry');
+    showNotification('Richiesta di respawn inviata!', 'info');
     return;
   }
   
