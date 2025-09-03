@@ -5352,6 +5352,9 @@ initGame();
     gameLoop();
 }
      function initializeCampaignEnemy() {
+        if (gameState.gameMode === "coop") return; // Non inizializzare boss in co-op!
+
+      
       if (gameState.gameMode === "duel1v1") return;
 
 
@@ -6623,7 +6626,13 @@ function forfeitMission() {
 
 // Funzione completa: disabilita il tasto R per restart da tastiera
 function restartGame() {
-    // Ferma eventuali timeout di avanzamento livello
+    if (gameState.gameMode === 'coop') {
+    showNotification('Retry non disponibile in co-op!', 'info');
+    return;
+  }
+  
+  
+  // Ferma eventuali timeout di avanzamento livello
     if (window.levelTimeout) {
         clearTimeout(window.levelTimeout);
         window.levelTimeout = null;
@@ -6809,27 +6818,60 @@ document.addEventListener('keydown', function(e) {
      
  // --- RENDER ALTRI PLAYER ---
 function renderOtherPlayers(ctx) {
+  // Debug: mostra lo stato degli altri player
   console.log("Rendering otherPlayers:", otherPlayers);
-    
+
   for (let id in otherPlayers) {
+    // Non disegnare te stesso
     if (id === mySocketId) continue;
     const p = otherPlayers[id];
-    // Interpolazione verso la posizione target
+
+    // Se il player è morto/inattivo, NON renderizzare (usa flag ricevuto dal server)
+    if (p.isDown) continue;
+
+    // Interpolazione verso la posizione target (se disponibile)
     if (typeof p.targetX === "number" && typeof p.targetY === "number") {
       p.x += (p.targetX - p.x) * 0.33;
       p.y += (p.targetY - p.y) * 0.33;
     }
+
+    // Interpolazione della health/energy (se vuoi effetto smooth sulle barre)
+    if (typeof p.targetHealth === "number" && typeof p.health === "number") {
+      p.health += (p.targetHealth - p.health) * 0.33;
+    }
+    if (typeof p.targetEnergy === "number" && typeof p.energy === "number") {
+      p.energy += (p.targetEnergy - p.energy) * 0.33;
+    }
+
     ctx.save();
     ctx.globalAlpha = 0.7;
-    ctx.drawImage(playerImage, p.x - 32, p.y - 32, 64, 64);
+
+    // Se hai skin/avatar custom per il player, usa p.skin, altrimenti playerImage
+    let img = playerImage;
+    if (p.skin) {
+      img = new Image();
+      img.src = p.skin; // oppure una funzione getShipImageFromId(p.skin)
+    }
+    ctx.drawImage(img, p.x - 32, p.y - 32, 64, 64);
+
+    // Nickname sopra la navicella
     ctx.font = "bold 18px Orbitron";
     ctx.fillStyle = "#ffd700";
     ctx.textAlign = "center";
-    ctx.fillText(p.nickname, p.x, p.y - 40);
+    ctx.fillText(p.nickname || "Player", p.x, p.y - 40);
+
+    // (Opzionale) barra vita/energia sopra la testa
+    if (typeof p.health === "number" && typeof p.maxHealth === "number") {
+      const hpPercent = Math.max(0, p.health) / Math.max(1, p.maxHealth);
+      ctx.fillStyle = hpPercent > 0.5 ? "#4caf50" : "#ffd700";
+      ctx.fillRect(p.x - 22, p.y - 54, 44 * hpPercent, 6);
+      ctx.strokeStyle = "#fff";
+      ctx.strokeRect(p.x - 22, p.y - 54, 44, 6);
+    }
+
     ctx.restore();
   }
 }
-
      
      function renderBullets() {
   gameState.bullets.forEach(bullet => {
@@ -8401,12 +8443,12 @@ function sendMyPosition() {
       y: gameState.player.y,
       angle: gameState.player.angle,
       nickname: getPlayerName(),
-      // PATCH: sincronizza stato vitale
       health: gameState.player.health,
       maxHealth: gameState.player.maxHealth,
       energy: gameState.player.energy,
       maxEnergy: gameState.player.maxEnergy,
-      lives: gameState.player.lives
+      lives: gameState.player.lives,
+      isDown: gameState.player.health <= 0 // oppure altro flag
     });
   }
 }
@@ -8756,15 +8798,37 @@ function showScreen(screenId) {
 
 
 function renderBossBar() {
-  if (bossServerHealth === null || bossMaxHealth === null) return;
-  if (bossVisualHealth === null) bossVisualHealth = bossServerHealth;
-  // Interpolazione fluida (più reattiva = 0.4)
+  // 1. Mostra la barra SOLO se i dati del server sono validi
+  if (typeof bossServerHealth !== "number" || typeof bossMaxHealth !== "number") return;
+
+  // 2. Inizializza la visualizzazione solo la prima volta (smooth)
+  if (bossVisualHealth === null || typeof bossVisualHealth !== "number") {
+    bossVisualHealth = bossServerHealth;
+  }
+
+  // 3. Interpolazione fluida della barra (più reattiva = 0.4)
   bossVisualHealth += (bossServerHealth - bossVisualHealth) * 0.4;
-  if (Math.abs(bossVisualHealth - bossServerHealth) < 0.7) bossVisualHealth = bossServerHealth;
-  // Aggiorna barra
+
+  // 4. Snap al valore reale se la differenza è minima
+  if (Math.abs(bossVisualHealth - bossServerHealth) < 0.7) {
+    bossVisualHealth = bossServerHealth;
+  }
+
+  // 5. Calcola la percentuale della barra
   const percent = Math.max(0, bossVisualHealth) / bossMaxHealth * 100;
-  document.getElementById('enemyHealthFill').style.width = percent + '%';
-  document.getElementById('enemyHealthText').textContent =
+
+  // 6. Aggiorna la barra grafica
+  const enemyHealthFill = document.getElementById('enemyHealthFill');
+  const enemyHealthText = document.getElementById('enemyHealthText');
+  if (enemyHealthFill) enemyHealthFill.style.width = percent + '%';
+  if (enemyHealthText) enemyHealthText.textContent =
+    `${Math.max(0, Math.floor(bossVisualHealth))} / ${bossMaxHealth}`;
+
+  // 7. (OPZIONALE) Aggiorna anche una barra custom co-op se esiste
+  const coopBossBarFill = document.getElementById('coopBossBarFill');
+  const coopBossBarText = document.getElementById('coopBossBarText');
+  if (coopBossBarFill) coopBossBarFill.style.width = percent + '%';
+  if (coopBossBarText) coopBossBarText.textContent =
     `${Math.max(0, Math.floor(bossVisualHealth))} / ${bossMaxHealth}`;
 }
  
@@ -12022,6 +12086,58 @@ function goToHomeFromClickReaction() {
   showScreen('mainMenu');
 }
 
+
+// Gestione della morte del player (vite > 0)
+socket.on('playerCanRetry', ({ lives }) => {
+  // Mostra un'interfaccia per permettere al player di "riprovarci"
+  showRespawnUI(lives); // Funzione che mostra un pulsante "Respawn" con vite rimaste
+
+  // Se vuoi fare respawn automatico, puoi inviare la richiesta:
+  // socket.emit('playerRetry');
+});
+
+// Gestione del "Game Over" (vite finite)
+socket.on('playerDead', ({ lives }) => {
+  // Mostra "Game Over" e blocca qualsiasi input del giocatore
+  showGameOverUI(); // Funzione che mostra la schermata di fine partita
+});
+
+// Quando il server conferma il revive
+socket.on('playerRespawn', ({ health, lives }) => {
+  // Aggiorna lo stato del giocatore
+  respawnPlayer(health, lives); // Funzione che resetta posizione, vita, ecc.
+});
+
+
+
+// Mostra UI per il respawn
+function showRespawnUI(lives) {
+  const respawnButton = document.createElement('button');
+  respawnButton.innerText = `Respawn (${lives} vite rimaste)`;
+  respawnButton.onclick = () => {
+    socket.emit('playerRetry'); // Invia la richiesta al server
+    respawnButton.remove(); // Rimuove il pulsante dopo il click
+  };
+  document.body.appendChild(respawnButton);
+}
+
+// Mostra la schermata di Game Over
+function showGameOverUI() {
+  const gameOverDiv = document.createElement('div');
+  gameOverDiv.innerHTML = "<h1>Game Over</h1><p>Non hai più vite!</p>";
+  document.body.appendChild(gameOverDiv);
+}
+
+// Resuscita il giocatore
+function respawnPlayer(health, lives) {
+  // Reset stato e vita del player
+  player.health = health;
+  player.lives = lives;
+  player.dead = false;
+  // Aggiorna la UI
+  updatePlayerHUD();
+  console.log(`Resuscitato con ${health} HP e ${lives} vite rimaste`);
+}
 
 </script>
   
