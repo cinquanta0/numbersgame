@@ -8,12 +8,11 @@ const socketIo = require('socket.io');
 const path = require('path');
 
 // =====================================================
-// PATCH FETCH SAFE (evita crash in Node < 18 o con node-fetch v3)
+// FETCH SAFE (fallback per Node < 18 o node-fetch ESM)
 // =====================================================
 let fetchFn = globalThis.fetch;
 if (typeof fetchFn !== 'function') {
   try {
-    // Lazy dynamic import (funziona con node-fetch v3 ESM)
     fetchFn = (...args) => import('node-fetch').then(m => m.default(...args));
     console.log('[INIT] Using dynamic import for node-fetch');
   } catch (e) {
@@ -24,8 +23,6 @@ async function safeFetch(url, options) {
   if (typeof fetchFn !== 'function') throw new Error('fetch non disponibile');
   return fetchFn(url, options);
 }
-
-// =====================================================
 
 const app = express();
 const server = http.createServer(app);
@@ -52,7 +49,7 @@ const BOSS_X_MIN = 100, BOSS_X_MAX = 900, BOSS_Y_MIN = 80, BOSS_Y_MAX = 220;
 const GAME_WIDTH = 1000, GAME_HEIGHT = 700;
 
 // === Boss Attacks ===
-let bossAttackCooldown = 0;
+let bossAttackTimer = 0; // (sostituisce bossAttackCooldown)
 const MIN_ATTACK_INTERVAL = 700, MAX_ATTACK_INTERVAL = 1600;
 const BOSS_ATTACK_PATTERNS = [
   'basic', 'spread', 'tracking', 'wave', 'laser', 'swarm', 'spiral', 'chaos', 'ultimate'
@@ -68,11 +65,12 @@ function resetGame() {
   coopBoss.health = 25000;
   coopBoss.dir = 1; coopBoss.yDir = 1;
   coopObstacles = [];
-  gameInProgress = false; bossAttackCooldown = 0;
+  gameInProgress = false;
+  bossAttackTimer = 0;
 }
 
 // =====================================================
-// PATCH: DREAMLO CO-OP LEADERBOARD (robusto, no crash)
+// DREAMLO CO-OP LEADERBOARD (robusto, no crash)
 // =====================================================
 async function submitCoopTeamScore(teamName, score) {
   try {
@@ -83,7 +81,6 @@ async function submitCoopTeamScore(teamName, score) {
     }
     const dreamloKey = process.env.DREAMLO_KEY_PUBLIC || "5z7d7N8IBkSwrhJdyZAXxAYn3Jv1KyTEm6GJZoIALRBw";
     const tag = "coopraid";
-    // update mantiene il punteggio se migliore o lo sovrascrive (add crea sempre nuova entry)
     const url = `https://dreamlo.com/lb/${dreamloKey}/update/${encodeURIComponent(teamName)}/${Math.floor(score)}/${tag}`;
     const res = await safeFetch(url);
     if (!res.ok) {
@@ -109,6 +106,9 @@ function spawnGlobalObstacle() {
     size: 32 + Math.random() * 32, type,
     angle: 0, spin: (Math.random() - 0.5) * 0.07, hit: false
   });
+  if (coopObstacles.length > 80) {
+    coopObstacles.splice(0, coopObstacles.length - 80);
+  }
 }
 function updateObstacles() {
   coopObstacles.forEach(o => { o.x += o.vx; o.y += o.vy; o.angle += o.spin; });
@@ -206,16 +206,27 @@ function spawnDuelObstacle(room) {
   }
 }
 
-// === MAIN GAME LOOP (COOP/DUEL SYNC) ===
+// === LOOP GIOCO (COOP/DUEL SYNC) ===
 let lastBossFrame = Date.now();
+let lastOtherPlayersBroadcast = 0;
+const OTHER_PLAYERS_INTERVAL = 90; // ms ~11Hz
+
 setInterval(() => {
   const now = Date.now();
   let delta = (now - lastBossFrame) / 1000;
   lastBossFrame = now;
   delta = Math.max(0.02, Math.min(delta, 0.07));
 
+  // Broadcast posizioni (throttled)
   if (Object.keys(players).length > 0) {
-    io.emit('otherPlayers', { players: Object.values(players) });
+    if (now - lastOtherPlayersBroadcast >= OTHER_PLAYERS_INTERVAL) {
+      lastOtherPlayersBroadcast = now;
+      io.emit('otherPlayers', {
+        players: Object.values(players).map(p => ({
+          id: p.id, x: p.x, y: p.y, angle: p.angle, nickname: p.nickname, dead: p.dead
+        }))
+      });
+    }
   }
 
   if (gameInProgress) {
@@ -229,15 +240,16 @@ setInterval(() => {
 
     io.emit('bossUpdate', { ...coopBoss });
 
-    bossAttackCooldown -= 40;
-    if (bossAttackCooldown <= 0 && Object.keys(players).length > 0) {
+    // Timer attacchi boss a tempo reale
+    bossAttackTimer -= (delta * 1000);
+    if (bossAttackTimer <= 0 && Object.keys(players).length > 0) {
       let unlockedPatterns = Math.min(
         Math.ceil((coopBoss.maxHealth - coopBoss.health) / 3000) + 2,
         BOSS_ATTACK_PATTERNS.length
       );
       const pattern = BOSS_ATTACK_PATTERNS[Math.floor(Math.random() * unlockedPatterns)];
       io.emit('bossAttack', { pattern, x: coopBoss.x, y: coopBoss.y, time: Date.now() });
-      bossAttackCooldown = Math.random() * (MAX_ATTACK_INTERVAL - MIN_ATTACK_INTERVAL) + MIN_ATTACK_INTERVAL;
+      bossAttackTimer = Math.random() * (MAX_ATTACK_INTERVAL - MIN_ATTACK_INTERVAL) + MIN_ATTACK_INTERVAL;
     }
 
     if (Math.random() < 0.035) spawnGlobalObstacle();
@@ -245,6 +257,7 @@ setInterval(() => {
     io.emit('obstaclesUpdate', coopObstacles);
   }
 
+  // Duel sync
   for (const [room, duel] of Object.entries(duelRooms)) {
     if (duel.ended) continue;
 
@@ -288,6 +301,21 @@ setInterval(() => {
   }
 }, 50);
 
+// === RATE LIMITERS & MAPS ===
+const lastBossDamageTime = new Map();
+const chatCounters = new Map();
+
+// === HELPERS ===
+function sanitizeName(str, max = 16) {
+  return (str || 'Player').toString().replace(/[^A-Za-z0-9_ ]/g, '').slice(0, max);
+}
+function buildTeamName() {
+  return Object.values(players)
+    .map(p => sanitizeName(p.nickname, 12))
+    .join('_')
+    .slice(0, 48) || 'Team';
+}
+
 // === SOCKET.IO HANDLERS ===
 io.on('connection', (socket) => {
   // --- JOIN LOBBY ---
@@ -296,7 +324,7 @@ io.on('connection', (socket) => {
       id: socket.id,
       x: 200 + Math.random() * 400,
       y: 400 + Math.random() * 120,
-      nickname: data.nickname || 'Player',
+      nickname: sanitizeName(data.nickname,16),
       angle: 0,
       health: 100,
       maxHealth: 100,
@@ -312,10 +340,10 @@ io.on('connection', (socket) => {
 
   socket.on('playerMove', (data) => {
     if (players[socket.id] && !players[socket.id].dead) {
-      players[socket.id].x = data.x;
-      players[socket.id].y = data.y;
-      players[socket.id].angle = data.angle || 0;
-      if (data.nickname) players[socket.id].nickname = data.nickname;
+      if (typeof data.x === 'number') players[socket.id].x = data.x;
+      if (typeof data.y === 'number') players[socket.id].y = data.y;
+      players[socket.id].angle = typeof data.angle === 'number' ? data.angle : players[socket.id].angle;
+      if (data.nickname) players[socket.id].nickname = sanitizeName(data.nickname,16);
     }
   });
 
@@ -354,6 +382,13 @@ io.on('connection', (socket) => {
     if (!gameInProgress || coopBoss.health <= 0) return;
     if (typeof damage !== "number" || damage <= 0 || damage > 300) return;
     if (players[socket.id]?.dead) return;
+
+    // Throttle DPS (min 60ms)
+    const now = Date.now();
+    const last = lastBossDamageTime.get(socket.id) || 0;
+    if (now - last < 60) return;
+    lastBossDamageTime.set(socket.id, now);
+
     const role = players[socket.id]?.role;
     let finalDamage = damage;
     if (role === "dps") finalDamage *= 1.25;
@@ -366,12 +401,9 @@ io.on('connection', (socket) => {
     io.emit('bossUpdate', { ...coopBoss });
     if (coopBoss.health <= 0) {
       gameInProgress = false;
-      const squadNicknames = Object.values(players).map(p => p.nickname).join("_") || "Team";
-      // Fire & forget: non bloccare
+      const squadNicknames = buildTeamName();
       submitCoopTeamScore(squadNicknames, Math.floor(coopBoss.maxHealth))
-        .then(r => {
-          if (!r.ok) console.warn('[Dreamlo] punteggio non salvato:', r);
-        });
+        .then(r => { if (!r.ok) console.warn('[Dreamlo] punteggio non salvato:', r); });
       io.emit('bossDefeated', { team: squadNicknames, score: Math.floor(coopBoss.maxHealth) });
     }
   });
@@ -415,12 +447,19 @@ io.on('connection', (socket) => {
   });
 
   socket.on('chatMessage', (data) => {
-    if (typeof data.text === "string" && data.text.length <= 200) {
-      io.emit('chatMessage', {
-        nickname: data.nickname || players[socket.id]?.nickname || 'Player',
-        text: data.text
-      });
-    }
+    if (typeof data.text !== "string" || data.text.length > 200) return;
+    // Rate limit chat: max 8 in 10s
+    const now = Date.now();
+    const history = chatCounters.get(socket.id) || [];
+    const recent = history.filter(t => now - t < 10000);
+    if (recent.length >= 8) return;
+    recent.push(now);
+    chatCounters.set(socket.id, recent);
+
+    io.emit('chatMessage', {
+      nickname: sanitizeName(data.nickname || players[socket.id]?.nickname || 'Player',16),
+      text: data.text
+    });
   });
 
   socket.on('shoot', (data) => {
@@ -435,34 +474,10 @@ io.on('connection', (socket) => {
     io.emit('obstaclesUpdate', coopObstacles);
   });
 
-  socket.on('disconnect', () => {
-    delete players[socket.id];
-    delete playerVoiceStatus[socket.id];
-    if (hostId === socket.id) {
-      const ids = Object.keys(players);
-      hostId = ids.length > 0 ? ids[0] : null;
-      if (!hostId) gameInProgress = false;
-    }
-    inviaLobbyAggiornata();
-    io.emit('voiceActive', { id: socket.id, active: false });
-  });
-
-  function inviaLobbyAggiornata() {
-    io.emit('lobbyUpdate', { players: Object.values(players) });
-  }
-
-  // --- WEBRTC ---
-  socket.on('webrtc-offer', (data) =>
-    socket.to(data.targetId).emit('webrtc-offer', { fromId: socket.id, sdp: data.sdp }));
-  socket.on('webrtc-answer', (data) =>
-    socket.to(data.targetId).emit('webrtc-answer', { fromId: socket.id, sdp: data.sdp }));
-  socket.on('webrtc-ice', (data) =>
-    socket.to(data.targetId).emit('webrtc-ice', { fromId: socket.id, candidate: data.candidate }));
-
-  // === 1v1 DUEL ===
+  // === DUEL QUEUE ===
   socket.on('duel_queue', (data) => {
     if (duelQueue.find(p => p.socket.id === socket.id)) return;
-    duelQueue.push({ socket, nickname: data.nickname || "Player", skin: data.skin || "navicella2.png" });
+    duelQueue.push({ socket, nickname: sanitizeName(data.nickname || "Player",16), skin: data.skin || "navicella2.png" });
     if (duelQueue.length >= 2) {
       const [p1, p2] = duelQueue.splice(0, 2);
       const room = createDuelRoom(p1.socket, p2.socket);
@@ -496,20 +511,20 @@ io.on('connection', (socket) => {
     }
 
     if (player?.skin) duel.playerMeta[socket.id].skin = player.skin;
-    if (player?.nickname) duel.playerMeta[socket.id].nickname = player.nickname;
+    if (player?.nickname) duel.playerMeta[socket.id].nickname = sanitizeName(player.nickname,16);
 
-    if (
-      duel.roundNum &&
-      duel.states[socket.id] &&
-      duel.states[socket.id].health === 100 &&
-      player.health < 100
-    ) {
-      // Ignora update incongruente
-    } else {
+    // Stato server-authoritative (ignora health client)
+    {
+      const prev = duel.states[socket.id] || { id: socket.id, health: 100, maxHealth: 100, energy: 100 };
       duel.states[socket.id] = {
-        ...player,
         id: socket.id,
-        maxHealth: (typeof player.maxHealth === "number" ? player.maxHealth : 100)
+        x: typeof player?.x === 'number' ? player.x : prev.x,
+        y: typeof player?.y === 'number' ? player.y : prev.y,
+        health: prev.health,
+        maxHealth: prev.maxHealth,
+        energy: typeof player?.energy === 'number'
+          ? Math.max(0, Math.min(player.energy, 100))
+          : prev.energy
       };
     }
 
@@ -530,7 +545,7 @@ io.on('connection', (socket) => {
         });
       }
       duel.events.push({ type: "shoot", player: socket.id, x: data.x, y: data.y, vx: data.vx, vy: data.vy });
-      duel.stats[socket.id].damage += 25;
+      // (Nota: damage effettivo verrà assegnato su 'duel_hit')
     }
 
     if (action === "emote" && data.emote) {
@@ -598,11 +613,11 @@ io.on('connection', (socket) => {
         duel.winner = finalWinner;
         io.to(duel.p1.id).emit('duel_end', {
           winner: finalWinner === "draw" ? "draw" : (duel.p1.id === finalWinner ? duel.p1.id : duel.p2.id),
-            stats: duel.stats
+          stats: duel.stats
         });
         io.to(duel.p2.id).emit('duel_end', {
           winner: finalWinner === "draw" ? "draw" : (duel.p2.id === finalWinner ? duel.p2.id : duel.p1.id),
-            stats: duel.stats
+          stats: duel.stats
         });
         duelSpectators[room]?.forEach(sid =>
           io.to(sid).emit('duel_end', { winner: finalWinner, stats: duel.stats })
@@ -624,11 +639,12 @@ io.on('connection', (socket) => {
     const attackerId = socket.id;
     const defenderId = getOpponent(room, attackerId)?.id;
     if (!defenderId) return;
+    if (typeof damage !== 'number' || damage <= 0 || damage > 60) damage = 20;
     if (duel.states[defenderId] && duel.states[defenderId].health > 0 &&
         duel.states[attackerId] && duel.states[attackerId].health > 0) {
-      duel.states[defenderId].health -= damage || 20;
+      duel.states[defenderId].health -= damage;
       if (duel.states[defenderId].health < 0) duel.states[defenderId].health = 0;
-      duel.stats[attackerId].damage += damage || 20;
+      duel.stats[attackerId].damage += damage;
     }
   });
 
@@ -653,15 +669,93 @@ io.on('connection', (socket) => {
     }
   });
 
+  // === DISCONNECT PATCH COMPLETA ===
+  socket.on('disconnect', () => {
+    // 1. Rimuovi da lobby coop
+    delete players[socket.id];
+    delete playerVoiceStatus[socket.id];
+
+    // 2. Se era host coop -> passa host o ferma partita
+    if (hostId === socket.id) {
+      const ids = Object.keys(players);
+      hostId = ids.length > 0 ? ids[0] : null;
+      if (!hostId) {
+        gameInProgress = false;
+        // (opzionale) io.emit('coop_aborted');
+      }
+    }
+
+    // 3. Rimuovi da duelQueue (se era in attesa)
+    duelQueue = duelQueue.filter(entry => entry.socket.id !== socket.id);
+
+    // 4. Rimuovi da spettatori (aggiorna conteggio)
+    for (const [roomId, spectators] of Object.entries(duelSpectators)) {
+      if (!Array.isArray(spectators)) continue;
+      const before = spectators.length;
+      duelSpectators[roomId] = spectators.filter(sid => sid !== socket.id);
+      if (before !== duelSpectators[roomId].length) {
+        io.to(roomId).emit('duel_spectators', { spectators: duelSpectators[roomId].length });
+      }
+    }
+
+    // 5. Se era player attivo in un duel => vittoria all'altro
+    for (const [roomId, duel] of Object.entries(duelRooms)) {
+      if (!duel || duel.ended) continue;
+      if (duel.p1.id === socket.id || duel.p2.id === socket.id) {
+        duel.ended = true;
+        const disconnectedId = socket.id;
+        const survivorSocket = (duel.p1.id === disconnectedId) ? duel.p2 : duel.p1;
+        const survivorId = survivorSocket?.id;
+        let winner = survivorId || 'draw';
+        if (winner !== 'draw' && duel.stats[winner]) {
+            duel.stats[winner].kills = 1;
+        }
+        if (survivorId && io.sockets.sockets.get(survivorId)) {
+          io.to(survivorId).emit('duel_end', {
+            winner: survivorId,
+            stats: duel.stats,
+            reason: 'opponent_disconnect'
+          });
+        }
+        duelSpectators[roomId]?.forEach(sid => {
+          io.to(sid).emit('duel_end', {
+            winner,
+            stats: duel.stats,
+            reason: 'opponent_disconnect'
+          });
+        });
+        setTimeout(() => {
+          delete duelRooms[roomId];
+          delete duelSpectators[roomId];
+        }, 2500);
+      }
+    }
+
+    // 6. Aggiorna lobby coop & voice stato
+    inviaLobbyAggiornata();
+    io.emit('voiceActive', { id: socket.id, active: false });
+  });
+
+  function inviaLobbyAggiornata() {
+    io.emit('lobbyUpdate', { players: Object.values(players) });
+  }
+
+  // --- WEBRTC ---
+  socket.on('webrtc-offer', (data) =>
+    socket.to(data.targetId).emit('webrtc-offer', { fromId: socket.id, sdp: data.sdp }));
+  socket.on('webrtc-answer', (data) =>
+    socket.to(data.targetId).emit('webrtc-answer', { fromId: socket.id, sdp: data.sdp }));
+  socket.on('webrtc-ice', (data) =>
+    socket.to(data.targetId).emit('webrtc-ice', { fromId: socket.id, candidate: data.candidate }));
 });
 
-// === GLOBAL ERROR HANDLERS (PATCH) ===
+// === GLOBAL ERROR HANDLERS ===
 process.on('unhandledRejection', err => {
   console.error('[unhandledRejection]', err);
 });
 process.on('uncaughtException', err => {
   console.error('[uncaughtException]', err);
-  // Valuta se riavviare: per ora log
+  // Valuta se riavviare con un process manager
 });
 
 // === PORT ===
