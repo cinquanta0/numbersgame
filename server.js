@@ -6,7 +6,26 @@ const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
 const path = require('path');
-const fetch = require('node-fetch');
+
+// =====================================================
+// PATCH FETCH SAFE (evita crash in Node < 18 o con node-fetch v3)
+// =====================================================
+let fetchFn = globalThis.fetch;
+if (typeof fetchFn !== 'function') {
+  try {
+    // Lazy dynamic import (funziona con node-fetch v3 ESM)
+    fetchFn = (...args) => import('node-fetch').then(m => m.default(...args));
+    console.log('[INIT] Using dynamic import for node-fetch');
+  } catch (e) {
+    console.error('[INIT] Impossibile configurare fetch fallback:', e);
+  }
+}
+async function safeFetch(url, options) {
+  if (typeof fetchFn !== 'function') throw new Error('fetch non disponibile');
+  return fetchFn(url, options);
+}
+
+// =====================================================
 
 const app = express();
 const server = http.createServer(app);
@@ -52,14 +71,32 @@ function resetGame() {
   gameInProgress = false; bossAttackCooldown = 0;
 }
 
-// === DREAMLO CO-OP LEADERBOARD ===
-function submitCoopTeamScore(teamName, score) {
-  const dreamloKey = "5z7d7N8IBkSwrhJdyZAXxAYn3Jv1KyTEm6GJZoIALRBw";
-  const tag = "coopraid";
-  const url = `https://dreamlo.com/lb/${dreamloKey}/add/${encodeURIComponent(teamName)}/${score}/${tag}`;
-  fetch(url)
-    .then(() => console.log(`[Dreamlo] Co-op score inviato: ${teamName} - ${score}`))
-    .catch(err => console.error("[Dreamlo] Errore invio co-op:", err));
+// =====================================================
+// PATCH: DREAMLO CO-OP LEADERBOARD (robusto, no crash)
+// =====================================================
+async function submitCoopTeamScore(teamName, score) {
+  try {
+    if (!teamName) teamName = 'Team';
+    if (typeof score !== 'number' || !isFinite(score) || score <= 0) {
+      console.warn('[Dreamlo] Punteggio non valido, skip:', teamName, score);
+      return { ok: false, reason: 'invalid_score' };
+    }
+    const dreamloKey = process.env.DREAMLO_KEY_PUBLIC || "5z7d7N8IBkSwrhJdyZAXxAYn3Jv1KyTEm6GJZoIALRBw";
+    const tag = "coopraid";
+    // update mantiene il punteggio se migliore o lo sovrascrive (add crea sempre nuova entry)
+    const url = `https://dreamlo.com/lb/${dreamloKey}/update/${encodeURIComponent(teamName)}/${Math.floor(score)}/${tag}`;
+    const res = await safeFetch(url);
+    if (!res.ok) {
+      console.warn('[Dreamlo] HTTP non OK:', res.status);
+      return { ok: false, status: res.status };
+    }
+    const text = await res.text();
+    console.log(`[Dreamlo] Co-op score inviato: ${teamName} - ${score} (response: ${text.slice(0,80)})`);
+    return { ok: true };
+  } catch (err) {
+    console.error('[Dreamlo] Errore invio co-op (non blocco il server):', err.message);
+    return { ok: false, error: err.message };
+  }
 }
 
 // === Obstacles (solo asteroid in co-op) ===
@@ -82,8 +119,8 @@ function updateObstacles() {
 
 // === 1v1 DUEL STATE ===
 let duelQueue = []; // [{socket, nickname, skin}]
-let duelRooms = {}; // roomId: { p1: socket, p2: socket, states: {id: {}}, stats: {}, ... }
-let duelSpectators = {}; // roomId: [socket.id,...]
+let duelRooms = {}; // roomId -> { ... }
+let duelSpectators = {}; // roomId -> [socket.id]
 
 // --- DUEL HELPERS ---
 function createDuelRoom(p1, p2) {
@@ -103,7 +140,7 @@ function createDuelRoom(p1, p2) {
     },
     roundNum: 1,
     roundWins: { [p1.id]: 0, [p2.id]: 0 },
-    maxRounds: 3 // Best of 3
+    maxRounds: 3
   };
   duelSpectators[room] = [];
   return room;
@@ -117,9 +154,7 @@ function getOpponent(room, id) {
 function startNextDuelRound(roomId, roundNumber = 1) {
   const duel = duelRooms[roomId];
   if (!duel) return;
-  // PATCH: health e maxHealth a 500
   const INIT_HEALTH = 500;
-  
   const playerStates = {
     [duel.p1.id]: { x: 300, y: 600, health: INIT_HEALTH, energy: 100 },
     [duel.p2.id]: { x: 900, y: 600, health: INIT_HEALTH, energy: 100 }
@@ -196,7 +231,10 @@ setInterval(() => {
 
     bossAttackCooldown -= 40;
     if (bossAttackCooldown <= 0 && Object.keys(players).length > 0) {
-      let unlockedPatterns = Math.min(Math.ceil((coopBoss.maxHealth - coopBoss.health) / 3000) + 2, BOSS_ATTACK_PATTERNS.length);
+      let unlockedPatterns = Math.min(
+        Math.ceil((coopBoss.maxHealth - coopBoss.health) / 3000) + 2,
+        BOSS_ATTACK_PATTERNS.length
+      );
       const pattern = BOSS_ATTACK_PATTERNS[Math.floor(Math.random() * unlockedPatterns)];
       io.emit('bossAttack', { pattern, x: coopBoss.x, y: coopBoss.y, time: Date.now() });
       bossAttackCooldown = Math.random() * (MAX_ATTACK_INTERVAL - MIN_ATTACK_INTERVAL) + MIN_ATTACK_INTERVAL;
@@ -219,14 +257,12 @@ setInterval(() => {
       let oppState = duel.states[oppId] || {};
       let meta = duel.playerMeta[oppId] || {};
       if (typeof oppState.maxHealth !== "number") oppState.maxHealth = 100;
-
-      // PATCH: aggiungi self con lo stato del player stesso!
       let selfState = duel.states[playerSocket.id] || {};
       if (typeof selfState.maxHealth !== "number") selfState.maxHealth = 100;
 
       playerSocket.emit('duel_state', {
         opponent: { ...oppState, skin: meta.skin, nickname: meta.nickname },
-        self: selfState, // <--- AGGIUNGI QUESTO!
+        self: selfState,
         powerups: duel.powerups,
         obstacles: duel.obstacles,
         events: duel.events
@@ -235,14 +271,8 @@ setInterval(() => {
 
     if (duelSpectators[room]) {
       const playerStates = [
-        {
-          ...duel.states[duel.p1.id],
-          ...duel.playerMeta[duel.p1.id]
-        },
-        {
-          ...duel.states[duel.p2.id],
-          ...duel.playerMeta[duel.p2.id]
-        }
+        { ...duel.states[duel.p1.id], ...duel.playerMeta[duel.p1.id] },
+        { ...duel.states[duel.p2.id], ...duel.playerMeta[duel.p2.id] }
       ];
       duelSpectators[room].forEach(sid => {
         io.to(sid).emit('duel_state', {
@@ -258,14 +288,9 @@ setInterval(() => {
   }
 }, 50);
 
-// === SOCKET.IO HANDLERS (COOP RAID PATCHED) ===
-// Funzione visibile a tutto il file
-function inviaLobbyAggiornata() {
-  io.emit('lobbyUpdate', { players: Object.values(players) });
-}
-
+// === SOCKET.IO HANDLERS ===
 io.on('connection', (socket) => {
-  // --- JOIN LOBBY: aggiunge health, vite, dead ---
+  // --- JOIN LOBBY ---
   socket.on('joinLobby', (data) => {
     players[socket.id] = {
       id: socket.id,
@@ -273,8 +298,8 @@ io.on('connection', (socket) => {
       y: 400 + Math.random() * 120,
       nickname: data.nickname || 'Player',
       angle: 0,
-      health: 850,
-      maxHealth: 850,
+      health: 100,
+      maxHealth: 100,
       role: "dps",
       ready: false,
       lives: 3,
@@ -285,7 +310,6 @@ io.on('connection', (socket) => {
     inviaLobbyAggiornata();
   });
 
-  // --- PLAYER MOVE: solo se non morto ---
   socket.on('playerMove', (data) => {
     if (players[socket.id] && !players[socket.id].dead) {
       players[socket.id].x = data.x;
@@ -295,7 +319,6 @@ io.on('connection', (socket) => {
     }
   });
 
-  // --- READY IN LOBBY ---
   socket.on('playerReady', ({ ready }) => {
     if (players[socket.id]) {
       players[socket.id].ready = !!ready;
@@ -303,7 +326,6 @@ io.on('connection', (socket) => {
     }
   });
 
-  // --- RUOLO IN LOBBY ---
   socket.on('selectRole', ({ role }) => {
     if (players[socket.id] && typeof role === 'string') {
       players[socket.id].role = role;
@@ -311,7 +333,6 @@ io.on('connection', (socket) => {
     }
   });
 
-  // --- AVVIO RAID: solo host, tutti ready ---
   socket.on('startCoopRaid', () => {
     if (socket.id !== hostId) return;
     const allReady = Object.values(players).every(p => p.ready);
@@ -320,17 +341,15 @@ io.on('connection', (socket) => {
       return;
     }
     Object.values(players).forEach(p => {
-  p.health = 850;
-  p.maxHealth = 850;
-  p.lives = 3;
-  p.dead = false;
-});
+      p.health = 100;
+      p.lives = 3;
+      p.dead = false;
+    });
     resetGame();
     gameInProgress = true;
     io.emit('gameStart', { boss: { ...coopBoss }, players: Object.values(players) });
   });
 
-  // --- DANNO AL BOSS: ruoli, validazione, anti-cheat ---
   socket.on('bossDamage', ({ damage }) => {
     if (!gameInProgress || coopBoss.health <= 0) return;
     if (typeof damage !== "number" || damage <= 0 || damage > 300) return;
@@ -348,12 +367,15 @@ io.on('connection', (socket) => {
     if (coopBoss.health <= 0) {
       gameInProgress = false;
       const squadNicknames = Object.values(players).map(p => p.nickname).join("_") || "Team";
-      submitCoopTeamScore(squadNicknames, Math.floor(coopBoss.maxHealth));
-      io.emit('bossDefeated');
+      // Fire & forget: non bloccare
+      submitCoopTeamScore(squadNicknames, Math.floor(coopBoss.maxHealth))
+        .then(r => {
+          if (!r.ok) console.warn('[Dreamlo] punteggio non salvato:', r);
+        });
+      io.emit('bossDefeated', { team: squadNicknames, score: Math.floor(coopBoss.maxHealth) });
     }
   });
 
-  // --- DANNO AL PLAYER (esempio: boss colpisce player) ---
   socket.on('playerHit', ({ damage }) => {
     if (!gameInProgress || typeof damage !== "number" || damage <= 0 || damage > 100) return;
     const player = players[socket.id];
@@ -374,27 +396,24 @@ io.on('connection', (socket) => {
     }
   });
 
-  // --- PLAYER RETRY: solo se ha vite rimaste ---
   socket.on('playerRetry', () => {
-  const player = players[socket.id];
-  if (!player) return;
-  if (player.lives <= 0) {
-    io.to(socket.id).emit('playerDead', { lives: 0 });
-    return;
-  }
-  player.health = 850;
-  player.dead = false;
-  io.to(socket.id).emit('playerRespawn', { health: player.health, lives: player.lives });
-  inviaLobbyAggiornata();
-});
+    const player = players[socket.id];
+    if (!player || !player.dead) return;
+    if (player.lives <= 0) {
+      io.to(socket.id).emit('playerDead', { lives: 0 });
+      return;
+    }
+    player.health = 100;
+    player.dead = false;
+    io.to(socket.id).emit('playerRespawn', { health: player.health, lives: player.lives });
+    inviaLobbyAggiornata();
+  });
 
-  // --- VOICE STATUS ---
   socket.on('voiceActive', (data) => {
     playerVoiceStatus[socket.id] = !!data.active;
     io.emit('voiceActive', { id: socket.id, active: !!data.active });
   });
 
-  // --- CHAT ---
   socket.on('chatMessage', (data) => {
     if (typeof data.text === "string" && data.text.length <= 200) {
       io.emit('chatMessage', {
@@ -404,21 +423,18 @@ io.on('connection', (socket) => {
     }
   });
 
-  // --- SHOOT/BULLET: solo se non morto ---
   socket.on('shoot', (data) => {
     if (players[socket.id] && !players[socket.id].dead) {
       io.emit('spawnBullet', data);
     }
   });
 
-  // --- OSTACOLO COLPITO ---
   socket.on('obstacleHit', (obstacleId) => {
     const ob = coopObstacles.find(o => o.id === obstacleId);
     if (ob) ob.hit = true;
     io.emit('obstaclesUpdate', coopObstacles);
   });
 
-  // --- DISCONNECTION: gestisce host, lobby, voice ---
   socket.on('disconnect', () => {
     delete players[socket.id];
     delete playerVoiceStatus[socket.id];
@@ -431,7 +447,11 @@ io.on('connection', (socket) => {
     io.emit('voiceActive', { id: socket.id, active: false });
   });
 
-  // --- WEBRTC (voice/video) ---
+  function inviaLobbyAggiornata() {
+    io.emit('lobbyUpdate', { players: Object.values(players) });
+  }
+
+  // --- WEBRTC ---
   socket.on('webrtc-offer', (data) =>
     socket.to(data.targetId).emit('webrtc-offer', { fromId: socket.id, sdp: data.sdp }));
   socket.on('webrtc-answer', (data) =>
@@ -439,10 +459,7 @@ io.on('connection', (socket) => {
   socket.on('webrtc-ice', (data) =>
     socket.to(data.targetId).emit('webrtc-ice', { fromId: socket.id, candidate: data.candidate }));
 
-  // --- FUTURE: healing, shield, buff handler ---
-  // es: socket.on('playerHeal', ...) ecc
-
-  // --- 1v1 DUEL PvP MODE ---
+  // === 1v1 DUEL ===
   socket.on('duel_queue', (data) => {
     if (duelQueue.find(p => p.socket.id === socket.id)) return;
     duelQueue.push({ socket, nickname: data.nickname || "Player", skin: data.skin || "navicella2.png" });
@@ -462,67 +479,56 @@ io.on('connection', (socket) => {
     duelQueue = duelQueue.filter(p => p.socket.id !== socket.id);
   });
 
-  // --- PATCH BEST OF 3 CORRETTO ---
   socket.on('duel_update', (data) => {
-
-    // --- PATCH: Special Ability Transmission ---
-    if (data.action === 'special_ability' && data.type) {
-      const duel = duelRooms[data.room];
-      if (!duel || duel.ended) return;
-      // BLOCCA LE SPECIAL SE SEI MORTO
-      if (duel.states[socket.id]?.health <= 0) return;
-
-      // Trova l’avversario
-      const opponentId = getOpponent(data.room, socket.id)?.id;
-      if (opponentId && io.sockets.sockets.get(opponentId)) {
-        io.to(opponentId).emit('duel_special', { type: data.type });
-        console.log(`[DUEL] Special ability '${data.type}' sent from ${socket.id} to ${opponentId}`);
-      }
-      return;
-    }
-
     const { room, player, action } = data;
     const duel = duelRooms[room];
     if (!duel || duel.ended) return;
 
-    // Aggiorna meta
-    if (player.skin) duel.playerMeta[socket.id].skin = player.skin;
-    if (player.nickname) duel.playerMeta[socket.id].nickname = player.nickname;
+    // Special ability
+    if (action === 'special_ability' && data.type) {
+      if (duel.states[socket.id]?.health <= 0) return;
+      const opponentId = getOpponent(room, socket.id)?.id;
+      if (opponentId && io.sockets.sockets.get(opponentId)) {
+        io.to(opponentId).emit('duel_special', { type: data.type });
+        console.log(`[DUEL] Special ability '${data.type}' from ${socket.id} to ${opponentId}`);
+      }
+      return;
+    }
 
-    // Aggiorna stato player
+    if (player?.skin) duel.playerMeta[socket.id].skin = player.skin;
+    if (player?.nickname) duel.playerMeta[socket.id].nickname = player.nickname;
+
     if (
       duel.roundNum &&
       duel.states[socket.id] &&
       duel.states[socket.id].health === 100 &&
       player.health < 100
     ) {
-      // Ignora update errato
+      // Ignora update incongruente
     } else {
-      duel.states[socket.id] = { ...player, id: socket.id, maxHealth: (typeof player.maxHealth === "number" ? player.maxHealth : 100) };
+      duel.states[socket.id] = {
+        ...player,
+        id: socket.id,
+        maxHealth: (typeof player.maxHealth === "number" ? player.maxHealth : 100)
+      };
     }
 
-    // PATCH: BLOCCA TUTTE LE AZIONI SE IL PLAYER È MORTO
     if (duel.states[socket.id]?.health <= 0) {
-      // Consenti solo cose "safe" tipo chat/emote, ma non shoot/special/powerup/obstacle
       if (action === "shoot" || action === "powerup_pick" || action === "obstacle_hit" || action === "special_ability") return;
     }
 
-    // --- PATCH: INOLTRA I COLPI ALL'AVVERSARIO IN 1v1 DUEL ---
-    if (action === "shoot" && typeof data.x === "number" && typeof data.y === "number" && typeof data.vx === "number" && typeof data.vy === "number") {
-      // PATCH: blocca i morti
-      if (duel.states[socket.id]?.health <= 0) return; // IGNORA SPARI SE SEI MORTO
-
-      // Trova l’avversario
+    if (action === "shoot" &&
+        typeof data.x === "number" &&
+        typeof data.y === "number" &&
+        typeof data.vx === "number" &&
+        typeof data.vy === "number") {
+      if (duel.states[socket.id]?.health <= 0) return;
       const opponent = getOpponent(room, socket.id);
       if (opponent && io.sockets.sockets.get(opponent.id)) {
         io.to(opponent.id).emit('duel_opponent_shoot', {
-          x: data.x,
-          y: data.y,
-          vx: data.vx,
-          vy: data.vy
+          x: data.x, y: data.y, vx: data.vx, vy: data.vy
         });
       }
-      // Inoltre mantieni anche stats/events se vuoi
       duel.events.push({ type: "shoot", player: socket.id, x: data.x, y: data.y, vx: data.vx, vy: data.vy });
       duel.stats[socket.id].damage += 25;
     }
@@ -534,10 +540,9 @@ io.on('connection', (socket) => {
         io.to(sid).emit('duel_emote', { player: socket.id, emote: data.emote });
       });
     }
-    if (action === "powerup_pick" && data.powerupId) {
-      // PATCH: blocca i morti
-      if (duel.states[socket.id]?.health <= 0) return;
 
+    if (action === "powerup_pick" && data.powerupId) {
+      if (duel.states[socket.id]?.health <= 0) return;
       const idx = duel.powerups.findIndex(p => p.id === data.powerupId);
       if (idx >= 0) {
         duel.powerups[idx].active = false;
@@ -548,10 +553,9 @@ io.on('connection', (socket) => {
         });
       }
     }
-    if (action === "obstacle_hit" && data.obstacleId) {
-      // PATCH: blocca i morti
-      if (duel.states[socket.id]?.health <= 0) return;
 
+    if (action === "obstacle_hit" && data.obstacleId) {
+      if (duel.states[socket.id]?.health <= 0) return;
       const idx = duel.obstacles.findIndex(o => o.id === data.obstacleId);
       if (idx >= 0) {
         duel.obstacles[idx].hit = true;
@@ -563,12 +567,10 @@ io.on('connection', (socket) => {
       }
     }
 
-    // PATCH: Logica best of 3 corretta
     const p1dead = duel.states[duel.p1.id]?.health <= 0;
     const p2dead = duel.states[duel.p2.id]?.health <= 0;
 
     if ((p1dead || p2dead) && !duel.ended) {
-
       if (!duel.roundNum) duel.roundNum = 1;
       if (!duel.roundWins) duel.roundWins = { [duel.p1.id]: 0, [duel.p2.id]: 0 };
       if (!duel.maxRounds) duel.maxRounds = 3;
@@ -582,12 +584,10 @@ io.on('connection', (socket) => {
       duel.stats[duel.p1.id].kills = p2dead ? 1 : 0;
       duel.stats[duel.p2.id].kills = p1dead ? 1 : 0;
 
-      // PATCH: ora la condizione è SOLO se uno arriva a 2 round vinti, OPPURE 3 round giocati
-      const winNeeded = Math.ceil(duel.maxRounds / 2); // 2 se 3 round
+      const winNeeded = Math.ceil(duel.maxRounds / 2);
       const p1Win = duel.roundWins[duel.p1.id] >= winNeeded;
       const p2Win = duel.roundWins[duel.p2.id] >= winNeeded;
-      const roundsPlayed = duel.roundNum; // parte da 1
-      const roundsFinished = roundsPlayed >= duel.maxRounds;
+      const roundsFinished = duel.roundNum >= duel.maxRounds;
 
       if (p1Win || p2Win || roundsFinished) {
         duel.ended = true;
@@ -598,11 +598,11 @@ io.on('connection', (socket) => {
         duel.winner = finalWinner;
         io.to(duel.p1.id).emit('duel_end', {
           winner: finalWinner === "draw" ? "draw" : (duel.p1.id === finalWinner ? duel.p1.id : duel.p2.id),
-          stats: duel.stats
+            stats: duel.stats
         });
         io.to(duel.p2.id).emit('duel_end', {
           winner: finalWinner === "draw" ? "draw" : (duel.p2.id === finalWinner ? duel.p2.id : duel.p1.id),
-          stats: duel.stats
+            stats: duel.stats
         });
         duelSpectators[room]?.forEach(sid =>
           io.to(sid).emit('duel_end', { winner: finalWinner, stats: duel.stats })
@@ -621,37 +621,18 @@ io.on('connection', (socket) => {
   socket.on('duel_hit', ({ room, damage }) => {
     const duel = duelRooms[room];
     if (!duel || duel.ended) return;
-
-    // Chi ha mandato il messaggio è l’attaccante, l’altro subisce danno
     const attackerId = socket.id;
     const defenderId = getOpponent(room, attackerId)?.id;
     if (!defenderId) return;
-
-    // Applica danno solo se entrambi sono vivi
-    if (duel.states[defenderId] && duel.states[defenderId].health > 0 && duel.states[attackerId] && duel.states[attackerId].health > 0) {
+    if (duel.states[defenderId] && duel.states[defenderId].health > 0 &&
+        duel.states[attackerId] && duel.states[attackerId].health > 0) {
       duel.states[defenderId].health -= damage || 20;
       if (duel.states[defenderId].health < 0) duel.states[defenderId].health = 0;
       duel.stats[attackerId].damage += damage || 20;
     }
   });
 
-  // PATCH: Handler per READY in lobby co-op
-  socket.on('playerReady', ({ ready }) => {
-    if (players[socket.id]) {
-      players[socket.id].ready = !!ready;
-      inviaLobbyAggiornata();
-    }
-  });
-
-  // PATCH: Handler per RUOLO in lobby co-op
-  socket.on('selectRole', ({ role }) => {
-    if (players[socket.id]) {
-      players[socket.id].role = role;
-      inviaLobbyAggiornata();
-    }
-  });
-
-  socket.on('duel_join', ({ roomId, role, nickname }) => {
+  socket.on('duel_join', ({ roomId, role }) => {
     if (!roomId || !duelRooms[roomId]) {
       socket.emit('error', { message: 'Room not found' });
       return;
@@ -662,14 +643,8 @@ io.on('connection', (socket) => {
       socket.join(roomId);
       const duel = duelRooms[roomId];
       const playerStates = [
-        {
-          ...duel.states[duel.p1.id],
-          ...duel.playerMeta[duel.p1.id]
-        },
-        {
-          ...duel.states[duel.p2.id],
-          ...duel.playerMeta[duel.p2.id]
-        }
+        { ...duel.states[duel.p1.id], ...duel.playerMeta[duel.p1.id] },
+        { ...duel.states[duel.p2.id], ...duel.playerMeta[duel.p2.id] }
       ];
       socket.emit('duel_state', {
         players: playerStates,
@@ -677,9 +652,21 @@ io.on('connection', (socket) => {
       });
     }
   });
-  // Rematch: il client fa semplicemente startDuelQueue di nuovo
+
+});
+
+// === GLOBAL ERROR HANDLERS (PATCH) ===
+process.on('unhandledRejection', err => {
+  console.error('[unhandledRejection]', err);
+});
+process.on('uncaughtException', err => {
+  console.error('[uncaughtException]', err);
+  // Valuta se riavviare: per ora log
 });
 
 // === PORT ===
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log('Server listening on port ' + PORT));
+server.listen(PORT, () => {
+  console.log('Server listening on port ' + PORT);
+  console.log('Node version:', process.version);
+});
