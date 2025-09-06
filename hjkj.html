@@ -6032,30 +6032,33 @@ document.getElementById('mobileSlowTime').style.display = "none";
       }
 
       function updateAdaptiveDifficulty() {
-          const survivalTime = (Date.now() - gameState.levelStartTime) / 1000;
-          
-          if (survivalTime > 120) {
-              gameState.adaptiveDifficulty = Math.min(2.0, gameState.adaptiveDifficulty + 0.003);
-              
-              if (gameState.adaptiveDifficulty > 1.5) {
-                  showDifficultyWarning();
-              }
-          }
-          
-          if (gameState.enemy) {
-              gameState.enemy.bulletCount = 1 + (gameState.adaptiveDifficulty - 1) * 0.2;
-              gameState.enemy.attackSpeed = gameState.adaptiveDifficulty;
-          }
-      }
+  // Disabilitata completamente in co-op
+  if (gameState.gameMode === 'coop') return;
+
+  const survivalTime = (Date.now() - gameState.levelStartTime) / 1000;
+
+  if (survivalTime > 120) {
+    gameState.adaptiveDifficulty = Math.min(2.0, gameState.adaptiveDifficulty + 0.003);
+
+    if (gameState.adaptiveDifficulty > 1.5) {
+      showDifficultyWarning();
+    }
+  }
+
+  if (gameState.enemy) {
+    gameState.enemy.bulletCount = 1 + (gameState.adaptiveDifficulty - 1) * 0.2;
+    gameState.enemy.attackSpeed = gameState.adaptiveDifficulty;
+  }
+}
 
       function showDifficultyWarning() {
-          const warning = document.getElementById('difficultyWarning');
-          warning.style.display = 'block';
-          
-          setTimeout(() => {
-              warning.style.display = 'none';
-          }, 2000);
-      }
+  if (gameState.gameMode === 'coop') return; // mai in co-op
+  const warning = document.getElementById('difficultyWarning');
+  if (!warning) return;
+  warning.style.display = 'block';
+  clearTimeout(window._diffWarnTO);
+  window._diffWarnTO = setTimeout(() => { warning.style.display = 'none'; }, 2000);
+}
 
       function updateScreenShake() {
           if (gameState.screenShake > 0) {
