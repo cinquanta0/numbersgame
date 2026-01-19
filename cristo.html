@@ -5783,7 +5783,7 @@ class ParticlePool {
 const EXPLOSION_PRESETS = {
   // Esplosione player morto
   PLAYER_DEATH: {
-    count: 80,
+    count: 30,
     colors: ['#00f5ff', '#0080ff', '#ffffff', '#4facfe'],
     sizeRange: [3, 12],
     speedRange: [2, 12],
@@ -5795,7 +5795,7 @@ const EXPLOSION_PRESETS = {
   
   // Esplosione boss
   BOSS_DEATH: {
-    count: 150,
+    count: 25,
     colors: ['#ff006e', '#ff9500', '#ffd700', '#ffffff'],
     sizeRange: [5, 20],
     speedRange: [3, 15],
@@ -9143,7 +9143,6 @@ playSound('explosion', 0.7);
    // 🌟 AGGIUNGI QUESTA RIGA:
     if (window.ultraEmitter) {
         window.ultraEmitter.burst(boss.x, boss.y, 'BOSS_DEATH');
-        window.ultraEmitter.confetti(boss.x, boss.y, 100);
     }
 
 // Super esplosione centrale
