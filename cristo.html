@@ -3791,6 +3791,461 @@ body {
    ✅ INSTALLATO! Ora il tuo gioco ha un'interfaccia moderna AAA!
    ═══════════════════════════════════════════════════════════════ */
 
+
+/* PATCH: Disabilita effetto vetro, blur/transparenze e menu pixel art flat */
+.menu-content,
+.menu-btn,
+.stat-box,
+.hud,
+.health-bar,
+.energy-meter,
+.level-card,
+.screen,
+.orientation-selector,
+.notification,
+.duel-lobby,
+.duel-end {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: #000 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  border: 2px solid #00bcd4 !important;
+  color: #ffe700 !important;
+  filter: none !important;
+}
+.menu-btn {
+  background: #00bcd4 !important;
+  color: #111 !important;
+  border: 2px solid #000 !important;
+}
+.menu-btn:active, .menu-btn:hover {
+  background: #ffd700 !important;
+  color: #222 !important;
+}
+.stat-box {
+  background: #111 !important;
+  color: #ffd700 !important;
+}
+.hud {
+  background: #000 !important;
+  color: #ffd700 !important;
+  border-bottom: 3px solid #00bcd4 !important;
+}
+
+/* Rimuovi effetto vetro (glass) nei controlli mobile */
+.mobile-controls,
+.mobile-joystick,
+.mobile-joystick-knob,
+.mobile-action-buttons,
+.mobile-action-btn {
+  background: #000 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+
+/* === PATCH: DISATTIVA GLASS/BLUR ==> PIXEL FLAT === */
+
+/* Elimina vetro dal MENU PRINCIPALE */
+.menu-content,
+.menu-btn,
+.stat-box,
+.hud,
+.health-bar,
+.energy-meter,
+.level-card,
+.screen,
+.orientation-selector,
+.notification,
+.duel-lobby,
+.duel-end,
+.mobile-controls,
+.mobile-joystick,
+.mobile-joystick-knob,
+.mobile-action-buttons,
+.mobile-action-btn {
+  background: #000 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  color: #ffd700 !important;
+  filter: none !important;
+  border: 2px solid #00bcd4 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Tasti flat azzurri */
+.menu-btn,
+.mobile-action-btn {
+  background: #00bcd4 !important;
+  color: #111 !important;
+  border: 2px solid #000 !important;
+  box-shadow: none !important;
+}
+.menu-btn:active, .menu-btn:hover {
+  background: #ffd700 !important;
+  color: #222 !important;
+}
+
+/* Stat flat gialle */
+.stat-box {
+  background: #111 !important;
+  color: #ffd700 !important;
+}
+.hud {
+  background: #000 !important;
+  color: #ffd700 !important;
+  border-bottom: 3px solid #00bcd4 !important;
+}
+/* Mobile controls flat */
+.mobile-controls, .mobile-joystick, .mobile-joystick-knob, .mobile-action-buttons, .mobile-action-btn {
+  background: #000 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Nessun effetto glass nemmeno su modali */
+.duel-lobby,
+.duel-end,
+.orientation-selector,
+.notification {
+  filter: none !important;
+  background: #000 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  border: 2px solid #00bcd4 !important;
+  color: #ffe700 !important;
+}
+
+/* PATCH MOBILE: Controlli mini e trasparenti */
+@media (pointer: coarse), (max-width: 700px) {
+  .mobile-controls {
+    height: 60px !important;
+    padding: 5px !important;
+    background: linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.4) 100%) !important;
+  }
+  
+  .mobile-joystick {
+    width: 65px !important;
+    height: 65px !important;
+    bottom: 8px !important;
+    left: 8px !important;
+    background: rgba(0, 188, 212, 0.2) !important; /* Più trasparente */
+    border: 2px solid rgba(0, 188, 212, 0.6) !important;
+  }
+  
+  .mobile-joystick-knob {
+    width: 28px !important;
+    height: 28px !important;
+  }
+  
+  .mobile-action-buttons {
+    bottom: 8px !important;
+    right: 8px !important;
+    gap: 8px !important;
+  }
+  
+  .mobile-action-btn {
+    width: 38px !important;
+    height: 38px !important;
+    background: rgba(0, 188, 212, 0.8) !important; /* Semi-trasparente */
+    border: 2px solid #fff !important;
+  }
+}
+
+/* PATCH DEFINITIVA: Controlli mobile SEMPRE visibili sopra i tasti sistema */
+@media (pointer: coarse), (max-width: 700px) {
+  
+  /* Aggiungi padding al body per evitare sovrapposizioni */
+  body {
+    padding-bottom: 100px !important; /* Spazio per i controlli */
+  }
+  
+  .mobile-controls {
+    height: 85px !important;
+    padding: 8px !important;
+    background: linear-gradient(180deg, transparent 30%, rgba(0,0,0,0.6) 100%) !important;
+    bottom: 0 !important;
+    position: fixed !important;
+    z-index: 9999 !important; /* Sopra tutto */
+    padding-bottom: env(safe-area-inset-bottom, 20px) !important; /* Spazio notch/home iPhone */
+  }
+  
+  /* Canvas più corto per lasciare spazio ai controlli */
+  #gameCanvas {
+    height: calc(100vh - 120px) !important; /* Sottrae controlli + margine sicurezza */
+    max-height: calc(100vh - 120px) !important;
+  }
+  
+  /* Joystick più in alto rispetto al fondo */
+  .mobile-joystick {
+    width: 75px !important;
+    height: 75px !important;
+    bottom: 20px !important; /* Più distante dal bordo */
+    left: 12px !important;
+    background: rgba(0, 188, 212, 0.25) !important;
+    border: 3px solid rgba(0, 188, 212, 0.7) !important;
+    z-index: 10000 !important;
+  }
+  
+  .mobile-joystick-knob {
+    width: 32px !important;
+    height: 32px !important;
+  }
+  
+  /* Pulsanti azione più in alto */
+  .mobile-action-buttons {
+    bottom: 20px !important; /* Più distante dal bordo */
+    right: 12px !important;
+    gap: 10px !important;
+    z-index: 10000 !important;
+  }
+  
+  .mobile-action-btn {
+    width: 45px !important;
+    height: 45px !important;
+    background: rgba(0, 188, 212, 0.85) !important;
+    border: 3px solid #fff !important;
+    font-size: 1.1em !important;
+  }
+  
+  .mobile-action-btn.special {
+    background: rgba(255, 215, 0, 0.85) !important;
+    border-color: #ffd700 !important;
+  }
+}
+
+/* Per telefoni MOLTO piccoli o con notch/home button virtuale */
+@media (max-width: 600px) {
+  .mobile-controls {
+    padding-bottom: calc(env(safe-area-inset-bottom) + 25px) !important;
+  }
+  
+  .mobile-joystick {
+    bottom: 25px !important; /* Ancora più in alto */
+  }
+  
+  .mobile-action-buttons {
+    bottom: 25px !important;
+  }
+}
+
+/* Per landscape (orizzontale) */
+@media (orientation: landscape) and (max-height: 500px) {
+  .mobile-controls {
+    height: 70px !important;
+    padding-bottom: calc(env(safe-area-inset-bottom) + 15px) !important;
+  }
+  
+  .mobile-joystick {
+    width: 65px !important;
+    height: 65px !important;
+    bottom: 15px !important;
+  }
+  
+  .mobile-action-buttons {
+    bottom: 15px !important;
+  }
+  
+  .mobile-action-btn {
+    width: 38px !important;
+    height: 38px !important;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   🎮 PATCH FINALE: CONTROLLI MOBILE ULTRA-COMPATTI
+   Riduce drasticamente l'ingombro per dare più spazio di gioco
+   ═══════════════════════════════════════════════════════════════ */
+
+/* RESET COMPLETO CONTROLLI MOBILE */
+@media (pointer: coarse), (max-width: 900px) {
+  
+  /* ─── BARRA CONTROLLI: PIÙ BASSA E TRASPARENTE ─── */
+  .mobile-controls {
+    height: 50px !important; /* Drasticamente ridotta */
+    padding: 3px !important;
+    background: linear-gradient(180deg, transparent 60%, rgba(0,0,0,0.25) 100%) !important;
+    bottom: 0 !important;
+    position: fixed !important;
+    z-index: 999 !important; /* Sotto l'HUD per non coprire */
+    padding-bottom: max(env(safe-area-inset-bottom), 5px) !important;
+  }
+  
+  /* ─── JOYSTICK: PIÙ PICCOLO E TRASPARENTE ─── */
+  .mobile-joystick {
+    width: 55px !important; /* Ridotto da 75px */
+    height: 55px !important;
+    bottom: 5px !important; /* Più vicino al bordo */
+    left: 8px !important;
+    background: rgba(0, 188, 212, 0.12) !important; /* Molto trasparente */
+    border: 2px solid rgba(0, 188, 212, 0.4) !important; /* Bordo sottile */
+    z-index: 1000 !important;
+  }
+  
+  .mobile-joystick-knob {
+    width: 22px !important; /* Ridotto da 32px */
+    height: 22px !important;
+    background: rgba(0, 188, 212, 0.7) !important;
+    border: 1px solid #fff !important;
+  }
+  
+  /* ─── PULSANTI AZIONE: MINI E COMPATTI ─── */
+  .mobile-action-buttons {
+    bottom: 5px !important; /* Più vicino al bordo */
+    right: 8px !important;
+    gap: 6px !important; /* Meno spazio tra pulsanti */
+    z-index: 1000 !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    max-width: 100px !important; /* Limita larghezza totale */
+  }
+  
+  .mobile-action-btn {
+    width: 32px !important; /* Ridotto da 45px */
+    height: 32px !important;
+    background: rgba(0, 188, 212, 0.75) !important; /* Semi-trasparente */
+    border: 2px solid rgba(255, 255, 255, 0.6) !important; /* Bordo sottile */
+    font-size: 0.85em !important; /* Testo più piccolo */
+    box-shadow: 0 2px 8px rgba(0, 188, 212, 0.3) !important;
+  }
+  
+  .mobile-action-btn.special {
+    background: rgba(255, 215, 0, 0.75) !important;
+    border-color: rgba(255, 215, 0, 0.6) !important;
+  }
+  
+  /* ─── CANVAS: PIÙ ALTO PER SFRUTTARE TUTTO LO SPAZIO ─── */
+  #gameCanvas {
+    height: calc(100vh - 70px) !important; /* Meno spazio sottratto */
+    max-height: calc(100vh - 70px) !important;
+    margin-bottom: 0 !important;
+  }
+  
+  /* ─── BODY: MENO PADDING ─── */
+  body {
+    padding-bottom: 55px !important; /* Ridotto da 100px */
+  }
+}
+
+/* ─── TELEFONI MOLTO PICCOLI ─── */
+@media (max-width: 600px) {
+  .mobile-controls {
+    height: 45px !important;
+    padding: 2px !important;
+  }
+  
+  .mobile-joystick {
+    width: 48px !important;
+    height: 48px !important;
+    bottom: 3px !important;
+    left: 5px !important;
+  }
+  
+  .mobile-joystick-knob {
+    width: 18px !important;
+    height: 18px !important;
+  }
+  
+  .mobile-action-buttons {
+    bottom: 3px !important;
+    right: 5px !important;
+    gap: 4px !important;
+  }
+  
+  .mobile-action-btn {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 0.75em !important;
+  }
+  
+  #gameCanvas {
+    height: calc(100vh - 60px) !important;
+    max-height: calc(100vh - 60px) !important;
+  }
+  
+  body {
+    padding-bottom: 50px !important;
+  }
+}
+
+/* ─── LANDSCAPE (ORIZZONTALE): ANCORA PIÙ COMPATTO ─── */
+@media (orientation: landscape) and (max-height: 500px) {
+  .mobile-controls {
+    height: 40px !important;
+    padding: 2px !important;
+    background: linear-gradient(180deg, transparent 70%, rgba(0,0,0,0.2) 100%) !important;
+  }
+  
+  .mobile-joystick {
+    width: 45px !important;
+    height: 45px !important;
+    bottom: 3px !important;
+    left: 5px !important;
+  }
+  
+  .mobile-joystick-knob {
+    width: 16px !important;
+    height: 16px !important;
+  }
+  
+  .mobile-action-buttons {
+    bottom: 3px !important;
+    right: 5px !important;
+    gap: 3px !important;
+    grid-template-columns: repeat(4, 1fr) !important; /* 4 pulsanti in fila */
+  }
+  
+  .mobile-action-btn {
+    width: 26px !important;
+    height: 26px !important;
+    font-size: 0.7em !important;
+  }
+  
+  #gameCanvas {
+    height: calc(100vh - 50px) !important;
+    max-height: calc(100vh - 50px) !important;
+  }
+  
+  body {
+    padding-bottom: 45px !important;
+  }
+}
+
+/* ─── EFFETTI VISIVI MIGLIORATI ─── */
+.mobile-action-btn:active {
+  transform: scale(0.9) !important;
+  background: rgba(0, 188, 212, 0.95) !important;
+  box-shadow: 0 0 15px rgba(0, 188, 212, 0.6) !important;
+}
+
+.mobile-action-btn.special:active {
+  background: rgba(255, 215, 0, 0.95) !important;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.6) !important;
+}
+
+/* ─── OPACITÀ AUMENTATA AL TOCCO ─── */
+.mobile-joystick:active,
+.mobile-joystick.active {
+  background: rgba(0, 188, 212, 0.2) !important;
+  border-color: rgba(0, 188, 212, 0.6) !important;
+}
+
+.mobile-joystick-knob.active {
+  background: rgba(0, 188, 212, 0.9) !important;
+  box-shadow: 0 0 12px rgba(0, 188, 212, 0.8) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ✅ RISULTATO: Controlli 40% più piccoli, area gioco +20%!
+   ═══════════════════════════════════════════════════════════════ */
+
 </style>
 </head>
 <body>
@@ -10387,35 +10842,36 @@ function interpolateBoss() {
 function renderEnemy() {
     if (gameState.gameMode === "duel1v1") return; // Non disegnare boss in 1v1!
 
-  const enemy = gameState.enemy;
-  if (!enemy || enemy.health <= 0) return;
-  ctx.save();
-  ctx.translate(enemy.x, enemy.y);
-  ctx.rotate(enemy.angle || 0);
+    const enemy = gameState.enemy;
+    if (!enemy || enemy.health <= 0) return;
+    ctx.save();
+    ctx.translate(enemy.x, enemy.y);
+    ctx.rotate(enemy.angle || 0);
 
-  // Modifica grandezza su mobile
-  let bossSize = 80;
-  if (isMobileDevice()) {
-    bossSize = Math.min(window.innerWidth, window.innerHeight) < 500 ? 54 : 64;
-    // Landscape molto stretto (altezza bassa): riduci ancora
-    if (window.innerWidth > window.innerHeight && window.innerHeight < 360) bossSize = 44;
-  }
+    // 👇 MODIFICA QUI bossSize 👇
+    let bossSize = 118;
+    if (isMobileDevice()) {
+      bossSize = Math.max(
+        96,
+        Math.floor(Math.min(window.innerWidth, window.innerHeight) * 0.16)
+      );
+    }
 
-  if (gameState.chaosBossMeme) {
-    ctx.font = bossSize + "px Arial";
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText("😂", 0, 0);
-  } else if (bossImage.complete && bossImage.naturalWidth !== 0) {
-    ctx.drawImage(bossImage, -bossSize/2, -bossSize/2, bossSize, bossSize);
-  } else {
-    ctx.fillStyle = '#f44336';
-    ctx.beginPath();
-    ctx.arc(0, 0, bossSize/2, 0, Math.PI * 2);
-    ctx.fill();
-  }
+    if (gameState.chaosBossMeme) {
+      ctx.font = bossSize + "px Arial";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("😂", 0, 0);
+    } else if (bossImage.complete && bossImage.naturalWidth !== 0) {
+      ctx.drawImage(bossImage, -bossSize/2, -bossSize/2, bossSize, bossSize);
+    } else {
+      ctx.fillStyle = '#f44336';
+      ctx.beginPath();
+      ctx.arc(0, 0, bossSize/2, 0, Math.PI * 2);
+      ctx.fill();
+    }
 
-  ctx.restore();
+    ctx.restore();
 }
  
  window.addEventListener('DOMContentLoaded', () => {
