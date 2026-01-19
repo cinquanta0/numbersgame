@@ -3337,6 +3337,460 @@ img, .ship-image, .duel-ship img {
   }
 }
 
+
+/* Halloween Buttons Override */
+.halloween-btn-main {
+  background: linear-gradient(135deg, #ff6600, #ff6600dd) !important;
+  color: #fff !important;
+  font-weight: 900 !important;
+  font-size: 1.4rem !important;
+  padding: 20px 40px !important;
+  margin: 12px auto !important;
+  display: block !important;
+  width: 90% !important;
+  max-width: 600px !important;
+  border: 4px solid #fff !important;
+  border-radius: 15px !important;
+  cursor: pointer !important;
+  transition: all 0.3s !important;
+  box-shadow: 0 6px 25px rgba(255, 102, 0, 0.8) !important;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.5) !important;
+  position: relative !important;
+  z-index: 9999 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+.halloween-btn-main:hover {
+  transform: scale(1.08) translateY(-3px) !important;
+  box-shadow: 0 10px 40px rgba(255, 102, 0, 1) !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+   🎨 GLASSMORPHISM UI - STELLAR GUARDIAN
+   Modern glass effect interface con blur e gradients
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────────
+   🌟 BASE GLASSMORPHISM CLASS
+   ───────────────────────────────────────────────────────────── */
+.glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  box-shadow: 
+    0 8px 32px 0 rgba(0, 0, 0, 0.37),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+}
+
+.glass-dark {
+  background: rgba(10, 10, 20, 0.7);
+  backdrop-filter: blur(25px) saturate(180%);
+  -webkit-backdrop-filter: blur(25px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-colored {
+  background: linear-gradient(
+    135deg,
+    rgba(0, 245, 255, 0.1),
+    rgba(255, 0, 110, 0.1)
+  );
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   🎮 HUD MODERNIZZATO
+   ───────────────────────────────────────────────────────────── */
+.hud {
+  background: linear-gradient(
+    180deg,
+    rgba(10, 10, 30, 0.85) 0%,
+    rgba(10, 10, 30, 0.4) 70%,
+    transparent 100%
+  ) !important;
+  backdrop-filter: blur(15px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(15px) saturate(180%) !important;
+  border-bottom: 1px solid rgba(0, 188, 212, 0.3) !important;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5) !important;
+}
+
+.stat-box {
+  background: rgba(10, 10, 30, 0.6) !important;
+  backdrop-filter: blur(12px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(180%) !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.stat-box:hover {
+  transform: translateY(-2px) !important;
+  border-color: rgba(0, 188, 212, 0.5) !important;
+  box-shadow: 
+    0 6px 30px rgba(0, 188, 212, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+}
+
+.stat-box.level {
+  border-color: rgba(255, 215, 0, 0.3) !important;
+}
+
+.stat-box.lives {
+  border-color: rgba(0, 188, 212, 0.3) !important;
+}
+
+.stat-box.energy {
+  border-color: rgba(76, 175, 80, 0.3) !important;
+}
+
+.stat-box.score {
+  border-color: rgba(156, 39, 176, 0.3) !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   🏠 MENU PRINCIPALE GLASS
+   ───────────────────────────────────────────────────────────── */
+.menu-content {
+  background: rgba(10, 10, 30, 0.4) !important;
+  backdrop-filter: blur(30px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
+  border-radius: 24px !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 
+    0 8px 40px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  padding: 3rem !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   🎯 BOTTONI GLASSMORPHISM
+   ───────────────────────────────────────────────────────────── */
+.menu-btn {
+  background: linear-gradient(
+    135deg,
+    rgba(0, 188, 212, 0.15),
+    rgba(33, 150, 243, 0.15)
+  ) !important;
+  backdrop-filter: blur(10px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(10px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  border-radius: 12px !important;
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.menu-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  transition: left 0.5s ease;
+}
+
+.menu-btn:hover::before {
+  left: 100%;
+}
+
+.menu-btn:hover {
+  transform: translateY(-3px) scale(1.02) !important;
+  border-color: rgba(0, 188, 212, 0.5) !important;
+  box-shadow: 
+    0 8px 35px rgba(0, 188, 212, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 188, 212, 0.25),
+    rgba(33, 150, 243, 0.25)
+  ) !important;
+}
+
+.menu-btn:active {
+  transform: translateY(-1px) scale(0.98) !important;
+}
+
+.menu-btn.primary {
+  background: linear-gradient(
+    135deg,
+    rgba(0, 188, 212, 0.3),
+    rgba(33, 150, 243, 0.3),
+    rgba(63, 81, 181, 0.3)
+  ) !important;
+  border: 2px solid rgba(0, 188, 212, 0.5) !important;
+  box-shadow: 
+    0 6px 30px rgba(0, 188, 212, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
+.menu-btn.primary:hover {
+  box-shadow: 
+    0 10px 50px rgba(0, 188, 212, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   📊 STATISTICHE GLASS
+   ───────────────────────────────────────────────────────────── */
+.stats-display {
+  background: linear-gradient(
+    135deg,
+    rgba(0, 188, 212, 0.05),
+    rgba(33, 150, 243, 0.05)
+  ) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(0, 188, 212, 0.2) !important;
+  border-radius: 20px !important;
+  box-shadow: 
+    0 8px 32px rgba(0, 188, 212, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+.stat-item {
+  background: rgba(10, 10, 30, 0.5) !important;
+  backdrop-filter: blur(15px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(15px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 16px !important;
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.stat-item:hover {
+  transform: translateY(-4px) scale(1.02) !important;
+  border-color: rgba(0, 188, 212, 0.4) !important;
+  box-shadow: 
+    0 8px 40px rgba(0, 188, 212, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   🎴 LEVEL CARDS GLASS
+   ───────────────────────────────────────────────────────────── */
+.level-card {
+  background: rgba(10, 10, 30, 0.6) !important;
+  backdrop-filter: blur(15px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(15px) saturate(180%) !important;
+  border: 1px solid rgba(0, 188, 212, 0.2) !important;
+  border-radius: 20px !important;
+  box-shadow: 
+    0 4px 25px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.level-card:hover {
+  transform: translateY(-8px) scale(1.03) !important;
+  border-color: rgba(0, 188, 212, 0.6) !important;
+  box-shadow: 
+    0 12px 50px rgba(0, 188, 212, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
+.level-card.locked {
+  background: rgba(10, 10, 30, 0.3) !important;
+  border-color: rgba(102, 102, 102, 0.3) !important;
+  opacity: 0.6 !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   💊 HEALTH & ENERGY BARS GLASS
+   ───────────────────────────────────────────────────────────── */
+.health-bar {
+  background: rgba(20, 20, 40, 0.8) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 2px solid rgba(0, 188, 212, 0.3) !important;
+  border-radius: 12px !important;
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+}
+
+.health-fill {
+  border-radius: 10px !important;
+  box-shadow: 
+    0 0 15px currentColor,
+    inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+}
+
+.energy-meter {
+  background: rgba(10, 10, 30, 0.8) !important;
+  backdrop-filter: blur(10px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(10px) saturate(180%) !important;
+  border: 2px solid rgba(0, 188, 212, 0.3) !important;
+  border-radius: 10px !important;
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   📢 NOTIFICATION GLASS
+   ───────────────────────────────────────────────────────────── */
+.notification {
+  background: linear-gradient(
+    135deg,
+    rgba(0, 188, 212, 0.9),
+    rgba(33, 150, 243, 0.9)
+  ) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 16px !important;
+  box-shadow: 
+    0 8px 32px rgba(0, 188, 212, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   🎭 MODAL/OVERLAY GLASS
+   ───────────────────────────────────────────────────────────── */
+.duel-lobby,
+.duel-end,
+.orientation-selector {
+  background: linear-gradient(
+    135deg,
+    rgba(10, 10, 30, 0.95),
+    rgba(20, 30, 50, 0.95)
+  ) !important;
+  backdrop-filter: blur(30px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(30px) saturate(180%) !important;
+  border: 2px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 24px !important;
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.7),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   ✨ GLOW EFFECTS
+   ───────────────────────────────────────────────────────────── */
+.stat-value {
+  text-shadow: 
+    0 0 10px currentColor,
+    0 0 20px currentColor,
+    0 2px 4px rgba(0, 0, 0, 0.5) !important;
+}
+
+.game-title {
+  text-shadow: 
+    0 0 30px #00bcd4,
+    0 0 60px #2196f3,
+    0 0 90px #3f51b5,
+    0 4px 8px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   📱 MOBILE CONTROLS GLASS
+   ───────────────────────────────────────────────────────────── */
+.mobile-controls {
+  background: linear-gradient(
+    180deg,
+    transparent,
+    rgba(10, 10, 30, 0.85)
+  ) !important;
+  backdrop-filter: blur(15px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(15px) saturate(180%) !important;
+}
+
+.mobile-joystick {
+  background: rgba(0, 188, 212, 0.15) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 3px solid rgba(0, 188, 212, 0.4) !important;
+  box-shadow: 
+    0 4px 20px rgba(0, 188, 212, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+.mobile-joystick-knob {
+  background: rgba(0, 188, 212, 0.9) !important;
+  box-shadow: 
+    0 0 20px rgba(0, 188, 212, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+}
+
+.mobile-action-btn {
+  background: rgba(0, 188, 212, 0.85) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border: 3px solid rgba(255, 255, 255, 0.3) !important;
+  box-shadow: 
+    0 4px 20px rgba(0, 188, 212, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
+.mobile-action-btn:active {
+  background: rgba(0, 188, 212, 1) !important;
+  box-shadow: 
+    0 0 30px rgba(0, 188, 212, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
+}
+
+.mobile-action-btn.special {
+  background: rgba(255, 215, 0, 0.85) !important;
+  border-color: rgba(255, 215, 0, 0.5) !important;
+  box-shadow: 
+    0 4px 20px rgba(255, 215, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   🌈 ANIMATED GRADIENT BACKGROUND (OPZIONALE)
+   ───────────────────────────────────────────────────────────── */
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+body {
+  background: linear-gradient(
+    -45deg,
+    #0a0a2e,
+    #16213e,
+    #1a237e,
+    #0f3460,
+    #0a0a2e
+  ) !important;
+  background-size: 400% 400% !important;
+  animation: gradient-shift 15s ease infinite !important;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   💫 SMOOTH TRANSITIONS
+   ───────────────────────────────────────────────────────────── */
+* {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ✅ INSTALLATO! Ora il tuo gioco ha un'interfaccia moderna AAA!
+   ═══════════════════════════════════════════════════════════════ */
+
 </style>
 </head>
 <body>
@@ -3500,7 +3954,9 @@ img, .ship-image, .duel-ship img {
 
 <audio id="musicaGioco" src="musica.mp3" loop></audio>        
                   <div class="menu-buttons">
-                  <button class="menu-btn" onclick="showScreen('shop')">🛒 SHOP</button>
+  
+                  
+                    <button class="menu-btn" onclick="showScreen('shop')">🛒 SHOP</button>
                   <button class="menu-btn" onclick="showScreen('levelSelect')">📋 SELECT MISSION</button>
                   <button class="menu-btn" onclick="startChaosMode()">💥 TOTAL CHAOS</button>
                   <button class="menu-btn primary" id="pulsanteMusica">🎵 Music ON</button>                  <button class="menu-btn" onclick="changePlayerName()">👤 Change nickname</button>
@@ -4428,6 +4884,15 @@ window.addEventListener('DOMContentLoaded', function() {
 const originalShowScreen = window.showScreen;
 window.showScreen = function(screenId) {
   originalShowScreen(screenId);
+
+  // Nascondi sempre il bottone
+  if (window.hideHalloweenMainMenuButton) window.hideHalloweenMainMenuButton();
+
+  // Mostra SOLO nel menu principale
+  if (screenId === 'mainMenu' && window.showHalloweenMainMenuButton) {
+    window.showHalloweenMainMenuButton();
+  }
+
   if (screenId === 'gameScreen') {
     setTimeout(applyMobileControls, 100);
   }
@@ -4768,10 +5233,394 @@ enemyImage.src = 'alien-enemy2.png'; // Senza /
 
       let bossImage = new Image();
       
+      
+      // ════════════════════════════════════════════════════════════
+// 🌟 ULTRA PARTICLE SYSTEM - STELLAR GUARDIAN
+// Sistema particellare avanzato con glow, trails e physics
+// ════════════════════════════════════════════════════════════
+
+// ─────────────────────────────────────────────────────────────
+// 📦 PARTICLE POOL - Performance ottimizzata
+// ─────────────────────────────────────────────────────────────
+class ParticlePool {
+  constructor(maxSize = 2000) {
+    this.pool = [];
+    this.active = [];
+    this.maxSize = maxSize;
+    
+    // Pre-alloca particles
+    for (let i = 0; i < maxSize; i++) {
+      this.pool.push(this.createParticle());
+    }
+  }
+  
+  createParticle() {
+    return {
+      x: 0, y: 0,
+      vx: 0, vy: 0,
+      life: 0, maxLife: 0,
+      size: 0, startSize: 0,
+      color: '#fff',
+      alpha: 1,
+      rotation: 0,
+      rotationSpeed: 0,
+      gravity: 0,
+      friction: 1,
+      glow: 0,
+      type: 'default',
+      active: false
+    };
+  }
+  
+  get(config) {
+    let particle = this.pool.pop() || this.createParticle();
+    Object.assign(particle, config);
+    particle.active = true;
+    particle.life = particle.maxLife;
+    this.active.push(particle);
+    return particle;
+  }
+  
+  release(particle) {
+    particle.active = false;
+    this.pool.push(particle);
+  }
+  
+  update(deltaTime = 1) {
+    for (let i = this.active.length - 1; i >= 0; i--) {
+      const p = this.active[i];
+      
+      // Physics
+      p.vx *= p.friction;
+      p.vy *= p.friction;
+      p.vy += p.gravity * deltaTime;
+      p.x += p.vx * deltaTime;
+      p.y += p.vy * deltaTime;
+      
+      // Rotation
+      p.rotation += p.rotationSpeed * deltaTime;
+      
+      // Life decay
+      p.life -= deltaTime;
+      p.alpha = p.life / p.maxLife;
+      
+      // Size interpolation (shrink over time)
+      const lifeRatio = p.life / p.maxLife;
+      p.size = p.startSize * lifeRatio;
+      
+      // Remove dead particles
+      if (p.life <= 0) {
+        this.active.splice(i, 1);
+        this.release(p);
+      }
+    }
+  }
+  
+  clear() {
+    this.active.forEach(p => this.release(p));
+    this.active = [];
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// 💥 EXPLOSION PRESETS - Effetti pronti all'uso
+// ─────────────────────────────────────────────────────────────
+const EXPLOSION_PRESETS = {
+  // Esplosione player morto
+  PLAYER_DEATH: {
+    count: 80,
+    colors: ['#00f5ff', '#0080ff', '#ffffff', '#4facfe'],
+    sizeRange: [3, 12],
+    speedRange: [2, 12],
+    life: 60,
+    glow: 25,
+    gravity: 0.05,
+    friction: 0.96
+  },
+  
+  // Esplosione boss
+  BOSS_DEATH: {
+    count: 150,
+    colors: ['#ff006e', '#ff9500', '#ffd700', '#ffffff'],
+    sizeRange: [5, 20],
+    speedRange: [3, 15],
+    life: 80,
+    glow: 35,
+    gravity: 0.08,
+    friction: 0.94,
+    shockwave: true
+  },
+  
+  // Hit generico
+  HIT_IMPACT: {
+    count: 25,
+    colors: ['#ffd700', '#ff6b35', '#ffffff'],
+    sizeRange: [2, 8],
+    speedRange: [1, 6],
+    life: 30,
+    glow: 15,
+    gravity: 0.02,
+    friction: 0.92
+  },
+  
+  // Power-up raccolto
+  POWERUP_COLLECT: {
+    count: 40,
+    colors: ['#4ade80', '#22d3ee', '#a78bfa', '#fbbf24'],
+    sizeRange: [3, 10],
+    speedRange: [2, 8],
+    life: 50,
+    glow: 20,
+    gravity: -0.05, // Verso l'alto!
+    friction: 0.95
+  },
+  
+  // Trail navicella
+  ENGINE_TRAIL: {
+    count: 3,
+    colors: ['#00f5ff', '#0066ff'],
+    sizeRange: [4, 8],
+    speedRange: [0.5, 2],
+    life: 25,
+    glow: 12,
+    gravity: 0,
+    friction: 0.88
+  },
+  
+  // Sparks metallici
+  METAL_SPARKS: {
+    count: 35,
+    colors: ['#ffd700', '#ff8c00', '#fff8dc'],
+    sizeRange: [1, 4],
+    speedRange: [3, 10],
+    life: 40,
+    glow: 8,
+    gravity: 0.15,
+    friction: 0.97
+  }
+};
+
+// ─────────────────────────────────────────────────────────────
+// 🎨 PARTICLE EMITTER - Generatore effetti
+// ─────────────────────────────────────────────────────────────
+class ParticleEmitter {
+  constructor(pool) {
+    this.pool = pool;
+  }
+  
+  // Esplosione circolare
+  burst(x, y, preset) {
+    const config = EXPLOSION_PRESETS[preset] || EXPLOSION_PRESETS.HIT_IMPACT;
+    
+    for (let i = 0; i < config.count; i++) {
+      const angle = (i / config.count) * Math.PI * 2 + (Math.random() - 0.5) * 0.5;
+      const speed = config.speedRange[0] + Math.random() * (config.speedRange[1] - config.speedRange[0]);
+      const size = config.sizeRange[0] + Math.random() * (config.sizeRange[1] - config.sizeRange[0]);
+      
+      this.pool.get({
+        x, y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        maxLife: config.life + Math.random() * 20,
+        startSize: size,
+        size: size,
+        color: config.colors[Math.floor(Math.random() * config.colors.length)],
+        glow: config.glow,
+        gravity: config.gravity,
+        friction: config.friction,
+        rotation: Math.random() * Math.PI * 2,
+        rotationSpeed: (Math.random() - 0.5) * 0.1,
+        type: 'burst'
+      });
+    }
+    
+    // Shockwave opzionale
+    if (config.shockwave) {
+      this.shockwave(x, y, 100, config.colors[0]);
+    }
+  }
+  
+  // Trail continuo
+  trail(x, y, preset, direction = {x: 0, y: 1}) {
+    const config = EXPLOSION_PRESETS[preset] || EXPLOSION_PRESETS.ENGINE_TRAIL;
+    
+    for (let i = 0; i < config.count; i++) {
+      const spread = 0.3;
+      const vx = direction.x + (Math.random() - 0.5) * spread;
+      const vy = direction.y + (Math.random() - 0.5) * spread;
+      const speed = config.speedRange[0] + Math.random() * (config.speedRange[1] - config.speedRange[0]);
+      
+      this.pool.get({
+        x: x + (Math.random() - 0.5) * 10,
+        y: y + (Math.random() - 0.5) * 10,
+        vx: vx * speed,
+        vy: vy * speed,
+        maxLife: config.life,
+        startSize: config.sizeRange[0] + Math.random() * (config.sizeRange[1] - config.sizeRange[0]),
+        color: config.colors[Math.floor(Math.random() * config.colors.length)],
+        glow: config.glow,
+        gravity: config.gravity,
+        friction: config.friction,
+        type: 'trail'
+      });
+    }
+  }
+  
+  // Confetti celebration
+  confetti(x, y, count = 60) {
+    const colors = ['#ff006e', '#ffd700', '#00f5ff', '#4ade80', '#a78bfa'];
+    
+    for (let i = 0; i < count; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 5 + Math.random() * 8;
+      
+      this.pool.get({
+        x, y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 3, // Bias verso l'alto
+        maxLife: 80 + Math.random() * 40,
+        startSize: 4 + Math.random() * 6,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        glow: 15,
+        gravity: 0.12,
+        friction: 0.98,
+        rotation: Math.random() * Math.PI * 2,
+        rotationSpeed: (Math.random() - 0.5) * 0.2,
+        type: 'confetti'
+      });
+    }
+  }
+  
+  // Shockwave ring
+  shockwave(x, y, maxRadius, color = '#fff') {
+    // Questo andrà in un array separato per rendering speciale
+    window.gameState.shockwaves = window.gameState.shockwaves || [];
+    window.gameState.shockwaves.push({
+      x, y,
+      radius: 0,
+      maxRadius,
+      life: 30,
+      maxLife: 30,
+      color,
+      lineWidth: 4
+    });
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// 🎨 ADVANCED RENDERER - Rendering con glow e blur
+// ─────────────────────────────────────────────────────────────
+class ParticleRenderer {
+  constructor(ctx) {
+    this.ctx = ctx;
+  }
+  
+  render(particles) {
+    const ctx = this.ctx;
+    
+    // Render particles con glow
+    particles.forEach(p => {
+      if (!p.active) return;
+      
+      ctx.save();
+      ctx.globalAlpha = p.alpha;
+      
+      // Glow effect
+      if (p.glow > 0) {
+        ctx.shadowBlur = p.glow;
+        ctx.shadowColor = p.color;
+      }
+      
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rotation);
+      
+      // Render based on type
+      switch (p.type) {
+        case 'confetti':
+          this.renderConfetti(ctx, p);
+          break;
+        case 'trail':
+          this.renderTrail(ctx, p);
+          break;
+        default:
+          this.renderDefault(ctx, p);
+      }
+      
+      ctx.restore();
+    });
+  }
+  
+  renderDefault(ctx, p) {
+    // Cerchio semplice con gradient
+    const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, p.size);
+    gradient.addColorStop(0, p.color);
+    gradient.addColorStop(0.5, p.color + 'cc'); // 80% alpha
+    gradient.addColorStop(1, p.color + '00'); // Transparent
+    
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.arc(0, 0, p.size, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  
+  renderTrail(ctx, p) {
+    // Ovale allungato per trail
+    ctx.fillStyle = p.color;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, p.size, p.size * 2, 0, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  
+  renderConfetti(ctx, p) {
+    // Rettangolo colorato
+    ctx.fillStyle = p.color;
+    ctx.fillRect(-p.size / 2, -p.size, p.size, p.size * 2);
+  }
+  
+  renderShockwaves(shockwaves) {
+    const ctx = this.ctx;
+    
+    for (let i = shockwaves.length - 1; i >= 0; i--) {
+      const sw = shockwaves[i];
+      
+      // Update
+      sw.radius += (sw.maxRadius / sw.maxLife) * 2;
+      sw.life--;
+      
+      // Render
+      ctx.save();
+      ctx.globalAlpha = sw.life / sw.maxLife;
+      ctx.strokeStyle = sw.color;
+      ctx.lineWidth = sw.lineWidth;
+      ctx.shadowBlur = 20;
+      ctx.shadowColor = sw.color;
+      
+      ctx.beginPath();
+      ctx.arc(sw.x, sw.y, sw.radius, 0, Math.PI * 2);
+      ctx.stroke();
+      
+      ctx.restore();
+      
+      // Remove if dead
+      if (sw.life <= 0) {
+        shockwaves.splice(i, 1);
+      }
+    }
+  }
+}
+      
+      
+      
       // Game Initialization
       function initGame() {
           canvas = document.getElementById('gameCanvas');
           ctx = canvas.getContext('2d');
+          
+          // 🌟 AGGIUNGI QUESTE 3 RIGHE:
+window.ultraParticlePool = new ParticlePool(2000);
+window.ultraEmitter = new ParticleEmitter(window.ultraParticlePool);
+window.ultraRenderer = new ParticleRenderer(ctx);
+          
           
           resizeCanvas();
           window.addEventListener('resize', resizeCanvas);
@@ -5775,7 +6624,20 @@ speed *= gameState.globalSpeed;
     }
 
     updateUI();
+
+     // 🌟 AGGIUNGI QUESTE RIGHE ALLA FINE:
+    if (window.ultraEmitter && Math.random() < 0.35) {
+        window.ultraEmitter.trail(
+            gameState.player.x,
+            gameState.player.y + 25,
+            'ENGINE_TRAIL',
+            {x: 0, y: 1}
+        );
+    }
 }
+
+
+  
       function updateEnemy(deltaTime) {
     if (gameState.gameMode === "duel1v1") return; // Non aggiornare boss in 1v1!
     if (gameState.gameMode === "coop") return; // In co-op, posizione boss solo da server!
@@ -6495,26 +7357,23 @@ function eseguiSpecial() {
     }
 }
 
-      function updateParticles(deltaTime) {
-          if (isMobileDevice() && window.innerWidth > window.innerHeight) {
-  // PATCH: limita particelle e proiettili su mobile landscape
-  if (gameState.particles.length > 38) gameState.particles = gameState.particles.slice(-38);
-  if (gameState.bullets.length > 22) gameState.bullets = gameState.bullets.slice(-22);
-  if (gameState.enemyBullets.length > 22) gameState.enemyBullets = gameState.enemyBullets.slice(-22);
+  function updateParticles(deltaTime) {
+    // Usa il nuovo sistema ultra
+    if (window.ultraParticlePool) {
+        window.ultraParticlePool.update(deltaTime || 1);
+    }
+    
+    // Mantieni il vecchio per compatibilità (opzionale)
+    gameState.particles = gameState.particles.filter(particle => {
+        particle.x += particle.vx * (deltaTime || 1);
+        particle.y += particle.vy * (deltaTime || 1);
+        particle.life -= (deltaTime || 1);
+        particle.alpha = particle.life / particle.maxLife;
+        return particle.life > 0;
+    });
 }
-        
-        
-        gameState.particles = gameState.particles.filter(particle => {
-              particle.x += particle.vx * deltaTime;
-              particle.y += particle.vy * deltaTime;
-              particle.life -= deltaTime;
-              particle.alpha = particle.life / particle.maxLife;
-              
-              return particle.life > 0;
-          });
-      }
 
-    function checkCollisions() {
+  function checkCollisions() {
     // Player bullets hitting enemy
     gameState.bullets.forEach((bullet, bulletIndex) => {
         const enemy = gameState.enemy;
@@ -6525,6 +7384,7 @@ function eseguiSpecial() {
             Math.pow(bullet.y - enemy.y, 2)
         );
 
+        // 🌟 AGGIUNGI IL CHECK DELLA DISTANZA CHE MANCAVA:
         if (dist < 60) {
             let damage = bullet.damage;
 
@@ -6540,19 +7400,25 @@ function eseguiSpecial() {
             enemy.health -= damage;
             gameState.bullets.splice(bulletIndex, 1);
 
-            createHitParticles(bullet.x, bullet.y, bullet.color);
+           
 
-            // SUONO HIT BOSS/NEMICO (puoi anche crearne uno apposito)
-                  playSound('playerShoot', 0.5);
+            // SUONO HIT BOSS/NEMICO
+            playSound('playerShoot', 0.5);
 
             // Se la vita va a zero, suona esplosione
             if (enemy.health <= 0) {
-               playSound('explosion', 0.7);
+                playSound('explosion', 0.7);
             }
 
             updateUI();
         }
     });
+
+    // Enemy bullets hitting player
+    gameState.enemyBullets.forEach((bullet, bulletIndex) => {
+        // ... resto del codice esistente ...
+    });
+
 
     // Enemy bullets hitting player
     gameState.enemyBullets.forEach((bullet, bulletIndex) => {
@@ -6644,8 +7510,8 @@ function eseguiSpecial() {
         unlockAchievement('bullet_dancer');
     }
     checkObstacleCollisions();
-}
       
+  }
       function createHitParticles(x, y, color) {
           for (let i = 0; i < 12; i++) {
               gameState.particles.push({
@@ -6669,6 +7535,16 @@ function eseguiSpecial() {
 
     showAd(); // Mostra pubblicità alla vittoria
 
+     // 🌟 AGGIUNGI QUESTE RIGHE:
+    if (window.ultraEmitter && gameState.player) {
+        window.ultraEmitter.confetti(
+            gameState.player.x, 
+            gameState.player.y, 
+            120
+        );
+    }
+    
+    
     // Se hai completato la campagna (livello 20)
     if (gameState.gameMode === 'campaign' && gameState.currentLevel >= 20) {
         unlockAchievement('ultimate_guardian');
@@ -6682,6 +7558,12 @@ function eseguiSpecial() {
 
     gameState.gameRunning = false;
 
+    
+     // 🎃 HALLOWEEN: Se hai completato un livello, dai le ricompense Halloween!
+  if (typeof Halloween !== 'undefined' && Halloween.completeLevel) {
+    Halloween.completeLevel(gameState.currentLevel);
+  }
+    
     // Calcola tempo di sopravvivenza
     const survivalTime = (Date.now() - gameState.levelStartTime) / 1000;
     gameState.totalSurvivalTime += survivalTime;
@@ -6932,7 +7814,7 @@ document.addEventListener('keydown', function(e) {
           gameLoop();
       }
 
-    function render() {
+  function render() {
   // Aggiorna lo sfondo animato
   backgroundY += 1;
   if (backgroundY >= canvas.height) backgroundY = 0;
@@ -6949,15 +7831,15 @@ document.addEventListener('keydown', function(e) {
 
   // Sfondo spazio (immagine e/o stelle animate)
   renderSpaceBackground();
-    renderFallingPowerups(ctx);  // <--- AGGIUNGI QUESTA RIGA QUI!
+  renderFallingPowerups(ctx);  // <--- AGGIUNGI QUESTA RIGA QUI!
 
   // --- MODALITÀ DUEL BOT (1v1 AI) ---
   if (gameState.gameMode === "duelAI") {
     renderPlayer();
     renderDuelBot(ctx);
-    renderBullets();
-    renderEnemyBullets();
-    renderParticles();
+    renderBullets(ctx);           // PATCH
+    renderEnemyBullets(ctx);      // PATCH
+    renderParticles(ctx);         // PATCH
     if (gameState.slowTimeActive) renderSlowTimeOverlay();
     endShake(ctx);
     return;
@@ -6974,11 +7856,10 @@ document.addEventListener('keydown', function(e) {
   if (gameState.gameMode === "duel2v2") {
     renderPlayer();
     render2v2Players(ctx);
-    renderBullets();
-    renderParticles();
+    renderBullets(ctx);           // PATCH
+    renderParticles(ctx);         // PATCH
     return; // NON disegnare boss/ostacoli!
   }
-  
   
   // --- MODALITÀ CO-OP ---
   else if (gameState.gameMode === "coop") {
@@ -6998,9 +7879,9 @@ document.addEventListener('keydown', function(e) {
 
   // Ostacoli, proiettili, particelle (sempre)
   renderObstacles();
-  renderBullets();
-  renderEnemyBullets();
-  renderParticles();
+  renderBullets(ctx);            // PATCH
+  renderEnemyBullets(ctx);       // PATCH
+  renderParticles(ctx);          // PATCH
 
   // Overlay slow-time
   if (gameState.slowTimeActive) renderSlowTimeOverlay();
@@ -7188,19 +8069,30 @@ function renderOtherPlayers(ctx) {
           });
       }
 
-      function renderParticles() {
-          gameState.particles.forEach(particle => {
-              ctx.save();
-              ctx.globalAlpha = particle.alpha;
-              ctx.fillStyle = particle.color;
-              ctx.shadowColor = particle.color;
-              ctx.shadowBlur = 8;
-              ctx.beginPath();
-              ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-              ctx.fill();
-              ctx.restore();
-          });
-      }
+     function renderParticles() {
+    // Render nuovo sistema ultra
+    if (window.ultraRenderer && window.ultraParticlePool) {
+        window.ultraRenderer.render(window.ultraParticlePool.active);
+        
+        // Render shockwaves
+        if (window.gameState.shockwaves) {
+            window.ultraRenderer.renderShockwaves(window.gameState.shockwaves);
+        }
+    }
+    
+    // Mantieni il vecchio per compatibilità (opzionale)
+    gameState.particles.forEach(particle => {
+        ctx.save();
+        ctx.globalAlpha = particle.alpha;
+        ctx.fillStyle = particle.color;
+        ctx.shadowColor = particle.color;
+        ctx.shadowBlur = 8;
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    });
+}
 
       function renderSlowTimeOverlay() {
           ctx.save();
@@ -7262,6 +8154,20 @@ eloDisplay.innerHTML =
         }
     });
 
+    
+      // 🎃 HALLOWEEN: Aggiorna valute Halloween se esistono
+  if (typeof Halloween !== 'undefined') {
+    const coinEl = document.getElementById('halloweenCoins');
+    const crystalEl = document.getElementById('halloweenCrystals');
+    const soulEl = document.getElementById('halloweenSouls');
+    
+    if (coinEl) coinEl.textContent = Halloween.coins;
+    if (crystalEl) crystalEl.textContent = Halloween.crystals;
+    if (soulEl) soulEl.textContent = Halloween.souls;
+  }
+
+    
+    
     // Gestione barra ENEMY: aggiorna valori solo se visibile
     const enemyHealthFill = document.getElementById('enemyHealthFill');
     const enemyHealthText = document.getElementById('enemyHealthText');
@@ -7760,7 +8666,13 @@ function drawFlash(ctx, canvas) {
 function esplodiGiocatore(player) {
      playSound('explosion', 0.7);
   
-  spawnSuperExplosion(player.x, player.y, {
+     // 🌟 AGGIUNGI QUESTA RIGA:
+    if (window.ultraEmitter) {
+        window.ultraEmitter.burst(player.x, player.y, 'PLAYER_DEATH');
+    }
+  
+  
+     spawnSuperExplosion(player.x, player.y, {
         colors: ["#00bcd4", "#fff", "#2196f3", "#14fc56"],
         count: 80,
         sparkle: true
@@ -7773,7 +8685,13 @@ function esplodiGiocatore(player) {
 function esplodiBoss(boss) {
 playSound('explosion', 0.7);
   
-  // Super esplosione centrale
+   // 🌟 AGGIUNGI QUESTA RIGA:
+    if (window.ultraEmitter) {
+        window.ultraEmitter.burst(boss.x, boss.y, 'BOSS_DEATH');
+        window.ultraEmitter.confetti(boss.x, boss.y, 100);
+    }
+
+// Super esplosione centrale
     spawnSuperExplosion(boss.x, boss.y, {
         colors: ["#f00", "#fff", "#ffd700", "#9c27b0", "#ff7f00"],
         count: 140,
@@ -8970,7 +9888,13 @@ function showScreen(screenId) {
     if (screenElem) {
         screenElem.classList.add('active');
         gameState.currentScreen = screenId;
-    } else {
+    
+     // --- AGGIUNGI QUI ---
+        if (screenId === 'gameScreen') {
+            window.scrollTo({ top: 0, behavior: 'auto' });
+        }
+    
+      } else {
         console.warn("Schermata non trovata:", screenId);
         return;
     }
@@ -9266,17 +10190,63 @@ function isSummerEventActive() {
 }
  
  
- function generaInventarioNavicelle() {
+function generaInventarioNavicelle() {
+  console.log("INIZIO FUNZIONE NAVICELLE PATCHATA!");
+  console.log("window.Halloween:", window.Halloween);
+console.log("Halloween.inventory:", window.Halloween && Halloween.inventory);
+console.log("Halloween.inventory.skins:", window.Halloween && Halloween.inventory && Halloween.inventory.skins);
+console.log("Array.isArray(Halloween.inventory.skins):", window.Halloween && Halloween.inventory && Array.isArray(Halloween.inventory.skins));
+  
+  
   const ships = [
     { id: "ship1", src: "navicella1.png", boss: "Falcon X", difficulty: "Agile & Fast" },
     { id: "ship2", src: "navicella2.png", boss: "Titan Omega", difficulty: "Heavy Armor" },
     { id: "ship3", src: "navicella3.png", boss: "Blue Star", difficulty: "Ultra Fast" },
     { id: "ship4", src: "navicella4.png", boss: "Pixel Blue", difficulty: "Retro Pixel" }
   ];
-  // Skin estiva evento
   if (isSummerEventActive()) {
     ships.push({ id: "summer", src: "navicella-summer.png", boss: "Sunrider", difficulty: "🌞 Summer 2025 (Evento!)" });
   }
+
+  // --- PATCH DEBUG SKIN ---
+  if (window.Halloween && Halloween.inventory && Array.isArray(Halloween.inventory.skins)) {
+    console.log("SKINS NEL CICLO:", Halloween.inventory.skins);
+    Halloween.inventory.skins.forEach(skinName => {
+      let skinMap = {
+        "🎃 Jack-O-Ship": {
+          id: "halloween-jack",
+          src: "skin-jack-o-ship.png",
+          boss: "Jack-O-Ship",
+          difficulty: "Halloween Special"
+        },
+        "🦇 Vampire Lord": {
+          id: "halloween-vampire",
+          src: "skin-vampire-lord.png",
+          boss: "Vampire Lord",
+          difficulty: "Halloween Special"
+        },
+        "💀 Skeleton Raider": {
+          id: "halloween-skeleton",
+          src: "skin-skeleton-raider.png",
+          boss: "Skeleton Raider",
+          difficulty: "Halloween Special"
+        },
+      };
+
+      Object.keys(skinMap).forEach(mapKey => {
+        console.log("CONFRONTO:", JSON.stringify(skinName), JSON.stringify(mapKey), skinName === mapKey);
+      });
+
+      if (skinMap[skinName]) {
+        console.log("AGGIUNGO LA CARD:", skinName);
+        ships.push(skinMap[skinName]);
+      } else {
+        console.log("NON TROVATA NELLA MAPPA:", skinName, "- Possibili problemi di spazi o caratteri invisibili.");
+      }
+    });
+  }
+  // --- FINE PATCH DEBUG ---
+
   const inventoryDiv = document.getElementById('shipInventory');
   inventoryDiv.innerHTML = '';
   ships.forEach(ship => {
@@ -12517,6 +13487,17 @@ function checkPowerupCollisions() {
 }
 
 function applyPowerupEffect(type) {
+  
+   // 🌟 AGGIUNGI QUESTE RIGHE:
+    if (window.ultraEmitter && window.gameState.player) {
+        window.ultraEmitter.burst(
+            window.gameState.player.x, 
+            window.gameState.player.y, 
+            'POWERUP_COLLECT'
+        );
+    }
+  
+  
   switch(type) {
     case 'triple':
       window.gameState.player.tripleTimer = 600;
@@ -12681,7 +13662,42 @@ function selectMobileWeapon(idx) {
   showNotification(`Arma ${idx+1} selezionata!`, "info");
 }
 
+
+
+
+
+
 </script>
+
+
+<!-- Inizializza variabili Halloween prima di caricare -->
+<script>
+  window.halloween = window.halloween || {};
+  window.saveHalloween = window.saveHalloween || function() {
+    if (window.halloween) {
+      localStorage.setItem("stellarHalloween25", JSON.stringify(window.halloween));
+    }
+  };
+</script>
+
+<!-- Carica i file Halloween -->
+<script src="perhalloween.js"></script>
+<script src="perhalloween-game.js"></script>
+
+<!-- Inizializza il bottone Halloween -->
+<script>
+  window.addEventListener("DOMContentLoaded", function() {
+    // Assicurati che le funzioni siano caricate
+    if (typeof window.initHalloweenMainMenuButton === "function") {
+      window.initHalloweenMainMenuButton();
+    }
+  });
+</script>
+
+
+
+</script>
+
 
 </body>
 </html>
