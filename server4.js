@@ -4,6 +4,7 @@
 
 const express = require('express');
 const http = require('http');
+const path = require('path');
 const socketIo = require('socket.io');
 
 const app = express();
@@ -232,10 +233,11 @@ io.on('connection', (socket) => {
     // Mostra il target dopo il delay
     const delay = room.targetPosition.appearTime - Date.now();
     setTimeout(() => {
-      if (!room.gameActive) return;
-      
+      const room = getRoom(roomCode); // risolvi sempre dal dict per evitare riferimenti obsoleti
+      if (!room || !room.gameActive) return;
+
       room.targetPosition.startTime = Date.now();
-      
+
       io.to(roomCode).emit('reaction_show_target', {
         x: room.targetPosition.x,
         y: room.targetPosition.y,
@@ -252,7 +254,9 @@ io.on('connection', (socket) => {
     // Se questo giocatore ha già cliccato in questo round, ignora
     if (room.clickTimes[socket.id]) return;
     
+    if (!room.targetPosition.startTime) return; // target non ancora apparso
     const reactionTime = Date.now() - room.targetPosition.startTime;
+    if (reactionTime < 0 || isNaN(reactionTime)) return;
     room.clickTimes[socket.id] = reactionTime;
     
     const player = room.players.find(p => p.id === socket.id);
@@ -283,7 +287,10 @@ io.on('connection', (socket) => {
       });
       
       // Prossimo round dopo 2 secondi
-      setTimeout(() => startRound(roomCode), 2000);
+      setTimeout(() => {
+        const r = getRoom(roomCode);
+        if (r && r.gameActive) startRound(roomCode);
+      }, 2000);
     }
   });
 
@@ -305,7 +312,7 @@ io.on('connection', (socket) => {
       id: p.id,
       nickname: p.nickname,
       score: p.score,
-      avgTime: p.reactionTime ? Math.round(p.reactionTime) : null,
+      lastReactionTime: p.reactionTime ? Math.round(p.reactionTime) : null,
       rank: sortedPlayers.indexOf(p) + 1
     }));
     
@@ -383,7 +390,7 @@ setInterval(() => {
   Object.keys(gameRooms).forEach(roomCode => {
     const room = gameRooms[roomCode];
     // Elimina rooms vuote o inattive da più di 30 minuti
-    if (room.players.length === 0 || (now - room.createdAt > 30 * 60 * 1000)) {
+    if (room.players.length === 0 || (!room.gameActive && now - room.createdAt > 30 * 60 * 1000)) {
       delete gameRooms[roomCode];
       console.log(`[Cleanup] Room ${roomCode} eliminata`);
     }

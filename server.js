@@ -33,7 +33,6 @@ app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 
 // === COOP GLOBAL STATE ===
 let players = {};
-let playerVoiceStatus = {};
 let coopObstacles = [];
 let gameInProgress = false;
 let hostId = null;
@@ -66,7 +65,7 @@ function resetGame() {
   coopBoss.dir = 1; coopBoss.yDir = 1;
   coopObstacles = [];
   gameInProgress = false;
-  bossAttackTimer = 0;
+  bossAttackTimer = 2000; // grace period iniziale: 2 secondi prima del primo attacco
 }
 
 // =====================================================
@@ -217,11 +216,16 @@ setInterval(() => {
   lastBossFrame = now;
   delta = Math.max(0.02, Math.min(delta, 0.07));
 
-  // Broadcast posizioni (throttled)
-  if (Object.keys(players).length > 0) {
+  // Broadcast posizioni e eventi COOP solo ai giocatori della lobby COOP (non ai duel)
+  const coopPlayerIds = Object.keys(players);
+  function emitToCoop(event, data) {
+    coopPlayerIds.forEach(id => io.to(id).emit(event, data));
+  }
+
+  if (coopPlayerIds.length > 0) {
     if (now - lastOtherPlayersBroadcast >= OTHER_PLAYERS_INTERVAL) {
       lastOtherPlayersBroadcast = now;
-      io.emit('otherPlayers', {
+      emitToCoop('otherPlayers', {
         players: Object.values(players).map(p => ({
           id: p.id, x: p.x, y: p.y, angle: p.angle, nickname: p.nickname, dead: p.dead
         }))
@@ -238,23 +242,23 @@ setInterval(() => {
     if (coopBoss.y > BOSS_Y_MAX) { coopBoss.y = BOSS_Y_MAX; coopBoss.yDir = -1; }
     coopBoss.angle += 0.02 * (delta * 60);
 
-    io.emit('bossUpdate', { ...coopBoss });
+    emitToCoop('bossUpdate', { ...coopBoss });
 
     // Timer attacchi boss a tempo reale
     bossAttackTimer -= (delta * 1000);
-    if (bossAttackTimer <= 0 && Object.keys(players).length > 0) {
+    if (bossAttackTimer <= 0 && coopPlayerIds.length > 0) {
       let unlockedPatterns = Math.min(
         Math.ceil((coopBoss.maxHealth - coopBoss.health) / 3000) + 2,
         BOSS_ATTACK_PATTERNS.length
       );
       const pattern = BOSS_ATTACK_PATTERNS[Math.floor(Math.random() * unlockedPatterns)];
-      io.emit('bossAttack', { pattern, x: coopBoss.x, y: coopBoss.y, time: Date.now() });
+      emitToCoop('bossAttack', { pattern, x: coopBoss.x, y: coopBoss.y, time: Date.now() });
       bossAttackTimer = Math.random() * (MAX_ATTACK_INTERVAL - MIN_ATTACK_INTERVAL) + MIN_ATTACK_INTERVAL;
     }
 
     if (Math.random() < 0.035) spawnGlobalObstacle();
     updateObstacles();
-    io.emit('obstaclesUpdate', coopObstacles);
+    emitToCoop('obstaclesUpdate', coopObstacles);
   }
 
   // Duel sync
@@ -292,8 +296,8 @@ setInterval(() => {
           players: playerStates,
           spectators: duelSpectators[room].length
         });
-        io.to(sid).emit('powerup_spawn', ...duel.powerups);
-        io.to(sid).emit('duel_obstacle_spawn', ...duel.obstacles);
+        io.to(sid).emit('powerup_spawn', duel.powerups);
+        io.to(sid).emit('duel_obstacle_spawn', duel.obstacles);
       });
     }
 
@@ -333,7 +337,6 @@ io.on('connection', (socket) => {
       lives: 3,
       dead: false
     };
-    playerVoiceStatus[socket.id] = false;
     if (!hostId) hostId = socket.id;
     inviaLobbyAggiornata();
   });
@@ -442,7 +445,6 @@ io.on('connection', (socket) => {
   });
 
   socket.on('voiceActive', (data) => {
-    playerVoiceStatus[socket.id] = !!data.active;
     io.emit('voiceActive', { id: socket.id, active: !!data.active });
   });
 
@@ -595,9 +597,10 @@ io.on('connection', (socket) => {
       else if (p1dead) roundWinner = duel.p2.id;
       else if (p2dead) roundWinner = duel.p1.id;
 
-      if (roundWinner && roundWinner !== "draw") duel.roundWins[roundWinner] += 1;
-      duel.stats[duel.p1.id].kills = p2dead ? 1 : 0;
-      duel.stats[duel.p2.id].kills = p1dead ? 1 : 0;
+      if (roundWinner && roundWinner !== "draw") {
+        duel.roundWins[roundWinner] += 1;
+        duel.stats[roundWinner].kills += 1;
+      }
 
       const winNeeded = Math.ceil(duel.maxRounds / 2);
       const p1Win = duel.roundWins[duel.p1.id] >= winNeeded;
@@ -637,6 +640,8 @@ io.on('connection', (socket) => {
     const duel = duelRooms[room];
     if (!duel || duel.ended) return;
     const attackerId = socket.id;
+    // Verifica che il mittente sia effettivamente un giocatore in questa room
+    if (attackerId !== duel.p1.id && attackerId !== duel.p2.id) return;
     const defenderId = getOpponent(room, attackerId)?.id;
     if (!defenderId) return;
     if (typeof damage !== 'number' || damage <= 0 || damage > 60) damage = 20;
@@ -673,7 +678,6 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     // 1. Rimuovi da lobby coop
     delete players[socket.id];
-    delete playerVoiceStatus[socket.id];
 
     // 2. Se era host coop -> passa host o ferma partita
     if (hostId === socket.id) {
@@ -737,7 +741,11 @@ io.on('connection', (socket) => {
   });
 
   function inviaLobbyAggiornata() {
-    io.emit('lobbyUpdate', { players: Object.values(players) });
+    io.emit('lobbyUpdate', {
+      players: Object.values(players),
+      host: hostId,
+      gameInProgress
+    });
   }
 
   // --- WEBRTC ---

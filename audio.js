@@ -39,10 +39,10 @@ window.startGameAudio = async function() {
 };
 
 // Play sound: chiamala solo dopo che audio è sbloccato!
-function playSound(name, volume = 0.5) {
+async function playSound(name, volume = 0.5) {
   if (!audioCtx || !sounds[name]) return;
   if (audioCtx.state === "suspended") {
-    audioCtx.resume();
+    await audioCtx.resume();
   }
   const src = audioCtx.createBufferSource();
   src.buffer = sounds[name];

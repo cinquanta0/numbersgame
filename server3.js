@@ -36,7 +36,12 @@ function broadcastLobbyUpdate() {
   io.emit('duel2v2_update', { players: list, count: list.length });
 }
 function assignTeams(fourPlayers) {
-  const shuffled = fourPlayers.sort(() => Math.random() - 0.5);
+  // Fisher-Yates shuffle uniforme
+  const shuffled = [...fourPlayers];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
   return {
     team1: [shuffled[0], shuffled[1]],
     team2: [shuffled[2], shuffled[3]],
@@ -45,6 +50,8 @@ function assignTeams(fourPlayers) {
 
 // PATCH: authoritative damage/collision
 function processBullets(room) {
+  if (room.processingBullets) return;
+  room.processingBullets = true;
   // Copy bullets array (avoid mutation during loop)
   let bullets = Array.isArray(room.bullets) ? room.bullets.slice() : [];
   let newBullets = [];
@@ -64,6 +71,7 @@ function processBullets(room) {
     if (!hit) newBullets.push(bullet);
   });
   room.bullets = newBullets;
+  room.processingBullets = false;
 }
 
 io.on('connection', socket => {
@@ -111,8 +119,8 @@ io.on('connection', socket => {
         roomId,
         state: "playing",
         bullets: [],
-        round: 1,
-        scores: { team1: 0, team2: 0 }
+        ended: false,
+        processingBullets: false
       };
 
       teams.team1.forEach((p, i) => {
@@ -170,10 +178,11 @@ io.on('connection', socket => {
       // PATCH: IGNORA health inviata dal client!
     }
 
-    // PATCH: aggiungi solo nuovi proiettili (opzionale: qui accetti tutto per semplicità)
+    // Accetta solo i bullet di proprietà di questo socket
     if (Array.isArray(data.bullets)) {
-      // PATCH: Se vuoi evitare duplicati, verifica id/owner
-      room.bullets = data.bullets;
+      room.bullets = room.bullets.filter(b => b.owner !== socket.id);
+      const myBullets = data.bullets.filter(b => b.owner === socket.id);
+      room.bullets.push(...myBullets);
     }
 
     // PATCH: authoritative damage/collision!
@@ -182,9 +191,7 @@ io.on('connection', socket => {
     io.to(room.roomId).emit('duel2v2_state', {
       team1: room.team1,
       team2: room.team2,
-      bullets: room.bullets,
-      round: room.round,
-      scores: room.scores
+      bullets: room.bullets
     });
 
     // Fine partita
@@ -229,6 +236,8 @@ io.on('connection', socket => {
 
 function end2v2Match(room, winningTeam) {
   if (!room || !room.roomId) return;
+  if (room.ended) return;
+  room.ended = true;
   const stats = {
     team1: {
       kills: room.team2.filter(p => p.health <= 0).length,
@@ -261,7 +270,7 @@ function end2v2Match(room, winningTeam) {
 http.listen(PORT, () => {
   console.log(`Stellar Guardian 2v2 Server PATCHED online on port ${PORT}`);
   console.log(`Apri http://localhost:${PORT} nel browser`);
-  console.log(`File serviti da: ${path.join(__dirname, 'public')}`);
+  console.log(`File serviti da: ${path.join(__dirname)}`);
 
 });
 

@@ -140,11 +140,11 @@ function updateLobbyPlayerList() {
     const playerEl = document.createElement('div');
     playerEl.className = 'lobby-player';
     if (player.id === currentPlayer.id) playerEl.classList.add('is-you');
-    if (player.id === hostId) playerEl.classList.add('is-host');
-    
+    if (isHost && player.id === currentPlayer.id) playerEl.classList.add('is-host');
+
     playerEl.innerHTML = `
       <span class="player-nickname">${player.nickname}</span>
-      <span class="player-status">${player.id === hostId ? '👑 Host' : ''}</span>
+      <span class="player-status">${isHost && player.id === currentPlayer.id ? '👑 Host' : ''}</span>
     `;
     
     playerList.appendChild(playerEl);
@@ -300,21 +300,20 @@ function cancelDuelQueue() {
 
 function collectPowerup(powerupId) {
   if (!duelState.room) return;
-  
-  socket.emit('duel_powerup_collected', {
+
+  socket.emit('duel_update', {
     room: duelState.room,
+    action: 'powerup_pick',
     powerupId: powerupId
   });
 }
 
 function confirmHit(bulletId, damage, targetId) {
   if (!duelState.room) return;
-  
-  socket.emit('duel_hit_confirmed', {
+
+  socket.emit('duel_hit', {
     room: duelState.room,
-    bulletId: bulletId,
-    damage: damage,
-    targetId: targetId
+    damage: damage
   });
 }
 
@@ -337,28 +336,6 @@ function hideDuelQueueUI() {
   if (queueUI) queueUI.style.display = 'none';
 }
 
-function spectateRandomDuel() {
-  // Trova un duello casuale da spettare
-  socket.emit('get_active_duels');
-}
-
-function stopSpectating() {
-  if (duelState.spectatingRoom) {
-    socket.emit('stop_spectating', { room: duelState.spectatingRoom });
-    duelState.spectating = false;
-    duelState.spectatingRoom = null;
-    gameMode = 'lobby';
-    updateUI();
-  }
-}
-
-function getLeaderboard() {
-  socket.emit('get_duel_leaderboard');
-}
-
-function getPlayerStats() {
-  socket.emit('get_player_stats');
-}
 
 // === VOICE CHAT FUNCTIONS ===
 let isVoiceActive = false;
@@ -527,7 +504,7 @@ function gameLoop() {
   // Aggiorna effetti temporanei
   updatePlayerEffects();
   
-  requestAnimationFrame(gameLoop);
+  // RAF gestito da enhancedGameLoop — non fare RAF qui per evitare doppio loop
 }
 
 function getBounds() {
@@ -566,9 +543,9 @@ socket.on('lobbyUpdate', (data) => {
   data.players.forEach(player => {
     lobbyPlayers[player.id] = player;
   });
-  
-  isHost = (data.host === socket.id);
-  gameInProgress = data.gameInProgress;
+
+  if (data.host) isHost = (data.host === socket.id);
+  if (typeof data.gameInProgress !== 'undefined') gameInProgress = data.gameInProgress;
   
   if (gameMode === 'lobby') {
     updateUI();
@@ -625,17 +602,7 @@ socket.on('spawnBullet', (data) => {
 });
 
 // === DUEL EVENTS ===
-socket.on('duel_queue_joined', (data) => {
-  console.log(`In coda posizione ${data.position}, attesa stimata: ${data.estimatedWait}s`);
-  updateQueueStatus(data);
-});
-
-socket.on('duel_queue_left', () => {
-  duelState.inQueue = false;
-  hideDuelQueueUI();
-});
-
-socket.on('duel_match_found', (data) => {
+socket.on('duel_opponent_found', (data) => {
   console.log('Match trovato!', data);
   
   duelState.inQueue = false;
@@ -667,7 +634,6 @@ socket.on('duel_state', (data) => {
   duelState.opponent = { ...duelState.opponent, ...data.opponent };
   duelState.powerups = data.powerups;
   duelState.obstacles = data.obstacles;
-  duelState.bullets = data.bullets;
   duelState.events = data.events;
   duelState.timeRemaining = data.timeRemaining;
   duelState.roundInfo = data.roundInfo;
@@ -681,7 +647,7 @@ socket.on('duel_state', (data) => {
   updateDuelDisplay();
 });
 
-socket.on('duel_new_round', (data) => {
+socket.on('duel_next_round', (data) => {
   console.log(`Nuovo round ${data.roundNumber}!`);
   showRoundTransition(data);
 });
@@ -700,47 +666,6 @@ socket.on('duel_end', (data) => {
   }, 5000);
 });
 
-socket.on('duel_opponent_disconnected', (data) => {
-  console.log('Avversario disconnesso:', data);
-  showDisconnectWin(data);
-  
-  duelState.inDuel = false;
-  duelState.room = null;
-  
-  setTimeout(() => {
-    gameMode = 'lobby';
-    updateUI();
-  }, 3000);
-});
-
-socket.on('duel_leaderboard', (data) => {
-  showLeaderboard(data);
-});
-
-socket.on('player_stats', (data) => {
-  showPlayerStats(data);
-});
-
-socket.on('duel_chat_message', (data) => {
-  addDuelChatMessage(data);
-});
-
-// === SPECTATOR EVENTS ===
-socket.on('spectate_start', (data) => {
-  console.log('Inizio spettatore:', data);
-  
-  duelState.spectating = true;
-  duelState.spectatingRoom = data.room;
-  gameMode = 'duel';
-  
-  // Setup visualizzazione spettatore
-  setupSpectatorView(data);
-  updateUI();
-});
-
-socket.on('spectate_ended', () => {
-  stopSpectating();
-});
 
 // === VOICE CHAT EVENTS ===
 socket.on('voiceActive', (data) => {
@@ -797,10 +722,6 @@ socket.on('chatMessage', (data) => {
   updateChat();
 });
 
-// === SERVER EVENTS ===
-socket.on('server_shutdown', (data) => {
-  alert(data.message);
-});
 
 // === DISPLAY FUNCTIONS ===
 function updateBossDisplay() {
@@ -993,7 +914,7 @@ function showDuelStartScreen(matchData) {
       <div class="duel-vs-screen">
         <div class="player-card">
           <h3>${currentPlayer.nickname}</h3>
-          <p>⭐ ${getPlayerRating(socket.id)}</p>
+          <p>⭐ 1000</p>
         </div>
         <div class="vs-divider">VS</div>
         <div class="player-card">
@@ -1419,19 +1340,6 @@ function updateDuelEffects() {
   }
 }
 
-// === TOURNAMENT FUNCTIONS (Future) ===
-function createTournament() {
-  socket.emit('create_tournament', {
-    name: 'Tournament Test',
-    maxPlayers: 8,
-    format: 'single_elimination'
-  });
-}
-
-// === ADMIN FUNCTIONS ===
-function sendAdminCommand(command, ...args) {
-  socket.emit('admin_command', { command, args });
-}
 
 // === INITIALIZATION ===
 function initializeClient() {
@@ -1490,11 +1398,6 @@ function setupEventListeners() {
 }
 
 // === HELPER FUNCTIONS ===
-function getPlayerRating(playerId) {
-  // Fallback per rating locale (viene sovrascritto dal server)
-  return 1000;
-}
-
 function formatTime(milliseconds) {
   const minutes = Math.floor(milliseconds / 60000);
   const seconds = Math.floor((milliseconds % 60000) / 1000);
@@ -1521,14 +1424,10 @@ window.stellarGuardian = {
   startCoopRaid,
   joinDuelQueue,
   cancelDuelQueue,
-  spectateRandomDuel,
-  stopSpectating,
-  
+
   // Chat & Social
   sendChatMessage,
   toggleVoiceChat,
-  getLeaderboard,
-  getPlayerStats,
   
   // Game actions
   shootBullet,

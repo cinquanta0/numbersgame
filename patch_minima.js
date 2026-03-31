@@ -1,6 +1,7 @@
 // ============ PATCH MINIMA MULTIPLAYER ============
 // Sicura da aggiungere in fondo: sovrascrive solo ciò che serve.
 // Assicurati che socket, gameState ecc. esistano già nel tuo script principale.
+// DIPENDE DA: window.socket esposto da stellar_guardian_client.js
 
 // ---- 1. Throttle bossDamage ----
 (function(){
@@ -143,20 +144,5 @@ window.getPlayerName = function(){
   return localStorage.getItem('playerName') || 'Player';
 };
 
-// ---- 8. Avviso se nel rendering stai ancora usando p.health ----
-// (Facoltativo: avvisa una sola volta)
-(function(){
-  let warned=false;
-  setTimeout(()=>{
-    if (window.otherPlayers && !warned){
-      for (const id in otherPlayers){
-        if (otherPlayers[id] && typeof otherPlayers[id].health !== 'undefined') {
-          // Se il server non manda più health, qui non dovrebbero esserci valori
-        }
-      }
-      // Se altrove provi a leggere p.health, non lo troverai: togli quella parte nel tuo render.
-    }
-  }, 4000);
-})();
 
 // ============ FINE PATCH MINIMA ============

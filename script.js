@@ -26,8 +26,6 @@ document.addEventListener("DOMContentLoaded", () => {
 function setupEventListeners() {
   document.getElementById("create-game-btn").addEventListener("click", createRoom)
   document.getElementById("join-game-btn").addEventListener("click", joinRoom)
-  document.getElementById("random-room-btn").addEventListener("click", findRandomRoom)
-  document.getElementById("public-rooms-btn").addEventListener("click", showPublicRooms)
 
   document.getElementById("submitGuess").addEventListener("click", makeGuess)
   document.getElementById("send-chat").addEventListener("click", sendMessage)
@@ -84,10 +82,7 @@ function initializeConnection() {
   socket.on("levelCompleted", handleLevelCompleted)
   socket.on("gameCompleted", handleGameCompleted)
   socket.on("chatMessage", handleChatMessage)
-  socket.on("publicRooms", handlePublicRooms)
   socket.on("error", handleError)
-  socket.on("roomState", handleRoomState)
-  socket.on("autoStartScheduled", handleAutoStartScheduled)
 }
 
 function updateConnectionStatus(status, text) {
@@ -97,7 +92,7 @@ function updateConnectionStatus(status, text) {
   indicator.className = `status-indicator status-${status}`
   textEl.textContent = text
 
-  const buttons = ["create-game-btn", "join-game-btn", "random-room-btn", "public-rooms-btn"]
+  const buttons = ["create-game-btn", "join-game-btn"]
   buttons.forEach((id) => {
     const btn = document.getElementById(id)
     if (btn) {
@@ -161,29 +156,6 @@ function joinRoom() {
   updateConnectionStatus("connecting", "Entrando nella stanza...")
 }
 
-function findRandomRoom() {
-  const name = document.getElementById("playerName").value.trim()
-
-  if (!name) {
-    alert("Inserisci il tuo nome!")
-    return
-  }
-
-  const randomCodes = ["GAME001", "GAME002", "GAME003"]
-  const randomCode = randomCodes[Math.floor(Math.random() * randomCodes.length)]
-
-  document.getElementById("room-code").value = randomCode
-  joinRoom()
-}
-
-function showPublicRooms() {
-  if (!socket || !socket.connected) {
-    alert("Non connesso al server!")
-    return
-  }
-
-  socket.emit("getPublicRooms")
-}
 
 function startGame() {
   if (!isHost) {
@@ -248,6 +220,7 @@ function makeGuess() {
 }
 
 function sendMessage() {
+  if (!currentRoom) return
   const input = document.getElementById("chat-input")
   const message = input.value.trim()
 
@@ -385,7 +358,7 @@ function handlePlayerLeft(data) {
   updateGameUI()
   addChatMessage("Sistema", `${data.player.name} ha lasciato la partita.`, true)
 
-  if (data.newHost && data.newHost.name === playerName) {
+  if (data.newHost && data.newHost.id === socket.id) {
     isHost = true
     addChatMessage("Sistema", "Sei diventato il nuovo host!", true)
   }
@@ -477,35 +450,6 @@ function handleChatMessage(data) {
   addChatMessage(data.player, data.message)
 }
 
-function handlePublicRooms(data) {
-  const roomsList = document.getElementById("roomsList")
-  const publicRoomsDiv = document.getElementById("publicRoomsList")
-
-  if (data.rooms.length === 0) {
-    roomsList.innerHTML = "<p>Nessuna stanza pubblica disponibile al momento.</p>"
-  } else {
-    roomsList.innerHTML = data.rooms
-      .map(
-        (room) => `
-            <div style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; margin: 5px 0; cursor: pointer;" 
-                 onclick="joinSpecificRoom('${room.code}')">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        <strong>${room.code}</strong> - Host: ${room.host}
-                        <br><small>${room.difficulty} • ${room.players}/${room.maxPlayers} giocatori</small>
-                    </div>
-                    <div style="background: #00fff2; color: black; padding: 5px 10px; border-radius: 5px; font-size: 0.8rem;">
-                        Unisciti
-                    </div>
-                </div>
-            </div>
-        `,
-      )
-      .join("")
-  }
-
-  publicRoomsDiv.classList.remove("hidden")
-}
 
 function handleError(data) {
   console.error("Errore:", data)
@@ -513,19 +457,6 @@ function handleError(data) {
   updateConnectionStatus("online", "Connesso al server globale")
 }
 
-function handleRoomState(data) {
-  console.log("Stato stanza aggiornato:", data)
-  gameState = data.gameState
-  updateGameUI()
-}
-
-function handleAutoStartScheduled(data) {
-  console.log("Auto-start programmato:", data)
-  gameState = data.gameState
-  updateGameUI()
-  startCountdown()
-  addChatMessage("Sistema", "⚡ La partita inizierà automaticamente tra 10 secondi!", true)
-}
 
 // UI Functions
 function showScreen(screenName) {
@@ -820,15 +751,6 @@ function showFinalLeaderboard(leaderboard) {
   }
 }
 
-function joinSpecificRoom(roomCode) {
-  document.getElementById("room-code").value = roomCode
-  document.getElementById("publicRoomsList").classList.add("hidden")
-  joinRoom()
-}
-
-function goHome() {
-  window.location.href = "/"
-}
 
 function showConfetti() {
   confetti({
