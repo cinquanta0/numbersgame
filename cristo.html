@@ -7001,9 +7001,6 @@ if (isMobileDevice && isMobileDevice()) {
 }
 
 
-// <<< INCOLLA QUI >>>
-    document.getElementById('coinCount').textContent = "Speed " + (window.gameState.mobileShipSpeed || localStorage.getItem('mobileShipSpeed'));
-
     if (skills.targeting_system && player.precisionMode) speed *= 0.7;
 
 speed *= 3; // lento!
@@ -7015,19 +7012,20 @@ speed *= 2.5; // ancora più lento!
     speed *= deltaTime;
     speed *= gameState.globalSpeed; // puoi anche forzarlo a 1 se vuoi
 
-// if (isMobileDevice && isMobileDevice()) {
-//   let custom = (window.gameState && window.gameState.mobileShipSpeed !== undefined)
-//     ? window.gameState.mobileShipSpeed
-//     : Number(localStorage.getItem('mobileShipSpeed')) || 0.7;
-//   speed *= custom;
-// }
-
-speed *= deltaTime;
-speed *= gameState.globalSpeed;
+    // Applica moltiplicatore velocità navicella dalle impostazioni mobile
+    if (isMobileDevice && isMobileDevice()) {
+      let custom = (window.gameState && window.gameState.mobileShipSpeed !== undefined)
+        ? window.gameState.mobileShipSpeed
+        : Number(localStorage.getItem('mobileShipSpeed')) || 0.7;
+      speed *= custom;
+    }
 
     // Mobile joystick movement
     if (gameState.isMobile && gameState.touchControls.joystick.active) {
-        const joystickStrength = 0.18;
+        const mobileSpeedMult = (window.gameState && window.gameState.mobileShipSpeed !== undefined)
+            ? window.gameState.mobileShipSpeed
+            : Number(localStorage.getItem('mobileShipSpeed')) || 0.7;
+        const joystickStrength = 0.18 * mobileSpeedMult;
         const moveX = gameState.touchControls.joystick.currentX * joystickStrength;
         const moveY = gameState.touchControls.joystick.currentY * joystickStrength;
 
